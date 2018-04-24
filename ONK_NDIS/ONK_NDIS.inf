@@ -1,0 +1,85 @@
+
+; Author / Auteur    KMS - Martin Dubois, ing.
+; Product / Produit  OpenNet
+; File / Fichier     ONK_NDIS/ONK_NDIS.inf
+;
+; Copyright (c) KMS. All rights reserved.
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = Net
+ClassGuid   = {4d36e972-e325-11ce-bfc1-08002be10318}
+Provider    = %Str_ManufacturerName%
+CatalogFile = ONK_NDIS.cat
+DriverVer   = 04/23/2018,0.0.0.0
+
+[DestinationDirs]
+ONK_NDIS.CopyFiles    = 12
+DefaultDestDir        = 12
+
+[SourceDisksNames]
+1 = %Str_DiskName%, , , ""
+
+[SourceDisksFiles]
+ONK_NDIS.sys                               = 1, ,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll = 1
+
+; ===== Device list / Liste des peripherique ================================
+
+[Manufacturer]
+%Str_ManufacturerName% = Standard, NTamd64
+
+[Standard.NTamd64]
+%Str_DeviceDescription% = ONK_NDIS.NT, Root\ONK_NDIS
+
+; ===== Install / Installation ==============================================
+
+[ONK_NDIS.NT]
+Characteristics    = 0x1
+*IfType            = 0x6
+*MediaType         = 0x0
+*PhysicalMediaType = 14
+AddReg             = ONK_NDIS.Reg
+CopyFiles          = ONK_NDIS.CopyFiles
+
+[ONK_NDIS.Reg]
+HKR,               , BusNumber,  0, "0" 
+HKR, Ndi           , Service,    0, "ONK_NDIS"
+HKR, Ndi\Interfaces, UpperRange, 0, "ndis5"
+HKR, Ndi\Interfaces, LowerRange, 0, "ethernet"
+
+[ONK_NDIS.CopyFiles]
+ONK_NDIS.sys, , , 2
+
+[ONK_NDIS.NT.Services]
+AddService = ONK_NDIS, 2, ONK_NDIS.Service, ONK_NDIS.EventLog
+
+[ONK_NDIS.Service]
+DisplayName   = %Str_ServiceName%
+ServiceType   = 1
+StartType     = 3
+ErrorControl  = 1
+ServiceBinary = %12%\ONK_NDIS.sys
+
+[ONK_NDIS.EventLog]
+AddReg = ONK_NDIS.AddEventLog.Reg
+
+[ONK_NDIS.AddEventLog.Reg]
+HKR, , EventMessageFile, 0x00020000, "%%SystemRoot%%\System32\drivers\ONK_NDIS.sys"
+HKR, , TypesSupported  , 0x00010001, 7
+
+; ===== WDF / WDF ===========================================================
+
+[ONK_NDIS.NT.Wdf]
+KmdfService = ONK_NDIS, ONK_NDIS_wdfsect
+
+[ONK_NDIS_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+; ===== Strings =============================================================
+
+[Strings]
+Str_ManufacturerName  = "KMS"
+Str_DiskName          = "OpenNet Installation Disk"
+Str_DeviceDescription = "OpenNet NDIS Device"
+Str_ServiceName       = "OpenNet NDIS Service"

@@ -1,0 +1,14 @@
+
+# Author / Auteur    KMS - Martin Dubois, ing.
+# Product / Produit  OpenNet
+# File / Fichier     .gitignore
+
+/.vs/
+/htm/
+
+x64/
+
+/OpenNet.VC.VC.opendb
+/OpenNet.VC.db
+
+*.user

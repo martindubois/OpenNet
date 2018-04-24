@@ -1,0 +1,51 @@
+
+# Author / Auteur    KMS - Martin Dubois, ing.
+# Product / Produit  OpenNet
+# File / Fichier     Export.cmd.txt
+
+. Binaries
+. Drivers
+. Drivers\Debug_64
+. Drivers\Release_64
+. Includes
+. Tests
+
+Includes/OpenNetK
+    Adapter.h
+    Interface.h
+
+x64/Debug Binaries/Debug_64
+    OpenNet.dll
+    OpenNet_Tool.exe
+
+x64/Debug Tests/Debug_64
+    ONK_Test.exe
+    OpenNet_Test.exe
+
+x64/Debug/ONK_NDIS Drivers/Debug_64/ONK_NDIS
+    onk_ndis.cat
+    ONK_NDIS.inf
+    ONK_NDIS.sys
+
+x64/Debug/ONK_Pro1000 Drivers/Debug_64/ONK_Pro1000
+    onk_pro1000.cat
+    ONK_Pro1000.inf
+    ONK_Pro1000.sys
+
+x64/Release Binaries/Release_64
+    OpenNet.dll
+    OpenNet_Tool.exe
+
+x64/Release Tests/Release_64
+    ONK_Test.exe
+    OpenNet_Test.exe
+
+x64/Release/ONK_NDIS Drivers/Release_64/ONK_NDIS
+    onk_ndis.cat
+    ONK_NDIS.inf
+    ONK_NDIS.sys
+
+x64/Release/ONK_Pro1000 Drivers/Release_64/ONK_Pro1000
+    onk_pro1000.cat
+    ONK_Pro1000.inf
+    ONK_Pro1000.sys

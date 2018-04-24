@@ -1,0 +1,32 @@
+
+Auteur   KMS - Martin Dubois, ing.
+Produit  OpenNet
+Fichier  _DocDev/Procedures/Build_fr.txt
+
+Developpeur        __________________________________________________________
+
+Date et heure      20______ - ______ - ______ ,               ______ : ______
+
+Version            _____ . _____ . _____ . _____ - __________________________
+
+[ ] Ouvrir la solution
+    - Fichier Common/Version.h - Changer la version
+    - Projet ONK_NDIS - Changer la propriete  "Stampinf - General - Driver
+      Version Number"
+    - Projet ONK_Pro1000 - Changer la propriete  "Stampinf - General - Driver
+      Version Number"
+    - Fermer la solution
+
+[ ] Executer Build.cmd
+
+[ ] Commetre les fichiers modifiers
+
+[ ] Ajouter un tag
+
+[ ] Pousser les sourses sur le serveur
+
+Heure                                                          _____ : ______
+
+Duree                                           ______ heures, ______ minutes
+
+Signature          __________________________________________________________
