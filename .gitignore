@@ -1,9 +1,10 @@
 
-# Author / Auteur    KMS - Martin Dubois, ing.
-# Product / Produit  OpenNet
-# File / Fichier     .gitignore
+# Author   KMS - Martin Dubois, ing.
+# Product  OpenNet
+# File     .gitignore
 
 /.vs/
+/Import/
 /htm/
 
 x64/

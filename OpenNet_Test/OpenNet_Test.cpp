@@ -1,14 +1,25 @@
 
-// Author / Auteur    KMS - Martin Dubois, ing.
-// Product / Produit  OpenNet
-// File / Fichier     OpenNet_Test/OpenNet_Test.cpp
+// Author   KMS - Martin Dubois, ing.
+// Product  OpenNet
+// File     OpenNet_Test/OpenNet_Test.cpp
 
-// Entry point / Point d'entree
+// Includes
 /////////////////////////////////////////////////////////////////////////////
 
-int main(int aCount, const char ** aVector)
-{
-    // TODO Dev
+// ===== Import/Includes ====================================================
+#include <KmsTest.h>
 
-    return 0;
-}
+// Tests
+/////////////////////////////////////////////////////////////////////////////
+
+KMS_TEST_GROUP_LIST_BEGIN
+    KMS_TEST_GROUP_LIST_ENTRY("Base")
+KMS_TEST_GROUP_LIST_END
+
+extern int System_Base();
+
+KMS_TEST_LIST_BEGIN
+    KMS_TEST_LIST_ENTRY(System_Base, "System - Base", 0, 0)
+KMS_TEST_LIST_END
+
+KMS_TEST_MAIN
