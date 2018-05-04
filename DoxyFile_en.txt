@@ -1,0 +1,13 @@
+
+## Author   KMS - Martin Dubois, ing.
+## Product  OpenNet
+## File     DoxyFile_en.txt
+
+ENABLED_SECTIONS   = en
+GENERATE_LATEX     = NO
+HIDE_UNDOC_MEMBERS = YES
+INPUT              = Includes Includes/OpenNet Includes/OpenNetK
+OUTPUT_DIRECTORY   = doxygen_en
+OUTPUT_LANGUAGE    = English
+PROJECT_NAME       = "OpenNet"
+SEARCHENGINE       = NO
