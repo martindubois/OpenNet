@@ -1,37 +1,83 @@
 
-// Author / Auteur    KMS - Martin Dubois, ing.
-// Product / Produit  OpenNet
-// File / Fichier     ONK_NDIS/Driver.cpp
+// Author   KMS - Martin Dubois, ing.
+// Product  OpenNet
+// File     ONK_NDIS/Driver.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== WDM ================================================================
-#include <ntddk.h>
+#include "Component.h"
 
-// ===== WDF ================================================================
-#include <wdf.h>
+// ===== ONK_NDIS ===========================================================
+#include "Device.h"
 
-// Entry point declaration / Declaration du point d'entre
+// Static function declarations
 /////////////////////////////////////////////////////////////////////////////
 
 extern "C"
 {
-    NTSTATUS DriverEntry(PDRIVER_OBJECT aDrvObj, PUNICODE_STRING aRegPath);
+    static EVT_WDF_DRIVER_DEVICE_ADD DeviceAdd;
+    static EVT_WDF_DRIVER_UNLOAD     Unload   ;
 }
 
 // Entry point / Point d'entre
 /////////////////////////////////////////////////////////////////////////////
 
+extern "C"
+{
+    DRIVER_INITIALIZE DriverEntry;
+}
+
 #pragma alloc_text (INIT, DriverEntry)
 
 NTSTATUS DriverEntry(PDRIVER_OBJECT aDrvObj, PUNICODE_STRING aRegPath)
 {
+    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
+
     ASSERT(NULL != aDrvObj );
     ASSERT(NULL != aRegPath);
 
-    // TODO  Dev
-    (void)(aDrvObj );
-    (void)(aRegPath);
-    return STATUS_NOT_IMPLEMENTED;
+    WDF_DRIVER_CONFIG lConfig;
+
+    WDF_DRIVER_CONFIG_INIT(&lConfig, DeviceAdd);
+
+    lConfig.DriverPoolTag   = TAG   ;
+    lConfig.EvtDriverUnload = Unload;
+
+    NTSTATUS lResult = WdfDriverCreate(aDrvObj, aRegPath, WDF_NO_OBJECT_ATTRIBUTES, &lConfig, NULL);
+    if (STATUS_SUCCESS != lResult)
+    {
+        DbgPrintEx(DEBUG_ID, DEBUG_ERROR, PREFIX __FUNCTION__ " - WdfDriverCreate( , , , ,  ) failed - 0x%08x" DEBUG_EOL, lResult);
+    }
+
+    return lResult;
+}
+
+// Static functions
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== Entry points =======================================================
+
+NTSTATUS DeviceAdd(WDFDRIVER aDriver, PWDFDEVICE_INIT aDeviceInit)
+{
+    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
+
+    ASSERT(NULL != aDriver    );
+    ASSERT(NULL != aDeviceInit);
+
+    UNREFERENCED_PARAMETER(aDriver    );
+    UNREFERENCED_PARAMETER(aDeviceInit);
+
+    return Device_Create(aDeviceInit);
+}
+
+VOID Unload(WDFDRIVER aDriver)
+{
+    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+
+    ASSERT(NULL != aDriver);
+
+    UNREFERENCED_PARAMETER(aDriver);
+
+    // TODO Dev
 }

@@ -79,12 +79,20 @@ static const GUID OPEN_NET_DRIVER_INTERFACE = { 0xC0BE33A0, 0xFFBA, 0x46BA,{ 0xB
 // Data type / Type de donnees
 /////////////////////////////////////////////////////////////////////////////
 
+/// \cond en
+/// \brief  This structure is used to return the information about an
+///         adapter.
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilise pour retourner les information au
+///         sujet d'un adaptateur.
+/// \endcond
 typedef struct
 {
-    uint32_t mAdapterCount;
     uint32_t mAdapterNo   ;
     uint32_t mAdapterType ;
     uint32_t mLinkState   ;
+    uint32_t mPacketSize_byte;
 
     uint8_t mReserved0[112];
 
@@ -92,6 +100,13 @@ typedef struct
 }
 OpenNet_AdapterInfo;
 
+/// \cond en
+/// \brief  This structure is used to return the adapter's statistics.
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilise pour retourner les statistiques d'un
+///         adaptateur.
+/// \endcond
 typedef struct
 {
     uint64_t mRx_bytes;
@@ -118,6 +133,13 @@ typedef struct
 }
 OpenNet_AdapterStats;
 
+/// \cond en
+/// \brief  This structure is used to pass the information about a buffer.
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilise pour passer les informations au sujet
+///         d'un espace memoire.
+/// \endcond
 typedef struct
 {
     uint32_t mVersion;
@@ -127,10 +149,17 @@ typedef struct
     uint32_t mPacketOffset_byte    ;
     uint32_t mPacketSize_byte      ;
 
-    uint8_t mReserved0[44]
+    uint8_t mReserved0[44];
 }
 OpenNet_BufferHeader;
 
+/// \cond en
+/// \brief  This structure is used to pass the information about a buffer.
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilise pour passer les informations au sujet
+///         d'un espace memoire.
+/// \endcond
 typedef struct
 {
     uint32_t mVersion;
@@ -143,6 +172,13 @@ typedef struct
 }
 OpenNet_BufferInfo;
 
+/// \cond en
+/// \brief  This structure is used to pass the information about a packet.
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilise pour passer les informations au sujet
+///         d'un paquet.
+/// \endcond
 typedef struct
 {
     uint64_t mToSendTo       ;
@@ -153,6 +189,13 @@ typedef struct
 }
 OpenNet_PacketInfo;
 
+/// \cond en
+/// \brief  This structure is used to return the version of a component.
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilise pour retourner la version d'un
+///         composant.
+/// \endcond
 typedef struct
 {
     uint8_t mMajor;

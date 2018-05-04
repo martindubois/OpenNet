@@ -142,9 +142,9 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Indicate the reception of a packet.
-        /// \param aBuffer [---;RW-]  The buffer containing the packet
-        /// \param aIndex             The index of the packet into the buffer
-        /// \pram  aSize_byte         The size of the packet
+        /// \param  aBuffer [---;RW-]  The buffer containing the packet
+        /// \param  aIndex             The index of the packet into the buffer
+        /// \param  aSize_byte         The size of the packet
         /// \retval false  Error
         /// \endcond
         /// \cond fr

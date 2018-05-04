@@ -11,11 +11,19 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Includes", "Includes", "{71B9DF04-676B-40FF-8B9F-DC35FC9B8A3C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{6D01BCC7-C19F-4709-A2C6-39FC2CAC8392}"
+	ProjectSection(SolutionItems) = preProject
+		Includes\OpenNet\Adapter.h = Includes\OpenNet\Adapter.h
+		Includes\OpenNet\OpenNet.h = Includes\OpenNet\OpenNet.h
+		Includes\OpenNet\Processor.h = Includes\OpenNet\Processor.h
+		Includes\OpenNet\System.h = Includes\OpenNet\System.h
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC513D0F-734D-4F5A-816A-911BAA9F2061}"
 	ProjectSection(SolutionItems) = preProject
 		Includes\OpenNetK\Adapter.h = Includes\OpenNetK\Adapter.h
+		Includes\OpenNetK\Debug.h = Includes\OpenNetK\Debug.h
 		Includes\OpenNetK\Interface.h = Includes\OpenNetK\Interface.h
+		Includes\OpenNetK\StdInt.h = Includes\OpenNetK\StdInt.h
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Lib", "ONK_Lib\ONK_Lib.vcxproj", "{03ADF26E-74F0-4F2A-989B-F408B0AAC441}"
@@ -48,9 +56,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Build.cmd = Build.cmd
+		DoxyFile_en.txt = DoxyFile_en.txt
+		DoxyFile_fr.txt = DoxyFile_fr.txt
 		Export.cmd = Export.cmd
 		Export.cmd.txt = Export.cmd.txt
+		Import.cmd = Import.cmd
+		RunDoxygen.cmd = RunDoxygen.cmd
 		Test.cmd = Test.cmd
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocDev", "_DocDev", "{2347E8F1-0547-43FF-9456-724FC9DAC35F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Procedures", "Procedures", "{F6D48D20-B04B-47E1-AB5E-C84AF52E70C4}"
+	ProjectSection(SolutionItems) = preProject
+		_DocDev\Procedures\Build_fr.txt = _DocDev\Procedures\Build_fr.txt
 	EndProjectSection
 EndProject
 Global
@@ -100,5 +119,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{6D01BCC7-C19F-4709-A2C6-39FC2CAC8392} = {71B9DF04-676B-40FF-8B9F-DC35FC9B8A3C}
 		{CC513D0F-734D-4F5A-816A-911BAA9F2061} = {71B9DF04-676B-40FF-8B9F-DC35FC9B8A3C}
+		{F6D48D20-B04B-47E1-AB5E-C84AF52E70C4} = {2347E8F1-0547-43FF-9456-724FC9DAC35F}
 	EndGlobalSection
 EndGlobal

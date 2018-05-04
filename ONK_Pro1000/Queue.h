@@ -1,42 +1,15 @@
-/*++
 
-Module Name:
+// Author   KMS - Martin Dubois, ing.
+// Product  OpenNet
+// File     ONK_Pro1000/Queue.h
 
-    queue.h
+#pragma once
 
-Abstract:
+// Functions
+/////////////////////////////////////////////////////////////////////////////
 
-    This file contains the queue definitions.
-
-Environment:
-
-    Kernel-mode Driver Framework
-
---*/
-
-EXTERN_C_START
-
-//
-// This is the context that can be placed per queue
-// and would contain per queue information.
-//
-typedef struct _QUEUE_CONTEXT {
-
-    ULONG PrivateDeviceData;  // just a placeholder
-
-} QUEUE_CONTEXT, *PQUEUE_CONTEXT;
-
-WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(QUEUE_CONTEXT, QueueGetContext)
-
-NTSTATUS
-ONKPro1000QueueInitialize(
-    _In_ WDFDEVICE hDevice
-    );
-
-//
-// Events from the IoQueue object
-//
-EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL ONKPro1000EvtIoDeviceControl;
-EVT_WDF_IO_QUEUE_IO_STOP ONKPro1000EvtIoStop;
-
-EXTERN_C_END
+extern "C"
+{
+    EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL Queue_IoDeviceControl;
+    EVT_WDF_IO_QUEUE_IO_STOP           Queue_IoStop;
+}
