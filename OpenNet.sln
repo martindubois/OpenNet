@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2043
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B19569F8-BE7B-4B34-9AB9-8104A177AC85}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,6 +13,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{6D01BCC7-C19F-4709-A2C6-39FC2CAC8392}"
 	ProjectSection(SolutionItems) = preProject
 		Includes\OpenNet\Adapter.h = Includes\OpenNet\Adapter.h
+		Includes\OpenNet\Filter.h = Includes\OpenNet\Filter.h
 		Includes\OpenNet\OpenNet.h = Includes\OpenNet\OpenNet.h
 		Includes\OpenNet\Processor.h = Includes\OpenNet\Processor.h
 		Includes\OpenNet\System.h = Includes\OpenNet\System.h
@@ -27,16 +28,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Lib", "ONK_Lib\ONK_Lib.vcxproj", "{03ADF26E-74F0-4F2A-989B-F408B0AAC441}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Pro1000", "ONK_Pro1000\ONK_Pro1000.vcxproj", "{6E6E53FA-9C80-4BDA-85A4-B9AB67D14CD7}"
-	ProjectSection(ProjectDependencies) = postProject
-		{03ADF26E-74F0-4F2A-989B-F408B0AAC441} = {03ADF26E-74F0-4F2A-989B-F408B0AAC441}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_NDIS", "ONK_NDIS\ONK_NDIS.vcxproj", "{7F28C34D-B4FD-4F82-8125-3A2696AA00D0}"
-	ProjectSection(ProjectDependencies) = postProject
-		{03ADF26E-74F0-4F2A-989B-F408B0AAC441} = {03ADF26E-74F0-4F2A-989B-F408B0AAC441}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Test", "ONK_Test\ONK_Test.vcxproj", "{67B73CC5-DF7B-4E3D-A996-BE8BBFBB2150}"
 EndProject
@@ -72,6 +63,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Procedures", "Procedures", 
 		_DocDev\Procedures\Build_fr.txt = _DocDev\Procedures\Build_fr.txt
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_NDIS", "ONK_NDIS\ONK_NDIS.vcxproj", "{0FEE010C-5B77-415F-A3D1-02B52DD2C4C6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Pro1000", "ONK_Pro1000\ONK_Pro1000.vcxproj", "{79320093-599B-4BD3-B289-0A8BF48BCFF3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -84,18 +79,6 @@ Global
 		{03ADF26E-74F0-4F2A-989B-F408B0AAC441}.Release|x64.ActiveCfg = Release|x64
 		{03ADF26E-74F0-4F2A-989B-F408B0AAC441}.Release|x64.Build.0 = Release|x64
 		{03ADF26E-74F0-4F2A-989B-F408B0AAC441}.Release|x64.Deploy.0 = Release|x64
-		{6E6E53FA-9C80-4BDA-85A4-B9AB67D14CD7}.Debug|x64.ActiveCfg = Debug|x64
-		{6E6E53FA-9C80-4BDA-85A4-B9AB67D14CD7}.Debug|x64.Build.0 = Debug|x64
-		{6E6E53FA-9C80-4BDA-85A4-B9AB67D14CD7}.Debug|x64.Deploy.0 = Debug|x64
-		{6E6E53FA-9C80-4BDA-85A4-B9AB67D14CD7}.Release|x64.ActiveCfg = Release|x64
-		{6E6E53FA-9C80-4BDA-85A4-B9AB67D14CD7}.Release|x64.Build.0 = Release|x64
-		{6E6E53FA-9C80-4BDA-85A4-B9AB67D14CD7}.Release|x64.Deploy.0 = Release|x64
-		{7F28C34D-B4FD-4F82-8125-3A2696AA00D0}.Debug|x64.ActiveCfg = Debug|x64
-		{7F28C34D-B4FD-4F82-8125-3A2696AA00D0}.Debug|x64.Build.0 = Debug|x64
-		{7F28C34D-B4FD-4F82-8125-3A2696AA00D0}.Debug|x64.Deploy.0 = Debug|x64
-		{7F28C34D-B4FD-4F82-8125-3A2696AA00D0}.Release|x64.ActiveCfg = Release|x64
-		{7F28C34D-B4FD-4F82-8125-3A2696AA00D0}.Release|x64.Build.0 = Release|x64
-		{7F28C34D-B4FD-4F82-8125-3A2696AA00D0}.Release|x64.Deploy.0 = Release|x64
 		{67B73CC5-DF7B-4E3D-A996-BE8BBFBB2150}.Debug|x64.ActiveCfg = Debug|x64
 		{67B73CC5-DF7B-4E3D-A996-BE8BBFBB2150}.Debug|x64.Build.0 = Debug|x64
 		{67B73CC5-DF7B-4E3D-A996-BE8BBFBB2150}.Release|x64.ActiveCfg = Release|x64
@@ -112,6 +95,18 @@ Global
 		{6E1300E6-C298-4442-952D-8268659F74D6}.Debug|x64.Build.0 = Debug|x64
 		{6E1300E6-C298-4442-952D-8268659F74D6}.Release|x64.ActiveCfg = Release|x64
 		{6E1300E6-C298-4442-952D-8268659F74D6}.Release|x64.Build.0 = Release|x64
+		{0FEE010C-5B77-415F-A3D1-02B52DD2C4C6}.Debug|x64.ActiveCfg = Debug|x64
+		{0FEE010C-5B77-415F-A3D1-02B52DD2C4C6}.Debug|x64.Build.0 = Debug|x64
+		{0FEE010C-5B77-415F-A3D1-02B52DD2C4C6}.Debug|x64.Deploy.0 = Debug|x64
+		{0FEE010C-5B77-415F-A3D1-02B52DD2C4C6}.Release|x64.ActiveCfg = Release|x64
+		{0FEE010C-5B77-415F-A3D1-02B52DD2C4C6}.Release|x64.Build.0 = Release|x64
+		{0FEE010C-5B77-415F-A3D1-02B52DD2C4C6}.Release|x64.Deploy.0 = Release|x64
+		{79320093-599B-4BD3-B289-0A8BF48BCFF3}.Debug|x64.ActiveCfg = Debug|x64
+		{79320093-599B-4BD3-B289-0A8BF48BCFF3}.Debug|x64.Build.0 = Debug|x64
+		{79320093-599B-4BD3-B289-0A8BF48BCFF3}.Debug|x64.Deploy.0 = Debug|x64
+		{79320093-599B-4BD3-B289-0A8BF48BCFF3}.Release|x64.ActiveCfg = Release|x64
+		{79320093-599B-4BD3-B289-0A8BF48BCFF3}.Release|x64.Build.0 = Release|x64
+		{79320093-599B-4BD3-B289-0A8BF48BCFF3}.Release|x64.Deploy.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -120,5 +115,8 @@ Global
 		{6D01BCC7-C19F-4709-A2C6-39FC2CAC8392} = {71B9DF04-676B-40FF-8B9F-DC35FC9B8A3C}
 		{CC513D0F-734D-4F5A-816A-911BAA9F2061} = {71B9DF04-676B-40FF-8B9F-DC35FC9B8A3C}
 		{F6D48D20-B04B-47E1-AB5E-C84AF52E70C4} = {2347E8F1-0547-43FF-9456-724FC9DAC35F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3390872B-D3FA-4AAE-8BB2-0888DA87EF63}
 	EndGlobalSection
 EndGlobal
