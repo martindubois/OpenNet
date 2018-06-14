@@ -27,6 +27,9 @@
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>KMDF</DriverType>
     <DriverTargetPlatform>Universal</DriverTargetPlatform>
+    <NETADAPTER_VERSION_MAJOR>1</NETADAPTER_VERSION_MAJOR>
+    <NETADAPTER_VERSION_MINOR>2</NETADAPTER_VERSION_MINOR>
+    <NetAdapterDriver>true</NetAdapterDriver>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
@@ -35,6 +38,9 @@
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>KMDF</DriverType>
     <DriverTargetPlatform>Universal</DriverTargetPlatform>
+    <NETADAPTER_VERSION_MAJOR>1</NETADAPTER_VERSION_MAJOR>
+    <NETADAPTER_VERSION_MINOR>2</NETADAPTER_VERSION_MINOR>
+    <NetAdapterDriver>true</NetAdapterDriver>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -46,22 +52,24 @@
   <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <ApiValidator_Enable>false</ApiValidator_Enable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <ApiValidator_Enable>false</ApiValidator_Enable>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>../Includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Includes;C:\Program Files (x86)\Windows Kits\10\Include\10.0.17134.0\km\netadaptercx\1.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>../Includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Includes;C:\Program Files (x86)\Windows Kits\10\Include\10.0.17134.0\km\netadaptercx\1.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -71,14 +79,16 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Adapter.cpp" />
-    <ClCompile Include="Device.cpp" />
+    <ClCompile Include="ControlDevice.cpp" />
+    <ClCompile Include="NdisAdapter.cpp" />
+    <ClCompile Include="NdisDevice.cpp" />
     <ClCompile Include="Driver.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Adapter.h" />
+    <ClInclude Include="ControlDevice.h" />
+    <ClInclude Include="NdisAdapter.h" />
     <ClInclude Include="Component.h" />
-    <ClInclude Include="Device.h" />
+    <ClInclude Include="NdisDevice.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Common\Version.rc" />

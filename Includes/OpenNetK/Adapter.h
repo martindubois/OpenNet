@@ -10,7 +10,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes/OpenNetK ==================================================
-#include "Adapter.h"
+#include <OpenNetK/Types.h>
+#include <OpenNetK/Interface.h>
 
 // Class / Classe
 /////////////////////////////////////////////////////////////////////////////
@@ -18,19 +19,19 @@
 namespace OpenNetK
 {
 
-    // =======
-    // Adapter
-    // =======
+    class Hardware;
 
     /// \cond en
     /// \brief  This class maintains information about an adapter on the
     ///         OpenNet internal network.
-    /// \note   Kernel class - No constructor, No destructor
+    /// \note   Kernel class - No constructor, no destructor, no virtual
+    ///         method
     /// \endcond
     /// \cond fr
     /// \brief  Cette classe maintien les information concernant un
     ///         adaptateur sur le reseau interne OpenNet.
-    /// \note   Classe noyau - Pas de constructeur, Pas de destructeur
+    /// \note   Classe noyau - Pas de constructer, pas de destructor, pas de
+    ///         method virtuel
     /// \endcond
     class Adapter
     {
@@ -61,6 +62,54 @@ namespace OpenNetK
             void  * mInternal;
         }
         BufferInfo;
+
+        /// \cond en
+        /// \brief  Initialize
+        /// \endcond
+        /// \cond fr
+        /// \brief  Initialiser
+        /// \endcond
+        void Init();
+
+        /// \cond en
+        /// \brief  Change the comment
+        /// \param  aComment [---;R--] The new comment
+        /// \endcond
+        /// \cond fr
+        /// \brief  Changer le commentaire
+        /// \param  aComment [---;R--] Le nouveau commentaire
+        /// \endcond
+        void SetComment(const char * aComment);
+
+        /// \cond en
+        /// \brief  Connect the hardware
+        /// \param  aHardware [-K-;RW-] The new comment
+        /// \endcond
+        /// \cond fr
+        /// \brief  Connecter le materiel
+        /// \param  aHardware [-K-;RW-] Le materiel
+        /// \endcond
+        void SetHardware(Hardware * aHardware);
+
+        /// \cond en
+        /// \brief  Change the link state
+        /// \param  aLinkState  See OPEN_NET_LINK_STATE_...
+        /// \endcond
+        /// \cond fr
+        /// \brief  Changer l'etat du lien
+        /// \param  aLinkState  Voir OPEN_NET_LINK_STATE_...
+        /// \endcond
+        void SetLinkState(uint32_t aLinkState);
+
+        /// \cond en
+        /// \brief  Change the packet size
+        /// \param  aPacketSize_byte  The new size
+        /// \endcond
+        /// \cond fr
+        /// \brief  Changer la taille des paquets
+        /// \param  aPacketSize_byte  La nouvelle taille
+        /// \endcond
+        void SetPacketSize(unsigned int aPacketSize_byte);
 
         /// \cond en
         /// \brief  Connect the adapter to the OpenNet internal network
@@ -122,7 +171,7 @@ namespace OpenNetK
         /// \return  Cette methode retourne la taille minimal des donnees
         ///          d'entree en octets.
         /// \endcond
-        unsigned int IoCtl_InSize_GetMin(unsigned int aCode);
+        unsigned int IoCtl_InSize_GetMin(unsigned int aCode) const;
 
         /// \cond en
         /// \brief  Retrieve the minimal output data size for the specified
@@ -138,7 +187,21 @@ namespace OpenNetK
         /// \return  Cette methode retourne la taille minimal des donnees
         ///          de sortie en octets.
         /// \endcond
-        unsigned int IoCtl_OutSize_GetMin(unsigned int aCode);
+        unsigned int IoCtl_OutSize_GetMin(unsigned int aCode) const;
+
+        /// \cond en
+        /// \brief  Process the request in the caller context.
+        /// \param  aCode         The IoCtl request code
+        /// \param  aIn [---;RW-] The input buffer
+        /// \param  aInSize_byte  The size of the input buffer
+        /// \endcond
+        /// \cond fr
+        /// \brief  Traite la requete dans le context de l'appelant
+        /// \param  aCode         Le code de la commande IoCtl
+        /// \param  aIn [---;RW-] Les donnees d'entrees
+        /// \param  aInSize_byte  La taille des donnees d'entree
+        /// \endcond
+        void IoInCallerContext(unsigned int aCode, void * aIn, unsigned int aInSize_byte);
 
         /// \cond en
         /// \brief  Indicate the reception of a packet.
@@ -212,51 +275,21 @@ namespace OpenNetK
         Adapter * Previous_Get();
         void      Previous_Set(Adapter * aAdapter);
 
-    protected:
-
-        /// \cond en
-        /// \brief  Add the buffer to the receiving queue.
-        /// \param aBuffer [---;RW-]  The buffer
-        /// \retval false  Error
-        /// \endcond
-        /// \cond fr
-        /// \brief  Ajoute le buffer a la queue de reception
-        /// \param aBuffer [---;RW-]  Le buffer
-        /// \retval false  Erreur
-        /// \endcond
-        /// \retval true  OK
-        virtual bool Buffer_Receive(OpenNet_BufferInfo * aBuffer) = 0;
-
-        /// \cond en
-        /// \brief  Add the packet to the send queue.
-        /// \param aBuffer [---;RW-]  The buffer containing the packet
-        /// \param aIndex             The index of the packet into the buffer
-        /// \retval false  Error
-        /// \endcond
-        /// \cond fr
-        /// \brief  Ajoute le paquet a la queue de transmission
-        /// \param aBuffer [---;RW-]  Le buffer qui contient le paquet
-        /// \param aIndex             L'index du paquet dans le buffer
-        /// \retval false  Erreur
-        /// \endcond
-        /// \retval true  OK
-        virtual bool Packet_Send(OpenNet_BufferInfo * aBuffer, unsigned int aIndex) = 0;
-
     private:
 
-        bool IoCtl_AdapterInfo_Get   (OpenNet_AdapterInfo  * aOut, unsigned int aOutSize_byte) const;
-        bool IoCtl_AdapterStats_Get  (OpenNet_AdapterStats * aOut, unsigned int aOutSize_byte) const;
-        bool IoCtl_AdapterStats_Reset();
-        bool IoCtl_Buffer_Queue      (const OpenNet_BufferInfo * aIn, unsigned int aInSize_byte);
-        bool IoCtl_Buffer_Retrieve   (OpenNet_BufferInfo * aOut, unsigned int aOutSize_byte);
-        bool IoCtl_Connect           (OpenNet_IoCtl_Connect_In * aIn, unsigned int aInSize_byte);
-        bool IoCtl_Packet_Send       (const void * aIn, unsigned int aInSize_byte);
-        bool IoCtl_Version_Get       (OpenNet_Version * aOut, unsigned int aOutSize_byte);
+        int IoCtl_Buffer_Queue   (const OpenNet_BufferInfo * aIn , unsigned int aInSize_byte );
+        int IoCtl_Buffer_Retrieve(      OpenNet_BufferInfo * aOut, unsigned int aOutSize_byte);
+        int IoCtl_Config_Get     (      OpenNet_Config     * aOut, unsigned int aOutSize_byte);
+        int IoCtl_Config_Set     (const OpenNet_Config     * aIn , unsigned int aInSize_byte, OpenNet_Config * aOut, unsigned int aOutSize_byte);
+        int IoCtl_Connect        (const OpenNet_Connect    * aIn , unsigned int aInSize_byte );
+        int IoCtl_Info_Get       (      OpenNet_Info       * aOut, unsigned int aOutSize_byte) const;
+        int IoCtl_Packet_Send    (const void               * aIn , unsigned int aInSize_byte );
+        int IoCtl_State_Get      (      OpenNet_State      * aOut, unsigned int aOutSize_byte);
+        int IoCtl_Stats_Get      (      OpenNet_Stats      * aOut, unsigned int aOutSize_byte) const;
+        int IoCtl_Stats_Reset    ();
 
-        OpenNet_AdapterInfo mInfo    ;
-        Adapter           * mNext    ;
-        Adapter           * mPrevious;
-        OpenNet_Stats       mStats   ;
+        Hardware            * mHardware;
+        mutable OpenNet_Stats mStats   ;
 
     };
 

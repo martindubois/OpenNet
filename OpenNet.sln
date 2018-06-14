@@ -13,18 +13,27 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{6D01BCC7-C19F-4709-A2C6-39FC2CAC8392}"
 	ProjectSection(SolutionItems) = preProject
 		Includes\OpenNet\Adapter.h = Includes\OpenNet\Adapter.h
+		Includes\OpenNet\EthernetAddress.h = Includes\OpenNet\EthernetAddress.h
 		Includes\OpenNet\Filter.h = Includes\OpenNet\Filter.h
+		Includes\OpenNet\Filter_Forward.h = Includes\OpenNet\Filter_Forward.h
 		Includes\OpenNet\OpenNet.h = Includes\OpenNet\OpenNet.h
 		Includes\OpenNet\Processor.h = Includes\OpenNet\Processor.h
+		Includes\OpenNet\Status.h = Includes\OpenNet\Status.h
 		Includes\OpenNet\System.h = Includes\OpenNet\System.h
+		Includes\OpenNet\VersionInfo.h = Includes\OpenNet\VersionInfo.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC513D0F-734D-4F5A-816A-911BAA9F2061}"
 	ProjectSection(SolutionItems) = preProject
 		Includes\OpenNetK\Adapter.h = Includes\OpenNetK\Adapter.h
+		Includes\OpenNetK\Adapter_WDF.h = Includes\OpenNetK\Adapter_WDF.h
 		Includes\OpenNetK\Debug.h = Includes\OpenNetK\Debug.h
+		Includes\OpenNetK\Hardware.h = Includes\OpenNetK\Hardware.h
+		Includes\OpenNetK\Hardware_WDF.h = Includes\OpenNetK\Hardware_WDF.h
 		Includes\OpenNetK\Interface.h = Includes\OpenNetK\Interface.h
+		Includes\OpenNetK\Kernel.h = Includes\OpenNetK\Kernel.h
 		Includes\OpenNetK\StdInt.h = Includes\OpenNetK\StdInt.h
+		Includes\OpenNetK\Types.h = Includes\OpenNetK\Types.h
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Lib", "ONK_Lib\ONK_Lib.vcxproj", "{03ADF26E-74F0-4F2A-989B-F408B0AAC441}"
@@ -64,8 +73,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Procedures", "Procedures", 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_NDIS", "ONK_NDIS\ONK_NDIS.vcxproj", "{0FEE010C-5B77-415F-A3D1-02B52DD2C4C6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{03ADF26E-74F0-4F2A-989B-F408B0AAC441} = {03ADF26E-74F0-4F2A-989B-F408B0AAC441}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Pro1000", "ONK_Pro1000\ONK_Pro1000.vcxproj", "{79320093-599B-4BD3-B289-0A8BF48BCFF3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{03ADF26E-74F0-4F2A-989B-F408B0AAC441} = {03ADF26E-74F0-4F2A-989B-F408B0AAC441}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

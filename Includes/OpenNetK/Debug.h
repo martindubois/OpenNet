@@ -9,8 +9,10 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-#define DEBUG_ENTRY_POINT (0)
-#define DEBUG_ERROR       (1)
-#define DEBUG_FUNCTION    (2)
+#define DEBUG_CONSTRUCTOR (0)
+#define DEBUG_ENTRY_POINT (1)
+#define DEBUG_ERROR       (2)
+#define DEBUG_FUNCTION    (3)
+#define DEBUG_METHOD      (4)
 
 #define DEBUG_EOL "\n"

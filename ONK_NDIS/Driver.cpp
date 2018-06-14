@@ -9,7 +9,13 @@
 #include "Component.h"
 
 // ===== ONK_NDIS ===========================================================
-#include "Device.h"
+#include "ControlDevice.h"
+#include "NdisDevice.h"
+
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+static DECLARE_CONST_UNICODE_STRING(SDDL, L"D:P(A;;GA;;;SY)(A;;GA;;;BA)(A;;GA;;;AU)");
 
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
@@ -68,7 +74,16 @@ NTSTATUS DeviceAdd(WDFDRIVER aDriver, PWDFDEVICE_INIT aDeviceInit)
     UNREFERENCED_PARAMETER(aDriver    );
     UNREFERENCED_PARAMETER(aDeviceInit);
 
-    return Device_Create(aDeviceInit);
+    NTSTATUS lResult = NdisDevice_Create(aDeviceInit);
+    if (STATUS_SUCCESS == lResult)
+    {
+        PWDFDEVICE_INIT lControlDeviceInit = WdfControlDeviceInitAllocate(aDriver, &SDDL);
+        ASSERT(NULL != lControlDeviceInit);
+
+        lResult = ControlDevice_Create(lControlDeviceInit);
+    }
+
+    return lResult;
 }
 
 VOID Unload(WDFDRIVER aDriver)

@@ -1,12 +1,11 @@
 
 // Author   KMS - Martin Dubois, ing.
 // Product  OpenNet
-// File     ONK_NDIS/Device.h
+// File     ONK_NDIS/NdisAdapter.h
 
 #pragma once
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
-NTSTATUS Device_Create(PWDFDEVICE_INIT aDeviceInit);
-
+NTSTATUS NdisAdapter_Create(WDFDEVICE aDevice, void ** aAdapter);

@@ -90,8 +90,15 @@
     <ResourceCompile Include="..\Common\Version.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Adapter.cpp" />
+    <ClCompile Include="EthernetAddress.cpp" />
+    <ClCompile Include="Filter.cpp" />
+    <ClCompile Include="Filter_Forward.cpp" />
     <ClCompile Include="OpenNet_Test.cpp" />
+    <ClCompile Include="Processor.cpp" />
+    <ClCompile Include="Status.cpp" />
     <ClCompile Include="System.cpp" />
+    <ClCompile Include="VersionInfo.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

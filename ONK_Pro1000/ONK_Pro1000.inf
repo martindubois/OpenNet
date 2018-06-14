@@ -30,6 +30,7 @@ Addreg = ClassReg
 [ClassReg]
 HKR, , ,0 , %ClassName%
 HKR, , Icon, , -5
+HKR, , Security, , "D:P(A;;GA;;;SY)(A;;GA;;;BA)(A;;GA;;;AU)"
 
 ; ===== Device list =========================================================
 
@@ -37,15 +38,23 @@ HKR, , Icon, , -5
 %ManufacturerName% = Standard, NTamd64
 
 [Standard.NTamd64]
-%DeviceDesc% = ONK_Pro1000_Device, Root\ONK_Pro1000
+%DeviceDesc% = ONK_Pro1000_Device, PCI\VEN_8086&DEV_10C9
 
 ; ===== ONK_Pro1000_Device ==================================================
 
 [ONK_Pro1000_Device.NT]
 CopyFiles=Drivers_Dir
 
+[ONK_Pro1000_Device.NT.HW]
+AddReg=ONK_Pro1000_Device_AddReg
+
 [Drivers_Dir]
 ONK_Pro1000.sys
+
+[ONK_Pro1000_Device_AddReg]
+HKR, Interrupt Management, , 0x00000010
+HKR, Interrupt Management\MessageSignaledInterruptProperties, , 0x00000010
+HKR, Interrupt Management\MessageSignaledInterruptProperties, MSISupported, 0x00010001, 1
 
 ; ===== Service =============================================================
 

@@ -10,6 +10,5 @@
 
 extern "C"
 {
-    EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL Queue_IoDeviceControl;
-    EVT_WDF_IO_QUEUE_IO_STOP           Queue_IoStop;
+    NTSTATUS Queue_Create(WDFDEVICE aDevice, OpenNetK::Adapter_WDF * aAdapter);
 }

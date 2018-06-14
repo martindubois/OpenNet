@@ -1,15 +1,18 @@
 
 // Author   KMS - Martin Dubois, ing.
 // Product  OpenNet
-// File     ONK_NDIS/Adapter.cpp
+// File     ONK_NDIS/NdisAdapter.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
 #include "Component.h"
 
+// ===== NetAdapterCx =======================================================
+#include <netadaptercx.h>
+
 // ===== ONK_NDIS ===========================================================
-#include "Adapter.h"
+#include "NdisAdapter.h"
 
 // Data type
 /////////////////////////////////////////////////////////////////////////////
@@ -31,15 +34,15 @@ static NTSTATUS InitRequestQueue(ADAPTER_CONTEXT * aThis);
 // ===== Entry points =======================================================
 extern "C"
 {
-//    static EVT_NET_ADAPTER_CREATE_RXQUEUE   CreateRxQueue  ;
-//    static EVT_NET_ADAPTER_CREATE_TXQUEUE   CreateTxQueue  ;
-//    static EVT_NET_ADAPTER_SET_CAPABILITIES SetCapabilities;
+    static EVT_NET_ADAPTER_CREATE_RXQUEUE   CreateRxQueue  ;
+    static EVT_NET_ADAPTER_CREATE_TXQUEUE   CreateTxQueue  ;
+    static EVT_NET_ADAPTER_SET_CAPABILITIES SetCapabilities;
 }
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
-NTSTATUS Adapter_Create(WDFDEVICE aDevice, void ** aAdapter)
+NTSTATUS NdisAdapter_Create(WDFDEVICE aDevice, void ** aAdapter)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_FUNCTION, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
@@ -49,7 +52,7 @@ NTSTATUS Adapter_Create(WDFDEVICE aDevice, void ** aAdapter)
     UNREFERENCED_PARAMETER(aDevice );
     UNREFERENCED_PARAMETER(aAdapter);
 
-/*    NET_ADAPTER_CONFIG lConfig;
+    NET_ADAPTER_CONFIG lConfig;
 
     NET_ADAPTER_CONFIG_INIT(&lConfig, SetCapabilities, CreateTxQueue, CreateRxQueue);
 
@@ -82,6 +85,57 @@ NTSTATUS Adapter_Create(WDFDEVICE aDevice, void ** aAdapter)
         DbgPrintEx(DEBUG_ID, DEBUG_ERROR, PREFIX __FUNCTION__ " - NetAdapterCreate( , , ,  ) failed - 0x%08x" DEBUG_EOL, lResult);
     }
 
-    return lResult; */
-    return STATUS_NOT_IMPLEMENTED;
+    return lResult;
+}
+
+// Static functions
+/////////////////////////////////////////////////////////////////////////////
+
+NTSTATUS InitContext(ADAPTER_CONTEXT * aThis)
+{
+    ASSERT(NULL != aThis);
+
+    // TODO Dev
+
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS InitRequestQueue(ADAPTER_CONTEXT * aThis)
+{
+    ASSERT(NULL != aThis);
+
+    // TODO Dev
+
+    return STATUS_SUCCESS;
+}
+
+// ===== Entry points =======================================================
+
+NTSTATUS CreateRxQueue(NETADAPTER aAdapter, PNETRXQUEUE_INIT aRxQueueInit)
+{
+    ASSERT(NULL != aAdapter    );
+    ASSERT(NULL != aRxQueueInit);
+
+    // TODO Dev
+
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS CreateTxQueue(NETADAPTER aAdapter,	PNETTXQUEUE_INIT aTxQueueInit)
+{
+    ASSERT(NULL != aAdapter    );
+    ASSERT(NULL != aTxQueueInit);
+
+    // TODO Dev
+
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS SetCapabilities(NETADAPTER aAdapter)
+{
+    ASSERT(NULL != aAdapter);
+
+    // TODO Dev
+
+    return STATUS_SUCCESS;
 }

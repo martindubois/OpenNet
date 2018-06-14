@@ -1,28 +1,31 @@
 
 // Author   KMS - Martin Dubois, ing
 // Product  OpenNet
-// File     ONK_NDIS/Device.cpp
+// File     ONK_NDIS/NdisDevice.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
 #include "Component.h"
 
-// ===== ONDK_NDIS ==========================================================
-#include "Adapter.h"
+// ===== NetAdapterCx =======================================================
+#include <netadaptercx.h>
 
-#include "Device.h"
+// ===== ONDK_NDIS ==========================================================
+#include "NdisAdapter.h"
+
+#include "NdisDevice.h"
 
 // Data type
 /////////////////////////////////////////////////////////////////////////////
 
 typedef struct
 {
-    void * mAdapter;
+    void * mAdapter   ;
 }
-DEVICE_CONTEXT;
+NdisDeviceContext;
 
-WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, GetDeviceContext)
+WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(NdisDeviceContext, GetNdisDeviceContext)
 
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
@@ -30,33 +33,31 @@ WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, GetDeviceContext)
 // ===== Entry point ========================================================
 extern "C"
 {
-    static EVT_WDF_DEVICE_D0_ENTRY         D0Entry        ;
-    static EVT_WDF_DEVICE_D0_EXIT          D0Exit         ;
-    static EVT_WDF_DEVICE_PREPARE_HARDWARE PrepareHardware;
-    static EVT_WDF_DEVICE_RELEASE_HARDWARE ReleaseHardware;
+    static EVT_WDF_DEVICE_D0_ENTRY D0Entry;
+    static EVT_WDF_DEVICE_D0_EXIT  D0Exit ;
 }
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
-NTSTATUS Device_Create(PWDFDEVICE_INIT aDeviceInit)
+NTSTATUS NdisDevice_Create(PWDFDEVICE_INIT aDeviceInit)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_FUNCTION, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
-    NTSTATUS lResult; // = NetAdapterDeviceInitConfig(aDeviceInit);
-//    if (STATUS_SUCCESS == lResult)
+    ASSERT(NULL != aDeviceInit);
+
+    NTSTATUS lResult = NetAdapterDeviceInitConfig(aDeviceInit);
     {
         WDF_OBJECT_ATTRIBUTES lAttributes;
-        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&lAttributes, DEVICE_CONTEXT);
+
+        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&lAttributes, NdisDeviceContext);
 
         WDF_PNPPOWER_EVENT_CALLBACKS lPnpPowerCallbacks;
 
         WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&lPnpPowerCallbacks);
 
-        lPnpPowerCallbacks.EvtDeviceD0Entry         = D0Entry        ;
-        lPnpPowerCallbacks.EvtDeviceD0Exit          = D0Exit         ;
-        lPnpPowerCallbacks.EvtDevicePrepareHardware = PrepareHardware;
-        lPnpPowerCallbacks.EvtDeviceReleaseHardware = ReleaseHardware;
+        lPnpPowerCallbacks.EvtDeviceD0Entry = D0Entry;
+        lPnpPowerCallbacks.EvtDeviceD0Exit  = D0Exit ;
 
         WdfDeviceInitSetPnpPowerEventCallbacks(aDeviceInit, &lPnpPowerCallbacks);
 
@@ -67,19 +68,15 @@ NTSTATUS Device_Create(PWDFDEVICE_INIT aDeviceInit)
         {
             ASSERT(NULL != lDevice);
 
-            void * lAdapter;
-
-            lResult = Adapter_Create(lDevice, &lAdapter);
-
-            DEVICE_CONTEXT * lThis = GetDeviceContext(lDevice);
+            NdisDeviceContext * lThis = GetNdisDeviceContext(lDevice);
             ASSERT(NULL != lThis);
 
-            lThis->mAdapter = lAdapter;
+            lResult = NdisAdapter_Create(lDevice, &lThis->mAdapter);
         }
-/*        else
+        else
         {
             DbgPrintEx(DEBUG_ID, DEBUG_ERROR, PREFIX __FUNCTION__ " - WdfDeviceCreate( , ,  ) failed - 0x%08x" DEBUG_EOL, lResult);
-        } */
+        }
     }
 
     return lResult;
@@ -114,38 +111,6 @@ NTSTATUS D0Exit(WDFDEVICE aDevice, WDF_POWER_DEVICE_STATE aTargetState)
 
     UNREFERENCED_PARAMETER(aDevice     );
     UNREFERENCED_PARAMETER(aTargetState);
-
-    // TODO Dev
-
-    return STATUS_SUCCESS;
-}
-
-NTSTATUS PrepareHardware(WDFDEVICE aDevice, WDFCMRESLIST aResourcesRaw, WDFCMRESLIST aResourcesTranslated)
-{
-    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( , ,  )" DEBUG_EOL);
-
-    ASSERT(NULL != aDevice             );
-    ASSERT(NULL != aResourcesRaw       );
-    ASSERT(NULL != aResourcesTranslated);
-
-    UNREFERENCED_PARAMETER(aDevice             );
-    UNREFERENCED_PARAMETER(aResourcesRaw       );
-    UNREFERENCED_PARAMETER(aResourcesTranslated);
-
-    // TODO Dev
-
-    return STATUS_SUCCESS;
-}
-
-NTSTATUS ReleaseHardware(WDFDEVICE aDevice, WDFCMRESLIST aResourcesTranslated)
-{
-    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
-
-    ASSERT(NULL != aDevice             );
-    ASSERT(NULL != aResourcesTranslated);
-
-    UNREFERENCED_PARAMETER(aDevice             );
-    UNREFERENCED_PARAMETER(aResourcesTranslated);
 
     // TODO Dev
 

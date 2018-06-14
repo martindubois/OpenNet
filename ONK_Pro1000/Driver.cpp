@@ -29,6 +29,11 @@ extern "C"
     DRIVER_INITIALIZE DriverEntry;
 }
 
+// Thread  PnP
+
+// NOT TESTED  ONK_Pro1000.Driver
+//             WdfDriverCreate fail
+
 #pragma alloc_text (INIT, DriverEntry)
 
 NTSTATUS DriverEntry(PDRIVER_OBJECT aDriverObject, PUNICODE_STRING aRegistryPath)
@@ -61,6 +66,8 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT aDriverObject, PUNICODE_STRING aRegistryPath
 
 // ===== Entry point ========================================================
 
+// Thread  PnP
+
 #pragma alloc_text (PAGE, Cleanup)
 
 VOID Cleanup(WDFOBJECT aDriverObject)
@@ -73,6 +80,11 @@ VOID Cleanup(WDFOBJECT aDriverObject)
 
     PAGED_CODE ();
 }
+
+// Thread  PnP
+
+// NOT TESTED  ONK_Pro1000.Driver
+//             Device_Create fail
 
 #pragma alloc_text (PAGE, DeviceAdd)
 

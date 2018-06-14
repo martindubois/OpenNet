@@ -56,11 +56,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;OPENNET_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../Includes</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Includes;../Import/Includes;C:\Program Files (x86)\AMD APP SDK\3.0-0-Beta\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\Import\Libraries\Debug_64_DLL;C:\Program Files (x86)\AMD APP SDK\3.0-0-Beta\lib\x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>KmsLib.lib;OpenCL.lib;SetupAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -73,21 +75,38 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;OPENNET_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../Includes</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Includes;../Import/Includes;C:\Program Files (x86)\AMD APP SDK\3.0-0-Beta\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\Import\Libraries\Release_64_DLL;C:\Program Files (x86)\AMD APP SDK\3.0-0-Beta\lib\x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>KmsLib.lib;OpenCL.lib;SetupAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Common\Version.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Adapter.cpp" />
+    <ClCompile Include="Adapter_Internal.cpp" />
+    <ClCompile Include="EthernetAddress.cpp" />
+    <ClCompile Include="Filter.cpp" />
+    <ClCompile Include="Filter_Forward.cpp" />
     <ClCompile Include="OpenNet.cpp" />
+    <ClCompile Include="Processor.cpp" />
+    <ClCompile Include="Processor_Internal.cpp" />
+    <ClCompile Include="Status.cpp" />
     <ClCompile Include="System.cpp" />
+    <ClCompile Include="System_Internal.cpp" />
+    <ClCompile Include="VersionInfo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Adapter_Internal.h" />
+    <ClInclude Include="Processor_Internal.h" />
+    <ClInclude Include="System_Internal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

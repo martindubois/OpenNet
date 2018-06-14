@@ -11,6 +11,7 @@
 
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/OpenNet.h>
+#include <OpenNet/Status.h>
 
 namespace OpenNet
 {
@@ -72,6 +73,17 @@ namespace OpenNet
         virtual Adapter * Adapter_Get( unsigned int aIndex ) = 0;
 
         /// \cond en
+        /// \brief  Display
+        /// \param  aOut [---;RW-] The output stream
+        /// \endcond
+        /// \cond fr
+        /// \brief  Affiche
+        /// \retval aOut [---;RW-] Le fichier de sortie
+        /// \endcond
+        /// \retval STATUS_OK
+        Status Display(FILE * aOut);
+
+        /// \cond en
         /// \return  This methode return the number of processors.
         /// \endcond
         /// \cond fr
@@ -88,6 +100,18 @@ namespace OpenNet
         /// \return  Cette methode retourne le processeur.
         /// \endcond
         virtual Processor * Processor_Get( unsigned int aIndex ) = 0;
+
+    protected:
+
+        System();
+
+        virtual ~System();
+
+    private:
+
+        System(const System &);
+
+        const System & operator = (const System &);
 
     };
 
