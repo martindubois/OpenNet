@@ -31,12 +31,16 @@ namespace OpenNet
     {
         STATUS_OK = 0,
 
+        STATUS_ADAPTER_ALREADY_CONNECTED,
+        STATUS_ADAPTER_NOT_CONNECTED    ,
+        STATUS_BUFFER_ALLOCATED         ,
+        STATUS_BUFFER_TOO_SMALL         ,
         STATUS_CANNOT_OPEN_INPUT_FILE   ,
         STATUS_CANNOT_READ_INPUT_FILE   ,
         STATUS_CODE_ALREADY_SET         ,
         STATUS_CODE_NOT_SET             ,
         STATUS_CORRUPTED_DRIVER_DATA    ,
-        STATUS_DESTINATION_ALREADY_SET  ,
+        STATUS_DESTINATION_ALREADY_SET  , // 10
         STATUS_DESTINATION_NOT_SET      ,
         STATUS_EMPTY_CODE               ,
         STATUS_EMPTY_INPUT_FILE         ,
@@ -45,18 +49,26 @@ namespace OpenNet
         STATUS_EXCEPTION                ,
         STATUS_FILTER_ALREADY_SET       ,
         STATUS_FILTER_NOT_SET           ,
-        STATUS_INPUT_FILE_TOO_LARGE     ,
+        STATUS_FILTER_SET               ,
+        STATUS_INPUT_FILE_TOO_LARGE     , // 20
+        STATUS_INTERNAL_ERROR           ,
+        STATUS_INVALID_ADAPTER          ,
         STATUS_INVALID_BUFFER_COUNT     ,
+        STATUS_INVALID_PACKET_SIZE      ,
         STATUS_INVALID_PROCESSOR        ,
         STATUS_INVALID_REFERENCE        ,
         STATUS_IOCTL_ERROR              ,
+        STATUS_NO_ADAPTER_CONNECTED     ,
         STATUS_NO_DESTINATION_SET       ,
-        STATUS_NOT_ALLOWED_NULL_ARGUMENT,
-        STATUS_NOT_CONNECTED            ,
+        STATUS_NOT_ALLOWED_NULL_ARGUMENT, // 30
+        STATUS_OPEN_CL_ERROR            ,
         STATUS_PACKET_TOO_LARGE         ,
         STATUS_PACKET_TOO_SMALL         ,
         STATUS_PROCESSOR_ALREADY_SET    ,
         STATUS_PROCESSOR_NOT_SET        ,
+        STATUS_SYSTEM_ALREADY_STARTED   ,
+        STATUS_SYSTEM_NOT_STARTED       ,
+        STATUS_TOO_MANY_BUFFER          ,
 
         STATUS_QTY
     }
@@ -87,14 +99,16 @@ namespace OpenNet
 
     /// \cond en
     /// \brief  Display
-    /// \param  aStatus        The Status
+    /// \param  aStatus        The Status to display
     /// \param  aOut [---;RW-] The output stream
     /// \endcond
     /// \cond fr
     /// \brief  Affiche  Le Status
-    /// \param  aStatus        Le Status
+    /// \param  aStatus        Le Status a afficher
     /// \param  aOut [---;RW-] Le fichier de sortie
     /// \endcond
-    extern OPEN_NET_PUBLIC void Status_Display(Status aStatus, FILE * aOut);
+    /// \retval STATUS_OK
+    /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
+    extern OPEN_NET_PUBLIC Status Status_Display(Status aStatus, FILE * aOut);
 
 }

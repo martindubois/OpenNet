@@ -43,6 +43,11 @@ static const char * LINK_STATE_NAMES[OPEN_NET_LINK_STATE_QTY] =
     "UP"     ,
 };
 
+// Static function declarations
+/////////////////////////////////////////////////////////////////////////////
+
+static const char * GetIoCtlName(unsigned int aCode);
+
 namespace OpenNet
 {
 
@@ -169,24 +174,24 @@ namespace OpenNet
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
         }
 
-        fprintf(aOut, "    IoCtl         = %u\n"    , aIn.mIoCtl            );
-        fprintf(aOut, "      - Last      = 0x%08x\n", aIn.mIoCtl_Last       );
-        fprintf(aOut, "         - Result = 0x%08x\n", aIn.mIoCtl_Last_Result);
-        fprintf(aOut, "    Rx            = %u buffers\n"   , aIn.mRx_buffer     );
-        fprintf(aOut, "                  = %llu bytes\n"   , aIn.mRx_byte       );
-        fprintf(aOut, "                  = %u errors\n"    , aIn.mRx_error      );
-        fprintf(aOut, "                  = %u interrupts\n", aIn.mRx_interrupt  );
-        fprintf(aOut, "                  = %u packets\n"   , aIn.mRx_packet     );
-        fprintf(aOut, "    Stats - Get   = %u\n"           , aIn.mStats_Get     );
-        fprintf(aOut, "          - Reset = %u\n"           , aIn.mStats_Reset   );
-        fprintf(aOut, "    Tx            = %u buffers\n"   , aIn.mTx_buffer     );
-        fprintf(aOut, "                  = %llu bytes\n"   , aIn.mTx_byte       );
-        fprintf(aOut, "                  = %u errors\n"    , aIn.mTx_error      );
-        fprintf(aOut, "                  = %u interrupts\n", aIn.mTx_interrupt  );
-        fprintf(aOut, "                  = %u packets\n"   , aIn.mTx_packet     );
-        fprintf(aOut, "      - Send      = %u bytes\n"     , aIn.mTx_Send_byte  );
-        fprintf(aOut, "                  = %u errors\n"    , aIn.mTx_Send_error );
-        fprintf(aOut, "                  = %u packets\n"   , aIn.mTx_Send_packet);
+        fprintf(aOut, "    IoCtl         = %u\n"           , aIn.mIoCtl            );
+        fprintf(aOut, "      - Last      = 0x%08x - %s\n"  , aIn.mIoCtl_Last       , GetIoCtlName(aIn.mIoCtl_Last));
+        fprintf(aOut, "         - Result = 0x%08x\n"       , aIn.mIoCtl_Last_Result);
+        fprintf(aOut, "    Rx            = %u buffers\n"   , aIn.mRx_buffer        );
+        fprintf(aOut, "                  = %llu bytes\n"   , aIn.mRx_byte          );
+        fprintf(aOut, "                  = %u errors\n"    , aIn.mRx_error         );
+        fprintf(aOut, "                  = %u interrupts\n", aIn.mRx_interrupt     );
+        fprintf(aOut, "                  = %u packets\n"   , aIn.mRx_packet        );
+        fprintf(aOut, "    Stats - Get   = %u\n"           , aIn.mStats_Get        );
+        fprintf(aOut, "          - Reset = %u\n"           , aIn.mStats_Reset      );
+        fprintf(aOut, "    Tx            = %u buffers\n"   , aIn.mTx_buffer        );
+        fprintf(aOut, "                  = %llu bytes\n"   , aIn.mTx_byte          );
+        fprintf(aOut, "                  = %u errors\n"    , aIn.mTx_error         );
+        fprintf(aOut, "                  = %u interrupts\n", aIn.mTx_interrupt     );
+        fprintf(aOut, "                  = %u packets\n"   , aIn.mTx_packet        );
+        fprintf(aOut, "      - Send      = %u bytes\n"     , aIn.mTx_Send_byte     );
+        fprintf(aOut, "                  = %u errors\n"    , aIn.mTx_Send_error    );
+        fprintf(aOut, "                  = %u packets\n"   , aIn.mTx_Send_packet   );
 
         return STATUS_OK;
     }
@@ -198,4 +203,26 @@ namespace OpenNet
     {
     }
 
+}
+
+// Static functions
+/////////////////////////////////////////////////////////////////////////////
+
+const char * GetIoCtlName(unsigned int aCode)
+{
+    switch (aCode)
+    {
+    case OPEN_NET_IOCTL_BUFFER_QUEUE   : return "BUFFER_QUEUE"   ;
+    case OPEN_NET_IOCTL_BUFFER_RETRIEVE: return "BUFFER_RETRIEVE";
+    case OPEN_NET_IOCTL_CONFIG_GET     : return "CONFIG_GET"     ;
+    case OPEN_NET_IOCTL_CONFIG_SET     : return "CONFIG_SET"     ;
+    case OPEN_NET_IOCTL_CONNECT        : return "CONNECT"        ;
+    case OPEN_NET_IOCTL_INFO_GET       : return "INFO_GET"       ;
+    case OPEN_NET_IOCTL_PACKET_SEND    : return "PACKET_SEND"    ;
+    case OPEN_NET_IOCTL_STATE_GET      : return "STATE_GET"      ;
+    case OPEN_NET_IOCTL_STATS_GET      : return "STATS_GET"      ;
+    case OPEN_NET_IOCTL_STATS_RESET    : return "STATS_RESET"    ;
+    }
+
+    return "Invalid IoCtl code";
 }

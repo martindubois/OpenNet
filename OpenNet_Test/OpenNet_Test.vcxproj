@@ -94,6 +94,7 @@
     <ClCompile Include="EthernetAddress.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Filter_Forward.cpp" />
+    <ClCompile Include="Mirror.cpp" />
     <ClCompile Include="OpenNet_Test.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="Status.cpp" />

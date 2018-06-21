@@ -30,16 +30,41 @@ namespace OpenNet
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    Filter::Filter() : mCode(NULL), mCodeSize_byte(0)
+    const unsigned int Filter::BUILD_LOG_MAX_SIZE_byte = 64 * 1024;
+
+    Filter::Filter() : mCode(NULL), mCodeLineBuffer(NULL), mCodeLineCount(0), mCodeLines(NULL), mCodeSize_byte(0)
     {
+        memset(&mName, 0, sizeof(mName));
     }
 
     Filter::~Filter()
     {
+        Invalidate();
+
         if (NULL != mCode)
         {
             delete mCode;
         }
+    }
+
+    unsigned int Filter::GetCodeLineCount()
+    {
+        if (0 >= mCodeLineCount)
+        {
+            CodeLines_Count();
+        }
+
+        return mCodeLineCount;
+    }
+
+    const char ** Filter::GetCodeLines()
+    {
+        if (NULL == mCodeLines)
+        {
+            CodeLines_Generate();
+        }
+
+        return mCodeLines;
     }
 
     unsigned int Filter::GetCodeSize() const
@@ -54,6 +79,11 @@ namespace OpenNet
         return mCodeSize_byte;
     }
 
+    const char * Filter::GetName() const
+    {
+        return mName;
+    }
+
     Status Filter::ResetCode()
     {
         if (NULL == mCode)
@@ -61,18 +91,22 @@ namespace OpenNet
             return STATUS_CODE_NOT_SET;
         }
 
+        Invalidate();
+
         ReleaseCode();
-        assert(NULL == mCode);
 
         return STATUS_OK;
     }
 
-    // NOT TESTED  Filter.ErrorHandling
+    // NOT TESTED  OpenNet.Filter.ErrorHandling
     //             CloseHandle fail<br>
     //             ReadInputFile fail
     Status Filter::SetCode(const char * aFileName)
     {
-        if (NULL != mCode) { return STATUS_CODE_ALREADY_SET; }
+        if (NULL != mCode)
+        {
+            return STATUS_CODE_ALREADY_SET;
+        }
 
         assert(0 == mCodeSize_byte);
 
@@ -99,7 +133,10 @@ namespace OpenNet
             }
         }
 
-        if (!CloseHandle(lHandle)) { lResult = STATUS_ERROR_CLOSING_FILE; }
+        if (!CloseHandle(lHandle))
+        {
+            lResult = STATUS_ERROR_CLOSING_FILE;
+        }
 
         return lResult;
     }
@@ -131,6 +168,23 @@ namespace OpenNet
         return STATUS_OK;
     }
 
+    Status Filter::SetName(const char * aName)
+    {
+        if (NULL == aName)
+        {
+            return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
+        }
+
+        strncpy_s(mName, aName, sizeof(mName) - 1);
+
+        return STATUS_OK;
+    }
+
+    void Filter::AddKernelArgs(void * aKernel)
+    {
+        assert(NULL != aKernel);
+    }
+
     Status Filter::Display(FILE * aOut) const
     {
         if (NULL == aOut)
@@ -138,7 +192,41 @@ namespace OpenNet
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
         }
 
-        fprintf(aOut, "    Code Size = %u bytes\n", mCodeSize_byte);
+        if (NULL == mCode)
+        {
+            fprintf(aOut, "    Code not set\n");
+        }
+
+        fprintf(aOut, "    Code Size         = %u bytes\n", mCodeSize_byte);
+        fprintf(aOut, "    Name              = %s\n"      , mName         );
+
+        if (NULL != mCode)
+        {
+            fprintf(aOut, "    Code :\n");
+
+            if (NULL == mCodeLines)
+            {
+                fprintf(aOut, "%s", mCode);
+            }
+            else
+            {
+                for (unsigned int i = 0; i < mCodeLineCount; i++)
+                {
+                    fprintf(aOut, "%3u  %s", i + 1, mCodeLines[i]);
+                }
+            }
+
+            fprintf(aOut, "\n");
+        }
+
+        if (NULL == mBuildLog)
+        {
+            fprintf(aOut, "    No Build Log\n");
+        }
+        else
+        {
+            fprintf(aOut, "    Build Log :\n%s\n", mBuildLog);
+        }
 
         return STATUS_OK;
     }
@@ -161,6 +249,8 @@ namespace OpenNet
         {
             return 0;
         }
+
+        Invalidate();
 
         char       * lPtr    = mCode;
         unsigned int lResult = 0;
@@ -201,6 +291,8 @@ namespace OpenNet
         {
             return 0;
         }
+
+        Invalidate();
 
         unsigned int lResult;
 
@@ -243,8 +335,126 @@ namespace OpenNet
         return lResult;
     }
 
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    void * Filter::AllocateBuildLog()
+    {
+        assert(NULL == mBuildLog);
+
+        mBuildLog = new char[BUILD_LOG_MAX_SIZE_byte];
+        assert(NULL != mBuildLog);
+
+        return mBuildLog;
+    }
+
     // Private
     /////////////////////////////////////////////////////////////////////////
+
+    void Filter::CodeLines_Count()
+    {
+        mCodeLineCount = 0;
+
+        if (NULL != mCode)
+        {
+            char lLast = 0;
+
+            const char * lPtr = mCode;
+            while ('\0' != (*lPtr))
+            {
+                switch (*lPtr)
+                {
+                case '\n':
+                    if ('\r' != lLast)
+                    {
+                        mCodeLineCount++;
+                        lLast = *lPtr;
+                    }
+                    break;
+
+                case '\r':
+                    if ('\n' != lLast)
+                    {
+                        mCodeLineCount++;
+                        lLast = *lPtr;
+                    }
+                    break;
+
+                default:
+                    lLast = *lPtr;
+                }
+
+                lPtr++;
+            }
+
+            mCodeLineCount++;
+        }
+    }
+
+    void Filter::CodeLines_Generate()
+    {
+        assert(NULL == mCodeLineBuffer);
+        assert(NULL == mCodeLines     );
+
+        if (NULL != mCode)
+        {
+            CodeLines_Count();
+
+            assert(0 < mCodeLineCount);
+
+            mCodeLineBuffer = new       char   [mCodeSize_byte + mCodeLineCount + 1];
+            mCodeLines      = new const char * [                 mCodeLineCount    ];
+
+            assert(NULL != mCodeLineBuffer);
+            assert(NULL != mCodeLines     );
+
+            char       * lDst  = mCodeLineBuffer;
+            unsigned int lLine =               0;
+            const char * lSrc  = mCode          ;
+
+            mCodeLines[lLine] = lDst;
+
+            while ('\0' != (*lSrc))
+            {
+                (*lDst) = (*lSrc); lDst++;
+
+                switch (*lSrc)
+                {
+                case '\n':
+                    if ('\r' == lSrc[1])
+                    {
+                        (*lDst) = '\r'; lDst++;
+
+                        lSrc ++;
+                    }
+
+                    (*lDst) = '\0'; lDst++;
+
+                    lLine++;
+                    mCodeLines[lLine] = lDst;
+                    break;
+
+                case '\r':
+                    if ('\n' == lSrc[1])
+                    {
+                        (*lDst) = '\n'; lDst++;
+
+                        lSrc ++;
+                    }
+
+                    (*lDst) = '\0'; lDst++;
+
+                    lLine++;
+                    mCodeLines[lLine] = lDst;
+                    break;
+                }
+
+                lSrc++;
+            }
+
+            (*lDst) = '\0';
+        }
+    }
 
     // aSearch  [---;R--]
     // aReplace [---;R--]
@@ -342,6 +552,29 @@ namespace OpenNet
         return lResult;
     }
 
+    void Filter::Invalidate()
+    {
+        mCodeLineCount = 0;
+
+        if (NULL != mBuildLog)
+        {
+            delete mBuildLog;
+
+            mBuildLog = NULL;
+        }
+
+        if (NULL != mCodeLines)
+        {
+            assert(NULL != mCodeLineBuffer);
+
+            delete mCodeLineBuffer;
+            delete mCodeLines     ;
+
+            mCodeLineBuffer = NULL;
+            mCodeLines      = NULL;
+        }
+    }
+
     void Filter::ReleaseCode()
     {
         assert(NULL != mCode         );
@@ -374,7 +607,7 @@ char * Allocate(unsigned int aSize_byte)
 
 // aOut_byte [---;-W-]
 
-// NOT TESTED  Filter.ErrorHandling
+// NOT TESTED  OpenNet.Filter.ErrorHandling
 //             GetFileSize fail<br>
 //             File too large
 OpenNet::Status GetInputFileSize(HANDLE aHandle, unsigned int * aOut_byte)
@@ -420,7 +653,7 @@ OpenNet::Status OpenInputFile(const char * aFileName, HANDLE * aOut)
 
 // aOut [---;-W-]
 
-// NOT TESTED  Filter.ErrorHandling
+// NOT TESTED  OpenNet.Filter.ErrorHandling
 //             ReadFile fail<br>
 //             ReadFile do not read the expected size
 OpenNet::Status ReadInputFile(HANDLE aHandle, void * aOut, unsigned int aOutSize_byte)

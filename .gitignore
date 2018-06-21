@@ -4,6 +4,7 @@
 # File     .gitignore
 
 /.vs/
+/KmsDoc/
 /Import/
 /doxygen_en/
 /doxygen_fr/

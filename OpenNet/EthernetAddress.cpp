@@ -139,4 +139,26 @@ namespace OpenNet
 
         return STATUS_OK;
     }
+
+    Status EthernetAddress_GetText(const OpenNet_EthernetAddress & aIn, char * aOut, unsigned int aOutSize_byte)
+    {
+        if (NULL == (&aIn))
+        {
+            return STATUS_INVALID_REFERENCE;
+        }
+
+        if (NULL == aOut)
+        {
+            return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
+        }
+
+        if (20 > aOutSize_byte)
+        {
+            return STATUS_BUFFER_TOO_SMALL;
+        }
+
+        sprintf_s(aOut, aOutSize_byte, "%02x:%02x:%02x:%02x:%02x:%02x", aIn.mAddress[0], aIn.mAddress[1], aIn.mAddress[2], aIn.mAddress[3], aIn.mAddress[4], aIn.mAddress[5]);
+
+        return STATUS_OK;
+    }
 }

@@ -18,6 +18,7 @@ namespace OpenNet
 {
 
     class Filter;
+    class System;
 
     // Class
     /////////////////////////////////////////////////////////////////////////
@@ -40,12 +41,12 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Display
-        /// \param  aIn  [---;R--] The Config
+        /// \param  aIn  [---;R--] The Config instance to display
         /// \param  aOut [---;RW-] The output stream
         /// \endcond
         /// \cond fr
         /// \brief  Affiche  Le Status
-        /// \param  aIn  [---;R--] Le Config
+        /// \param  aIn  [---;R--] L'instance de Config a afficher
         /// \param  aOut [---;RW-] Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
@@ -55,12 +56,12 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Display
-        /// \param  aIn  [---;R--] The Info
+        /// \param  aIn  [---;R--] The Info instance to display
         /// \param  aOut [---;RW-] The output stream
         /// \endcond
         /// \cond fr
         /// \brief  Affiche  Le Status
-        /// \param  aIn  [---;R--] Le Info
+        /// \param  aIn  [---;R--] L'instance de Info a afficher
         /// \param  aOut [---;RW-] Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
@@ -70,12 +71,12 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Display
-        /// \param  aIn  [---;R--] The State
+        /// \param  aIn  [---;R--] The State instance to display
         /// \param  aOut [---;RW-] The output stream
         /// \endcond
         /// \cond fr
         /// \brief  Affiche  Le Status
-        /// \param  aIn  [---;R--] Le State
+        /// \param  aIn  [---;R--] L'instance de State a afficher
         /// \param  aOut [---;RW-] Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
@@ -85,12 +86,12 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Display
-        /// \param  aIn  [---;R--] The Stats
+        /// \param  aIn  [---;R--] The Stats instance to display
         /// \param  aOut [---;RW-] The output stream
         /// \endcond
         /// \cond fr
         /// \brief  Afficher
-        /// \param  aIn  [---;R--] Le Stats
+        /// \param  aIn  [---;R--] L'instance de Stats a afficher
         /// \param  aOut [---;RW-] Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
@@ -102,11 +103,11 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief Cette methode retourne le numero de l'adaptateur.
-        /// \param aOut [---;-W-] La medhode retourne les informations ici.
+        /// \param aOut [---;-W-] La medhode retourne l'information ici.
         /// \endcond
         /// \retval STATUS_OK
+        /// \retval STATUS_ADAPTER_NOT_CONNECTED
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
-        /// \retval STATUS_NOT_CONNECTED
         virtual Status GetAdapterNo(unsigned int * aOut) = 0;
 
         /// \cond en
@@ -135,6 +136,27 @@ namespace OpenNet
         virtual Status GetInfo(Info * aOut) const = 0;
 
         /// \cond en
+        /// \brief  This method returns the adapter's name.
+        /// \return This method returns the address of an internal buffer.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette methode retourne le nom de l'adaptateur
+        /// \retval Cette methode retourne l'adresse d'un espace memoire
+        ///         interne.
+        /// \endcond
+        virtual const char * GetName() const = 0;
+
+        /// \cond en
+        /// \brief  This method returns the packet size.
+        /// \return This method returns the packet size in bytes.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette methode retourne la taille des paquets.
+        /// \retval Cette methode retourne la taille des paquets en octets.
+        /// \endcond
+        virtual unsigned int GetPacketSize() const = 0;
+
+        /// \cond en
         /// \brief  This methode returns the state of the adapter.
         /// \param  aOut [---;-W-] The methode return the information here.
         /// \endcond
@@ -143,7 +165,6 @@ namespace OpenNet
         /// \param aOut [---;-W-] La medhode retourne les informations ici.
         /// \endcond
         /// \retval STATUS_OK
-        /// \retval STATUS_EXCEPTION
         /// \retval STATUS_IOCTL_ERROR
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         virtual Status GetState(State * aOut) = 0;
@@ -157,10 +178,35 @@ namespace OpenNet
         /// \param aOut [---;-W-] La medhode retourne les statistiques ici.
         /// \endcond
         /// \retval STATUS_OK
-        /// \retval STATUS_EXCEPTION
         /// \retval STATUS_IOCTL_ERROR
         /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
         virtual Status GetStats(Stats * aOut) = 0;
+
+        /// \cond en
+        /// \brief  This methode indicate if the adapter is connected to a
+        ///         system.
+        /// \endcond
+        /// \cond fr
+        /// \brief Cette methode indique si l'adaptateur est connecte a un
+        ///        system.
+        /// \endcond
+        /// \retval false
+        /// \retval true
+        virtual bool IsConnected() = 0;
+
+        /// \cond en
+        /// \brief  This methode indicate if the adapter is connected to the
+        ///         system.
+        /// \param  aSystem [---;R--] The System instance
+        /// \endcond
+        /// \cond fr
+        /// \brief Cette methode indique si l'adaptateur est connecte au
+        ///        system.
+        /// \param aSystem [---;R--] L'instance de System
+        /// \endcond
+        /// \retval false
+        /// \retval true
+        virtual bool IsConnected(const System & aSystem) = 0;
 
         /// \cond en
         /// \brief  This methode reset the input filter.
@@ -189,43 +235,57 @@ namespace OpenNet
         /// \brief Cette methode reset les statistiques de l'adaptateur.
         /// \endcond
         /// \retval STATUS_OK
-        /// \retval STATUS_EXCEPTION
         /// \retval STATUS_IOCTL_ERROR
         virtual Status ResetStats() = 0;
 
         /// \cond en
         /// \brief  This methode set the configuration.
-        /// \param  aConfig [---;RW-] The configuration
+        /// \param  aConfig [---;RW-] The Config instance
         /// \endcond
         /// \cond fr
         /// \brief Cette methode change la configuration.
-        /// \param aConfig [---;RW-] La configuration
+        /// \param aConfig [---;RW-] L'instance de Config
         /// \endcond
         /// \retval STATUS_OK
+        /// \retval STATUS_INVALID_REFERENCE
         /// \retval STATUS_IOCTL_ERROR
-        /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         virtual Status SetConfig(const Config & aConfig) = 0;
 
         /// \cond en
         /// \brief  This methode set the input filter.
-        /// \param  aFilter [---;RW-] The Open CL program.
+        /// \param  aFilter [---;RW-] The Filter instance
         /// \endcond
         /// \cond fr
         /// \brief Cette methode affecte le filtre d'entre.
-        /// \param aFilter [---;RW-] Le programme Open CL
+        /// \param aFilter [---;RW-] L'instance de Filter
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_FILTER_ALREADY_SET
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
+        /// \retval STATUS_PROCESSOR_NOT_SET
         virtual OpenNet::Status SetInputFilter(Filter * aFilter) = 0;
 
         /// \cond en
-        /// \brief  This methode associate a processor to the adapter.
-        /// \param  aProcessor The processor to associate
+        /// \brief  This methode set the packet size.
+        /// \param  aSize_byte  The packet size
         /// \endcond
         /// \cond fr
-        /// \brief Cette methode associe un processeur a l'adaptateur.
-        /// \param aProcessor Le processeur a associer
+        /// \brief Cette methode change la taille des paquets.
+        /// \param aSize_byte  La taille des paquets
+        /// \endcond
+        /// \retval STATUS_OK
+        /// \retval STATUS_IOCTL_ERROR
+        /// \retval STATUS_PACKET_TOO_LARGE
+        /// \retval STATUS_PACKET_TOO_SMALL
+        virtual OpenNet::Status SetPacketSize(unsigned int aSize_byte) = 0;
+
+        /// \cond en
+        /// \brief  This methode associate a processor to the adapter.
+        /// \param  aProcessor [-K-;RW-] The Processor instance
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette methode associe un processeur a l'adaptateur.
+        /// \param  aProcessor [-K-;RW-] L'intance de Processeur
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_INVALID_PROCESSOR
@@ -243,15 +303,16 @@ namespace OpenNet
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_INVALID_BUFFER_COUNT
+        /// \retval STATUS_TOO_MANY_BUFFER
         virtual Status Buffer_Allocate(unsigned int aCount) = 0;
 
         /// \cond en
         /// \brief  This methode release buffers.
-        /// \param  aCount The number of buffer to release
+        /// \param  aCount  The number of buffer to release
         /// \endcond
         /// \cond fr
-        /// \brief Cette methode relache des espace memoire.
-        /// \param aCount Le nombre d'espace memoire a relacher
+        /// \brief  Cette methode relache des espace memoire.
+        /// \param  aCount  Le nombre d'espace memoire a relacher
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_INVALID_BUFFER_COUNT
@@ -280,7 +341,6 @@ namespace OpenNet
         /// \param  aSize_byte      La taille
         /// \endcond
         /// \retval STATUS_OK
-        /// \retval STATUS_EXCEPTION
         /// \retval STATUS_IOCTL_ERROR
         /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
         /// \retval STATUS_PACKET_TO_LARGE

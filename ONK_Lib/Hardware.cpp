@@ -18,6 +18,7 @@
 // ===== Includes ===========================================================
 #include <OpenNetK/StdInt.h>
 
+#include <OpenNetK/Adapter.h>
 #include <OpenNetK/Interface.h>
 
 #include <OpenNetK/Hardware.h>
@@ -46,25 +47,6 @@ namespace OpenNetK
         return aAddress;
     }
 
-    unsigned int Hardware::GetCommonBufferSize() const
-    {
-        return mInfo.mCommonBufferSize_byte;
-    }
-
-    void Hardware::GetConfig(OpenNet_Config * aConfig)
-    {
-        ASSERT(NULL != aConfig);
-
-        memcpy(aConfig, &mConfig, sizeof(mConfig));
-    }
-
-    void Hardware::GetInfo(OpenNet_Info * aInfo)
-    {
-        ASSERT(NULL != aInfo);
-
-        memcpy(aInfo, &mInfo, sizeof(mInfo));
-    }
-
     unsigned int Hardware::GetPacketSize() const
     {
         return mConfig.mPacketSize_byte;
@@ -74,7 +56,7 @@ namespace OpenNetK
     {
         ASSERT(NULL != aState);
 
-        memset(aState, 0, sizeof(OpenNet_State));
+        (void)(aState);
     }
 
     void Hardware::ResetMemory()
@@ -115,7 +97,9 @@ namespace OpenNetK
         ASSERT(NULL != aVirtual  );
         ASSERT(   0 <  aSize_byte);
 
-        (void)(aIndex);
+        (void)(aVirtual  );
+        (void)(aIndex    );
+        (void)(aSize_byte);
 
         return true;
     }
@@ -155,10 +139,64 @@ namespace OpenNetK
 
     void Hardware::Interrupt_Process2()
     {
+        ASSERT(NULL != mAdapter);
+
+        mAdapter->Buffers_Process();
+    }
+
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    unsigned int Hardware::GetCommonBufferSize() const
+    {
+        return mInfo.mCommonBufferSize_byte;
+    }
+
+    void Hardware::GetConfig(OpenNet_Config * aConfig)
+    {
+        ASSERT(NULL != aConfig);
+
+        memcpy(aConfig, &mConfig, sizeof(mConfig));
+    }
+
+    void Hardware::GetInfo(OpenNet_Info * aInfo)
+    {
+        ASSERT(NULL != aInfo);
+
+        memcpy(aInfo, &mInfo, sizeof(mInfo));
     }
 
     // Protected
     /////////////////////////////////////////////////////////////////////////
+
+    void Hardware::Skip64KByteBoundary(uint64_t * aLogical, volatile uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, volatile uint8_t ** aOutVirtual)
+    {
+        ASSERT(NULL       !=   aLogical   );
+        ASSERT(NULL       !=   aVirtual   );
+        ASSERT(NULL       != (*aVirtual  ));
+        ASSERT(         0 <    aSize_byte );
+        ASSERT(SIZE_64_KB >    aSize_byte );
+        ASSERT(NULL       !=   aOutLogical);
+        ASSERT(NULL       !=   aOutVirtual);
+
+        uint64_t lEnd = (*aLogical) + aSize_byte - 1;
+
+        if (((*aLogical) & SIZE_64_KB) == (lEnd & SIZE_64_KB))
+        {
+            (*aOutLogical) = (*aLogical);
+            (*aOutVirtual) = (*aVirtual);
+        }
+        else
+        {
+            uint64_t lOffset_byte = SIZE_64_KB - ((*aLogical) % SIZE_64_KB);
+
+            (*aOutLogical) = (*aLogical) + lOffset_byte;
+            (*aOutVirtual) = (*aVirtual) + lOffset_byte;
+        }
+
+        (*aLogical) = (*aOutLogical) + aSize_byte;
+        (*aVirtual) = (*aOutVirtual) + aSize_byte;
+    }
 
     Hardware::Hardware() : mAdapter(NULL)
     {
@@ -193,32 +231,4 @@ namespace OpenNetK
         return mAdapter;
     }
 
-    void Hardware::Skip64KByteBoundary(uint64_t * aLogical, volatile uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, volatile uint8_t ** aOutVirtual)
-    {
-        ASSERT(NULL       !=   aLogical   );
-        ASSERT(NULL       !=   aVirtual   );
-        ASSERT(NULL       != (*aVirtual  ));
-        ASSERT(         0 <    aSize_byte );
-        ASSERT(SIZE_64_KB >    aSize_byte );
-        ASSERT(NULL       !=   aOutLogical);
-        ASSERT(NULL       !=   aOutVirtual);
-
-        uint64_t lEnd = (*aLogical) + aSize_byte - 1;
-
-        if (((*aLogical) & SIZE_64_KB) == (lEnd & SIZE_64_KB))
-        {
-            (*aOutLogical) = (*aLogical);
-            (*aOutVirtual) = (*aVirtual);
-        }
-        else
-        {
-            uint64_t lOffset_byte = SIZE_64_KB - ((*aLogical) % SIZE_64_KB);
-
-            (*aOutLogical) = (*aLogical) + lOffset_byte;
-            (*aOutVirtual) = (*aVirtual) + lOffset_byte;
-        }
-
-        (*aLogical) = (*aOutLogical) + aSize_byte;
-        (*aVirtual) = (*aOutVirtual) + aSize_byte;
-    }
 }

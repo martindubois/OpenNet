@@ -20,7 +20,7 @@
 // Configuration
 /////////////////////////////////////////////////////////////////////////////
 
-#define PACKET_SIZE_byte  (9728)
+#define PACKET_SIZE_byte  (9 * 1024)
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
@@ -65,6 +65,7 @@ void Pro1000::GetState(OpenNet_State * aState)
 
     // TODO  Dev
     //       Comprendre pourquoi la vitesse n'est pas indique correctement.
+
     switch (mBAR1->mDeviceStatus.mFields.mSpeed)
     {
     case 0x0: aState->mSpeed_MB_s =  10; break;
@@ -115,7 +116,7 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, volatile void * aVirtual)
     }
 }
 
-// NOT TESTED  ONK_Pro1000.Pro1000
+// NOT TESTED  ONK_Pro1000.Pro1000.ErrorHandling
 //             Memory 0 too small
 bool Pro1000::SetMemory(unsigned int aIndex, volatile void * aVirtual, unsigned int aSize_byte)
 {
@@ -166,39 +167,10 @@ bool Pro1000::D0_Entry()
     mBAR1->mDeviceControl.mFields.mInvertLossOfSignal = false;
     mBAR1->mDeviceControl.mFields.mSetLinkUp          = true ;
 
-    mBAR1->mInterruptAcknowledgeAutoMask.mFields.mTx_DescriptorWritten = true;
+    mBAR1->mGeneralPurposeInterruptEnable.mFields.mExtendedInterruptAutoMaskEnable = true;
 
-    for (unsigned int i = 0; i < (sizeof(mBAR1->mMulticastTableArray) / sizeof(mBAR1->mMulticastTableArray[0])); i++)
-    {
-        mBAR1->mMulticastTableArray[i] = 0;
-    }
-
-    mBAR1->mRx_DescriptorBaseAddressHigh0 = (mRx_Logical >> 32) & 0xffffffff;
-    mBAR1->mRx_DescriptorBaseAddressLow0  =  mRx_Logical        & 0xffffffff;
-
-    mBAR1->mRx_DescriptorRingLength0.mFields.mValue_byte = sizeof(Pro1000_Rx_Descriptor) * TX_DESCRIPTOR_QTY;
-
-    mBAR1->mRx_SplitAndReplicationControl.mFields.mHeaderSize_64bytes = 0;
-    mBAR1->mRx_SplitAndReplicationControl.mFields.mPacketSize_KB      = mConfig.mPacketSize_byte / 1024;
-
-    mBAR1->mRx_DescriptorControl0.mFields.mQueueEnable = true;
-
-    // while (!mBAR1->mRx_DescriptorControl0.mFields.mQueueEnable);
-
-    mBAR1->mRx_Control.mFields.mLongPacketEnabled = true;
-    mBAR1->mRx_Control.mFields.mEnable            = true;
-
-    mBAR1->mTx_DescriptorBaseAddressHigh0 = (mTx_Logical >> 32) & 0xffffffff;
-    mBAR1->mTx_DescriptorBaseAddressLow0  =  mTx_Logical        & 0xffffffff;
-
-    mBAR1->mTx_DescriptorRingLength0.mFields.mValue_bytes = sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY;
-
-    mBAR1->mTx_DescriptorControl0.mFields.mWriteBackThreshold = 1;
-    mBAR1->mTx_DescriptorControl0.mFields.mQueueEnable        = true;
-
-    // while (!mBAR1->mTx_DescriptorControl0.mFields.mQueueEnable);
-
-    mBAR1->mTx_Control.mFields.mEnable = true;
+    Rx_Config();
+    Tx_Config();
 
     return Hardware::D0_Entry();
 }
@@ -230,6 +202,7 @@ void Pro1000::Interrupt_Enable()
     Hardware::Interrupt_Enable();
 
     mBAR1->mInterruptMaskSet.mFields.mTx_DescriptorWritten = true;
+    mBAR1->mInterruptMaskSet.mFields.mRx_DescriptorWritten = true;
 }
 
 bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing)
@@ -250,38 +223,62 @@ void Pro1000::Interrupt_Process2()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
-    Hardware::Interrupt_Process2();
-
+    Rx_Process();
     Tx_Process();
 
-    // TODO  Dev
+    Hardware::Interrupt_Process2();
 }
 
-// TODO  Test
-bool Pro1000::Packet_Receive(OpenNet_BufferInfo * aBuffer, unsigned int aIndex)
+void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , ,  )" DEBUG_EOL);
 
-    ASSERT(NULL != aBuffer);
+    ASSERT(NULL != aPacketInfo);
+    ASSERT(NULL != aCounter   );
 
-    (void)(aIndex);
-    // TODO Dev
+    ASSERT(NULL              != mBAR1      );
+    ASSERT(RX_DESCRIPTOR_QTY >  mRx_In     );
+    ASSERT(NULL              != mRx_Virtual);
 
-    return true;
+    mRx_Counter   [mRx_In] = aCounter   ;
+    mRx_PacketInfo[mRx_In] = aPacketInfo;
+
+    mRx_PacketInfo[mRx_In]->mPacketState = OPEN_NET_PACKET_STATE_RECEIVING;
+
+    memset((Pro1000_Rx_Descriptor *)(mRx_Virtual) + mRx_In, 0, sizeof(Pro1000_Rx_Descriptor)); // volatile_cast
+
+    mRx_Virtual[mRx_In].mLogicalAddress = aData;
+
+    InterlockedIncrement(mRx_Counter[mRx_In]);
+
+    mRx_In = (mRx_In + 1) % RX_DESCRIPTOR_QTY;
+
+    mBAR1->mRx_DescriptorTail0.mFields.mValue = mRx_In;
 }
 
-bool Pro1000::Packet_Send(OpenNet_BufferInfo * aBuffer, unsigned int aIndex)
+void Pro1000::Packet_Send(uint64_t aData, unsigned int aSize_byte, volatile long * aCounter)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u )" DEBUG_EOL, aIndex);
+    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u,  )" DEBUG_EOL, aSize_byte);
 
-    ASSERT(NULL != aBuffer);
+    ASSERT(OPEN_NET_PACKET_SIZE_MAX_byte >= aSize_byte);
 
-    // TODO Dev
+    mTx_Counter[mTx_In] = aCounter;
 
-    return true;
+    mTx_Virtual[mTx_In].mFields.mDescriptorDone = false     ;
+    mTx_Virtual[mTx_In].mFields.mSize_byte      = aSize_byte;
+    mTx_Virtual[mTx_In].mLogicalAddress         = aData     ;
+
+    if (NULL != mTx_Counter[mTx_In])
+    {
+        InterlockedIncrement(mTx_Counter[mTx_In]);
+    }
+
+    mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
+
+    mBAR1->mTx_DescriptorTail0.mFields.mValue = mTx_In;
 }
 
-bool Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
+void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes )" DEBUG_EOL, aSize_byte);
 
@@ -292,8 +289,6 @@ bool Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
     Packet_Send(mTx_PacketBuffer_Logical[mTx_PacketBuffer_In], aSize_byte, NULL);
 
     mTx_PacketBuffer_In++;
-
-    return true;
 }
 
 // Private
@@ -308,28 +303,6 @@ void Pro1000::FlushWrite()
     uint32_t lValue = mBAR1->mDeviceStatus.mValue;
 
     (void)(lValue);
-}
-
-void Pro1000::Packet_Send(uint64_t aLogical, unsigned int aSize_byte, volatile long * aCounter)
-{
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes,  )" DEBUG_EOL, aSize_byte);
-
-    mTx_Counter[mTx_In] = aCounter;
-
-    mTx_Virtual[mTx_In].mFields.mDescriptorDone = false     ;
-    mTx_Virtual[mTx_In].mFields.mEndOfPacket    = true      ;
-    mTx_Virtual[mTx_In].mFields.mReportStatus   = true      ;
-    mTx_Virtual[mTx_In].mFields.mSize_byte      = aSize_byte;
-    mTx_Virtual[mTx_In].mLogicalAddress         = aLogical  ;
-
-    if (NULL != mTx_Counter[mTx_In])
-    {
-        InterlockedIncrement(mTx_Counter[mTx_In]);
-    }
-
-    mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
-
-    mBAR1->mTx_DescriptorTail0.mFields.mValue = mTx_In;
 }
 
 void Pro1000::Reset()
@@ -351,8 +324,90 @@ void Pro1000::Reset()
     (void)(lValue);
 }
 
-// Level   DISPATCH
-// Thread  DpcForIsr
+// Level   Thread
+// Thread  Init
+void Pro1000::Rx_Config()
+{
+    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+
+    ASSERT(NULL != mBAR1);
+
+    for (unsigned int i = 0; i < (sizeof(mBAR1->mMulticastTableArray) / sizeof(mBAR1->mMulticastTableArray[0])); i++)
+    {
+        mBAR1->mMulticastTableArray[i] = 0;
+    }
+
+    mBAR1->mRx_Control.mFields.mBroadcastAcceptMode         = true ; // TODO Config
+    mBAR1->mRx_Control.mFields.mLongPacketEnabled           = true ;
+    mBAR1->mRx_Control.mFields.mMulticastPromiscuousEnabled = true ; // TODO Config
+    mBAR1->mRx_Control.mFields.mPassMacControlFrames        = true ; // TODO Config
+    mBAR1->mRx_Control.mFields.mStoreBadPackets             = true ; // TODO Config
+    mBAR1->mRx_Control.mFields.mUnicastPromiscuousEnabled   = true ; // TODO Config
+
+    mBAR1->mRx_LongPacketMaximumLength.mFields.mValue_byte = mConfig.mPacketSize_byte;
+
+    mBAR1->mRx_DescriptorBaseAddressHigh0 = (mRx_Logical >> 32) & 0xffffffff;
+    mBAR1->mRx_DescriptorBaseAddressLow0  =  mRx_Logical        & 0xffffffff;
+
+    mBAR1->mRx_DescriptorRingLength0.mFields.mValue_byte = sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY;
+
+    mBAR1->mRx_SplitAndReplicationControl.mFields.mHeaderSize_64bytes = 0;
+    mBAR1->mRx_SplitAndReplicationControl.mFields.mPacketSize_KB      = mConfig.mPacketSize_byte / 1024;
+
+    mBAR1->mRx_DescriptorControl0.mFields.mQueueEnable = true;
+
+    mBAR1->mRx_Control.mFields.mEnable = true;
+}
+
+// Level   SoftInt
+// Thread  SoftInt
+void Pro1000::Rx_Process()
+{
+    ASSERT(RX_DESCRIPTOR_QTY >  mRx_In     );
+    ASSERT(RX_DESCRIPTOR_QTY >  mRx_Out    );
+    ASSERT(NULL              != mRx_Virtual);
+
+    while (mRx_In != mRx_Out)
+    {
+        if (!mRx_Virtual[mRx_Out].mFields.mDescriptorDone)
+        {
+            break;
+        }
+
+        ASSERT(NULL                            != mRx_Counter   [mRx_Out]              );
+        ASSERT(NULL                            != mRx_PacketInfo[mRx_Out]              );
+        ASSERT(OPEN_NET_PACKET_STATE_RECEIVING == mRx_PacketInfo[mRx_Out]->mPacketState);
+        ASSERT(OPEN_NET_PACKET_SIZE_MAX_byte   >= mRx_Virtual   [mRx_Out].mSize_byte   );
+
+        mRx_PacketInfo[mRx_Out]->mPacketSize_byte = mRx_Virtual[mRx_Out].mSize_byte;
+        mRx_PacketInfo[mRx_Out]->mPacketState     = OPEN_NET_PACKET_STATE_RECEIVED ;
+
+        InterlockedDecrement(mRx_Counter[mRx_Out]);
+
+        mRx_Out = (mRx_Out + 1) % RX_DESCRIPTOR_QTY;
+    }
+}
+
+// Level   Thread
+// Thread  Init
+void Pro1000::Tx_Config()
+{
+    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+
+    ASSERT(NULL != mBAR1);
+
+    mBAR1->mTx_DescriptorBaseAddressHigh0 = (mTx_Logical >> 32) & 0xffffffff;
+    mBAR1->mTx_DescriptorBaseAddressLow0  =  mTx_Logical        & 0xffffffff;
+
+    mBAR1->mTx_DescriptorRingLength0.mFields.mValue_bytes = sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY;
+
+    mBAR1->mTx_DescriptorControl0.mFields.mQueueEnable = true;
+
+    mBAR1->mTx_Control.mFields.mEnable = true;
+}
+
+// Level   SoftInt
+// Thread  SoftInt
 void Pro1000::Tx_Process()
 {
     ASSERT(TX_DESCRIPTOR_QTY >  mTx_In     );
@@ -365,9 +420,6 @@ void Pro1000::Tx_Process()
         {
             break;
         }
-
-        // TODO  Dev
-        //       Comprendre pourquoi nous ne nous rendons pas ici.
 
         if (NULL != mTx_Counter[mTx_Out])
         {

@@ -96,13 +96,13 @@ namespace OpenNet
         Info;
 
         /// \cond en
-        /// \brief  Display the Info
-        /// \param  aIn  [---;R--] The Info
+        /// \brief  Display
+        /// \param  aIn  [---;R--] The Info instance to Display
         /// \param  aOut [---;RW-] The output stream
         /// \endcond
         /// \cond fr
-        /// \brief  Affiche le Info
-        /// \param  aIn  [---;R--] Le Info
+        /// \brief  Afficher
+        /// \param  aIn  [---;R--] L'instance d'Info a afficher
         /// \param  aOut [---;RW-] Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
@@ -112,15 +112,26 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Retrieve the Info
-        /// \param  aOut [---;RW-] The Info
+        /// \param  aOut [---;RW-] The Info instance
         /// \endcond
         /// \cond fr
         /// \brief  Retrouver le Info
-        /// \param  aOut [---;RW-] Le Info
+        /// \param  aOut [---;RW-] L'instance d'Info
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
         virtual Status GetInfo(Info * aOut) const = 0;
+
+        /// \cond en
+        /// \brief  Retrieve the instance's name
+        /// \retval This method returns the address of an internal buffer.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Obtenir le nom de l'instance
+        /// \retval Cette methode retourne l'adresse d'un espace memoire
+        ///         interne.
+        /// \endcond
+        virtual const char * GetName() const = 0;
 
         /// \cond en
         /// \brief  Display

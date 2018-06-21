@@ -42,7 +42,7 @@ typedef struct
 }
 Pro1000_Rx_Descriptor;
 
-typedef struct e1000_tx_desc {
+typedef struct {
     uint64_t       mLogicalAddress;
     struct
     {
@@ -55,7 +55,8 @@ typedef struct e1000_tx_desc {
 
         unsigned mReserved0 : 1;
 
-        unsigned mVLanPacketEnable : 1;
+        unsigned mDescriptorExtension : 1;
+        unsigned mVLanPacketEnable    : 1;
 
         unsigned mReserved1 : 1;
 
@@ -66,7 +67,7 @@ typedef struct e1000_tx_desc {
         unsigned mCheckSumStart :  8;
         unsigned mVLanId        : 12;
         unsigned mCFI           :  1;
-        unsigned mPRI           :  1;
+        unsigned mPRI           :  3;
     }
     mFields;
  }
@@ -136,6 +137,31 @@ typedef union
     mFields;
 }
 Pro1000_DeviceStatus;
+
+typedef union
+{
+    uint32_t mValue;
+
+    struct
+    {
+        unsigned mNonSelectiveInterruptClearOnRead : 1;
+
+        unsigned mReserved0 : 3;
+
+        unsigned mMultipleMSIX : 1;
+
+        unsigned mReserved1 : 2;
+
+        unsigned mLowLatencyCredits : 5;
+
+        unsigned mReserved2 : 18;
+
+        unsigned mExtendedInterruptAutoMaskEnable : 1;
+        unsigned mPbaSupport                      : 1;
+    }
+    mFields;
+}
+Pro1000_GeneralPurposeInterruptEnable;
 
 typedef union
 {
@@ -609,11 +635,12 @@ typedef struct
 
     uint32_t mReserved_01504[(0x01508 - 0x01504) / 4];
 
-    Pro1000_InterruptMask mInterruptMaskSet            ; // 0x01508
-    Pro1000_InterruptMask mInterruptMaskClear          ; // 0x0150c
-    Pro1000_InterruptMask mInterruptAcknowledgeAutoMask; // 0x01510
+    Pro1000_InterruptMask                 mInterruptMaskSet             ; // 0x01508
+    Pro1000_InterruptMask                 mInterruptMaskClear           ; // 0x0150c
+    Pro1000_InterruptMask                 mInterruptAcknowledgeAutoMask ; // 0x01510
+    Pro1000_GeneralPurposeInterruptEnable mGeneralPurposeInterruptEnable; // 0x01514
 
-	uint32_t mReserved_01514[(0x02404 - 0x01514) / 4];
+	uint32_t mReserved_01518[(0x02404 - 0x01518) / 4];
 
     Pro1000_Rx_PacketBufferSize mRx_PacketBufferSize; // 0x02404
 

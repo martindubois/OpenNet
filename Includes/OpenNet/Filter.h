@@ -47,6 +47,38 @@ namespace OpenNet
         virtual OPEN_NET_PUBLIC ~Filter();
 
         /// \cond en
+        /// \brief  Retrieve the build log
+        /// \return This method returns the address of an internal buffer.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Obtenir le log de compilation
+        /// \retval Cette methode retourne l'adresse d'un espace de memoire
+        ///         interne.
+        /// \endcond
+        OPEN_NET_PUBLIC const char * GetBuildLog() const;
+
+        /// \cond en
+        /// \brief  Retrieve the code line count
+        /// \return This method returns the code line cout.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Obtenir le nombre de ligne de code
+        /// \retval Cette methode retourne le nombre de ligne de code.
+        /// \endcond
+        OPEN_NET_PUBLIC unsigned int  GetCodeLineCount();
+
+        /// \cond en
+        /// \brief  Retrieve the code lines
+        /// \return This method returns the address of an internal buffer.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Obtenir les lignes de code
+        /// \retval Cette methode retourne l'adresse d'un espace de memoire
+        ///         interne.
+        /// \endcond
+        OPEN_NET_PUBLIC const char ** GetCodeLines();
+
+        /// \cond en
         /// \brief  Get code size
         /// \return The code size in byte
         /// \endcond
@@ -55,6 +87,17 @@ namespace OpenNet
         /// \return La taille du code en octet
         /// \endcond
         OPEN_NET_PUBLIC unsigned int GetCodeSize() const;
+
+        /// \cond en
+        /// \brief  Retrieve the instance name
+        /// \return This methode returns the address of an internal buffer.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Obtenir le nom de l'instance
+        /// \return Cette methode retourne l'adresse d'un espace de memoire
+        ///         interne.
+        /// \endcond
+        OPEN_NET_PUBLIC const char * GetName() const;
 
         /// \cond en
         /// \brief  Reset the code using a source file
@@ -98,6 +141,30 @@ namespace OpenNet
         /// \retval STATUS_CODE_ALREADY_SET
         /// \retval STATUS_EMPTY_CODE
         OPEN_NET_PUBLIC Status SetCode(const char * aCode, unsigned int aCodeSize_byte);
+
+        /// \cond en
+        /// \brief  Set the instance's name
+        /// \param  aName [---;R--] The name
+        /// \endcond
+        /// \cond fr
+        /// \brief  Assigner le nom de l'instance
+        /// \param  aName [---;R--] Le nom
+        /// \endcond
+        /// \retval STATUS_OK
+        /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
+        OPEN_NET_PUBLIC Status SetName(const char * aName);
+
+        /// \cond en
+        /// \brief  Add the kernel arguments other than the first one
+        /// \param  aKernel [---;R--] The cl_kernel instance
+        /// \endcond
+        /// \cond fr
+        /// \brief  Ajouter les argument du kernel autre que le premier
+        /// \param  aKernel [---;R--] L'instance de cl_kernel
+        /// \endcond
+        /// \retval STATUS_OK
+        /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
+        virtual OPEN_NET_PUBLIC void AddKernelArgs(void * aKernal);
 
         /// \cond en
         /// \brief  Display
@@ -152,20 +219,36 @@ namespace OpenNet
         /// \endcond
         OPEN_NET_PUBLIC unsigned int Edit_Search(const char * aSearch);
 
+    // internal
+
+        static const unsigned int BUILD_LOG_MAX_SIZE_byte;
+
+        void * AllocateBuildLog();
+
     private:
 
         Filter(const Filter &);
 
         const Filter & operator = (const Filter &);
 
+        void CodeLines_Count   ();
+        void CodeLines_Generate();
+
         unsigned int Edit_Replace_ByEqual  (const char * aSearch, const char * aReplace, unsigned int aLength);
         unsigned int Edit_Replace_ByLonger (const char * aSearch, const char * aReplace, unsigned int aSearchLength, unsigned int aReplaceLength);
         unsigned int Edit_Replace_ByShorter(const char * aSearch, const char * aReplace, unsigned int aSearchLength, unsigned int aReplaceLength);
 
+        void Invalidate();
+
         void ReleaseCode();
 
-        char *       mCode         ;
-        unsigned int mCodeSize_byte;
+        char        * mBuildLog      ;
+        char        * mCode          ;
+        char        * mCodeLineBuffer;
+        unsigned int  mCodeLineCount ;
+        const char ** mCodeLines     ;
+        unsigned int  mCodeSize_byte ;
+        char          mName[64]      ;
 
     };
 

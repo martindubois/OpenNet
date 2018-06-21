@@ -6,14 +6,17 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== Includes/OpenNet ===================================================
-#include <OpenNet/System.h>
+// ===== Windows ============================================================
+#include <Windows.h>
 
 // ===== OpenCL =============================================================
 #include <CL/opencl.h>
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
+
+// ===== Includes ===========================================================
+#include <OpenNet/System.h>
 
 // ===== OpenNet ============================================================
 #include "System_Internal.h"
@@ -24,7 +27,7 @@ namespace OpenNet
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    // NOT TESTED  System.ErrorHandling
+    // NOT TESTED  OpenNet.System.ErrorHandling
     //             System_Internal contructor raise an exception
     System * System::Create()
     {
@@ -34,7 +37,7 @@ namespace OpenNet
         {
             lResult = new System_Internal();
         }
-        catch (...)
+        catch ( ... )
         {
             lResult = NULL;
         }
@@ -44,7 +47,13 @@ namespace OpenNet
 
     void System::Delete()
     {
-        delete this;
+        try
+        {
+            delete this;
+        }
+        catch (...)
+        {
+        }
     }
 
     // Protected

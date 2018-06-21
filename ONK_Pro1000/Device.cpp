@@ -26,10 +26,13 @@
 
 typedef struct
 {
-    OpenNetK::Adapter      mAdapter     ;
     OpenNetK::Adapter_WDF  mAdapter_WDF ;
-    Pro1000                mHardware    ;
     OpenNetK::Hardware_WDF mHardware_WDF;
+
+    // ===== Zone 0 =========================================================
+    WDFSPINLOCK       mZone0   ;
+    OpenNetK::Adapter mAdapter ;
+    Pro1000           mHardware;
 }
 DeviceContext;
 
@@ -45,11 +48,14 @@ static void DeviceInit_Init(PWDFDEVICE_INIT aDeviceInit);
 // ===== Entry points =======================================================
 extern "C"
 {
-    static EVT_WDF_DEVICE_D0_ENTRY         D0Entry        ;
-    static EVT_WDF_DEVICE_D0_EXIT          D0Exit         ;
+    static EVT_WDF_DEVICE_D0_ENTRY         D0Entry          ;
+    static EVT_WDF_DEVICE_D0_EXIT          D0Exit           ;
+    static EVT_WDF_FILE_CLEANUP            FileCleanup      ;
+    static EVT_WDF_FILE_CLOSE              FileClose        ;
+    static EVT_WDF_DEVICE_FILE_CREATE      FileCreate       ;
     static EVT_WDF_IO_IN_CALLER_CONTEXT    IoInCallerContext;
-    static EVT_WDF_DEVICE_PREPARE_HARDWARE PrepareHardware;
-    static EVT_WDF_DEVICE_RELEASE_HARDWARE ReleaseHardware;
+    static EVT_WDF_DEVICE_PREPARE_HARDWARE PrepareHardware  ;
+    static EVT_WDF_DEVICE_RELEASE_HARDWARE ReleaseHardware  ;
 }
 
 // Functions
@@ -59,10 +65,9 @@ extern "C"
 
 // Thread  PnP
 
-// NOT TESTED  ONK_Pro1000.Device
+// NOT TESTED  ONK_Pro1000.Device.ErrorHandling
 //             WdfDeviceCreate fail<br>
-//             WdfDeviceCreateDeviceInterface
-
+//             WdfDeviceCreateDeviceInterface fail
 NTSTATUS Device_Create(PWDFDEVICE_INIT aDeviceInit)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_FUNCTION, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
@@ -117,40 +122,61 @@ NTSTATUS Device_Create(PWDFDEVICE_INIT aDeviceInit)
 //
 // Thread  PnP
 
-// NOT TESTED  ONK_Pro1000.Device
+// NOT TESTED  ONK_Pro1000.Device.ErrorHandling
 //             Hardware_WDF.Init fail
 NTSTATUS Init(DeviceContext * aThis, WDFDEVICE aDevice)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
 
-    ASSERT(NULL != aThis  );
+    ASSERT(NULL != aThis);
     ASSERT(NULL != aDevice);
 
-    new (&aThis->mHardware) Pro1000();
+    WDF_OBJECT_ATTRIBUTES lAttr;
 
-    NTSTATUS lResult = aThis->mHardware_WDF.Init(aDevice, &aThis->mHardware);
+    WDF_OBJECT_ATTRIBUTES_INIT(&lAttr);
+
+    lAttr.ParentObject = aDevice;
+
+    NTSTATUS lResult = WdfSpinLockCreate(&lAttr, &aThis->mZone0);
     if (STATUS_SUCCESS == lResult)
     {
-        aThis->mAdapter_WDF.Init(&aThis->mAdapter, aDevice);
-        aThis->mAdapter.SetHardware(&aThis->mHardware);
+        new (&aThis->mHardware) Pro1000();
 
-        aThis->mHardware.SetAdapter(&aThis->mAdapter);
+        lResult = aThis->mHardware_WDF.Init(aDevice, &aThis->mHardware, aThis->mZone0);
+        if (STATUS_SUCCESS == lResult)
+        {
+            aThis->mAdapter_WDF.Init(&aThis->mAdapter, aDevice, &aThis->mHardware_WDF, aThis->mZone0);
+            aThis->mAdapter.SetHardware(&aThis->mHardware);
+
+            aThis->mHardware.SetAdapter(&aThis->mAdapter);
+        }
+        else
+        {
+            DbgPrintEx(DEBUG_ID, DEBUG_ERROR, PREFIX __FUNCTION__ " - Hardware_WDF::Init( , ,  ) failed - 0x%08x" DEBUG_EOL, lResult);
+        }
     }
     else
     {
-        DbgPrintEx(DEBUG_ID, DEBUG_ERROR, PREFIX __FUNCTION__ " - Hardware_WDF::Init( ,  ) failed - 0x%08x" DEBUG_EOL, lResult);
+        DbgPrintEx(DEBUG_ID, DEBUG_ERROR, PREFIX __FUNCTION__ " - WdfSpinLockCreate( ,  ) failed - 0x%08x" DEBUG_EOL, lResult);
     }
 
     return lResult;
 }
 
 // Thread  PnP
-
 void DeviceInit_Init(PWDFDEVICE_INIT aDeviceInit)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
     ASSERT(NULL != aDeviceInit);
+
+    WDF_FILEOBJECT_CONFIG lFileObjectConfig;
+
+    WDF_FILEOBJECT_CONFIG_INIT(&lFileObjectConfig, FileCreate, FileClose, FileCleanup);
+
+    WdfDeviceInitSetFileObjectConfig(aDeviceInit, &lFileObjectConfig, WDF_NO_OBJECT_ATTRIBUTES);
+
+    WdfDeviceInitSetIoInCallerContextCallback(aDeviceInit, IoInCallerContext);
 
     WDF_PNPPOWER_EVENT_CALLBACKS lPnpPowerEventCallbacks;
 
@@ -163,13 +189,11 @@ void DeviceInit_Init(PWDFDEVICE_INIT aDeviceInit)
 
     WdfDeviceInitSetPnpPowerEventCallbacks(aDeviceInit, & lPnpPowerEventCallbacks);
 
-    WdfDeviceInitSetIoInCallerContextCallback(aDeviceInit, IoInCallerContext);
 }
 
 // ===== Entry points =======================================================
 
 // Thread  PnP
-
 NTSTATUS D0Entry(WDFDEVICE aDevice, WDF_POWER_DEVICE_STATE aPreviousState)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( , 0x%08x )" DEBUG_EOL, aPreviousState);
@@ -187,7 +211,6 @@ NTSTATUS D0Entry(WDFDEVICE aDevice, WDF_POWER_DEVICE_STATE aPreviousState)
 }
 
 // Thread  PnP
-
 NTSTATUS D0Exit(WDFDEVICE aDevice, WDF_POWER_DEVICE_STATE aTargetState)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( , 0x%08x )" DEBUG_EOL, aTargetState);
@@ -204,8 +227,48 @@ NTSTATUS D0Exit(WDFDEVICE aDevice, WDF_POWER_DEVICE_STATE aTargetState)
     return lThis->mHardware_WDF.D0Exit(aTargetState);
 }
 
-// Thread  Users
+// Threads  Users
+void FileCleanup(WDFFILEOBJECT aFileObject)
+{
+    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
+    ASSERT(NULL != aFileObject);
+
+    WDFDEVICE lDevice = WdfFileObjectGetDevice(aFileObject);
+    ASSERT(NULL != lDevice);
+
+    DeviceContext * lThis = GetDeviceContext(lDevice);
+    ASSERT(NULL != lThis);
+
+    lThis->mAdapter_WDF.FileCleanup(aFileObject);
+}
+
+// Threads  Users
+void FileClose(WDFFILEOBJECT aFileObject)
+{
+    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+
+    ASSERT(NULL != aFileObject);
+
+    (void)(aFileObject);
+}
+
+// Threads  Users
+void FileCreate(WDFDEVICE aDevice, WDFREQUEST aRequest, WDFFILEOBJECT aFileObject)
+{
+    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
+
+    ASSERT(NULL != aDevice    );
+    ASSERT(NULL != aRequest   );
+    ASSERT(NULL != aFileObject);
+
+    (void)(aDevice    );
+    (void)(aFileObject);
+
+    WdfRequestComplete(aRequest, STATUS_SUCCESS);
+}
+
+// Threads  Users
 void IoInCallerContext(WDFDEVICE aDevice, WDFREQUEST aRequest)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
@@ -219,7 +282,6 @@ void IoInCallerContext(WDFDEVICE aDevice, WDFREQUEST aRequest)
 }
 
 // Thread  PnP
-
 NTSTATUS PrepareHardware(WDFDEVICE aDevice, WDFCMRESLIST aRaw, WDFCMRESLIST aTranslated)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( , ,  )" DEBUG_EOL);
@@ -236,7 +298,6 @@ NTSTATUS PrepareHardware(WDFDEVICE aDevice, WDFCMRESLIST aRaw, WDFCMRESLIST aTra
 }
 
 // Thread  PnP
-
 NTSTATUS ReleaseHardware(WDFDEVICE aDevice, WDFCMRESLIST aTranslated)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);

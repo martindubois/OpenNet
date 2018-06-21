@@ -28,6 +28,8 @@ extern int Filter_Base();
 
 extern int Filter_Forward_Base();
 
+extern int Mirror_SetupA();
+
 extern int Processor_Base();
 
 extern int Status_Base();
@@ -43,6 +45,7 @@ KMS_TEST_LIST_BEGIN
     KMS_TEST_LIST_ENTRY(EthernetAddress_Base, "EthernetAddress - Base", 0, 0)
     KMS_TEST_LIST_ENTRY(Filter_Base         , "Filter - Base"         , 0, 0)
     KMS_TEST_LIST_ENTRY(Filter_Forward_Base , "Filter_Forward - Base" , 0, 0)
+    KMS_TEST_LIST_ENTRY(Mirror_SetupA       , "Mirror - SetupA"       , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(Processor_Base      , "Processor - Base"      , 0, 0)
     KMS_TEST_LIST_ENTRY(Status_Base         , "Status - Base"         , 0, 0)
     KMS_TEST_LIST_ENTRY(System_Base         , "System - Base"         , 0, 0)

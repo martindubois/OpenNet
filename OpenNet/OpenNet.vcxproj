@@ -95,6 +95,7 @@
     <ClCompile Include="EthernetAddress.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Filter_Forward.cpp" />
+    <ClCompile Include="OCLW.cpp" />
     <ClCompile Include="OpenNet.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="Processor_Internal.cpp" />
@@ -105,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Adapter_Internal.h" />
+    <ClInclude Include="OCLW.h" />
     <ClInclude Include="Processor_Internal.h" />
     <ClInclude Include="System_Internal.h" />
   </ItemGroup>

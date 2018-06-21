@@ -62,7 +62,7 @@ KMS_TEST_END
 KMS_TEST_BEGIN(Adapter_SetupA)
 {
     OpenNet::System * lSystem = OpenNet::System::Create();
-    KMS_TEST_ASSERT(NULL != lSystem);
+    KMS_TEST_ASSERT_RETURN(NULL != lSystem);
 
     OpenNet::Adapter * lA0 = lSystem->Adapter_Get(0);
     KMS_TEST_ASSERT(NULL != lA0);
@@ -129,5 +129,7 @@ KMS_TEST_BEGIN(Adapter_SetupA)
 
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lA0->SetInputFilter(NULL));
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lA0->SetProcessor  (NULL));
+
+    lSystem->Delete();
 }
 KMS_TEST_END

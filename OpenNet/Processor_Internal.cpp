@@ -11,24 +11,43 @@
 #include <memory.h>
 #include <stdint.h>
 
-// ===== OpenCL =============================================================
-#include <CL/opencl.h>
+// ===== Windows ============================================================
+#include <Windows.h>
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
 
+// ===== Includes ===========================================================
+#include <OpenNetK/Interface.h>
+#include <OpenNetK/Types.h>
+
 // ===== OpenNet ============================================================
+#include "OCLW.h"
+
 #include "Processor_Internal.h"
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-Processor_Internal::Processor_Internal(cl_platform_id aPlatform, cl_device_id aDevice)
+// aEnqueueMakeBufferResident [-K-;--X]
+// aEnqueueWaitSignal         [-K-;--X]
+// aDebugLog                  [-K-;RW-]
+//
+// Exception  KmsLib::Exception *  See InitInfo
+//                                 See OCLW_CreateContext
+//                                 See OCLW_CreateCommandQueueWithProperties
+// Threads  Apps
+Processor_Internal::Processor_Internal(cl_platform_id aPlatform, cl_device_id aDevice, clEnqueueMakeBuffersResidentAMD_fn aEnqueueMakeBufferResident, clEnqueueWaitSignalAMD_fn aEnqueueWaitSignal, KmsLib::DebugLog * aDebugLog)
+    : mDebugLog                 (aDebugLog                 )
+    , mDevice                   (aDevice                   )
+    , mEnqueueMakeBufferResident(aEnqueueMakeBufferResident)
+    , mEnqueueWaitSignal        (aEnqueueWaitSignal        )
 {
-    assert(0 != aPlatform);
-    assert(0 != aDevice  );
-
-    mDevice = aDevice;
+    assert(   0 != aPlatform                 );
+    assert(   0 != aDevice                   );
+    assert(NULL != aEnqueueMakeBufferResident);
+    assert(NULL != aEnqueueWaitSignal        );
+    assert(NULL != aDebugLog                 );
 
     InitInfo();
 
@@ -38,25 +57,209 @@ Processor_Internal::Processor_Internal(cl_platform_id aPlatform, cl_device_id aD
     lProperties[1] = (cl_context_properties)(aPlatform);
     lProperties[2] = 0;
 
-    cl_int lStatus;
+    // OCLW_CreateContext ==> OCLW_ReleaseContext  See ~Processor_Internal
+    mContext = OCLW_CreateContext(lProperties, 1, &aDevice);
+    assert(NULL != mContext);
 
-    mContext = clCreateContext(lProperties, 1, &aDevice, NULL, NULL, &lStatus);
+    // OCLW_CreateCommandQueueWithProperties ==> OCLW_ReleaseCommandQueue  See ~Processor_Internal
+    mQueue = OCLW_CreateCommandQueueWithProperties(mContext, aDevice);
+    assert(NULL != mQueue);
+}
+
+// Exception  KmsLib::Exception *  See OCL_ReleaseCommandQueue
+//                                 See OCL_ReleaseContext
+// Threads  Apps
+Processor_Internal::~Processor_Internal()
+{
+    assert(NULL != mContext);
+    assert(NULL != mQueue  );
+
+    // OCLW_CreateCommandQueueWithProperties ==> OCLW_ReleaseCommandQueue  See Processor_Internal
+    OCLW_ReleaseCommandQueue(mQueue);
+
+    // OCLW_CreateContext ==> OCLW_ReleaseContext  See Processor_Internal
+    OCLW_ReleaseContext(mContext);
+}
+
+// aFilterData [---;RW-]
+// aBufferInfo [---;-W-]
+// aBufferData [---;-W-]
+//
+// Exception  KmsLib::Exception *  CODE_OPEN_CL_ERROR
+//                                 See GetKernelWorkGroupInfo
+//                                 See OCLW_CreateBuffer
+// Threads  Apps
+//
+// Buffer_Allocate ==> Buffer_Release
+void Processor_Internal::Buffer_Allocate(unsigned int aPacketSize_byte, FilterData * aFilterData, OpenNet_BufferInfo * aBufferInfo, BufferData * aBufferData)
+{
+    assert(OPEN_NET_PACKET_SIZE_MAX_byte >= aPacketSize_byte    );
+    assert(OPEN_NET_PACKET_SIZE_MIN_byte <= aPacketSize_byte    );
+    assert(NULL                          != aFilterData         );
+    assert(NULL                          != aFilterData->mKernel);
+    assert(NULL                          != aBufferInfo         );
+    assert(NULL                          != aBufferData         );
+
+    assert(NULL != mContext);
+    assert(NULL != mQueue  );
+
+    memset(aBufferInfo, 0, sizeof(OpenNet_BufferInfo));
+    memset(aBufferData, 0, sizeof(BufferData        ));
+
+    size_t lPacketQty;
+
+    GetKernelWorkGroupInfo(aFilterData->mKernel, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(lPacketQty), &lPacketQty);
+
+    aBufferInfo->mSize_byte = sizeof(OpenNet_BufferHeader);
+
+    aBufferInfo->mSize_byte += sizeof(OpenNet_PacketInfo) * static_cast<unsigned int>(lPacketQty);
+    aBufferInfo->mSize_byte += aPacketSize_byte           * static_cast<unsigned int>(lPacketQty);
+    aBufferInfo->mSize_byte += (aBufferInfo->mSize_byte / (64 * 1024)) * aPacketSize_byte;
+
+    // OCLW_CreateBuffer ==> OCLW_ReleaseMemObject  See Buffer_Release
+    aBufferData->mMem = OCLW_CreateBuffer(mContext, CL_MEM_BUS_ADDRESSABLE_AMD, aBufferInfo->mSize_byte);
+    assert(NULL != aBufferData->mMem);
+
+    cl_bus_address_amd lBusAddress;
+
+    cl_int lStatus = mEnqueueMakeBufferResident(mQueue, 1, &aBufferData->mMem, CL_TRUE, &lBusAddress, 0, NULL, NULL);
     if (CL_SUCCESS != lStatus)
     {
+        OCLW_ReleaseMemObject(aBufferData->mMem);
+
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
-            "clCreateContext( , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+            "clEnqueueMakeBufferResident( , , , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
     }
 
-    assert(0 != mContext);
+    aBufferData->mPacketQty = static_cast<unsigned int>(lPacketQty);
+    aBufferData->mSize_byte = aBufferInfo->mSize_byte;
 
-    mQueue = clCreateCommandQueueWithProperties(mContext, aDevice, NULL, &lStatus);
+    aBufferInfo->mBuffer_PA = lBusAddress.surface_bus_address;
+    aBufferInfo->mMarker_PA = lBusAddress.marker_bus_address ;
+    aBufferInfo->mPacketQty = static_cast<uint32_t>(lPacketQty);
+}
+
+// aBufferData [---;RW-]
+//
+// Exception  KmsLib::Exception *  CODE_INVALID_ARGUMENT
+//                                 See OCLW_ReleaseMemObject
+// Threads  Apps
+//
+// Buffer_Allocate ==> Buffer_Release
+void Processor_Internal::Buffer_Release(BufferData * aBufferData)
+{
+    assert(NULL != aBufferData      );
+    assert(NULL != aBufferData->mMem);
+
+    // OCLW_CreateBuffer ==> OCLW_ReleaseMemObject  See Buffer_Allocate
+    OCLW_ReleaseMemObject(aBufferData->mMem);
+}
+
+// aFilterData [---;-W-]
+// aFilter     [-K-;RW-]
+//
+// Threads  Apps
+//
+// Processing_Create ==> Processing_Release
+void Processor_Internal::Processing_Create(FilterData * aFilterData, OpenNet::Filter * aFilter)
+{
+    assert(NULL != aFilterData);
+    assert(NULL != aFilter    );
+
+    memset(aFilterData, 0, sizeof(FilterData));
+
+    aFilterData->mFilter = aFilter;
+
+    // OCLW_CreateProgramWithSource ==> OCLW_ReleaseProgram  See Processing_Release
+    aFilterData->mProgram = OCLW_CreateProgramWithSource(mContext, aFilter->GetCodeLineCount(), aFilter->GetCodeLines(), NULL);
+    assert(NULL != aFilterData->mProgram);
+
+    try
+    {
+        OCLW_BuildProgram(aFilterData->mProgram, 1, &mDevice, "-I V:/OpenNet/Includes", NULL, NULL);
+
+        // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Processing_Release
+        aFilterData->mKernel = OCLW_CreateKernel(aFilterData->mProgram, "Filter");
+    }
+    catch ( ... )
+    {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+
+        OCLW_GetProgramBuildInfo(aFilterData->mProgram, mDevice, CL_PROGRAM_BUILD_LOG, OpenNet::Filter::BUILD_LOG_MAX_SIZE_byte, aFilter->AllocateBuildLog());
+
+        OCLW_ReleaseProgram(aFilterData->mProgram);
+        aFilterData->mProgram = NULL;
+        throw;
+    }
+}
+
+// aFilterData [---;RW-]
+// aBufferData [---;RW-]
+//
+// Processing_Queue ==> Processing_Wait
+//
+// Exception  KmsLib::Exception *  CODE_OPEN_CL_ERROR
+//                                 See OCLW_EnqueueNDRangeKernel
+//                                 See OCLW_SetKernelArg
+// Thread  Worker
+void Processor_Internal::Processing_Queue(FilterData * aFilterData, BufferData * aBufferData)
+{
+    assert(NULL != aFilterData            );
+    assert(NULL != aFilterData->mFilter   );
+    assert(NULL != aFilterData->mKernel   );
+    assert(NULL != aBufferData            );
+    assert(NULL != aBufferData->mMem      );
+    assert(   0 <  aBufferData->mPacketQty);
+    assert(   0 <  aBufferData->mSize_byte);
+
+    size_t lGO = 0;
+    size_t lGS = aBufferData->mPacketQty;
+
+    OCLW_SetKernelArg(aFilterData->mKernel, 0, sizeof(aBufferData->mMem), &aBufferData->mMem);
+
+    aFilterData->mFilter->AddKernelArgs(aFilterData->mKernel);
+
+    cl_int lStatus = mEnqueueWaitSignal(mQueue, aBufferData->mMem, OPEN_NET_MARKER_VALUE, 0, NULL, NULL);
     if (CL_SUCCESS != lStatus)
     {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
-            "clCreateCommandQueue( , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+            "EnqueueWaitSignal( , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
     }
 
-    assert(0 != mQueue);
+    OCLW_EnqueueNDRangeKernel(mQueue, aFilterData->mKernel, 1, &lGO, &lGS, NULL, 0, NULL, &aBufferData->mEvent);
+}
+
+// aFilterData [---;RW-]
+//
+// Threads  Apps
+//
+// Processing_Create ==> Processing_Release
+void Processor_Internal::Processing_Release(FilterData * aFilterData)
+{
+    assert(NULL != aFilterData          );
+    assert(NULL != aFilterData->mKernel );
+    assert(NULL != aFilterData->mProgram);
+
+    // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Processing_Create
+    OCLW_ReleaseKernel(aFilterData->mKernel);
+
+    // OCLW_CreateProgramWithSournce ==> OCLW_ReleaseProgram  See Process_Create
+    OCLW_ReleaseProgram(aFilterData->mProgram);
+}
+
+// aBufferData [---;RW-]
+//
+// Thread  Worker
+//
+// Processing_Queue ==> Processing_Wait
+void Processor_Internal::Processing_Wait(BufferData * aBufferData)
+{
+    assert(NULL != aBufferData        );
+    assert(NULL != aBufferData->mEvent);
+
+    OCLW_WaitForEvents(1, &aBufferData->mEvent);
 }
 
 // ===== OpenNet::Processor =================================================
@@ -65,6 +268,7 @@ OpenNet::Status Processor_Internal::GetInfo(Info * aOut) const
 {
     if (NULL == aOut)
     {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -73,10 +277,16 @@ OpenNet::Status Processor_Internal::GetInfo(Info * aOut) const
     return OpenNet::STATUS_OK;
 }
 
+const char * Processor_Internal::GetName() const
+{
+    return mInfo.mName;
+}
+
 OpenNet::Status Processor_Internal::Display(FILE * aOut) const
 {
     if (NULL == aOut)
     {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -88,10 +298,10 @@ OpenNet::Status Processor_Internal::Display(FILE * aOut) const
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
+// Exception  KmsLib::Exception *  See GetDeviceInfo
+// Threads  Apps
 void Processor_Internal::InitInfo()
 {
-    assert(0 != mDevice);
-
     memset(&mInfo, 0, sizeof(mInfo));
 
     GetDeviceInfo(CL_DEVICE_GLOBAL_MEM_CACHE_SIZE   , sizeof(mInfo.mGlobalMemCacheSize_byte   ), &mInfo.mGlobalMemCacheSize_byte   );
@@ -136,29 +346,23 @@ void Processor_Internal::InitInfo()
     GetDeviceInfo(CL_DEVICE_VERSION, sizeof(mInfo.mVersion      ), &mInfo.mVersion      );
 }
 
+// ===== OpenCL =============================================================
+
+// Exception  KmsLib::Exception *  See OCLW_GetDeviceInfo
+// Threads  Apps
 bool Processor_Internal::GetDeviceInfo(cl_device_info aParam)
 {
     assert(0 != mDevice);
 
-    size_t  lInfo_byte;
     cl_bool lResult   ;
 
-    cl_int lRet = clGetDeviceInfo(mDevice, aParam, sizeof(lResult), &lResult, &lInfo_byte);
-    if (CL_SUCCESS != lRet)
-    {
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
-            "clGetDeviceInfo( , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet);
-    }
-
-    if (sizeof(lResult) < lInfo_byte)
-    {
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
-            "clGetDeviceInfo indicated an invalid size", NULL, __FILE__, __FUNCTION__, __LINE__, static_cast<unsigned int>(lInfo_byte));
-    }
+    OCLW_GetDeviceInfo(mDevice, aParam, sizeof(lResult), &lResult);
 
     return lResult;
 }
 
+// Exception  KmsLib::Exception *  See OCLW_GetDeviceInfo
+// Threads  Apps
 void Processor_Internal::GetDeviceInfo(cl_device_info aParam, size_t aOutSize_byte, void * aOut)
 {
     assert(0    <  aOutSize_byte);
@@ -166,22 +370,17 @@ void Processor_Internal::GetDeviceInfo(cl_device_info aParam, size_t aOutSize_by
 
     assert(0 != mDevice);
 
-    size_t lInfo_byte;
+    OCLW_GetDeviceInfo(mDevice, aParam, aOutSize_byte, aOut);
+}
 
-    cl_int lRet = clGetDeviceInfo(mDevice, aParam, aOutSize_byte, aOut, &lInfo_byte);
-    if (CL_SUCCESS != lRet)
-    {
-        char lMsg[1024];
+// Exception  KmsLib::Exception *  See OCLW_GetKernelWorkGroupInfo
+// Threads  Apps
+void Processor_Internal::GetKernelWorkGroupInfo(cl_kernel aKernel, cl_kernel_work_group_info aParam, size_t aOutSize_byte, void * aOut)
+{
+    assert(0    <  aOutSize_byte);
+    assert(NULL != aOut         );
 
-        sprintf_s(lMsg, "clGetDeviceInfo( , , %llu bytes, ,  ) failed", aOutSize_byte);
+    assert(0 != mDevice);
 
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
-            "clGetDeviceInfo( , , , ,  ) failed", lMsg, __FILE__, __FUNCTION__, __LINE__, lRet);
-    }
-
-    if (aOutSize_byte < lInfo_byte)
-    {
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
-            "clGetDeviceInfo indicated an invalid size", NULL, __FILE__, __FUNCTION__, __LINE__, static_cast<unsigned int>(lInfo_byte));
-    }
+    OCLW_GetKernelWorkGroupInfo(aKernel, mDevice, aParam, aOutSize_byte, aOut);
 }

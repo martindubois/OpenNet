@@ -52,13 +52,15 @@ namespace OpenNetK
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    NTSTATUS Hardware_WDF::Init(WDFDEVICE aDevice, Hardware * aHardware)
+    NTSTATUS Hardware_WDF::Init(WDFDEVICE aDevice, Hardware * aHardware, WDFSPINLOCK aZone0)
     {
         ASSERT(NULL != aDevice  );
         ASSERT(NULL != aHardware);
+        ASSERT(NULL != aZone0   );
 
         mDevice   = aDevice  ;
         mHardware = aHardware;
+        mZone0    = aZone0   ;
 
         mMemCount = 0;
 
@@ -106,7 +108,7 @@ namespace OpenNetK
         return mHardware->D0_Exit() ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
     }
 
-    // NOT TESTED  ONK_Lib.Hardware_WDF
+    // NOT TESTED  ONK_Lib.Hardware_WDF.ErrorHandling
     //             PrepareInterrupt or PrepareMemory fail
     NTSTATUS Hardware_WDF::PrepareHardware(WDFCMRESLIST aRaw, WDFCMRESLIST aTranslated)
     {
@@ -131,6 +133,8 @@ namespace OpenNetK
                 NTSTATUS lRet = ReleaseHardware(aTranslated);
                 ASSERT(STATUS_SUCCESS == lRet);
 
+                (void)(lRet);
+
                 break;
             }
         }
@@ -143,6 +147,8 @@ namespace OpenNetK
         ASSERT(NULL != aTranslated);
 
         ASSERT(NULL != mHardware);
+
+        (void)(aTranslated);
 
         mHardware->ResetMemory();
 
@@ -165,8 +171,11 @@ namespace OpenNetK
     NTSTATUS Hardware_WDF::Interrupt_Disable()
     {
         ASSERT(NULL != mHardware);
+        ASSERT(NULL != mZone0   );
 
-        mHardware->Interrupt_Disable();
+        WdfSpinLockAcquire(mZone0);
+            mHardware->Interrupt_Disable();
+        WdfSpinLockRelease(mZone0);
 
         return STATUS_SUCCESS;
     }
@@ -174,15 +183,21 @@ namespace OpenNetK
     void Hardware_WDF::Interrupt_Dpc()
     {
         ASSERT(NULL != mHardware);
+        ASSERT(NULL != mZone0   );
 
-        mHardware->Interrupt_Process2();
+        WdfSpinLockAcquire(mZone0);
+            mHardware->Interrupt_Process2();
+        WdfSpinLockRelease(mZone0);
     }
 
     NTSTATUS Hardware_WDF::Interrupt_Enable()
     {
         ASSERT(NULL != mHardware);
+        ASSERT(NULL != mZone0   );
 
-        mHardware->Interrupt_Enable();
+        WdfSpinLockAcquire(mZone0);
+            mHardware->Interrupt_Enable();
+        WdfSpinLockRelease(mZone0);
 
         return STATUS_SUCCESS;
     }
@@ -198,10 +213,17 @@ namespace OpenNetK
 
         if (lNeedDpc)
         {
-            WdfInterruptQueueDpcForIsr(mInterrupt);
+            TrigProcess2();
         }
 
         return lResult;
+    }
+
+    void Hardware_WDF::TrigProcess2()
+    {
+        ASSERT(NULL != mInterrupt);
+
+        WdfInterruptQueueDpcForIsr(mInterrupt);
     }
 
     // Private
@@ -259,7 +281,7 @@ namespace OpenNetK
     //
     // Thread  PnP
 
-    // NOT TESTED  ONK_Lib.Hardware_WDF
+    // NOT TESTED  ONK_Lib.Hardware_WDF.ErrorHandling
     //             MmMapIoSpace fail<br>
     //             Hardware::SetMemory fail
     NTSTATUS Hardware_WDF::PrepareMemory(CM_PARTIAL_RESOURCE_DESCRIPTOR * aTranslated)

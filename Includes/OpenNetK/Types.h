@@ -11,27 +11,29 @@
 
 // ===== Buffer state =======================================================
 
-// --> INVALID <--+<------------+<----------+
-//        |       |             |           |
-//        +--> RECEVING --> RECEIVED --> TO_SEND
+// --> INVALID --> SENDING <---------------------------+
+//                  |                                  |
+//                  +--> RECEIVING --> PROCESSING --> PROCESSED
 
-#define OPEN_NET_BUFFER_STATE_INVALID   (0)
-#define OPNE_NET_BUFFER_STATE_RECEIVED  (1)
-#define OPEN_NET_BUFFER_STATE_RECEIVING (2)
-#define OPEN_NET_BUFFER_STATE_TO_SEND   (3)
-#define OPEN_NET_BUFFER_STATE_QTY       (4)
+#define OPEN_NET_BUFFER_STATE_INVALID    (0)
+#define OPEN_NET_BUFFER_STATE_PROCESSED  (1)
+#define OPNE_NET_BUFFER_STATE_PROCESSING (2)
+#define OPEN_NET_BUFFER_STATE_RECEIVING  (3)
+#define OPEN_NET_BUFFER_STATE_SENDING    (4)
+#define OPEN_NET_BUFFER_STATE_QTY        (5)
 
 // ===== Packet state / Etat d'un paquet ====================================
 
-// --> INVALID <--+<------------+<----------+
-//        |       |             |           |
-//        +--> RECEVING --> RECEIVED --> TO_SEND
+// --> INVALID --> SENDING <------------------------+
+//                  |                               |
+//                  +--> RECEVING --> RECEIVED --> PROCESSED
 
-#define OPEN_NET_PACKET_STATE_INVALID   (0)
-#define OPNE_NET_PACKET_STATE_RECEIVED  (1)
-#define OPEN_NET_PACKET_STATE_RECEIVING (2)
-#define OPEN_NET_PACKET_STATE_TO_SEND   (3)
-#define OPEN_NET_PACKET_STATE_QTY       (4)
+#define OPEN_NET_PACKET_STATE_INVALID    (0)
+#define OPEN_NET_PACKET_STATE_PROCESSED  (1)
+#define OPEN_NET_PACKET_STATE_RECEIVED   (2)
+#define OPEN_NET_PACKET_STATE_RECEIVING  (3)
+#define OPEN_NET_PACKET_STATE_SENDING    (4)
+#define OPEN_NET_PACKET_STATE_QTY        (5)
 
 // Data type / Type de donnees
 /////////////////////////////////////////////////////////////////////////////
@@ -45,14 +47,12 @@
 /// \endcond
 typedef struct
 {
-    uint32_t mVersion;
-
-    uint32_t mPacketCount          ;
+    uint32_t mPacketQty            ;
     uint32_t mPacketInfoOffset_byte;
     uint32_t mPacketSize_byte      ;
     uint32_t mBufferState          ;
 
-    uint8_t mReserved0[44];
+    uint8_t mReserved0[48];
 }
 OpenNet_BufferHeader;
 
@@ -67,12 +67,12 @@ typedef struct
 {
     uint32_t mToSendTo;
 
-    uint8_t mReserved[4];
+    uint8_t mReserved0[4];
 
     uint32_t mPacketOffset_byte;
     uint32_t mPacketState      ;
     uint32_t mPacketSize_byte  ;
 
-    uint8_t mReserved0[12];
+    uint8_t mReserved1[12];
 }
 OpenNet_PacketInfo;

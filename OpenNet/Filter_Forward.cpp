@@ -25,7 +25,7 @@
 #define EOL "\n"
 
 static const char * CODE =
-"#include <OpenNet/Kernel.h>"                                            EOL
+"#include <OpenNetK/Kernel.h>"                                           EOL
                                                                          EOL
 "OPEN_NET_KERNEL_DECLARE"                                                EOL
 "{"                                                                      EOL
@@ -33,7 +33,7 @@ static const char * CODE =
                                                                          EOL
 "    if ( OPEN_NET_PACKET_STATE_RECEIVED == lPacketInfo->mPacketState )" EOL
 "    {"                                                                  EOL
-"        lPacketInfo->mPacketState = OPEN_NET_PACKET_STATE_TO_SEND;"     EOL
+"        lPacketInfo->mPacketState = OPEN_NET_PACKET_STATE_PROCESSED;"   EOL
 "        lPacketInfo->mToSendTo    = DESTINATIONS;"                      EOL
 "    }"                                                                  EOL
                                                                          EOL
@@ -163,7 +163,7 @@ namespace OpenNet
     {
         assert(0 != mDestinations);
 
-        Status lStatus = SetCode(CODE, sizeof(CODE) - 1);
+        Status lStatus = SetCode(CODE, static_cast<unsigned int>(strlen(CODE)));
         assert(STATUS_OK == lStatus);
 
         char lDestinations[16];

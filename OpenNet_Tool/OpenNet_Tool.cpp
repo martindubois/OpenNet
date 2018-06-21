@@ -31,6 +31,7 @@
 // Commands
 /////////////////////////////////////////////////////////////////////////////
 
+static void Adapter_Display  (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Adapter_GetConfig(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Adapter_GetState (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Adapter_GetStats (KmsLib::ToolBase * aToolBase, const char * aArg);
@@ -39,6 +40,7 @@ static void Adapter_Select   (KmsLib::ToolBase * aToolBase, const char * aArg);
 
 static const KmsLib::ToolBase::CommandInfo ADAPTER_COMMANDS[] =
 {
+    { "Display"  , Adapter_Display  , "Display                       Display the adapter"  , NULL },
     { "GetConfig", Adapter_GetConfig, "GetConfig                     Display configuration", NULL },
     { "GetState" , Adapter_GetState , "GetState                      Display state"        , NULL },
     { "GetStats" , Adapter_GetStats , "GetStats                      Display statistics"   , NULL },
@@ -67,6 +69,7 @@ static const KmsLib::ToolBase::CommandInfo FILTER_FORWARD_COMMANDS[] =
 
 static void Filter_Create      (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Filter_Delete      (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Filter_Display     (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Filter_Edit_Remove (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Filter_Edit_Replace(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Filter_Edit_Search (KmsLib::ToolBase * aToolBase, const char * aArg);
@@ -80,6 +83,7 @@ static const KmsLib::ToolBase::CommandInfo FILTER_COMMANDS[] =
 {
     { "Create"      , Filter_Create      , "Create {Name}                 Create a Filter instance"  , NULL },
     { "Delete"      , Filter_Delete      , "Delete                        Delete the filter instance", NULL },
+    { "Display"     , Filter_Display     , "Display                       Display the filter"        , NULL },
     { "Edit_Remove" , Filter_Edit_Remove , "Edit_Remote {Remove}          Remove strings from code"  , NULL },
     { "Edit_Replace", Filter_Edit_Replace, "Edit_Replace {Search} [Rep]   Search and replace strings", NULL },
     { "Edit_Search" , Filter_Edit_Search , "Edit_Search {Search}          Search a string"           , NULL },
@@ -93,24 +97,33 @@ static const KmsLib::ToolBase::CommandInfo FILTER_COMMANDS[] =
     { NULL, NULL, NULL, NULL }
 };
 
-static void Processor_List  (KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Processor_Select(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Processor_Display(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Processor_List   (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Processor_Select (KmsLib::ToolBase * aToolBase, const char * aArg);
 
 static const KmsLib::ToolBase::CommandInfo PROCESSOR_COMMANDS[] =
 {
-	{ "List"  , Processor_List  , "List                          List the processors", NULL },
-	{ "Select", Processor_Select, "Select {Index}                Select an processor", NULL },
+	{ "Display", Processor_Display, "Display                       Display the processor", NULL },
+	{ "List"   , Processor_List   , "List                          List the processors"  , NULL },
+	{ "Select" , Processor_Select , "Select {Index}                Select an processor"  , NULL },
 
 	{ NULL, NULL, NULL, NULL }
 };
 
+static void Display(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Start  (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Stop   (KmsLib::ToolBase * aToolBase, const char * aArg);
+
 static const KmsLib::ToolBase::CommandInfo COMMANDS[] =
 {
-	{ "Adapter"      , NULL                           , "Adapter ..."                                 , ADAPTER_COMMANDS   },
-	{ "ExecuteScript", KmsLib::ToolBase::ExecuteScript, "ExecuteSript {Script}         Execute script", NULL               },
-	{ "Exit"         , KmsLib::ToolBase::Exit         , "Exit                          Exit"          , NULL               },
-    { "Filter"       , NULL                           , "Filter ..."                                  , FILTER_COMMANDS    },
-	{ "Processor"    , NULL                           , "Processor ..."                               , PROCESSOR_COMMANDS },
+	{ "Adapter"      , NULL                           , "Adapter ..."                                             , ADAPTER_COMMANDS   },
+    { "Display"      , Display                        , "Display                       Display system information", NULL               },
+	{ "ExecuteScript", KmsLib::ToolBase::ExecuteScript, "ExecuteSript {Script}         Execute script"            , NULL               },
+	{ "Exit"         , KmsLib::ToolBase::Exit         , "Exit                          Exit"                      , NULL               },
+    { "Filter"       , NULL                           , "Filter ..."                                              , FILTER_COMMANDS    },
+	{ "Processor"    , NULL                           , "Processor ..."                                           , PROCESSOR_COMMANDS },
+    { "Start"        , Start                          , "Start                         Start the system"          , NULL               },
+    { "Stop"         , Stop                           , "Stop                          Stop the system"           , NULL               },
 
 	{ NULL, NULL, NULL, NULL }
 };
@@ -159,6 +172,23 @@ int main(int aCount, const char ** aVector)
 
 // Commands
 /////////////////////////////////////////////////////////////////////////////
+
+void Adapter_Display(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Adapter Display %s\n", aArg);
+    printf("Adapter Display\n");
+
+    if (NULL == sAdapter)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No adapter selected");
+        return;
+    }
+
+    OpenNet::Status lStatus = sAdapter->Display(stdout);
+    assert(OpenNet::STATUS_OK == lStatus);
+}
 
 void Adapter_GetConfig(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
@@ -233,12 +263,8 @@ void Adapter_List(KmsLib::ToolBase * aToolBase, const char * aArg)
 	unsigned int lCount = sSystem->Adapter_GetCount();
 	for (unsigned int i = 0; i < lCount; i++)
 	{
-		printf("Adapter %u of %u\n", i, lCount);
-
-		sSystem->Adapter_Get(i)->Display(stdout);
+		printf("Adapter %u of %u : %s\n", i, lCount, sSystem->Adapter_Get(i)->GetName());
 	}
-
-    KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Adapter listed");
 }
 
 void Adapter_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
@@ -272,6 +298,17 @@ void Adapter_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
 	default :
 		KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
 	}
+}
+
+void Display(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Display %s\n", aArg);
+    printf("Display\n");
+
+    OpenNet::Status lStatus = sSystem->Display(stdout);
+    assert(OpenNet::STATUS_OK == lStatus);
 }
 
 void Filter_Forward_AddDestination(KmsLib::ToolBase * aToolBase, const char * aArg)
@@ -350,6 +387,8 @@ void Filter_Forward_Create(KmsLib::ToolBase * aToolBase, const char * aArg)
 
         sFilter = new OpenNet::Filter_Forward();
 
+        sFilter->SetName(lName);
+
         sFilters.insert(FilterMap::value_type(lName, sFilter));
 
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Filter_Forward created");
@@ -374,7 +413,7 @@ void Filter_Forward_List(KmsLib::ToolBase * aToolBase, const char * aArg)
         OpenNet::Filter_Forward * lFF = dynamic_cast<OpenNet::Filter_Forward *>(lIt->second);
         if (NULL != lFF)
         {
-            printf("Filter_Forward %s\n", lIt->first.c_str());
+            printf("Filter_Forward : %s\n", lIt->first.c_str());
 
 			lFF->Display(stdout);
         }
@@ -482,6 +521,8 @@ void Filter_Create(KmsLib::ToolBase * aToolBase, const char * aArg)
 
         sFilter = new OpenNet::Filter();
 
+        sFilter->SetName(lName);
+
         sFilters.insert(FilterMap::value_type(lName, sFilter));
 
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Filter created");
@@ -519,6 +560,23 @@ void Filter_Delete(KmsLib::ToolBase * aToolBase, const char * aArg)
     }
 
     KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Filter deleted");
+}
+
+void Filter_Display(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Filter Display %s\n", aArg);
+    printf("Filter Display\n");
+
+    if (NULL == sFilter)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No filter selected");
+        return;
+    }
+
+    OpenNet::Status lStatus = sFilter->Display(stdout);
+    assert(OpenNet::STATUS_OK == lStatus);
 }
 
 void Filter_Edit_Remove(KmsLib::ToolBase * aToolBase, const char * aArg)
@@ -652,7 +710,7 @@ void Filter_List(KmsLib::ToolBase * aToolBase, const char * aArg)
     {
         assert(NULL != lIt->second);
 
-        printf("Filter %s\n", lIt->first.c_str());
+        printf("Filter : %s\n", lIt->first.c_str());
 
         lIt->second->Display(stdout);
     }
@@ -740,6 +798,23 @@ void Filter_SetCode(KmsLib::ToolBase * aToolBase, const char * aArg)
     }
 }
 
+void Processor_Display(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Processor Display %s\n", aArg);
+    printf("Processor Display\n");
+
+    if (NULL == sProcessor)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No processor selected");
+        return;
+    }
+
+    OpenNet::Status lStatus = sProcessor->Display(stdout);
+    assert(OpenNet::STATUS_OK == lStatus);
+}
+
 void Processor_List(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
 	assert(NULL != aArg);
@@ -750,9 +825,7 @@ void Processor_List(KmsLib::ToolBase * aToolBase, const char * aArg)
 	unsigned int lCount = sSystem->Processor_GetCount();
 	for (unsigned int i = 0; i < lCount; i++)
 	{
-		printf("Processor %u of %u\n", i, lCount);
-
-        sSystem->Processor_Get(i)->Display(stdout);
+		printf("Processor %u of %u : %s\n", i, lCount, sSystem->Processor_Get(i)->GetName());
 	}
 
     KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Processor listed");
@@ -789,6 +862,42 @@ void Processor_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
 	default:
 		KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
 	}
+}
+
+void Stop(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Stop %s\n", aArg);
+    printf("Stop\n");
+
+    OpenNet::Status lStatus = sSystem->Stop();
+    if (OpenNet::STATUS_OK != lStatus)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System::Stop failed");
+        OpenNet::Status_Display(lStatus, stdout);
+        return;
+    }
+
+    KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System stopped");
+}
+
+void Start(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Start %s\n", aArg);
+    printf("Start\n");
+
+    OpenNet::Status lStatus = sSystem->Start();
+    if (OpenNet::STATUS_OK != lStatus)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System::Start failed");
+        OpenNet::Status_Display(lStatus, stdout);
+        return;
+    }
+
+    KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System started");
 }
 
 // Static functions

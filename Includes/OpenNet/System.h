@@ -47,12 +47,45 @@ namespace OpenNet
         static OPEN_NET_PUBLIC System * Create();
 
         /// \cond en
+        /// \brief   Retrieve the system identifier
+        /// \return  This method return the system identifier.
+        /// \endcond
+        /// \cond fr
+        /// \brief   Obtenir l'identificateur de system.
+        /// \return  Cette methode retourne l'identificateur de system.
+        /// \endcond
+        virtual unsigned int GetSystemId() const = 0;
+
+        /// \cond en
+        /// \brief   Set the maximum packet size
+        /// \param   aSize_byte  The maximum packet size
+        /// \endcond
+        /// \cond fr
+        /// \brief   Changer la taille maximal des paquets
+        /// \param   aSize_byte  La taille maximal des paquets
+        /// \endcond
+        /// \retval  STATUS_PACKET_TOO_LARGE
+        /// \retval  STATUS_PACKET_TOO_SMALL
+        virtual Status SetPacketSize(unsigned int aSize_byte) = 0;
+
+        /// \cond en
         /// \brief   This methode delete the instance.
         /// \endcond
         /// \cond fr
         /// \brief   Cette methode detruit l'instance.
         /// \endcond
         virtual void Delete();
+
+        /// \cond en
+        /// \brief   Connect an Adapter to the System
+        /// \param   aAdapter  The Adapter
+        /// \endcond
+        /// \cond fr
+        /// \brief   Connecte un Adapter au System
+        /// \param   aAdapter  L'Adapter
+        /// \endcond
+        /// \retval  STATUS_OK
+        virtual Status Adapter_Connect(Adapter * aAdapter) = 0;
 
         /// \cond en
         /// \return  This methode return the number of adapters.
@@ -81,7 +114,7 @@ namespace OpenNet
         /// \retval aOut [---;RW-] Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
-        Status Display(FILE * aOut);
+        virtual Status Display(FILE * aOut) = 0;
 
         /// \cond en
         /// \return  This methode return the number of processors.
@@ -100,6 +133,24 @@ namespace OpenNet
         /// \return  Cette methode retourne le processeur.
         /// \endcond
         virtual Processor * Processor_Get( unsigned int aIndex ) = 0;
+
+        /// \cond en
+        /// \brief  Start
+        /// \endcond
+        /// \cond fr
+        /// \brief  Demarrer
+        /// \endcond
+        /// \retval STATUS_OK
+        virtual Status Start() = 0;
+
+        /// \cond en
+        /// \brief  Stop
+        /// \endcond
+        /// \cond fr
+        /// \brief  Arreter
+        /// \endcond
+        /// \retval STATUS_OK
+        virtual Status Stop() = 0;
 
     protected:
 
