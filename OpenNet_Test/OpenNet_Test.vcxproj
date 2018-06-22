@@ -95,12 +95,17 @@
     <ClCompile Include="EthernetAddress.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Filter_Forward.cpp" />
+    <ClCompile Include="Loop.cpp" />
     <ClCompile Include="Mirror.cpp" />
     <ClCompile Include="OpenNet_Test.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="Status.cpp" />
     <ClCompile Include="System.cpp" />
+    <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VersionInfo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

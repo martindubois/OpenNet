@@ -17,6 +17,9 @@
 #include <OpenNet/EthernetAddress.h>
 #include <OpenNet/System.h>
 
+// ====== OpenNet_Test ======================================================
+#include "Utilities.h"
+
 // Tests
 /////////////////////////////////////////////////////////////////////////////
 
@@ -102,10 +105,25 @@ KMS_TEST_BEGIN(Adapter_SetupA)
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lA0->GetState(NULL ));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , lA0->GetState(&lSe0));
 
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->ResetStats());
+
     OpenNet::Adapter::Stats lSs0;
 
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lA0->GetStats(NULL ));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , lA0->GetStats(&lSs0));
+
+    OpenNet::Adapter::Stats lSsE;
+    OpenNet::Adapter::Stats lSsM;
+
+    Utl_ValidateInit(&lSsE, &lSsM);
+
+    lSsE.mDriver.mAdapter.mIoCtl              = 1;
+    lSsE.mDriver.mAdapter_NoReset.mIoCtl_Last = OPEN_NET_IOCTL_STATS_RESET;
+
+    lSsM.mDriver.mAdapter_NoReset.mIoCtl_Stats_Reset = UTL_MASK_ABOVE;
+    lSsM.mDriver.mHardware_NoReset.mStats_Reset      = UTL_MASK_ABOVE;
+
+    KMS_TEST_COMPARE(0, Utl_Validate(lSs0, lSsE, lSsM));
 
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lA0->Packet_Send(NULL, 0));
     KMS_TEST_COMPARE(OpenNet::STATUS_PACKET_TOO_SMALL         , lA0->Packet_Send(""  , 0));
@@ -119,8 +137,6 @@ KMS_TEST_BEGIN(Adapter_SetupA)
     KMS_TEST_COMPARE(OpenNet::STATUS_FILTER_NOT_SET, lA0->ResetInputFilter());
 
     KMS_TEST_COMPARE(OpenNet::STATUS_PROCESSOR_NOT_SET, lA0->ResetProcessor());
-
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->ResetStats());
 
     OpenNet::Adapter::Config * lCP = NULL;
 

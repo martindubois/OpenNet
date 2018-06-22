@@ -17,6 +17,9 @@
 #include <OpenNet/Filter_Forward.h>
 #include <OpenNet/System.h>
 
+// ===== OpenNet_Test =======================================================
+#include "Utilities.h"
+
 // Configuration
 /////////////////////////////////////////////////////////////////////////////
 
@@ -64,38 +67,36 @@ Cleanup1:
 
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->GetStats(&lStats));
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, OpenNet::Adapter::Display(lStats, stdout));
+    OpenNet::Adapter::Stats lStatsE;
+    OpenNet::Adapter::Stats lStatsM;
 
-    KMS_TEST_COMPARE(BUFFER_QTY, lStats.mDll.mBuffer_Allocated            );
-    KMS_TEST_COMPARE(BUFFER_QTY, lStats.mDll.mBuffer_Released             );
-    KMS_TEST_COMPARE(         0, lStats.mDll.mPacket_Send                 );
-    KMS_TEST_COMPARE(         1, lStats.mDll.mRun_Entry                   );
-    KMS_TEST_COMPARE(         0, lStats.mDll.mRun_Exception               );
-    KMS_TEST_COMPARE(         1, lStats.mDll.mRun_Exit                    );
-    KMS_TEST_COMPARE(         0, lStats.mDll.mRun_Loop_Exception          );
-    KMS_TEST_COMPARE(         0, lStats.mDll.mRun_Loop_UnexpectedException);
-    KMS_TEST_COMPARE(BUFFER_QTY, lStats.mDll.mRun_Loop_Wait               );
-    KMS_TEST_COMPARE(BUFFER_QTY, lStats.mDll.mRun_Queue                   );
-    KMS_TEST_COMPARE(         0, lStats.mDll.mRun_UnexpectedException     );
-    KMS_TEST_COMPARE(         1, lStats.mDll.mStart                       );
-    KMS_TEST_COMPARE(         1, lStats.mDll.mStop                        );
+    Utl_ValidateInit(&lStatsE, &lStatsM);
 
-    KMS_TEST_ASSERT (         0 <  lStats.mDriver.mAdapter.mBuffers_Process   );
-    KMS_TEST_COMPARE(BUFFER_QTY  , lStats.mDriver.mAdapter.mBuffer_InitHeader );
-    KMS_TEST_ASSERT (         0 <  lStats.mDriver.mAdapter.mBuffer_Process    );
-    KMS_TEST_ASSERT (         0 <  lStats.mDriver.mAdapter.mBuffer_Process    );
-    KMS_TEST_COMPARE(BUFFER_QTY  , lStats.mDriver.mAdapter.mBuffer_Queue      );
-    KMS_TEST_ASSERT (BUFFER_QTY <= lStats.mDriver.mAdapter.mBuffer_Receive    );
-    KMS_TEST_ASSERT (         0 <  lStats.mDriver.mAdapter.mBuffer_Send       );
-    KMS_TEST_ASSERT (         0 <  lStats.mDriver.mAdapter.mBuffer_SendPackets);
-    KMS_TEST_ASSERT (         0 == lStats.mDriver.mAdapter.mTx_Packet         );
+    lStatsE.mDll.mBuffer_Allocated = BUFFER_QTY;
+    lStatsE.mDll.mBuffer_Released  = BUFFER_QTY;
+    lStatsE.mDll.mRun_Entry        = 1;
+    lStatsE.mDll.mRun_Exit         = 1;
+    lStatsE.mDll.mRun_Loop_Wait    = BUFFER_QTY;
+    lStatsE.mDll.mRun_Queue        = BUFFER_QTY;
+    lStatsE.mDll.mStart            = 1;
+    lStatsE.mDll.mStop             = 1;
 
-    KMS_TEST_ASSERT(0 <  lStats.mDriver.mHardware.mInterrupt_Process );
-    KMS_TEST_ASSERT(0 <  lStats.mDriver.mHardware.mInterrupt_Process2);
-    KMS_TEST_ASSERT(0 <  lStats.mDriver.mHardware.mPacket_Receive    );
-    KMS_TEST_ASSERT(0 == lStats.mDriver.mHardware.mPacket_Send       );
-    KMS_TEST_ASSERT(0 <  lStats.mDriver.mHardware.mRx_Packet         );
-    KMS_TEST_ASSERT(0 == lStats.mDriver.mHardware.mTx_Packet         );
+    lStatsE.mDriver.mAdapter.mBuffer_InitHeader = BUFFER_QTY;
+    lStatsE.mDriver.mAdapter.mBuffer_Queue      = BUFFER_QTY;
+    lStatsE.mDriver.mAdapter.mBuffer_Receive    = BUFFER_QTY;
+
+    lStatsM.mDriver.mAdapter.mBuffers_Process     = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter.mBuffer_Process      = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter.mBuffer_Process      = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter.mBuffer_Receive      = UTL_MASK_ABOVE_OR_EQUAL;
+    lStatsM.mDriver.mAdapter.mBuffer_Send         = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter.mBuffer_SendPackets  = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mHardware.mInterrupt_Process  = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mHardware.mInterrupt_Process2 = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mHardware.mPacket_Receive     = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mHardware.mRx_Packet          = UTL_MASK_ABOVE;
+
+    KMS_TEST_COMPARE(0, Utl_Validate(lStats, lStatsE, lStatsM));
 
 Cleanup0:
     lS0->Delete();
