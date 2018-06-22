@@ -7,6 +7,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== C ==================================================================
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -48,6 +49,15 @@ static const char * LINK_STATE_NAMES[OPEN_NET_LINK_STATE_QTY] =
 
 static const char * GetIoCtlName(unsigned int aCode);
 
+static void Display(const OpenNet::Adapter::Stats_Dll    & aIn, FILE * aOut);
+static void Display(const OpenNet_Stats                  & aIn, FILE * aOut);
+static void Display(const OpenNet_Stats_Adapter          & aIn, FILE * aOut);
+static void Display(const OpenNet_Stats_Adapter_NoReset  & aIn, FILE * aOut);
+static void Display(const OpenNet_Stats_Hardware         & aIn, FILE * aOut);
+static void Display(const OpenNet_Stats_Hardware_NoReset & aIn, FILE * aOut);
+
+static void DisplayStats(const char * aText, unsigned int aValue, FILE * aOut);
+
 namespace OpenNet
 {
 
@@ -58,6 +68,8 @@ namespace OpenNet
     {
         if (NULL == (&aIn)) { return STATUS_INVALID_REFERENCE        ; }
         if (NULL ==   aOut) { return STATUS_NOT_ALLOWED_NULL_ARGUMENT; }
+
+        fprintf(aOut, "  Adapter Configuration :\n");
 
         if (OPEN_NET_MODE_QTY > aIn.mMode)
         {
@@ -96,6 +108,8 @@ namespace OpenNet
         if (NULL == (&aIn))	{ return STATUS_INVALID_REFERENCE        ; }
         if (NULL ==   aOut)	{ return STATUS_NOT_ALLOWED_NULL_ARGUMENT; }
 
+        fprintf(aOut, "  Adapter Information :\n");
+
         if (OPEN_NET_ADAPTER_TYPE_QTY > aIn.mAdapterType)
         {
             fprintf(aOut, "    Adapter Type       = %u - %s\n", aIn.mAdapterType, ADAPTER_TYPE_NAMES[aIn.mAdapterType]);
@@ -123,15 +137,15 @@ namespace OpenNet
 
         EthernetAddress_Display(aIn.mEthernetAddress, aOut);
 
-        fprintf(aOut, "    Version Driver\n");
+        fprintf(aOut, "    Version - Driver :\n");
 
         VersionInfo_Display(aIn.mVersion_Driver  , aOut);
 
-        fprintf(aOut, "    Version Hardware\n");
+        fprintf(aOut, "    Version - Hardware :\n");
 
         VersionInfo_Display(aIn.mVersion_Hardware, aOut);
 
-        fprintf(aOut, "    Version Driver\n");
+        fprintf(aOut, "    Version - ONK_Lib :\n");
 
         VersionInfo_Display(aIn.mVersion_ONK_Lib , aOut);
 
@@ -149,6 +163,8 @@ namespace OpenNet
         {
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
         }
+
+        fprintf(aOut, "  Adapter State :\n");
 
         if      (OPEN_NET_ADAPTER_NO_QTY     >  aIn.mAdapterNo) { fprintf(aOut, "    Adapter No  = %u\n"                       , aIn.mAdapterNo); }
         else if (OPEN_NET_ADAPTER_NO_UNKNOWN == aIn.mAdapterNo) { fprintf(aOut, "    Adapter No  = %u - Unknown\n"             , aIn.mAdapterNo); }
@@ -174,24 +190,10 @@ namespace OpenNet
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
         }
 
-        fprintf(aOut, "    IoCtl         = %u\n"           , aIn.mIoCtl            );
-        fprintf(aOut, "      - Last      = 0x%08x - %s\n"  , aIn.mIoCtl_Last       , GetIoCtlName(aIn.mIoCtl_Last));
-        fprintf(aOut, "         - Result = 0x%08x\n"       , aIn.mIoCtl_Last_Result);
-        fprintf(aOut, "    Rx            = %u buffers\n"   , aIn.mRx_buffer        );
-        fprintf(aOut, "                  = %llu bytes\n"   , aIn.mRx_byte          );
-        fprintf(aOut, "                  = %u errors\n"    , aIn.mRx_error         );
-        fprintf(aOut, "                  = %u interrupts\n", aIn.mRx_interrupt     );
-        fprintf(aOut, "                  = %u packets\n"   , aIn.mRx_packet        );
-        fprintf(aOut, "    Stats - Get   = %u\n"           , aIn.mStats_Get        );
-        fprintf(aOut, "          - Reset = %u\n"           , aIn.mStats_Reset      );
-        fprintf(aOut, "    Tx            = %u buffers\n"   , aIn.mTx_buffer        );
-        fprintf(aOut, "                  = %llu bytes\n"   , aIn.mTx_byte          );
-        fprintf(aOut, "                  = %u errors\n"    , aIn.mTx_error         );
-        fprintf(aOut, "                  = %u interrupts\n", aIn.mTx_interrupt     );
-        fprintf(aOut, "                  = %u packets\n"   , aIn.mTx_packet        );
-        fprintf(aOut, "      - Send      = %u bytes\n"     , aIn.mTx_Send_byte     );
-        fprintf(aOut, "                  = %u errors\n"    , aIn.mTx_Send_error    );
-        fprintf(aOut, "                  = %u packets\n"   , aIn.mTx_Send_packet   );
+        fprintf(aOut, "Adapter Statistics:\n");
+
+        ::Display(aIn.mDll   , aOut);
+        ::Display(aIn.mDriver, aOut);
 
         return STATUS_OK;
     }
@@ -212,17 +214,131 @@ const char * GetIoCtlName(unsigned int aCode)
 {
     switch (aCode)
     {
-    case OPEN_NET_IOCTL_BUFFER_QUEUE   : return "BUFFER_QUEUE"   ;
-    case OPEN_NET_IOCTL_BUFFER_RETRIEVE: return "BUFFER_RETRIEVE";
-    case OPEN_NET_IOCTL_CONFIG_GET     : return "CONFIG_GET"     ;
-    case OPEN_NET_IOCTL_CONFIG_SET     : return "CONFIG_SET"     ;
-    case OPEN_NET_IOCTL_CONNECT        : return "CONNECT"        ;
-    case OPEN_NET_IOCTL_INFO_GET       : return "INFO_GET"       ;
-    case OPEN_NET_IOCTL_PACKET_SEND    : return "PACKET_SEND"    ;
-    case OPEN_NET_IOCTL_STATE_GET      : return "STATE_GET"      ;
-    case OPEN_NET_IOCTL_STATS_GET      : return "STATS_GET"      ;
-    case OPEN_NET_IOCTL_STATS_RESET    : return "STATS_RESET"    ;
+    case OPEN_NET_IOCTL_CONFIG_GET : return "CONFIG_GET" ;
+    case OPEN_NET_IOCTL_CONFIG_SET : return "CONFIG_SET" ;
+    case OPEN_NET_IOCTL_CONNECT    : return "CONNECT"    ;
+    case OPEN_NET_IOCTL_INFO_GET   : return "INFO_GET"   ;
+    case OPEN_NET_IOCTL_PACKET_SEND: return "PACKET_SEND";
+    case OPEN_NET_IOCTL_START      : return "START"      ;
+    case OPEN_NET_IOCTL_STATE_GET  : return "STATE_GET"  ;
+    case OPEN_NET_IOCTL_STATS_GET  : return "STATS_GET"  ;
+    case OPEN_NET_IOCTL_STATS_RESET: return "STATS_RESET";
+    case OPEN_NET_IOCTL_STOP       : return "STOP"       ;
     }
 
     return "Invalid IoCtl code";
+}
+
+void Display(const OpenNet::Adapter::Stats_Dll & aIn, FILE * aOut)
+{
+    assert(NULL != (&aIn));
+    assert(NULL !=   aOut);
+
+    fprintf(aOut, "  Dll Statistics :\n");
+    fprintf(aOut, "    Buffer - Allocated                = %u\n", aIn.mBuffer_Allocated   );
+    DisplayStats( "           - Released                 = %u\n", aIn.mBuffer_Released             , aOut);
+    DisplayStats( "    Packet - Send                     = %u\n", aIn.mPacket_Send                 , aOut);
+    fprintf(aOut, "    Run - Entry                       = %u\n", aIn.mRun_Entry          );
+    DisplayStats( "        - Exception                   = %u\n", aIn.mRun_Exception               , aOut);
+    DisplayStats( "        - Exit                        = %u\n", aIn.mRun_Exit                    , aOut);
+    fprintf(aOut, "        - Iteration - Queue           = %u\n", aIn.mRun_Iteration_Queue);
+    DisplayStats( "                    - Wait            = %u\n", aIn.mRun_Iteration_Wait          , aOut);
+    fprintf(aOut, "        - Loop - Exception            = %u\n", aIn.mRun_Loop_Exception );
+    DisplayStats( "               - Unexpected Exception = %u\n", aIn.mRun_Loop_UnexpectedException, aOut);
+    DisplayStats( "               - Wait                 = %u\n", aIn.mRun_Loop_Wait               , aOut);
+    DisplayStats( "        - Queue                       = %u\n", aIn.mRun_Queue                   , aOut);
+    DisplayStats( "        - Unexpected Exception        = %u\n", aIn.mRun_UnexpectedException     , aOut);
+    DisplayStats( "    Start                             = %u\n", aIn.mStart                       , aOut);
+    DisplayStats( "    Stop                              = %u\n", aIn.mStop                        , aOut);
+}
+
+void Display(const OpenNet_Stats & aIn, FILE * aOut)
+{
+    assert(NULL != (&aIn));
+    assert(NULL !=   aOut);
+
+    fprintf(aOut, "  Driver Statistics :\n");
+
+    ::Display(aIn.mAdapter         , aOut);
+    ::Display(aIn.mAdapter_NoReset , aOut);
+    ::Display(aIn.mHardware        , aOut);
+    ::Display(aIn.mHardware_NoReset, aOut);
+}
+
+void Display(const OpenNet_Stats_Adapter & aIn, FILE * aOut)
+{
+    assert(NULL != (&aIn));
+    assert(NULL !=   aOut);
+
+    fprintf(aOut, "    Adapter Statistics :\n");
+    fprintf(aOut, "      Buffer - InitHeader  = %u\n", aIn.mBuffer_InitHeader);
+    DisplayStats( "             - Process     = %u\n", aIn.mBuffer_Process    , aOut);
+    DisplayStats( "             - Queue       = %u\n", aIn.mBuffer_Queue      , aOut);
+    DisplayStats( "             - Receive     = %u\n", aIn.mBuffer_Receive    , aOut);
+    DisplayStats( "             - Send        = %u\n", aIn.mBuffer_Send       , aOut);
+    DisplayStats( "             - SendPackets = %u\n", aIn.mBuffer_SendPackets, aOut);
+    DisplayStats( "             - Stop        = %u\n", aIn.mBuffer_Stop       , aOut);
+    DisplayStats( "      Buffers - Process    = %u\n", aIn.mBuffers_Process   , aOut);
+    fprintf(aOut, "      IoCtl                = %u\n", aIn.mIoCtl            );
+    fprintf(aOut, "        - Config - Get     = %u\n", aIn.mIoCtl_Config_Get );
+    DisplayStats( "                 - Set     = %u\n", aIn.mIoCtl_Config_Set  , aOut);
+    DisplayStats( "        - Connect          = %u\n", aIn.mIoCtl_Connect     , aOut);
+    DisplayStats( "        - Info - Get       = %u\n", aIn.mIoCtl_Info_Get    , aOut);
+    DisplayStats( "        - Packet - Send    = %u\n", aIn.mIoCtl_Packet_Send , aOut);
+    DisplayStats( "        - Start            = %u\n", aIn.mIoCtl_Start       , aOut);
+    DisplayStats( "        - State - Get      = %u\n", aIn.mIoCtl_State_Get   , aOut);
+    DisplayStats( "        - Stats - Get      = %u\n", aIn.mIoCtl_Stats_Get   , aOut);
+    DisplayStats( "        - Stop             = %u\n", aIn.mIoCtl_Stop        , aOut);
+    DisplayStats( "      Tx - Packet          = %u\n", aIn.mTx_Packet         , aOut);
+}
+
+void Display(const OpenNet_Stats_Adapter_NoReset & aIn, FILE * aOut)
+{
+    assert(NULL != (&aIn));
+    assert(NULL !=   aOut);
+
+    fprintf(aOut, "    Adapter statistics (No Reset) :\n");
+    fprintf(aOut, "      IoCtl - Last          = 0x%08x - %s\n", aIn.mIoCtl_Last, GetIoCtlName(aIn.mIoCtl_Last));
+    DisplayStats( "                - Result    = 0x%08x\n"     , aIn.mIoCtl_Last_Result, aOut);
+    DisplayStats( "            - Stats - Reset = %u\n"         , aIn.mIoCtl_Stats_Reset, aOut);
+}
+
+void Display(const OpenNet_Stats_Hardware & aIn, FILE * aOut)
+{
+    assert(NULL != (&aIn));
+    assert(NULL !=   aOut);
+
+    fprintf(aOut, "    Hardware Statistics :\n");
+    fprintf(aOut, "      D0 - Entry           = %u\n", aIn.mD0_Entry         );
+    DisplayStats( "         - Exit            = %u\n", aIn.mD0_Exit           , aOut);
+    fprintf(aOut, "      Interrupt - Disable  = %u\n", aIn.mInterrupt_Disable);
+    DisplayStats( "                - Enable   = %u\n", aIn.mInterrupt_Enable  , aOut);
+    DisplayStats( "                - Process  = %u\n", aIn.mInterrupt_Process , aOut);
+    DisplayStats( "                - Process2 = %u\n", aIn.mInterrupt_Process2, aOut);
+    fprintf(aOut, "      Packet - Receive     = %u\n", aIn.mPacket_Receive   );
+    DisplayStats( "             - Send        = %u\n", aIn.mPacket_Send       , aOut);
+    DisplayStats( "      Rx - Packet          = %u\n", aIn.mRx_Packet         , aOut);
+    DisplayStats( "      SetConfig            = %u\n", aIn.mSetConfig         , aOut);
+    DisplayStats( "      Stats - Get          = %u\n", aIn.mStats_Get         , aOut);
+    DisplayStats( "      Tx - Packet          = %u\n", aIn.mTx_Packet         , aOut);
+}
+
+void Display(const OpenNet_Stats_Hardware_NoReset & aIn, FILE * aOut)
+{
+    assert(NULL != (&aIn));
+    assert(NULL !=   aOut);
+
+    fprintf(aOut, "    Hardware Statistics (No Reset) :\n");
+    fprintf(aOut, "      Stats - Reset = %u\n", aIn.mStats_Reset);
+}
+
+void DisplayStats(const char * aFormat, unsigned int aValue, FILE * aOut)
+{
+    assert(NULL != aFormat);
+    assert(NULL != aOut   );
+
+    if (0 < aValue)
+    {
+        fprintf(aOut, aFormat, aValue);
+    }
 }

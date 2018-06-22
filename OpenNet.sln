@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC
 	ProjectSection(SolutionItems) = preProject
 		Includes\OpenNetK\Adapter.h = Includes\OpenNetK\Adapter.h
 		Includes\OpenNetK\Adapter_WDF.h = Includes\OpenNetK\Adapter_WDF.h
+		Includes\OpenNetK\Constants.h = Includes\OpenNetK\Constants.h
 		Includes\OpenNetK\Debug.h = Includes\OpenNetK\Debug.h
 		Includes\OpenNetK\Hardware.h = Includes\OpenNetK\Hardware.h
 		Includes\OpenNetK\Hardware_WDF.h = Includes\OpenNetK\Hardware_WDF.h

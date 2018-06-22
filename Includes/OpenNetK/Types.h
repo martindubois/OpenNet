@@ -11,16 +11,19 @@
 
 // ===== Buffer state =======================================================
 
+//                  +--> STOPPED
+//                  |
 // --> INVALID --> SENDING <---------------------------+
 //                  |                                  |
 //                  +--> RECEIVING --> PROCESSING --> PROCESSED
 
 #define OPEN_NET_BUFFER_STATE_INVALID    (0)
 #define OPEN_NET_BUFFER_STATE_PROCESSED  (1)
-#define OPNE_NET_BUFFER_STATE_PROCESSING (2)
+#define OPEN_NET_BUFFER_STATE_PROCESSING (2)
 #define OPEN_NET_BUFFER_STATE_RECEIVING  (3)
 #define OPEN_NET_BUFFER_STATE_SENDING    (4)
-#define OPEN_NET_BUFFER_STATE_QTY        (5)
+#define OPEN_NET_BUFFER_STATE_STOPPED    (5)
+#define OPEN_NET_BUFFER_STATE_QTY        (6)
 
 // ===== Packet state / Etat d'un paquet ====================================
 

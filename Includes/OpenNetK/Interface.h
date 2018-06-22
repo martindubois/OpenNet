@@ -12,10 +12,6 @@
 // {C0BE33A0-FFBA-46BA-B131-63BB331CA73E}
 static const GUID OPEN_NET_DRIVER_INTERFACE = { 0xC0BE33A0, 0xFFBA, 0x46BA,{ 0xB1, 0x31, 0x63, 0xBB, 0x33, 0x1C, 0xA7, 0x3E } };
 
-#define OPEN_NET_BUFFER_QTY (8)
-
-#define OPEN_NET_MARKER_VALUE (0xa0a0a0a0)
-
 // ===== Adapter numero =====================================================
 #define OPEN_NET_ADAPTER_NO_QTY     (32)
 #define OPEN_NET_ADAPTER_NO_UNKNOWN (99)
@@ -28,32 +24,28 @@ static const GUID OPEN_NET_DRIVER_INTERFACE = { 0xC0BE33A0, 0xFFBA, 0x46BA,{ 0xB
 
 // ===== IoCtl ==============================================================
 
-// Input   OpenNet_BufferInfo[ 1 .. N ]
-// Output  None
-#define OPEN_NET_IOCTL_BUFFER_QUEUE    CTL_CODE( 0x8000, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// Input   None
-// Output  OpenNet_BufferInfp[ 1 .. N ]
-#define OPEN_NET_IOCTL_BUFFER_RETRIEVE CTL_CODE( 0x8000, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
 // Input   None
 // Output  OpenNet_Config
-#define OPEN_NET_IOCTL_CONFIG_GET      CTL_CODE( 0x8000, 0x810, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define OPEN_NET_IOCTL_CONFIG_GET      CTL_CODE( 0x8000, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Input   OpenNet_Config
 // Output  OpenNet_Config
-#define OPEN_NET_IOCTL_CONFIG_SET      CTL_CODE( 0x8000, 0x811, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define OPEN_NET_IOCTL_CONFIG_SET      CTL_CODE( 0x8000, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Input   OpenNet_AdapterConnect_In
 // Output  None
-#define OPEN_NET_IOCTL_CONNECT         CTL_CODE( 0x8000, 0x820, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define OPEN_NET_IOCTL_CONNECT         CTL_CODE( 0x8000, 0x810, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Output  OpenNet_AdatperInfo
-#define OPEN_NET_IOCTL_INFO_GET        CTL_CODE( 0x8000, 0x830, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define OPEN_NET_IOCTL_INFO_GET        CTL_CODE( 0x8000, 0x820, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Input   The paquet
 // Output  None
-#define OPEN_NET_IOCTL_PACKET_SEND     CTL_CODE( 0x8000, 0x840, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define OPEN_NET_IOCTL_PACKET_SEND     CTL_CODE( 0x8000, 0x830, METHOD_BUFFERED, FILE_ANY_ACCESS )
+
+// Input   OpenNet_BufferInfo[ 1 .. N ]
+// Output  None
+#define OPEN_NET_IOCTL_START           CTL_CODE( 0x8000, 0x840, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Input   None// Input   None
 // Output  OpenNet_State
@@ -66,6 +58,10 @@ static const GUID OPEN_NET_DRIVER_INTERFACE = { 0xC0BE33A0, 0xFFBA, 0x46BA,{ 0xB
 // Input   None
 // Output  None
 #define OPEN_NET_IOCTL_STATS_RESET     CTL_CODE( 0x8000, 0x861, METHOD_BUFFERED, FILE_ANY_ACCESS )
+
+// Input   None
+// Output  None
+#define OPEN_NET_IOCTL_STOP            CTL_CODE( 0x8000, 0x870, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // ===== Link state =========================================================
 #define OPEN_NET_LINK_STATE_UNKNOWN (0)
@@ -224,11 +220,12 @@ typedef struct
     }
     mFlags;
 
-    uint32_t mAdapterNo ;
-    uint32_t mSpeed_MB_s;
-    uint32_t mSystemId  ;
+    uint32_t mAdapterNo  ;
+    uint32_t mBufferCount;
+    uint32_t mSpeed_MB_s ;
+    uint32_t mSystemId   ;
 
-    uint32_t mReserved0[124];
+    uint32_t mReserved0[123];
 }
 OpenNet_State;
 
@@ -241,31 +238,100 @@ OpenNet_State;
 /// \endcond
 typedef struct
 {
-    uint64_t mRx_byte;
-    uint64_t mTx_byte;
+    uint32_t mBuffer_InitHeader ; //  0
+    uint32_t mBuffer_Process    ;
+    uint32_t mBuffer_Queue      ;
+    uint32_t mBuffer_Receive    ;
+    uint32_t mBuffer_Send       ;
+    uint32_t mBuffer_SendPackets; //  5
+    uint32_t mBuffer_Stop       ;
+    uint32_t mBuffers_Process   ;
+    uint32_t mIoCtl             ;
+    uint32_t mIoCtl_Config_Get  ;
+    uint32_t mIoCtl_Config_Set  ; // 10
+    uint32_t mIoCtl_Connect     ;
+    uint32_t mIoCtl_Info_Get    ;
+    uint32_t mIoCtl_Packet_Send ;
+    uint32_t mIoCtl_Start       ;
+    uint32_t mIoCtl_State_Get   ; // 15
+    uint32_t mIoCtl_Stats_Get   ;
+    uint32_t mIoCtl_Stop        ;
+    uint32_t mTx_Packet         ;
 
-    uint32_t mReserved0[12];
+    uint32_t mReserved0[109];
+}
+OpenNet_Stats_Adapter;
 
-    uint32_t mIoCtl         ;
-    uint32_t mStats_Get     ;
-    uint32_t mRx_buffer     ;
-    uint32_t mRx_error      ;
-    uint32_t mRx_interrupt  ;
-    uint32_t mRx_packet     ;
-    uint32_t mTx_buffer     ;
-    uint32_t mTx_error      ;
-    uint32_t mTx_interrupt  ;
-    uint32_t mTx_packet     ;
-    uint32_t mTx_Send_byte  ;
-    uint32_t mTx_Send_error ;
-    uint32_t mTx_Send_packet;
-
-    uint32_t mReserved1[99];
-
+/// \cond en
+/// \brief  This structure is used to return the adapter's statistics.
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilise pour retourner les statistiques d'un
+///         adaptateur.
+/// \endcond
+typedef struct
+{
     uint32_t mIoCtl_Last       ;
     uint32_t mIoCtl_Last_Result;
-    uint32_t mStats_Reset      ;
+    uint32_t mIoCtl_Stats_Reset;
 
-    uint32_t mReserved2[125];
+    uint32_t mReserved0[125];
+}
+OpenNet_Stats_Adapter_NoReset;
+
+/// \cond en
+/// \brief  This structure is used to return the adapter's statistics.
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilise pour retourner les statistiques d'un
+///         adaptateur.
+/// \endcond
+typedef struct
+{
+    uint32_t mD0_Entry          ; //  0
+    uint32_t mD0_Exit           ;
+    uint32_t mInterrupt_Disable ;
+    uint32_t mInterrupt_Enable  ;
+    uint32_t mInterrupt_Process ;
+    uint32_t mInterrupt_Process2; //  5
+    uint32_t mPacket_Receive    ;
+    uint32_t mPacket_Send       ;
+    uint32_t mRx_Packet         ;
+    uint32_t mSetConfig         ;
+    uint32_t mStats_Get         ; // 10
+    uint32_t mTx_Packet         ;
+
+    uint32_t mReserved0[116];
+}
+OpenNet_Stats_Hardware;
+
+/// \cond en
+/// \brief  This structure is used to return the adapter's statistics.
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilise pour retourner les statistiques d'un
+///         adaptateur.
+/// \endcond
+typedef struct
+{
+    uint32_t mStats_Reset; //  0
+
+    uint32_t mReserved0[127];
+}
+OpenNet_Stats_Hardware_NoReset;
+
+/// \cond en
+/// \brief  This structure is used to return the adapter's statistics.
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilise pour retourner les statistiques d'un
+///         adaptateur.
+/// \endcond
+typedef struct
+{
+    OpenNet_Stats_Adapter          mAdapter         ;
+    OpenNet_Stats_Adapter_NoReset  mAdapter_NoReset ;
+    OpenNet_Stats_Hardware         mHardware        ;
+    OpenNet_Stats_Hardware_NoReset mHardware_NoReset;
 }
 OpenNet_Stats;

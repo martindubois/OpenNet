@@ -33,6 +33,14 @@ InterruptContext;
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(InterruptContext, GetInterruptContext)
 
+typedef struct
+{
+    OpenNetK::Hardware_WDF * mHardware_WDF;
+}
+TimerContext;
+
+WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(TimerContext, GetTimerContext);
+
 // Static function declaration
 /////////////////////////////////////////////////////////////////////////////
 
@@ -44,6 +52,8 @@ extern "C"
     static EVT_WDF_INTERRUPT_DPC     InterruptDpc    ;
     static EVT_WDF_INTERRUPT_ENABLE  InterruptEnable ;
     static EVT_WDF_INTERRUPT_ISR     InterruptIsr    ;
+    static EVT_WDF_TIMER             Tick            ;
+
 };
 
 namespace OpenNetK
@@ -87,6 +97,8 @@ namespace OpenNetK
                     memset((void *)(lVirtualAddress), 0, lSize_byte); // volatile_cast
 
                     mHardware->SetCommonBuffer(lLogicalAddress.QuadPart, lVirtualAddress);
+
+                    InitTimer();
                 }
             }
         }
@@ -96,14 +108,31 @@ namespace OpenNetK
 
     NTSTATUS Hardware_WDF::D0Entry(WDF_POWER_DEVICE_STATE aPreviousState)
     {
+        ASSERT(NULL != mTimer);
+
         (void)(aPreviousState);
 
-        return mHardware->D0_Entry() ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
+        if (!mHardware->D0_Entry())
+        {
+            return STATUS_UNSUCCESSFUL;
+        }
+
+        BOOLEAN lRetB = WdfTimerStart(mTimer, 1000);
+        ASSERT(!lRetB);
+        (void)(lRetB);
+
+        return STATUS_SUCCESS;
     }
 
     NTSTATUS Hardware_WDF::D0Exit(WDF_POWER_DEVICE_STATE aTargetState)
     {
+        ASSERT(NULL != mTimer);
+
         (void)(aTargetState);
+
+        BOOLEAN lRetB = WdfTimerStop(mTimer, FALSE);
+        ASSERT(lRetB);
+        (void)(lRetB);
 
         return mHardware->D0_Exit() ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
     }
@@ -226,8 +255,39 @@ namespace OpenNetK
         WdfInterruptQueueDpcForIsr(mInterrupt);
     }
 
+    void Hardware_WDF::Tick()
+    {
+        TrigProcess2();
+    }
+
     // Private
     /////////////////////////////////////////////////////////////////////////
+
+    void Hardware_WDF::InitTimer()
+    {
+        ASSERT(NULL != mDevice);
+
+        WDF_TIMER_CONFIG lConfig;
+
+        WDF_TIMER_CONFIG_INIT(&lConfig, ::Tick);
+
+        lConfig.Period = 1000;
+
+        WDF_OBJECT_ATTRIBUTES lAttr;
+
+        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&lAttr, TimerContext);
+
+        lAttr.ParentObject = mDevice;
+
+        NTSTATUS lStatus = WdfTimerCreate(&lConfig, &lAttr, &mTimer);
+        ASSERT(STATUS_SUCCESS == lStatus);
+        ASSERT(NULL != mTimer);
+
+        TimerContext * lTimerContext = GetTimerContext(mTimer);
+        ASSERT(NULL != lTimerContext);
+
+        lTimerContext->mHardware_WDF = this;
+    }
 
     // aTranslated [---;R--]
     // aRaw        [---;R--]
@@ -360,4 +420,14 @@ BOOLEAN InterruptIsr(WDFINTERRUPT aInterrupt, ULONG aMessageId)
     ASSERT(NULL != lContext->mHardware_WDF);
 
     return lContext->mHardware_WDF->Interrupt_Isr(aMessageId);
+}
+
+VOID Tick(WDFTIMER aTimer)
+{
+    ASSERT(NULL != aTimer);
+
+    TimerContext * lTimerContext = GetTimerContext(aTimer);
+    ASSERT(NULL != lTimerContext);
+
+    lTimerContext->mHardware_WDF->Tick();
 }

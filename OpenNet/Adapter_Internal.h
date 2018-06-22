@@ -18,6 +18,7 @@
 // ===== Includes ===========================================================
 #include <OpenNet/Adapter.h>
 #include <OpenNet/System.h>
+#include <OpenNetK/Constants.h>
 
 // ===== OpenNet ============================================================
 #include "Processor_Internal.h"
@@ -76,6 +77,10 @@ private:
 
     OpenNet::Status Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte);
 
+    void Run_Iteration(unsigned int aIndex);
+    void Run_Loop     ();
+    void Run_Wait     ();
+
     void State_Change(unsigned int aFrom, unsigned int aTo);
 
     void Stop_Zone0();
@@ -91,6 +96,7 @@ private:
     Info                            mInfo       ;
     char                            mName   [64];
     Processor_Internal            * mProcessor  ;
+    Stats_Dll                       mStats      ;
     HANDLE                          mThread     ;
     DWORD                           mThreadId   ;
 

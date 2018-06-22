@@ -49,8 +49,6 @@ private:
         TX_DESCRIPTOR_QTY = 1024,
     };
 
-    void FlushWrite();
-
     void Reset();
 
     void Rx_Config ();

@@ -87,6 +87,7 @@ Adapter_Internal::Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsL
     memset(&mConfig, 0, sizeof(mConfig));
     memset(&mInfo  , 0, sizeof(mInfo  ));
     memset(&mName  , 0, sizeof(mName  ));
+    memset(&mStats , 0, sizeof(mStats ));
 
     mHandle->Control(OPEN_NET_IOCTL_CONFIG_GET, NULL, 0, &mConfig, sizeof(mConfig));
     mHandle->Control(OPEN_NET_IOCTL_INFO_GET  , NULL, 0, &mInfo  , sizeof(mInfo  ));
@@ -148,7 +149,7 @@ void Adapter_Internal::Connect(OpenNet_Connect * aConnect)
     HANDLE lEvent = reinterpret_cast<HANDLE>(aConnect->mEvent);
     assert(NULL != lEvent);
 
-    DWORD lRet = WaitForSingleObject(lEvent, 10000);
+    DWORD lRet = WaitForSingleObject(lEvent, 60000);
     if (WAIT_OBJECT_0 != lRet)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -195,6 +196,8 @@ void Adapter_Internal::Start()
         throw new KmsLib::Exception(KmsLib::Exception::CODE_THREAD_ERROR,
             "CreateThread( , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
     }
+
+    mStats.mStart++;
 }
 
 // Exception  KmsLib::Exception *  CODE_THREAD_ERROR
@@ -204,6 +207,8 @@ void Adapter_Internal::Stop()
     EnterCriticalSection(&mZone0);
         Stop_Zone0();
     LeaveCriticalSection(&mZone0);
+
+    mStats.mStop++;
 }
 
 // ===== OpenNet::Adapter ===================================================
@@ -305,7 +310,9 @@ OpenNet::Status Adapter_Internal::GetStats(Stats * aOut)
 
     assert(NULL != mHandle);
 
-    return Control(OPEN_NET_IOCTL_STATS_GET, NULL, 0, aOut, sizeof(Stats));
+    memcpy(&aOut->mDll, &mStats, sizeof(mStats));
+
+    return Control(OPEN_NET_IOCTL_STATS_GET, NULL, 0, &aOut->mDriver, sizeof(aOut->mDriver));
 }
 
 bool Adapter_Internal::IsConnected()
@@ -601,20 +608,16 @@ OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
-    fprintf(aOut, "%u Buffers\n"    , mBufferCount);
-    fprintf(aOut, "Filter    = %s\n", ((NULL == mFilter   ) ? "Not set" : mFilter   ->GetName()));
-    fprintf(aOut, "Name      = %s\n", mName);
-    fprintf(aOut, "Processor = %s\n", ((NULL == mProcessor) ? "Not set" : mProcessor->GetName()));
-    fprintf(aOut, "State     = %s\n", STATE_NAMES[mState]);
-    fprintf(aOut, "Thread Id = %u\n", mThreadId);
+    fprintf(aOut, "Adapter :\n");
+    fprintf(aOut, "  %u Buffers\n"    , mBufferCount);
+    fprintf(aOut, "  Filter    = %s\n", ((NULL == mFilter   ) ? "Not set" : mFilter   ->GetName()));
+    fprintf(aOut, "  Name      = %s\n", mName);
+    fprintf(aOut, "  Processor = %s\n", ((NULL == mProcessor) ? "Not set" : mProcessor->GetName()));
+    fprintf(aOut, "  State     = %s\n", STATE_NAMES[mState]);
+    fprintf(aOut, "  Thread Id = %u\n", mThreadId);
     
-    fprintf(aOut, "Config :\n");
-
     OpenNet::Adapter::Display(mConfig, aOut);
-
-    fprintf(aOut, "Info :\n");
-
-    OpenNet::Adapter::Display(mInfo, aOut);
+    OpenNet::Adapter::Display(mInfo  , aOut);
 
     return OpenNet::STATUS_OK;
 }
@@ -641,6 +644,8 @@ OpenNet::Status Adapter_Internal::Packet_Send(void * aData, unsigned int aSize_b
         return OpenNet::STATUS_PACKET_TOO_LARGE;
     }
 
+    mStats.mPacket_Send++;
+
     return Control(OPEN_NET_IOCTL_PACKET_SEND, aData, aSize_byte, NULL, 0);
 }
 
@@ -650,6 +655,8 @@ OpenNet::Status Adapter_Internal::Packet_Send(void * aData, unsigned int aSize_b
 // Thread  Worker
 void Adapter_Internal::Run()
 {
+    mStats.mRun_Entry++;
+
     try
     {
         State_Change(STATE_START_REQUESTED, STATE_STARTING);
@@ -663,46 +670,34 @@ void Adapter_Internal::Run()
 
         for (i = 0; i < mBufferCount; i++)
         {
+            mBufferData[i].mMarkerValue = 0;
+
             mProcessor->Processing_Queue(&mFilterData, mBufferData + i);
+            mStats.mRun_Queue++;
         }
 
-        mHandle->Control(OPEN_NET_IOCTL_BUFFER_QUEUE, mBuffers, sizeof(OpenNet_BufferInfo) * mBufferCount, NULL, 0);
+        mHandle->Control(OPEN_NET_IOCTL_START, mBuffers, sizeof(OpenNet_BufferInfo) * mBufferCount, NULL, 0);
 
-        unsigned lIndex = 0;
-
-        State_Change(STATE_STARTING, STATE_RUNNING);
-
-        while (STATE_RUNNING == mState)
-        {
-            mProcessor->Processing_Wait (              mBufferData + lIndex);
-            mProcessor->Processing_Queue(&mFilterData, mBufferData + lIndex);
-
-            lIndex = (lIndex + 1) % mBufferCount;
-        }
-
-        State_Change(STATE_STOP_REQUESTED, STATE_STOPPING);
-
-        for (i = 0; i < mBufferCount; i++)
-        {
-            mProcessor->Processing_Wait(mBufferData + lIndex);
-
-            lIndex = (lIndex + 1) % mBufferCount;
-        }
-
-        // TODO  OpenNet.Adapter_Internal
-        //       Retrieve buffers
+        Run_Loop();
+        Run_Wait();
     }
     catch (KmsLib::Exception * eE)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog->Log(eE);
-        mState = STATE_STOPPING;
+
+        mStats.mRun_Exception++;
     }
     catch (...)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        mState = STATE_STOPPING;
+
+        mStats.mRun_UnexpectedException++;
     }
+
+    mState = STATE_STOPPING;
+
+    mStats.mRun_Exit++;
 }
 
 // Private
@@ -726,6 +721,8 @@ void Adapter_Internal::Buffer_Allocate()
     mProcessor->Buffer_Allocate(mConfig.mPacketSize_byte, &mFilterData, mBuffers + mBufferCount, mBufferData + mBufferCount);
 
     mBufferCount++;
+
+    mStats.mBuffer_Allocated++;
 }
 
 // Exception  KmsLib::Exception *  CODE_INVALID_DATA
@@ -742,6 +739,8 @@ void Adapter_Internal::Buffer_Release()
     mBufferCount--;
 
     mProcessor->Buffer_Release(mBufferData + mBufferCount);
+
+    mStats.mBuffer_Released++;
 }
 
 // aIn  [--O;R--]
@@ -765,6 +764,89 @@ OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, 
     }
 
     return OpenNet::STATUS_OK;
+}
+
+void Adapter_Internal::Run_Iteration(unsigned int aIndex)
+{
+    assert(OPEN_NET_BUFFER_QTY > aIndex);
+
+    mProcessor->Processing_Wait(mBufferData + aIndex);
+    mStats.mRun_Iteration_Wait++;
+
+    mProcessor->Processing_Queue(&mFilterData, mBufferData + aIndex);
+    mStats.mRun_Iteration_Queue++;
+}
+
+void Adapter_Internal::Run_Loop()
+{
+    assert(                  0 <  mBufferCount);
+    assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
+    assert(NULL                != mHandle     );
+    try
+    {
+        unsigned lIndex = 0;
+
+        State_Change(STATE_STARTING, STATE_RUNNING);
+
+        while (STATE_RUNNING == mState)
+        {
+            Run_Iteration(lIndex);
+
+            lIndex = (lIndex + 1) % mBufferCount;
+        }
+
+        State_Change(STATE_STOP_REQUESTED, STATE_STOPPING);
+
+        mHandle->Control(OPEN_NET_IOCTL_STOP, NULL, 0, NULL, 0);
+
+        for (unsigned int i = 0; i < mBufferCount; i++)
+        {
+            mProcessor->Processing_Wait(mBufferData + lIndex);
+            mStats.mRun_Loop_Wait++;
+
+            lIndex = (lIndex + 1) % mBufferCount;
+        }
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(eE);
+
+        mStats.mRun_Loop_Exception++;
+    }
+    catch (...)
+    {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+
+        mStats.mRun_Loop_UnexpectedException++;
+    }
+}
+
+void Adapter_Internal::Run_Wait()
+{
+    assert(NULL != mHandle);
+
+    OpenNet_State lState;
+
+    for (unsigned int i = 0; i < 600; i++)
+    {
+        mHandle->Control(OPEN_NET_IOCTL_STATE_GET, NULL, 0, &lState, sizeof(lState));
+
+        if (0 >= lState.mBufferCount)
+        {
+            return;
+        }
+
+        Sleep(1000);
+    }
+
+    // TODO  OpenNet.Adapter_Internal.Error_Handling
+    //       This is a big program because the driver still use GPU buffer
+    //       and the application is maybe going to release them.
+
+    mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+    throw new KmsLib::Exception(KmsLib::Exception::CODE_TIMEOUT,
+        "The driver did not release the buffers in time", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
 }
 
 // Exception  KmsLib::Exception *  CODE_STATE_ERROR
@@ -815,10 +897,16 @@ void Adapter_Internal::Stop_Zone0()
         DWORD lRet;
 
         LeaveCriticalSection(&mZone0);
-            lRet = WaitForSingleObject(mThread, 10000);
+            lRet = WaitForSingleObject(mThread, 600000);
         EnterCriticalSection(&mZone0);
 
         if (WAIT_OBJECT_0 == lRet) { break; }
+
+        // TODO  OpenNet.Adapter_Internal.ErrorHandling
+        //       This case is a big problem. Terminating the thread
+        //       interracting with the GPU may let the system in an instabla
+        //       state. Worst, in this case the drive still use the GPU
+        //       buffer.
 
         LeaveCriticalSection(&mZone0);
             if (!TerminateThread(mThread, __LINE__))

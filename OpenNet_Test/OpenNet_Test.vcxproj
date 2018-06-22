@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Adapter.cpp" />
+    <ClCompile Include="BlackHole.cpp" />
     <ClCompile Include="EthernetAddress.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Filter_Forward.cpp" />

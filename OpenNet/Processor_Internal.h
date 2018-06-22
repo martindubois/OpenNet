@@ -31,10 +31,11 @@ public:
 
     typedef struct
     {
-        cl_event     mEvent    ;
-        cl_mem       mMem      ;
-        unsigned int mPacketQty;
-        unsigned int mSize_byte;
+        cl_event     mEvent      ;
+        uint32_t     mMarkerValue;
+        cl_mem       mMem        ;
+        unsigned int mPacketQty  ;
+        unsigned int mSize_byte  ;
     }
     BufferData;
 

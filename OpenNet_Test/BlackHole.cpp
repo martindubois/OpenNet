@@ -1,7 +1,7 @@
 
 // Author   KMS - Martin Dubois, ing.
 // Product  OpenNet
-// File     OpenNet_Test/Mirror.cpp
+// File     OpenNet_Test/BlackHole.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@
 // Tests
 /////////////////////////////////////////////////////////////////////////////
 
-KMS_TEST_BEGIN(Mirror_SetupA)
+KMS_TEST_BEGIN(BlackHole_SetupA)
 {
     OpenNet::Filter_Forward lFF0;
 
@@ -42,10 +42,7 @@ KMS_TEST_BEGIN(Mirror_SetupA)
 
     KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lS0->Adapter_Connect(lA0), Cleanup0);
 
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lA0->SetProcessor(lP0), Cleanup0);
-
-    lFF0.AddDestination(lA0);
-
+    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lA0->SetProcessor   ( lP0      ), Cleanup0);
     KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lA0->SetInputFilter (&lFF0     ), Cleanup0);
     KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lA0->Buffer_Allocate(BUFFER_QTY), Cleanup1);
 
@@ -91,14 +88,14 @@ Cleanup1:
     KMS_TEST_ASSERT (BUFFER_QTY <= lStats.mDriver.mAdapter.mBuffer_Receive    );
     KMS_TEST_ASSERT (         0 <  lStats.mDriver.mAdapter.mBuffer_Send       );
     KMS_TEST_ASSERT (         0 <  lStats.mDriver.mAdapter.mBuffer_SendPackets);
-    KMS_TEST_ASSERT (         0 <  lStats.mDriver.mAdapter.mTx_Packet         );
+    KMS_TEST_ASSERT (         0 == lStats.mDriver.mAdapter.mTx_Packet         );
 
-    KMS_TEST_ASSERT(0 < lStats.mDriver.mHardware.mInterrupt_Process );
-    KMS_TEST_ASSERT(0 < lStats.mDriver.mHardware.mInterrupt_Process2);
-    KMS_TEST_ASSERT(0 < lStats.mDriver.mHardware.mPacket_Receive    );
-    KMS_TEST_ASSERT(0 < lStats.mDriver.mHardware.mPacket_Send       );
-    KMS_TEST_ASSERT(0 < lStats.mDriver.mHardware.mRx_Packet         );
-    KMS_TEST_ASSERT(0 < lStats.mDriver.mHardware.mTx_Packet         );
+    KMS_TEST_ASSERT(0 <  lStats.mDriver.mHardware.mInterrupt_Process );
+    KMS_TEST_ASSERT(0 <  lStats.mDriver.mHardware.mInterrupt_Process2);
+    KMS_TEST_ASSERT(0 <  lStats.mDriver.mHardware.mPacket_Receive    );
+    KMS_TEST_ASSERT(0 == lStats.mDriver.mHardware.mPacket_Send       );
+    KMS_TEST_ASSERT(0 <  lStats.mDriver.mHardware.mRx_Packet         );
+    KMS_TEST_ASSERT(0 == lStats.mDriver.mHardware.mTx_Packet         );
 
 Cleanup0:
     lS0->Delete();

@@ -9,6 +9,7 @@
 #include "Component.h"
 
 // ===== Includes ===========================================================
+#include <OpenNetK/Constants.h>
 #include <OpenNetK/Interface.h>
 
 // ===== Common =============================================================
@@ -36,7 +37,7 @@ Pro1000::Pro1000()
     mInfo.mCommonBufferSize_byte += (sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY); // Rx packet descriptors
     mInfo.mCommonBufferSize_byte += (sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY); // Tx packet descriptors
     mInfo.mCommonBufferSize_byte += (PACKET_SIZE_byte * PACKET_BUFFER_QTY); // Packet buffers
-    mInfo.mCommonBufferSize_byte += (mInfo.mCommonBufferSize_byte / (64 * 1024)) * PACKET_SIZE_byte; // Skip 64 KB boundaries
+    mInfo.mCommonBufferSize_byte += (mInfo.mCommonBufferSize_byte / OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte) * PACKET_SIZE_byte; // Skip 64 KB boundaries
 
     mInfo.mRx_Descriptors = RX_DESCRIPTOR_QTY;
     mInfo.mTx_Descriptors = TX_DESCRIPTOR_QTY;
@@ -63,7 +64,7 @@ void Pro1000::GetState(OpenNet_State * aState)
     aState->mFlags.mLinkUp     = mBAR1->mDeviceStatus.mFields.mLinkUp    ;
     aState->mFlags.mTx_Off     = mBAR1->mDeviceStatus.mFields.mTx_Off    ;
 
-    // TODO  Dev
+    // TODO  ONK_Pro1000.Pro1000
     //       Comprendre pourquoi la vitesse n'est pas indique correctement.
 
     switch (mBAR1->mDeviceStatus.mFields.mSpeed)
@@ -99,14 +100,14 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, volatile void * aVirtual)
     uint64_t           lLogical = aLogical;
     volatile uint8_t * lVirtual = reinterpret_cast<volatile uint8_t *>(aVirtual);
 
-    Skip64KByteBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY, &mRx_Logical, reinterpret_cast<volatile uint8_t **>(&mRx_Virtual));
-    Skip64KByteBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY, &mTx_Logical, reinterpret_cast<volatile uint8_t **>(&mTx_Virtual));
+    SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY, &mRx_Logical, reinterpret_cast<volatile uint8_t **>(&mRx_Virtual));
+    SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY, &mTx_Logical, reinterpret_cast<volatile uint8_t **>(&mTx_Virtual));
 
     unsigned int i;
 
     for (i = 0; i < PACKET_BUFFER_QTY; i++)
     {
-        Skip64KByteBoundary(&lLogical, &lVirtual, mConfig.mPacketSize_byte, mTx_PacketBuffer_Logical + i, reinterpret_cast<volatile uint8_t **>(mTx_PacketBuffer_Virtual + i));
+        SkipDangerousBoundary(&lLogical, &lVirtual, mConfig.mPacketSize_byte, mTx_PacketBuffer_Logical + i, reinterpret_cast<volatile uint8_t **>(mTx_PacketBuffer_Virtual + i));
     }
 
     for (i = 0; i < TX_DESCRIPTOR_QTY; i++)
@@ -216,12 +217,14 @@ bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcess
 
     (*aNeedMoreProcessing) = true;
 
+    mStats.mInterrupt_Process++;
+
     return true;
 }
 
 void Pro1000::Interrupt_Process2()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     Rx_Process();
     Tx_Process();
@@ -231,7 +234,7 @@ void Pro1000::Interrupt_Process2()
 
 void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , ,  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , ,  )" DEBUG_EOL);
 
     ASSERT(NULL != aPacketInfo);
     ASSERT(NULL != aCounter   );
@@ -254,6 +257,8 @@ void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, v
     mRx_In = (mRx_In + 1) % RX_DESCRIPTOR_QTY;
 
     mBAR1->mRx_DescriptorTail0.mFields.mValue = mRx_In;
+
+    mStats.mPacket_Receive++;
 }
 
 void Pro1000::Packet_Send(uint64_t aData, unsigned int aSize_byte, volatile long * aCounter)
@@ -276,6 +281,8 @@ void Pro1000::Packet_Send(uint64_t aData, unsigned int aSize_byte, volatile long
     mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
 
     mBAR1->mTx_DescriptorTail0.mFields.mValue = mTx_In;
+
+    mStats.mPacket_Send++;
 }
 
 void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
@@ -293,17 +300,6 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
 
 // Private
 /////////////////////////////////////////////////////////////////////////////
-
-void Pro1000::FlushWrite()
-{
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
-
-    ASSERT(NULL != mBAR1);
-
-    uint32_t lValue = mBAR1->mDeviceStatus.mValue;
-
-    (void)(lValue);
-}
 
 void Pro1000::Reset()
 {
@@ -385,6 +381,8 @@ void Pro1000::Rx_Process()
         InterlockedDecrement(mRx_Counter[mRx_Out]);
 
         mRx_Out = (mRx_Out + 1) % RX_DESCRIPTOR_QTY;
+
+        mStats.mRx_Packet++;
     }
 }
 
@@ -427,5 +425,7 @@ void Pro1000::Tx_Process()
         }
 
         mTx_Out = (mTx_Out + 1) % TX_DESCRIPTOR_QTY;
+
+        mStats.mTx_Packet++;
     }
 }

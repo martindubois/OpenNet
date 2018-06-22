@@ -18,6 +18,7 @@
 #include <KmsLib/Exception.h>
 
 // ===== Includes ===========================================================
+#include <OpenNetK/Constants.h>
 #include <OpenNetK/Interface.h>
 #include <OpenNetK/Types.h>
 
@@ -114,7 +115,7 @@ void Processor_Internal::Buffer_Allocate(unsigned int aPacketSize_byte, FilterDa
 
     aBufferInfo->mSize_byte += sizeof(OpenNet_PacketInfo) * static_cast<unsigned int>(lPacketQty);
     aBufferInfo->mSize_byte += aPacketSize_byte           * static_cast<unsigned int>(lPacketQty);
-    aBufferInfo->mSize_byte += (aBufferInfo->mSize_byte / (64 * 1024)) * aPacketSize_byte;
+    aBufferInfo->mSize_byte += (aBufferInfo->mSize_byte / OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte) * aPacketSize_byte;
 
     // OCLW_CreateBuffer ==> OCLW_ReleaseMemObject  See Buffer_Release
     aBufferData->mMem = OCLW_CreateBuffer(mContext, CL_MEM_BUS_ADDRESSABLE_AMD, aBufferInfo->mSize_byte);
@@ -220,7 +221,9 @@ void Processor_Internal::Processing_Queue(FilterData * aFilterData, BufferData *
 
     aFilterData->mFilter->AddKernelArgs(aFilterData->mKernel);
 
-    cl_int lStatus = mEnqueueWaitSignal(mQueue, aBufferData->mMem, OPEN_NET_MARKER_VALUE, 0, NULL, NULL);
+    aBufferData->mMarkerValue++;
+
+    cl_int lStatus = mEnqueueWaitSignal(mQueue, aBufferData->mMem, aBufferData->mMarkerValue, 0, NULL, NULL);
     if (CL_SUCCESS != lStatus)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -290,7 +293,7 @@ OpenNet::Status Processor_Internal::Display(FILE * aOut) const
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
-    fprintf(aOut, "Info\n");
+    fprintf(aOut, "Processor :\n");
 
     return Processor::Display(mInfo, aOut);
 }

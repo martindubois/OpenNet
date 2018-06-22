@@ -222,11 +222,12 @@ OpenNet::Status System_Internal::Display(FILE * aOut)
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
-    fprintf(aOut, "    %u Adapter Running\n"    , mAdapterRunning    );
-    fprintf(aOut, "    %zu Adapters\n"          , mAdapters  .size() );
-    fprintf(aOut, "    %zu Processors\n"        , mProcessors.size() );
-    fprintf(aOut, "    System Id   = %u\n"      , mConnect.mSystemId );
-    fprintf(aOut, "    Packet Size = %u bytes\n", mPacketSize_byte   );
+    fprintf(aOut, "System :\n");
+    fprintf(aOut, "  %u Adapter Running\n"    , mAdapterRunning    );
+    fprintf(aOut, "  %zu Adapters\n"          , mAdapters  .size() );
+    fprintf(aOut, "  %zu Processors\n"        , mProcessors.size() );
+    fprintf(aOut, "  System Id   = %u\n"      , mConnect.mSystemId );
+    fprintf(aOut, "  Packet Size = %u bytes\n", mPacketSize_byte   );
 
     return OpenNet::STATUS_OK;
 }

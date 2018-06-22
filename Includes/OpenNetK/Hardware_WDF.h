@@ -96,9 +96,13 @@ namespace OpenNetK
         BOOLEAN  Interrupt_Isr     (ULONG aMessageId);
         void     Interrupt_Dpc     ();
 
+        void Tick();
+
         void TrigProcess2();
 
     private:
+
+        void InitTimer();
 
         NTSTATUS PrepareInterrupt(CM_PARTIAL_RESOURCE_DESCRIPTOR * aTranslated, CM_PARTIAL_RESOURCE_DESCRIPTOR * aRaw);
         NTSTATUS PrepareMemory   (CM_PARTIAL_RESOURCE_DESCRIPTOR * aTranslated);
@@ -113,6 +117,8 @@ namespace OpenNetK
         unsigned int    mMemCount;
         unsigned int    mMemSize_byte[6];
         volatile void * mMemVirtual  [6];
+
+        WDFTIMER mTimer;
 
         // ===== Zone 0 =====================================================
         WDFSPINLOCK mZone0;

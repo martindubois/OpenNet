@@ -22,6 +22,8 @@ KMS_TEST_GROUP_LIST_END
 extern int Adapter_Base  ();
 extern int Adapter_SetupA();
 
+extern int BlackHole_SetupA();
+
 extern int EthernetAddress_Base();
 
 extern int Filter_Base();
@@ -42,6 +44,7 @@ extern int VersionInfo_Base();
 KMS_TEST_LIST_BEGIN
     KMS_TEST_LIST_ENTRY(Adapter_Base        , "Adapter - Base"        , 0, 0)
     KMS_TEST_LIST_ENTRY(Adapter_SetupA      , "Adapter - SetupA"      , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(BlackHole_SetupA    , "BlackHole - SetupA"    , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(EthernetAddress_Base, "EthernetAddress - Base", 0, 0)
     KMS_TEST_LIST_ENTRY(Filter_Base         , "Filter - Base"         , 0, 0)
     KMS_TEST_LIST_ENTRY(Filter_Forward_Base , "Filter_Forward - Base" , 0, 0)

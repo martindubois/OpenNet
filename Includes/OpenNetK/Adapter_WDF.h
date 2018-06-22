@@ -85,10 +85,6 @@ namespace OpenNetK
         /// \endcond
         void IoInCallerContext(WDFREQUEST aRequest);
 
-    // internal:
-
-        void CompletePendingRequest(int aResult);
-
     private:
 
         NTSTATUS Connect   (OpenNet_Connect * aIn, WDFFILEOBJECT aFileObject);
@@ -96,6 +92,8 @@ namespace OpenNetK
 
         void     Event_Release  ();
         NTSTATUS Event_Translate(uint64_t * aEvent);
+
+        void ProcessIoCtlResult(int aResult);
 
         NTSTATUS SharedMemory_ProbeAndLock();
         void     SharedMemory_Release     ();
@@ -107,7 +105,6 @@ namespace OpenNetK
         KEVENT       * mEvent           ;
         WDFFILEOBJECT  mFileObject      ;
         Hardware_WDF * mHardware_WDF    ;
-        WDFREQUEST     mPendingRequest  ;
         MDL          * mSharedMemory_MDL;
 
         // ===== Zone 0 =====================================================

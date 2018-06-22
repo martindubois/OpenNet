@@ -46,8 +46,9 @@ namespace OpenNet
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    Filter_Forward::Filter_Forward()
+    Filter_Forward::Filter_Forward() : mDestinations(0)
     {
+        GenerateCode();
     }
 
     Status Filter_Forward::AddDestination(Adapter * aAdapter)
@@ -63,27 +64,18 @@ namespace OpenNet
         {
             uint32_t lDestination = 1 << lAdapterNo;
 
-            if (0 == mDestinations)
+            if (0 == (mDestinations & lDestination))
             {
-                mDestinations = lDestination;
+                mDestinations |= lDestination;
+
+                lResult = ResetCode();
+                assert(STATUS_OK == lResult);
 
                 GenerateCode();
             }
             else
             {
-                if (0 == (mDestinations & lDestination))
-                {
-                    mDestinations |= lDestination;
-
-                    lResult = ResetCode();
-                    assert(STATUS_OK == lResult);
-
-                    GenerateCode();
-                }
-                else
-                {
-                    lResult = STATUS_DESTINATION_ALREADY_SET;
-                }
+                lResult = STATUS_DESTINATION_ALREADY_SET;
             }
         }
 
@@ -146,6 +138,8 @@ namespace OpenNet
         Status lResult = ResetCode();
         assert(STATUS_OK == lResult);
 
+        GenerateCode();
+
         return lResult;
     }
 
@@ -161,8 +155,6 @@ namespace OpenNet
     // TODO  Test
     void Filter_Forward::GenerateCode()
     {
-        assert(0 != mDestinations);
-
         Status lStatus = SetCode(CODE, static_cast<unsigned int>(strlen(CODE)));
         assert(STATUS_OK == lStatus);
 

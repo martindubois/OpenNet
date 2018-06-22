@@ -10,6 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes/OpenNetK ==================================================
+#include <OpenNetK/Constants.h>
 #include <OpenNetK/Types.h>
 #include <OpenNetK/Interface.h>
 
@@ -53,15 +54,14 @@ namespace OpenNetK
 
         enum
         {
-            IOCTL_RESULT_OK = 0x00000000,
+            IOCTL_RESULT_OK                = 0x00000000,
 
             IOCTL_RESULT_PROCESSING_NEEDED = 0xffffffe0,
 
-            IOCTL_RESULT_PENDING           = 0xfffffff0,
-
-            IOCTL_RESULT_ERROR             = 0xfffffffb,
-            IOCTL_RESULT_INVALID_CODE      = 0xfffffffc,
-            IOCTL_RESULT_INVALID_SYSTEM_ID = 0xfffffffd,
+            IOCTL_RESULT_ERROR             = 0xfffffffa,
+            IOCTL_RESULT_INVALID_SYSTEM_ID = 0xfffffffb,
+            IOCTL_RESULT_NO_BUFFER         = 0xfffffffc,
+            IOCTL_RESULT_NOT_SET           = 0xfffffffd,
             IOCTL_RESULT_TOO_MANY_ADAPTER  = 0xfffffffe,
             IOCTL_RESULT_TOO_MANY_BUFFER   = 0xffffffff,
         };
@@ -75,22 +75,30 @@ namespace OpenNetK
 
             struct
             {
-                unsigned mMarkedForRetrieval : 1;
+                unsigned mStopRequested : 1;
 
                 unsigned mReserved : 31;
             }
             mFlags;
 
-            volatile long mReceiveCounter;
-            volatile long mSendCounter   ;
+            uint32_t      mMarkerValue;
+            volatile long mRx_Counter ;
+            volatile long mTx_Counter ;
 
-            uint8_t mReserved1[36];
+            uint8_t mReserved1[32];
         }
         BufferInfo;
 
-        typedef void(*CompletePendingRequest)(void *, int);
+        typedef struct
+        {
+            unsigned int mIn_MinSize_byte ;
+            unsigned int mOut_MinSize_byte;
+        }
+        IoCtlInfo;
 
-        void Init(CompletePendingRequest aCompletePendingRequest, void * aContext);
+        static bool IoCtl_GetInfo(unsigned int aCode, IoCtlInfo * aInfo);
+
+        void Init();
 
         void Buffer_SendPackets(BufferInfo * aInfo);
 
@@ -98,9 +106,7 @@ namespace OpenNetK
 
         void Disconnect();
 
-        int          IoCtl               (unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte);
-        unsigned int IoCtl_InSize_GetMin (unsigned int aCode) const;
-        unsigned int IoCtl_OutSize_GetMin(unsigned int aCode) const;
+        int  IoCtl(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte);
 
     private:
 
@@ -108,35 +114,34 @@ namespace OpenNetK
         void Buffer_Process   (BufferInfo * aBuffer);
         void Buffer_Queue     (const OpenNet_BufferInfo & aBufferInfo);
         void Buffer_Receive   (BufferInfo * aBuffer);
-        void Buffer_Retrieve  ();
         void Buffer_Send      (BufferInfo * aBuffer);
+        void Buffer_Stop      (BufferInfo * aBuffer);
+
+        void Stop();
 
         // ===== IoCtl ======================================================
 
-        int IoCtl_Buffer_Queue   (const OpenNet_BufferInfo * aIn , unsigned int aInSize_byte );
-        int IoCtl_Buffer_Retrieve(      OpenNet_BufferInfo * aOut, unsigned int aOutSize_byte);
-        int IoCtl_Config_Get     (      OpenNet_Config     * aOut);
-        int IoCtl_Config_Set     (const OpenNet_Config     * aIn , OpenNet_Config * aOut);
-        int IoCtl_Connect        (const OpenNet_Connect    * aIn );
-        int IoCtl_Info_Get       (      OpenNet_Info       * aOut) const;
-        int IoCtl_Packet_Send    (const void               * aIn , unsigned int aInSize_byte );
-        int IoCtl_State_Get      (      OpenNet_State      * aOut);
-        int IoCtl_Stats_Get      (      OpenNet_Stats      * aOut) const;
-        int IoCtl_Stats_Reset    ();
+        int IoCtl_Config_Get (      OpenNet_Config     * aOut);
+        int IoCtl_Config_Set (const OpenNet_Config     * aIn , OpenNet_Config * aOut);
+        int IoCtl_Connect    (const OpenNet_Connect    * aIn );
+        int IoCtl_Info_Get   (      OpenNet_Info       * aOut) const;
+        int IoCtl_Packet_Send(const void               * aIn , unsigned int aInSize_byte );
+        int IoCtl_Start      (const OpenNet_BufferInfo * aIn, unsigned int aInSize_byte);
+        int IoCtl_State_Get  (      OpenNet_State      * aOut);
+        int IoCtl_Stats_Get  (      OpenNet_Stats      * aOut) const;
+        int IoCtl_Stats_Reset();
+        int IoCtl_Stop       ();
 
-        Adapter            ** mAdapters   ;
-        unsigned int          mAdapterNo  ;
-        unsigned int          mBufferCount;
-        unsigned int          mBufferRetrieveCount ;
-        OpenNet_BufferInfo  * mBufferRetrieveOutput;
-        unsigned int          mBufferRetrieveQty   ;
-        BufferInfo            mBuffers[OPEN_NET_BUFFER_QTY];
-        void                (*mCompletePendingRequest)(void *, int);
-        void                * mContext    ;
-        KEVENT              * mEvent      ;
-        Hardware            * mHardware   ;
-        mutable OpenNet_Stats mStats      ;
-        unsigned int          mSystemId   ;
+        Adapter           ** mAdapters   ;
+        unsigned int         mAdapterNo  ;
+        unsigned int         mBufferCount;
+        BufferInfo           mBuffers[OPEN_NET_BUFFER_QTY];
+        KEVENT             * mEvent      ;
+        Hardware           * mHardware   ;
+        unsigned int         mSystemId   ;
+
+        mutable OpenNet_Stats_Adapter         mStats        ;
+        mutable OpenNet_Stats_Adapter_NoReset mStats_NoReset;
 
     };
 

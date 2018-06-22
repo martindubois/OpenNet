@@ -33,9 +33,9 @@ namespace OpenNet
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
         }
 
-        fprintf(aOut, "        Version = %u.%u.%u.%u\n", aIn.mMajor, aIn.mMinor, aIn.mBuild, aIn.mCompatibility);
-        fprintf(aOut, "        Comment = %s\n"         , aIn.mComment);
-        fprintf(aOut, "        Type    = %s\n"         , aIn.mType   );
+        fprintf(aOut, "      Version = %u.%u.%u.%u\n", aIn.mMajor, aIn.mMinor, aIn.mBuild, aIn.mCompatibility);
+        fprintf(aOut, "      Comment = %s\n"         , aIn.mComment);
+        fprintf(aOut, "      Type    = %s\n"         , aIn.mType   );
 
         return STATUS_OK;
     }

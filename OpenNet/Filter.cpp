@@ -192,17 +192,19 @@ namespace OpenNet
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
         }
 
+        fprintf(aOut, "Filter :\n");
+
         if (NULL == mCode)
         {
-            fprintf(aOut, "    Code not set\n");
+            fprintf(aOut, "  Code not set\n");
         }
 
-        fprintf(aOut, "    Code Size         = %u bytes\n", mCodeSize_byte);
-        fprintf(aOut, "    Name              = %s\n"      , mName         );
+        fprintf(aOut, "  Code Size         = %u bytes\n", mCodeSize_byte);
+        fprintf(aOut, "  Name              = %s\n"      , mName         );
 
         if (NULL != mCode)
         {
-            fprintf(aOut, "    Code :\n");
+            fprintf(aOut, "  Code :\n");
 
             if (NULL == mCodeLines)
             {
@@ -221,11 +223,11 @@ namespace OpenNet
 
         if (NULL == mBuildLog)
         {
-            fprintf(aOut, "    No Build Log\n");
+            fprintf(aOut, "  No Build Log\n");
         }
         else
         {
-            fprintf(aOut, "    Build Log :\n%s\n", mBuildLog);
+            fprintf(aOut, "  Build Log :\n%s\n", mBuildLog);
         }
 
         return STATUS_OK;

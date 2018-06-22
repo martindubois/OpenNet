@@ -24,12 +24,6 @@
 
 #include <OpenNetK/Adapter_WDF.h>
 
-// Static function declarations
-/////////////////////////////////////////////////////////////////////////////
-
-static void CompletePendingRequest(void * aThis, int aResult);
-
-
 namespace OpenNetK
 {
 
@@ -43,16 +37,15 @@ namespace OpenNetK
         ASSERT(NULL != aHardware_WDF);
         ASSERT(NULL != aZone0       );
 
-        mAdapter        = aAdapter     ;
-        mDevice         = aDevice      ;
-        mEvent          = NULL         ;
-        mFileObject     = NULL         ;
-        mHardware_WDF   = aHardware_WDF;
-        mPendingRequest = NULL         ;
-        mZone0          = aZone0       ;
+        mAdapter      = aAdapter     ;
+        mDevice       = aDevice      ;
+        mEvent        = NULL         ;
+        mFileObject   = NULL         ;
+        mHardware_WDF = aHardware_WDF;
+        mZone0        = aZone0       ;
 
         WdfSpinLockAcquire(mZone0);
-            mAdapter->Init(::CompletePendingRequest, this);
+            mAdapter->Init();
         WdfSpinLockRelease(mZone0);
     }
 
@@ -77,72 +70,47 @@ namespace OpenNetK
     {
         ASSERT(NULL != aRequest);
 
-        ASSERT(NULL != mAdapter     );
-        ASSERT(NULL != mHardware_WDF);
-        ASSERT(NULL != mZone0       );
+        ASSERT(NULL != mAdapter);
+        ASSERT(NULL != mZone0  );
 
-        unsigned int lInSizeMin_byte  = mAdapter->IoCtl_InSize_GetMin (aCode);
-        unsigned int lOutSizeMin_byte = mAdapter->IoCtl_OutSize_GetMin(aCode);
+        NTSTATUS lStatus = STATUS_NOT_SUPPORTED;
 
-        NTSTATUS lStatus;
+        Adapter::IoCtlInfo lInfo;
 
-        if ((aInSize_byte < lInSizeMin_byte) || (aOutSize_byte < lOutSizeMin_byte))
+        if (mAdapter->IoCtl_GetInfo(aCode, &lInfo))
         {
-            // TODO  Test
-            lStatus = STATUS_INVALID_BUFFER_SIZE;
-        }
-        else
-        {
-            void * lIn = NULL;
-
-            if (0 < aInSize_byte)
+            if ((aInSize_byte < lInfo.mIn_MinSize_byte) || (aOutSize_byte < lInfo.mOut_MinSize_byte))
             {
-                lStatus = WdfRequestRetrieveInputBuffer(aRequest, lInSizeMin_byte, &lIn, NULL);
+                lStatus = STATUS_INVALID_BUFFER_SIZE;
             }
             else
             {
-                lStatus = STATUS_SUCCESS;
-            }
+                void * lIn = NULL;
 
-            if (STATUS_SUCCESS == lStatus)
-            {
-                void * lOut = NULL;
-
-                if (0 < aOutSize_byte)
-                {
-                    lStatus = WdfRequestRetrieveOutputBuffer(aRequest, lOutSizeMin_byte, &lOut, NULL);
-                }
-
+                lStatus = (0 < aInSize_byte) ? WdfRequestRetrieveInputBuffer(aRequest, lInfo.mIn_MinSize_byte, &lIn, NULL) : STATUS_SUCCESS;
                 if (STATUS_SUCCESS == lStatus)
                 {
-                    int lRet;
+                    void * lOut = NULL;
 
-                    WdfSpinLockAcquire(mZone0);
-                        lRet = mAdapter->IoCtl(aCode, lIn, static_cast<unsigned int>(aInSize_byte), lOut, static_cast<unsigned int>(aOutSize_byte));
-                    WdfSpinLockRelease(mZone0);
-
-                    switch (lRet)
+                    lStatus = (0 < aOutSize_byte) ? WdfRequestRetrieveOutputBuffer(aRequest, lInfo.mOut_MinSize_byte, &lOut, NULL) : STATUS_SUCCESS;
+                    if (STATUS_SUCCESS == lStatus)
                     {
-                    case Adapter::IOCTL_RESULT_INVALID_SYSTEM_ID:
-                    case Adapter::IOCTL_RESULT_TOO_MANY_ADAPTER :
-                        // TODO  Test
-                        Disconnect();
-                        break;
+                        int lRet;
 
-                    case Adapter::IOCTL_RESULT_PROCESSING_NEEDED:
-                        mHardware_WDF->TrigProcess2();
-                        break;
+                        WdfSpinLockAcquire(mZone0);
+                            lRet = mAdapter->IoCtl(aCode, lIn, static_cast<unsigned int>(aInSize_byte), lOut, static_cast<unsigned int>(aOutSize_byte));
+                        WdfSpinLockRelease(mZone0);
+
+                        ProcessIoCtlResult(lRet);
+
+                        lStatus = ResultToStatus(aRequest, lRet);
                     }
-
-                    lStatus = ResultToStatus(aRequest, lRet);
                 }
             }
         }
 
-        if (STATUS_PENDING != lStatus)
-        {
-            WdfRequestComplete(aRequest, lStatus);
-        }
+        ASSERT(STATUS_PENDING != lStatus);
+        WdfRequestComplete(aRequest, lStatus);
     }
 
     void Adapter_WDF::IoInCallerContext(WDFREQUEST aRequest)
@@ -163,13 +131,13 @@ namespace OpenNetK
 
             if (NULL == mFileObject)
             {
-                OpenNet_Connect * lIn;
+                OpenNet_Connect * lIn         ;
                 size_t            lInSize_byte;
 
                 lStatus = WdfRequestRetrieveInputBuffer(aRequest, sizeof(OpenNet_Connect), reinterpret_cast<PVOID *>(&lIn), &lInSize_byte);
                 if (STATUS_SUCCESS == lStatus)
                 {
-                    ASSERT(NULL != lIn);
+                    ASSERT(NULL                    != lIn         );
                     ASSERT(sizeof(OpenNet_Connect) <= lInSize_byte);
 
                     lStatus = Connect(lIn, WdfRequestGetFileObject(aRequest));
@@ -177,7 +145,6 @@ namespace OpenNetK
             }
             else
             {
-                // TODO  Test
                 lStatus = STATUS_INVALID_STATE_TRANSITION;
             }
 
@@ -189,29 +156,6 @@ namespace OpenNetK
         }
 
         WdfDeviceEnqueueRequest(mDevice, aRequest);
-    }
-
-    // Internal
-    /////////////////////////////////////////////////////////////////////////
-
-    // TODO  Test
-    //
-    // Level   DISPATCH
-    // Thread  DpcForIsr
-    void Adapter_WDF::CompletePendingRequest(int aResult)
-    {
-        ASSERT(Adapter::IOCTL_RESULT_PENDING != aResult);
-
-        ASSERT(NULL != mPendingRequest);
-
-        NTSTATUS lStatus = ResultToStatus(mPendingRequest, aResult);
-        ASSERT(STATUS_PENDING != lStatus);
-
-        WDFREQUEST lRequest = mPendingRequest;
-
-        mPendingRequest = NULL;
-
-        WdfRequestComplete(lRequest, lStatus);
     }
 
     // Private
@@ -235,8 +179,6 @@ namespace OpenNetK
         NTSTATUS lResult = Event_Translate(&aIn->mEvent);
         if (STATUS_SUCCESS == lResult)
         {
-            // TODO  Test
-
             ASSERT(NULL != aIn->mEvent);
 
             // SharedMemory_Translate ==> SharedMemory_Release  See FileCleanup
@@ -293,7 +235,6 @@ namespace OpenNetK
 
         if (NULL == (*aEvent))
         {
-            // TODO  Test
             return STATUS_INVALID_HANDLE;
         }
 
@@ -306,13 +247,31 @@ namespace OpenNetK
         NTSTATUS lResult = ObReferenceObjectByHandle(reinterpret_cast<HANDLE>(*aEvent), SYNCHRONIZE, *ExEventObjectType, UserMode, reinterpret_cast<PVOID *>(&mEvent), NULL);
         if (STATUS_SUCCESS == lResult)
         {
-            // TODO  Test
             ASSERT(NULL != mEvent);
 
             (*aEvent) = reinterpret_cast<uint64_t>(mEvent);
         }
 
         return lResult;
+    }
+
+    // Level   DISPATCH
+    // Thread  Queue
+    void Adapter_WDF::ProcessIoCtlResult(int aResult)
+    {
+        ASSERT(NULL != mHardware_WDF);
+
+        switch (aResult)
+        {
+        case Adapter::IOCTL_RESULT_INVALID_SYSTEM_ID:
+        case Adapter::IOCTL_RESULT_TOO_MANY_ADAPTER :
+            Disconnect();
+            break;
+
+        case Adapter::IOCTL_RESULT_PROCESSING_NEEDED:
+            mHardware_WDF->TrigProcess2();
+            break;
+        }
     }
 
     // Level   PASSIVE
@@ -367,7 +326,6 @@ namespace OpenNetK
 
         if (NULL == (*aSharedMemory)   )
         {
-            // TODO  Test
             return STATUS_INVALID_ADDRESS;
         }
 
@@ -390,7 +348,6 @@ namespace OpenNetK
             (*aSharedMemory) = MmGetSystemAddressForMdlSafe(mSharedMemory_MDL, NormalPagePriority | MdlMappingNoExecute);
             if (NULL == (*aSharedMemory))
             {
-                // TODO  Test
                 MmUnlockPages(mSharedMemory_MDL);
                 lResult = STATUS_INSUFFICIENT_RESOURCES;
             }
@@ -418,15 +375,8 @@ namespace OpenNetK
             lResult = STATUS_SUCCESS;
             break;
 
-        case Adapter::IOCTL_RESULT_PENDING:
-            // TODO  Test
-            mPendingRequest = aRequest;
-            lResult = STATUS_PENDING;
-            break;
-
         case Adapter::IOCTL_RESULT_ERROR           : lResult = STATUS_UNSUCCESSFUL      ; break;
-        case Adapter::IOCTL_RESULT_INVALID_CODE    : lResult = STATUS_NOT_SUPPORTED     ; break;
-        case Adapter::IOCTL_RESULT_TOO_MANY_ADAPTER: lResult = STATUS_TOO_MANY_NODES    ; break; // TODO  Test
+        case Adapter::IOCTL_RESULT_TOO_MANY_ADAPTER: lResult = STATUS_TOO_MANY_NODES    ; break;
         case Adapter::IOCTL_RESULT_TOO_MANY_BUFFER : lResult = STATUS_TOO_MANY_ADDRESSES; break;
 
         default:
@@ -436,20 +386,5 @@ namespace OpenNetK
 
         return lResult;
     }
-}
 
-// Static functions
-/////////////////////////////////////////////////////////////////////////////
-
-// Level   DISPATCH
-// Thread  DpcForIsr or Queue
-
-// TODO  Test
-void CompletePendingRequest(void * aThis, int aResult)
-{
-    ASSERT(NULL != aThis);
-
-    OpenNetK::Adapter_WDF * lThis = reinterpret_cast<OpenNetK::Adapter_WDF *>(aThis);
-
-    lThis->CompletePendingRequest(aResult);
 }

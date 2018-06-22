@@ -37,7 +37,35 @@ namespace OpenNet
         typedef OpenNet_Config Config;
         typedef OpenNet_Info   Info  ;
         typedef OpenNet_State  State ;
-        typedef OpenNet_Stats  Stats ;
+
+        typedef struct
+        {
+            unsigned int mBuffer_Allocated             ; //  0
+            unsigned int mBuffer_Released              ;
+            unsigned int mPacket_Send                  ;
+            unsigned int mRun_Entry                    ;
+            unsigned int mRun_Exception                ;
+            unsigned int mRun_Exit                     ; //  5
+            unsigned int mRun_Iteration_Queue          ;
+            unsigned int mRun_Iteration_Wait           ;
+            unsigned int mRun_Loop_Exception           ;
+            unsigned int mRun_Loop_UnexpectedException ;
+            unsigned int mRun_Loop_Wait                ; // 10
+            unsigned int mRun_Queue                    ;
+            unsigned int mRun_UnexpectedException      ;
+            unsigned int mStart                        ;
+            unsigned int mStop                         ;
+
+            unsigned int mReserved0[113];
+        }
+        Stats_Dll;
+
+        typedef struct
+        {
+            Stats_Dll      mDll   ;
+            OpenNet_Stats  mDriver;
+        }
+        Stats;
 
         /// \cond en
         /// \brief  Display

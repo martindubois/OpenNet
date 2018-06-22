@@ -19,17 +19,13 @@
 #include <OpenNetK/StdInt.h>
 
 #include <OpenNetK/Adapter.h>
+#include <OpenNetK/Constants.h>
 #include <OpenNetK/Interface.h>
 
 #include <OpenNetK/Hardware.h>
 
 // ===== Common =============================================================
 #include "../Common/Version.h"
-
-// Constants
-/////////////////////////////////////////////////////////////////////////////
-
-#define SIZE_64_KB (64 * 1024)
 
 namespace OpenNetK
 {
@@ -90,6 +86,8 @@ namespace OpenNetK
         ASSERT(NULL != (&aConfig));
 
         memcpy(&mConfig, &aConfig, sizeof(mConfig));
+
+        mStats.mSetConfig++;
     }
 
     bool Hardware::SetMemory(unsigned int aIndex, volatile void * aVirtual, unsigned int aSize_byte)
@@ -106,20 +104,26 @@ namespace OpenNetK
 
     bool Hardware::D0_Entry()
     {
+        mStats.mD0_Entry++;
+
         return true;
     }
 
     bool Hardware::D0_Exit()
     {
+        mStats.mD0_Exit++;
+
         return true;
     }
 
     void Hardware::Interrupt_Disable()
     {
+        mStats.mInterrupt_Disable++;
     }
 
     void Hardware::Interrupt_Enable()
     {
+        mStats.mInterrupt_Enable++;
     }
 
     // NOT TESTED  ONK_Lib.Hardware
@@ -142,6 +146,25 @@ namespace OpenNetK
         ASSERT(NULL != mAdapter);
 
         mAdapter->Buffers_Process();
+
+        mStats.mInterrupt_Process2++;
+    }
+
+    void Hardware::Stats_Get(OpenNet_Stats * aStats)
+    {
+        ASSERT(NULL != aStats);
+
+        memcpy(&aStats->mHardware        , &mStats        , sizeof(mStats        ));
+        memcpy(&aStats->mHardware_NoReset, &mStats_NoReset, sizeof(mStats_NoReset));
+
+        mStats.mStats_Get++;
+    }
+
+    void Hardware::Stats_Reset()
+    {
+        memset(&mStats, 0, sizeof(mStats));
+
+        mStats_NoReset.mStats_Reset++;
     }
 
     // Internal
@@ -169,26 +192,26 @@ namespace OpenNetK
     // Protected
     /////////////////////////////////////////////////////////////////////////
 
-    void Hardware::Skip64KByteBoundary(uint64_t * aLogical, volatile uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, volatile uint8_t ** aOutVirtual)
+    void Hardware::SkipDangerousBoundary(uint64_t * aLogical, volatile uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, volatile uint8_t ** aOutVirtual)
     {
-        ASSERT(NULL       !=   aLogical   );
-        ASSERT(NULL       !=   aVirtual   );
-        ASSERT(NULL       != (*aVirtual  ));
-        ASSERT(         0 <    aSize_byte );
-        ASSERT(SIZE_64_KB >    aSize_byte );
-        ASSERT(NULL       !=   aOutLogical);
-        ASSERT(NULL       !=   aOutVirtual);
+        ASSERT(NULL                                  !=   aLogical   );
+        ASSERT(NULL                                  !=   aVirtual   );
+        ASSERT(NULL                                  != (*aVirtual  ));
+        ASSERT(                                    0 <    aSize_byte );
+        ASSERT(OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte >    aSize_byte );
+        ASSERT(NULL                                  !=   aOutLogical);
+        ASSERT(NULL                                  !=   aOutVirtual);
 
         uint64_t lEnd = (*aLogical) + aSize_byte - 1;
 
-        if (((*aLogical) & SIZE_64_KB) == (lEnd & SIZE_64_KB))
+        if (((*aLogical) & OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte) == (lEnd & OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte))
         {
             (*aOutLogical) = (*aLogical);
             (*aOutVirtual) = (*aVirtual);
         }
         else
         {
-            uint64_t lOffset_byte = SIZE_64_KB - ((*aLogical) % SIZE_64_KB);
+            uint64_t lOffset_byte = OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte - ((*aLogical) % OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte);
 
             (*aOutLogical) = (*aLogical) + lOffset_byte;
             (*aOutVirtual) = (*aVirtual) + lOffset_byte;

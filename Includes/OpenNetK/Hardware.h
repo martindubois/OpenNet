@@ -242,6 +242,10 @@ namespace OpenNetK
         /// \note   Thread = Queue
         virtual void Packet_Send(const void * aPacket, unsigned int aSize_byte) = 0;
 
+        virtual void Stats_Get(OpenNet_Stats * aStats);
+
+        virtual void Stats_Reset();
+
     // internal:
 
         unsigned int GetCommonBufferSize() const;
@@ -268,7 +272,7 @@ namespace OpenNetK
         /// \param  aOutVirtual [---;-W-]
         /// \endcond
         /// \note   Thread = Initialisation
-        static void Skip64KByteBoundary(uint64_t * aLogical, volatile uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, volatile uint8_t ** aOutVirtual);
+        static void SkipDangerousBoundary(uint64_t * aLogical, volatile uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, volatile uint8_t ** aOutVirtual);
 
         /// \cond en
         /// \brief  The default constructor
@@ -291,6 +295,9 @@ namespace OpenNetK
 
         OpenNet_Config mConfig;
         OpenNet_Info   mInfo  ;
+
+        mutable OpenNet_Stats_Hardware         mStats        ;
+        mutable OpenNet_Stats_Hardware_NoReset mStats_NoReset;
 
     private:
 
