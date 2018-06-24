@@ -37,8 +37,9 @@ public:
 
     void Connect(OpenNet_Connect * aConnect);
 
-    void Start();
-    void Stop ();
+    void Start       ();
+    void Stop_Request();
+    void Stop_Wait   ();
 
     // ===== OpenNet::Adapter ===============================================
 
@@ -64,7 +65,7 @@ public:
 
     virtual OpenNet::Status Display(FILE * aOut) const;
 
-    virtual OpenNet::Status Packet_Send(void * aData, unsigned int aSize_byte);
+    virtual OpenNet::Status Packet_Send(const void * aData, unsigned int aSize_byte);
 
 // internal:
 
@@ -83,7 +84,8 @@ private:
 
     void State_Change(unsigned int aFrom, unsigned int aTo);
 
-    void Stop_Zone0();
+    void Stop_Request_Zone0();
+    void Stop_Wait_Zone0   ();
 
     unsigned int                    mBufferCount;
     Processor_Internal::BufferData  mBufferData[OPEN_NET_BUFFER_QTY];

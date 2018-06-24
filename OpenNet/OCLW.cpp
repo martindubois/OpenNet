@@ -144,7 +144,7 @@ cl_mem OCLW_CreateBuffer(cl_context aContext, cl_mem_flags aFlags, size_t aSize_
 // TODO  Test
 //
 // OCLW_CreateCommandQueueWithProperties ==> OCLW_ReleaseCommandQueue
-cl_command_queue OCLW_CreateCommandQueueWithProperties(cl_context aContext, cl_device_id aDevice)
+cl_command_queue OCLW_CreateCommandQueueWithProperties(cl_context aContext, cl_device_id aDevice, const cl_queue_properties * aProperties)
 {
     assert(NULL != aContext);
     assert(NULL != aDevice );
@@ -152,7 +152,7 @@ cl_command_queue OCLW_CreateCommandQueueWithProperties(cl_context aContext, cl_d
     cl_int lStatus;
 
     // clCreateCommandQueueWithProperties ==> clReleaseCommandQueue  See OCLW_ReleaseCommandQueue
-    cl_command_queue lResult = clCreateCommandQueueWithProperties(aContext, aDevice, NULL, &lStatus);
+    cl_command_queue lResult = clCreateCommandQueueWithProperties(aContext, aDevice, aProperties, &lStatus);
     if (CL_SUCCESS != lStatus)
     {
         throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
@@ -226,6 +226,20 @@ void OCLW_GetDeviceInfo(cl_device_id aDevice, cl_device_info aParam, size_t aOut
     {
         throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
             "clGetDeviceInfo reported an invalid data size", NULL, __FILE__, __FUNCTION__, __LINE__, static_cast<unsigned int>(lInfo_byte));
+    }
+}
+
+// ===== cl_event ===========================================================
+
+void OCLW_ReleaseEvent(cl_event aEvent)
+{
+    assert(NULL != aEvent);
+
+    cl_int lStatus = clReleaseEvent(aEvent);
+    if (CL_SUCCESS != lStatus)
+    {
+        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
+            "clReleaseEvent(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
     }
 }
 

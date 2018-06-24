@@ -30,23 +30,21 @@ namespace OpenNetK
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    void Adapter_WDF::Init(Adapter * aAdapter, WDFDEVICE aDevice, Hardware_WDF * aHardware_WDF, WDFSPINLOCK aZone0)
+    void Adapter_WDF::Init(Adapter * aAdapter, WDFDEVICE aDevice, Hardware_WDF * aHardware_WDF)
     {
         ASSERT(NULL != aAdapter     );
         ASSERT(NULL != aDevice      );
         ASSERT(NULL != aHardware_WDF);
-        ASSERT(NULL != aZone0       );
 
         mAdapter      = aAdapter     ;
         mDevice       = aDevice      ;
         mEvent        = NULL         ;
         mFileObject   = NULL         ;
         mHardware_WDF = aHardware_WDF;
-        mZone0        = aZone0       ;
 
-        WdfSpinLockAcquire(mZone0);
-            mAdapter->Init();
-        WdfSpinLockRelease(mZone0);
+        new (&mZone0) SpinLock_WDF(aDevice);
+
+        mAdapter->Init(&mZone0);
     }
 
     void Adapter_WDF::FileCleanup(WDFFILEOBJECT aFileObject)
@@ -54,13 +52,10 @@ namespace OpenNetK
         ASSERT(NULL != aFileObject);
 
         ASSERT(NULL != mAdapter);
-        ASSERT(NULL != mZone0  );
 
         if (mFileObject == aFileObject)
         {
-            WdfSpinLockAcquire(mZone0);
-                mAdapter->Disconnect();
-            WdfSpinLockRelease(mZone0);
+            mAdapter->Disconnect();
 
             Disconnect();
         }
@@ -71,7 +66,6 @@ namespace OpenNetK
         ASSERT(NULL != aRequest);
 
         ASSERT(NULL != mAdapter);
-        ASSERT(NULL != mZone0  );
 
         NTSTATUS lStatus = STATUS_NOT_SUPPORTED;
 
@@ -95,11 +89,7 @@ namespace OpenNetK
                     lStatus = (0 < aOutSize_byte) ? WdfRequestRetrieveOutputBuffer(aRequest, lInfo.mOut_MinSize_byte, &lOut, NULL) : STATUS_SUCCESS;
                     if (STATUS_SUCCESS == lStatus)
                     {
-                        int lRet;
-
-                        WdfSpinLockAcquire(mZone0);
-                            lRet = mAdapter->IoCtl(aCode, lIn, static_cast<unsigned int>(aInSize_byte), lOut, static_cast<unsigned int>(aOutSize_byte));
-                        WdfSpinLockRelease(mZone0);
+                        int lRet = mAdapter->IoCtl(aCode, lIn, static_cast<unsigned int>(aInSize_byte), lOut, static_cast<unsigned int>(aOutSize_byte));
 
                         ProcessIoCtlResult(lRet);
 

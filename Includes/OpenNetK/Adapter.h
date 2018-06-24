@@ -18,6 +18,7 @@ namespace OpenNetK
 {
 
     class Hardware;
+    class SpinLock;
 
     // Class
     /////////////////////////////////////////////////////////////////////////
@@ -98,7 +99,7 @@ namespace OpenNetK
 
         static bool IoCtl_GetInfo(unsigned int aCode, IoCtlInfo * aInfo);
 
-        void Init();
+        void Init(SpinLock * aZone0);
 
         void Buffer_SendPackets(BufferInfo * aInfo);
 
@@ -110,17 +111,22 @@ namespace OpenNetK
 
     private:
 
-        void Buffer_InitHeader(OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo);
-        void Buffer_Process   (BufferInfo * aBuffer);
-        void Buffer_Queue     (const OpenNet_BufferInfo & aBufferInfo);
-        void Buffer_Receive   (BufferInfo * aBuffer);
-        void Buffer_Send      (BufferInfo * aBuffer);
-        void Buffer_Stop      (BufferInfo * aBuffer);
+        void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo);
+        void Buffer_Queue_Zone0      (const OpenNet_BufferInfo & aBufferInfo);
+        void Buffer_Receive_Zone0    (BufferInfo * aBuffer);
+        void Buffer_Send_Zone0       (BufferInfo * aBuffer);
+        void Buffer_WriteMarker_Zone0(BufferInfo * aBuffer);
 
-        void Stop();
+        void Stop_Zone0();
+
+        // ===== Buffer_State ===============================================
+        void Buffer_PxCompleted_Zone0(BufferInfo * aBuffer);
+        void Buffer_PxRunning_Zone0  (BufferInfo * aBuffer);
+        void Buffer_RxRunning_Zone0  (BufferInfo * aBuffer);
+        void Buffer_Stopped_Zone0    (unsigned int aIndex );
+        void Buffer_TxRunning_Zone0  (BufferInfo * aBuffer);
 
         // ===== IoCtl ======================================================
-
         int IoCtl_Config_Get (      OpenNet_Config     * aOut);
         int IoCtl_Config_Set (const OpenNet_Config     * aIn , OpenNet_Config * aOut);
         int IoCtl_Connect    (const OpenNet_Connect    * aIn );
@@ -132,16 +138,20 @@ namespace OpenNetK
         int IoCtl_Stats_Reset();
         int IoCtl_Stop       ();
 
-        Adapter           ** mAdapters   ;
-        unsigned int         mAdapterNo  ;
-        unsigned int         mBufferCount;
-        BufferInfo           mBuffers[OPEN_NET_BUFFER_QTY];
-        KEVENT             * mEvent      ;
-        Hardware           * mHardware   ;
-        unsigned int         mSystemId   ;
+        Adapter   ** mAdapters ;
+        unsigned int mAdapterNo;
+        KEVENT     * mEvent    ;
+        Hardware   * mHardware ;
+        unsigned int mSystemId ;
 
         mutable OpenNet_Stats_Adapter         mStats        ;
         mutable OpenNet_Stats_Adapter_NoReset mStats_NoReset;
+
+        // ===== Zone 0 =====================================================
+        SpinLock * mZone0;
+
+        unsigned int mBufferCount;
+        BufferInfo   mBuffers[OPEN_NET_BUFFER_QTY];
 
     };
 

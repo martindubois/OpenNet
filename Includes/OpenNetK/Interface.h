@@ -239,26 +239,24 @@ OpenNet_State;
 typedef struct
 {
     uint32_t mBuffer_InitHeader ; //  0
-    uint32_t mBuffer_Process    ;
     uint32_t mBuffer_Queue      ;
     uint32_t mBuffer_Receive    ;
     uint32_t mBuffer_Send       ;
-    uint32_t mBuffer_SendPackets; //  5
-    uint32_t mBuffer_Stop       ;
-    uint32_t mBuffers_Process   ;
+    uint32_t mBuffer_SendPackets;
+    uint32_t mBuffers_Process   ; //  5
     uint32_t mIoCtl             ;
     uint32_t mIoCtl_Config_Get  ;
-    uint32_t mIoCtl_Config_Set  ; // 10
+    uint32_t mIoCtl_Config_Set  ;
     uint32_t mIoCtl_Connect     ;
-    uint32_t mIoCtl_Info_Get    ;
+    uint32_t mIoCtl_Info_Get    ; // 10
     uint32_t mIoCtl_Packet_Send ;
     uint32_t mIoCtl_Start       ;
-    uint32_t mIoCtl_State_Get   ; // 15
+    uint32_t mIoCtl_State_Get   ;
     uint32_t mIoCtl_Stats_Get   ;
-    uint32_t mIoCtl_Stop        ;
+    uint32_t mIoCtl_Stop        ; // 15
     uint32_t mTx_Packet         ;
 
-    uint32_t mReserved0[109];
+    uint32_t mReserved0[110];
 }
 OpenNet_Stats_Adapter;
 

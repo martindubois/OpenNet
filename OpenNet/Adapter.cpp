@@ -249,7 +249,8 @@ void Display(const OpenNet::Adapter::Stats_Dll & aIn, FILE * aOut)
     DisplayStats( "        - Queue                       = %u\n", aIn.mRun_Queue                   , aOut);
     DisplayStats( "        - Unexpected Exception        = %u\n", aIn.mRun_UnexpectedException     , aOut);
     DisplayStats( "    Start                             = %u\n", aIn.mStart                       , aOut);
-    DisplayStats( "    Stop                              = %u\n", aIn.mStop                        , aOut);
+    fprintf(aOut, "    Stop - Request                    = %u\n", aIn.mStop_Request       );
+    DisplayStats( "         - Wait                       = %u\n", aIn.mStop_Wait                   , aOut);
 }
 
 void Display(const OpenNet_Stats & aIn, FILE * aOut)
@@ -272,12 +273,10 @@ void Display(const OpenNet_Stats_Adapter & aIn, FILE * aOut)
 
     fprintf(aOut, "    Adapter Statistics :\n");
     fprintf(aOut, "      Buffer - InitHeader  = %u\n", aIn.mBuffer_InitHeader);
-    DisplayStats( "             - Process     = %u\n", aIn.mBuffer_Process    , aOut);
     DisplayStats( "             - Queue       = %u\n", aIn.mBuffer_Queue      , aOut);
     DisplayStats( "             - Receive     = %u\n", aIn.mBuffer_Receive    , aOut);
     DisplayStats( "             - Send        = %u\n", aIn.mBuffer_Send       , aOut);
     DisplayStats( "             - SendPackets = %u\n", aIn.mBuffer_SendPackets, aOut);
-    DisplayStats( "             - Stop        = %u\n", aIn.mBuffer_Stop       , aOut);
     DisplayStats( "      Buffers - Process    = %u\n", aIn.mBuffers_Process   , aOut);
     fprintf(aOut, "      IoCtl                = %u\n", aIn.mIoCtl            );
     fprintf(aOut, "        - Config - Get     = %u\n", aIn.mIoCtl_Config_Get );

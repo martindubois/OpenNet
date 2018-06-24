@@ -170,6 +170,15 @@ namespace OpenNetK
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
+    void Hardware::Init(SpinLock * aZone0)
+    {
+        ASSERT(NULL != aZone0);
+
+        ASSERT(NULL == mZone0);
+
+        mZone0 = aZone0;
+    }
+
     unsigned int Hardware::GetCommonBufferSize() const
     {
         return mInfo.mCommonBufferSize_byte;
@@ -221,7 +230,7 @@ namespace OpenNetK
         (*aVirtual) = (*aOutVirtual) + aSize_byte;
     }
 
-    Hardware::Hardware() : mAdapter(NULL)
+    Hardware::Hardware() : mAdapter(NULL), mZone0(NULL)
     {
         memset(&mConfig, 0, sizeof(mConfig));
         memset(&mInfo  , 0, sizeof(mInfo  ));

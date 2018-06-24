@@ -82,15 +82,14 @@ Cleanup1:
     lStatsE.mDll.mRun_Loop_Wait    = BUFFER_QTY;
     lStatsE.mDll.mRun_Queue        = BUFFER_QTY;
     lStatsE.mDll.mStart            = 1;
-    lStatsE.mDll.mStop             = 1;
+    lStatsE.mDll.mStop_Request     = 1;
+    lStatsE.mDll.mStop_Wait        = 1;
 
     lStatsE.mDriver.mAdapter.mBuffer_InitHeader = BUFFER_QTY;
     lStatsE.mDriver.mAdapter.mBuffer_Queue      = BUFFER_QTY;
     lStatsE.mDriver.mAdapter.mBuffer_Receive    = BUFFER_QTY;
 
     lStatsM.mDriver.mAdapter.mBuffers_Process    = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mBuffer_Process     = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mBuffer_Process     = UTL_MASK_ABOVE;
     lStatsM.mDriver.mAdapter.mBuffer_Receive     = UTL_MASK_ABOVE_OR_EQUAL;
     lStatsM.mDriver.mAdapter.mBuffer_Send        = UTL_MASK_ABOVE;
     lStatsM.mDriver.mAdapter.mBuffer_SendPackets = UTL_MASK_ABOVE;

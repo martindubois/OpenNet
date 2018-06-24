@@ -15,6 +15,8 @@
     <ClCompile Include="Adapter_WDF.cpp" />
     <ClCompile Include="Hardware.cpp" />
     <ClCompile Include="Hardware_WDF.cpp" />
+    <ClCompile Include="SpinLock.cpp" />
+    <ClCompile Include="SpinLock_WDF.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{03ADF26E-74F0-4F2A-989B-F408B0AAC441}</ProjectGuid>

@@ -26,13 +26,10 @@
 
 typedef struct
 {
+    OpenNetK::Adapter      mAdapter     ;
+    Pro1000                mHardware    ;
     OpenNetK::Adapter_WDF  mAdapter_WDF ;
     OpenNetK::Hardware_WDF mHardware_WDF;
-
-    // ===== Zone 0 =========================================================
-    WDFSPINLOCK       mZone0   ;
-    OpenNetK::Adapter mAdapter ;
-    Pro1000           mHardware;
 }
 DeviceContext;
 
@@ -131,33 +128,19 @@ NTSTATUS Init(DeviceContext * aThis, WDFDEVICE aDevice)
     ASSERT(NULL != aThis);
     ASSERT(NULL != aDevice);
 
-    WDF_OBJECT_ATTRIBUTES lAttr;
+    new (&aThis->mHardware) Pro1000();
 
-    WDF_OBJECT_ATTRIBUTES_INIT(&lAttr);
-
-    lAttr.ParentObject = aDevice;
-
-    NTSTATUS lResult = WdfSpinLockCreate(&lAttr, &aThis->mZone0);
+    NTSTATUS lResult = aThis->mHardware_WDF.Init(aDevice, &aThis->mHardware);
     if (STATUS_SUCCESS == lResult)
     {
-        new (&aThis->mHardware) Pro1000();
+        aThis->mAdapter_WDF.Init(&aThis->mAdapter, aDevice, &aThis->mHardware_WDF);
+        aThis->mAdapter.SetHardware(&aThis->mHardware);
 
-        lResult = aThis->mHardware_WDF.Init(aDevice, &aThis->mHardware, aThis->mZone0);
-        if (STATUS_SUCCESS == lResult)
-        {
-            aThis->mAdapter_WDF.Init(&aThis->mAdapter, aDevice, &aThis->mHardware_WDF, aThis->mZone0);
-            aThis->mAdapter.SetHardware(&aThis->mHardware);
-
-            aThis->mHardware.SetAdapter(&aThis->mAdapter);
-        }
-        else
-        {
-            DbgPrintEx(DEBUG_ID, DEBUG_ERROR, PREFIX __FUNCTION__ " - Hardware_WDF::Init( , ,  ) failed - 0x%08x" DEBUG_EOL, lResult);
-        }
+        aThis->mHardware.SetAdapter(&aThis->mAdapter);
     }
     else
     {
-        DbgPrintEx(DEBUG_ID, DEBUG_ERROR, PREFIX __FUNCTION__ " - WdfSpinLockCreate( ,  ) failed - 0x%08x" DEBUG_EOL, lResult);
+        DbgPrintEx(DEBUG_ID, DEBUG_ERROR, PREFIX __FUNCTION__ " - Hardware_WDF::Init( , ,  ) failed - 0x%08x" DEBUG_EOL, lResult);
     }
 
     return lResult;

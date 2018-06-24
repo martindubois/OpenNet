@@ -19,8 +19,9 @@
 #include <OpenNetK/Interface.h>
 
 // ===== OpenNet ============================================================
+#include "Processor_Internal.h"
+
 class Adapter_Internal  ;
-class Processor_Internal;
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
@@ -65,14 +66,15 @@ private:
 
     OpenNet::Status ValidateAdapter(OpenNet::Adapter * aAdapter);
 
-    unsigned int                       mAdapterRunning           ;
-    AdapterVector                      mAdapters                 ;
-    OpenNet_Connect                    mConnect                  ;
-    KmsLib::DebugLog                   mDebugLog                 ;
-    clEnqueueMakeBuffersResidentAMD_fn mEnqueueMakeBufferResident;
-    clEnqueueWaitSignalAMD_fn          mEnqueueWaitSignal        ;
-    unsigned int                       mPacketSize_byte          ;
-    cl_platform_id                     mPlatform                 ;
-    ProcessorVector                    mProcessors               ;
+    unsigned int                           mAdapterRunning    ;
+    AdapterVector                          mAdapters          ;
+    OpenNet_Connect                        mConnect           ;
+    KmsLib::DebugLog                       mDebugLog          ;
+    Processor_Internal::ExtensionFunctions mExtensionFunctions;
+    clEnqueueWaitSignalAMD_fn              mEnqueueWaitSignal ;
+    clEnqueueWriteSignalAMD_fn             mEnqueueWriteSignal;
+    unsigned int                           mPacketSize_byte   ;
+    cl_platform_id                         mPlatform          ;
+    ProcessorVector                        mProcessors        ;
 
 };

@@ -110,6 +110,15 @@ static const KmsLib::ToolBase::CommandInfo PROCESSOR_COMMANDS[] =
 	{ NULL, NULL, NULL, NULL }
 };
 
+static void Test_Loop(KmsLib::ToolBase * aToolBase, const char * aArg);
+
+static const KmsLib::ToolBase::CommandInfo TEST_COMMANDS[] =
+{
+	{ "Loop", Test_Loop, "Loop {BQ} {PS} {PQ}           Display the processor", NULL },
+
+	{ NULL, NULL, NULL, NULL }
+};
+
 static void Display(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Start  (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Stop   (KmsLib::ToolBase * aToolBase, const char * aArg);
@@ -124,6 +133,7 @@ static const KmsLib::ToolBase::CommandInfo COMMANDS[] =
 	{ "Processor"    , NULL                           , "Processor ..."                                           , PROCESSOR_COMMANDS },
     { "Start"        , Start                          , "Start                         Start the system"          , NULL               },
     { "Stop"         , Stop                           , "Stop                          Stop the system"           , NULL               },
+    { "Test"         , NULL                           , "Test ..."                                                , TEST_COMMANDS      },
 
 	{ NULL, NULL, NULL, NULL }
 };
@@ -132,6 +142,13 @@ static const KmsLib::ToolBase::CommandInfo COMMANDS[] =
 /////////////////////////////////////////////////////////////////////////////
 
 static void ReportStatus(OpenNet::Status aStatus, const char * aMsgOK);
+
+static void SendPackets(OpenNet::Adapter * aA0, OpenNet::Adapter * aA1, unsigned int aPacketSize_byte, unsigned int aPacketQty);
+
+static void System_Connect();
+static void System_Reset  ();
+
+static void Test_Loop(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int aPacketQty);
 
 // Global variable
 /////////////////////////////////////////////////////////////////////////////
@@ -151,12 +168,7 @@ int main(int aCount, const char ** aVector)
 {
     KMS_TOOL_BANNER("OpenNet", "OpenNet_Tool", VERSION_STR, VERSION_TYPE);
 
-	sSystem = OpenNet::System::Create();
-	if (NULL == sSystem)
-	{
-		KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_FATAL_ERROR, "OpenNet::System::Create() failed");
-		return __LINE__;
-	}
+    System_Connect();
 
 	KmsLib::ToolBase lToolBase(COMMANDS);
 
@@ -864,6 +876,53 @@ void Processor_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
 	}
 }
 
+void Test_Loop(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test Loop %s\n", aArg);
+
+    unsigned int lBufferQty      ;
+    unsigned int lPacketSize_byte;
+    unsigned int lPacketQty      ;
+
+    switch (sscanf_s(aArg, "%u %u %u", &lBufferQty, &lPacketSize_byte, &lPacketQty))
+    {
+    case EOF:
+        lBufferQty = 1;
+        // no break;
+
+    case 1:
+        lPacketSize_byte = 1024;
+        // no break;
+
+    case 2:
+        lPacketQty = 128;
+        // No break
+
+    case 3:
+        printf("Test Loop %u %u %u\n", lBufferQty, lPacketSize_byte, lPacketQty);
+
+        if (0 >= lBufferQty)
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid buffer quantity");
+            return;
+        }
+
+        if (0 >= lPacketQty)
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid packet quantity");
+            return;
+        }
+
+        Test_Loop(lBufferQty, lPacketSize_byte, lPacketQty);
+        break;
+
+    default:
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
+    }
+}
+
 void Stop(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
@@ -914,4 +973,198 @@ void ReportStatus(OpenNet::Status aStatus, const char * aMsgOK)
     }
 
     KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, aMsgOK);
+}
+
+void SendPackets(OpenNet::Adapter * aA0, OpenNet::Adapter * aA1, unsigned int aPacketSize_byte, unsigned int aPacketQty)
+{
+    assert(NULL != aA0             );
+    assert(NULL != aA1             );
+    assert(0    <  aPacketSize_byte);
+    assert(0    <  aPacketQty      );
+
+    unsigned char * lPacket = new unsigned char[aPacketSize_byte];
+    assert(NULL != lPacket);
+
+    memset(lPacket, 0xff, aPacketSize_byte);
+
+    for (unsigned int i = 0; i < aPacketQty; i++)
+    {
+        OpenNet::Status lS0 = aA0->Packet_Send(lPacket, aPacketSize_byte);
+        OpenNet::Status lS1 = aA1->Packet_Send(lPacket, aPacketSize_byte);
+        if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::Packet_Send( ,  ) failed");
+            break;
+        }
+    }
+
+    delete lPacket;
+}
+
+void System_Connect()
+{
+    sSystem = OpenNet::System::Create();
+    if (NULL == sSystem)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_FATAL_ERROR, "OpenNet::System::Create() failed");
+        exit(__LINE__);
+    }
+}
+
+void System_Reset()
+{
+    sAdapter   = NULL;
+    sProcessor = NULL;
+
+    sSystem->Delete();
+
+    System_Connect();
+}
+
+void Test_Loop(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int aPacketQty)
+{
+    OpenNet::Filter_Forward lFF0;
+    OpenNet::Filter_Forward lFF1;
+
+    printf("Retrieving adapters...\n");
+    OpenNet::Adapter * lA0 = sSystem->Adapter_Get(0);
+    OpenNet::Adapter * lA1 = sSystem->Adapter_Get(1);
+    if ((NULL == lA0) || (NULL == lA1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "This test need 2 adapters");
+        return;
+    }
+
+    printf("Retriving processor...\n");
+    OpenNet::Processor * lP0 = sSystem->Processor_Get(0);
+    if (NULL == lP0)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "This test need 1 processor");
+        return;
+    }
+
+    printf("Connecting adapters...\n");
+    OpenNet::Status lS0 = sSystem->Adapter_Connect(lA0);
+    OpenNet::Status lS1 = sSystem->Adapter_Connect(lA1);
+    if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "System::Adapter_Connect(  ) failed");
+        goto Error3;
+    }
+
+    printf("Setting processor...\n");
+    lS0 = lA0->SetProcessor(lP0);
+    lS1 = lA1->SetProcessor(lP0);
+    if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::SetProcessor(  ) failed");
+        goto Error3;
+    }
+
+    printf("Adding destination...\n");
+    lS0 = lFF0.AddDestination(lA1);
+    lS1 = lFF1.AddDestination(lA0);
+    if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Filter::AddDestination(  ) failed");
+        goto Error3;
+    }
+
+    printf("Setting input filter...\n");
+    lS0 = lA0->SetInputFilter(&lFF0);
+    lS1 = lA1->SetInputFilter(&lFF1);
+    if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::SetInputFilter(  ) failed");
+        goto Error3;
+    }
+
+    printf("Allocating buffers...\n");
+    lS0 = lA0->Buffer_Allocate(aBufferQty);
+    lS1 = lA1->Buffer_Allocate(aBufferQty);
+    if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::Buffer_Allocate(  ) failed");
+        goto Error1;
+    }
+
+    printf("Starting...\n");
+    OpenNet::Status lS = sSystem->Start();
+    if (OpenNet::STATUS_OK != lS)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "System::Start(  ) failed");
+        goto Error0;
+    }
+
+    Sleep(2000);
+
+    printf("Sending packets...\n");
+    SendPackets(lA0, lA1, aPacketSize_byte, aPacketQty);
+
+    printf("Stabilizing...\n");
+    Sleep(2000);
+
+    printf("Reseting statistics...\n");
+    lS0 = lA0->ResetStats();
+    lS1 = lA1->ResetStats();
+    if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::Reset_State() failed");
+    }
+
+    printf("Running...\n");
+    Sleep(10000);
+
+    printf("Stopping...\n");
+    lS = sSystem->Stop();
+    if (OpenNet::STATUS_OK != lS)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "System::Stop(  ) failed");
+    }
+
+Error0:
+    printf("Releasing buffers...\n");
+    lS0 = lA0->Buffer_Release(aBufferQty);
+    lS1 = lA1->Buffer_Release(aBufferQty);
+    if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::Buffer_Release(  ) failed");
+    }
+
+Error1:
+    printf("Reseting input filter...\n");
+    lS0 = lA0->ResetInputFilter();
+    lS1 = lA1->ResetInputFilter();
+    if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::ResetInputFilter(  ) failed");
+    }
+
+    OpenNet::Adapter::Stats lStats0;
+    OpenNet::Adapter::Stats lStats1;
+
+    printf("Retrieving statistics...\n");
+    lS0 = lA0->GetStats(&lStats0);
+    lS1 = lA1->GetStats(&lStats1);
+    if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::GetStats(  ) failed");
+    }
+    else
+    {
+        double lPackets = static_cast<double>(lStats0.mDriver.mHardware.mRx_Packet + lStats1.mDriver.mHardware.mRx_Packet);
+
+        printf("%f packets/s\n", lPackets / 10.0);
+
+        double lBytes = lPackets * aPacketSize_byte;
+
+        printf("%f bytes/s\n", lPackets / 10.0);
+        printf("%f KB/s\n"   , lBytes / 10.0 / 1024.0);
+        printf("%f MB/s\n"   , lBytes / 10.0 / 1024.0 / 1024.0);
+        printf("%f GB/s\n"   , lBytes / 10.0 / 1024.0 / 1024.0 / 1024.0);
+    }
+
+Error3:
+    printf("Resting system...\n");
+    System_Reset();
 }

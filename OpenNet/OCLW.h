@@ -25,12 +25,15 @@ void OCLW_ReleaseCommandQueue (cl_command_queue aCommandQueue);
 
 // ===== cl_context =========================================================
 cl_mem           OCLW_CreateBuffer                    (cl_context aContext, cl_mem_flags aFlags, size_t aSize_byte);
-cl_command_queue OCLW_CreateCommandQueueWithProperties(cl_context aContext, cl_device_id aDevice);
+cl_command_queue OCLW_CreateCommandQueueWithProperties(cl_context aContext, cl_device_id aDevice, const cl_queue_properties * aProperties);
 cl_program       OCLW_CreateProgramWithSource         (cl_context aContext, cl_uint aLineCount, const char ** aLines, const size_t * aLineLengths);
 void             OCLW_ReleaseContext                  (cl_context aContext);
 
 // ===== cl_device_id =======================================================
 void OCLW_GetDeviceInfo(cl_device_id aDevice, cl_device_info aParam, size_t aOutSize_byte, void * aOut);
+
+// ===== cl_event ===========================================================
+void OCLW_ReleaseEvent(cl_event aEvent);
 
 // ===== cl_kernel ==========================================================
 void OCLW_GetKernelWorkGroupInfo(cl_kernel aKernel, cl_device_id aDevice, cl_kernel_work_group_info aParam, size_t aOutSize_byte, void * aOut);

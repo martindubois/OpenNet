@@ -11,6 +11,7 @@
 // ===== Includes ===========================================================
 #include <OpenNetK/Constants.h>
 #include <OpenNetK/Interface.h>
+#include <OpenNetK/SpinLock.h>
 
 // ===== Common =============================================================
 #include "../Common/Version.h"
@@ -58,28 +59,36 @@ void Pro1000::GetState(OpenNet_State * aState)
 
     ASSERT(NULL != aState);
 
+    ASSERT(NULL != mZone0);
+
     Hardware::GetState(aState);
 
-    aState->mFlags.mFullDuplex = mBAR1->mDeviceStatus.mFields.mFullDuplex;
-    aState->mFlags.mLinkUp     = mBAR1->mDeviceStatus.mFields.mLinkUp    ;
-    aState->mFlags.mTx_Off     = mBAR1->mDeviceStatus.mFields.mTx_Off    ;
+    mZone0->Lock();
 
-    // TODO  ONK_Pro1000.Pro1000
-    //       Comprendre pourquoi la vitesse n'est pas indique correctement.
+        ASSERT(NULL != mBAR1);
 
-    switch (mBAR1->mDeviceStatus.mFields.mSpeed)
-    {
-    case 0x0: aState->mSpeed_MB_s =  10; break;
-    case 0x1: aState->mSpeed_MB_s = 100; break;
+        aState->mFlags.mFullDuplex = mBAR1->mDeviceStatus.mFields.mFullDuplex;
+        aState->mFlags.mLinkUp     = mBAR1->mDeviceStatus.mFields.mLinkUp    ;
+        aState->mFlags.mTx_Off     = mBAR1->mDeviceStatus.mFields.mTx_Off    ;
 
-    case 0x2:
-    case 0x3:
-        aState->mSpeed_MB_s = 1000;
-        break;
+        // TODO  ONK_Pro1000.Pro1000
+        //       Comprendre pourquoi la vitesse n'est pas indique correctement.
 
-    default:
-        ASSERT(false);
-    }
+        switch (mBAR1->mDeviceStatus.mFields.mSpeed)
+        {
+        case 0x0: aState->mSpeed_MB_s =  10; break;
+        case 0x1: aState->mSpeed_MB_s = 100; break;
+
+        case 0x2:
+        case 0x3:
+            aState->mSpeed_MB_s = 1000;
+            break;
+
+        default:
+            ASSERT(false);
+        }
+
+    mZone0->Unlock();
 }
 
 void Pro1000::ResetMemory()
@@ -88,7 +97,11 @@ void Pro1000::ResetMemory()
 
     Hardware::ResetMemory();
 
-    mBAR1 = NULL;
+    mZone0->Lock();
+
+        mBAR1 = NULL;
+
+    mZone0->Unlock();
 }
 
 void Pro1000::SetCommonBuffer(uint64_t aLogical, volatile void * aVirtual)
@@ -97,24 +110,30 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, volatile void * aVirtual)
 
     ASSERT(NULL != aVirtual);
 
-    uint64_t           lLogical = aLogical;
-    volatile uint8_t * lVirtual = reinterpret_cast<volatile uint8_t *>(aVirtual);
+    ASSERT(NULL != mZone0);
 
-    SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY, &mRx_Logical, reinterpret_cast<volatile uint8_t **>(&mRx_Virtual));
-    SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY, &mTx_Logical, reinterpret_cast<volatile uint8_t **>(&mTx_Virtual));
+    mZone0->Lock();
 
-    unsigned int i;
+        uint64_t           lLogical = aLogical;
+        volatile uint8_t * lVirtual = reinterpret_cast<volatile uint8_t *>(aVirtual);
 
-    for (i = 0; i < PACKET_BUFFER_QTY; i++)
-    {
-        SkipDangerousBoundary(&lLogical, &lVirtual, mConfig.mPacketSize_byte, mTx_PacketBuffer_Logical + i, reinterpret_cast<volatile uint8_t **>(mTx_PacketBuffer_Virtual + i));
-    }
+        SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY, &mRx_Logical, reinterpret_cast<volatile uint8_t **>(&mRx_Virtual));
+        SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY, &mTx_Logical, reinterpret_cast<volatile uint8_t **>(&mTx_Virtual));
 
-    for (i = 0; i < TX_DESCRIPTOR_QTY; i++)
-    {
-        mTx_Virtual[i].mFields.mEndOfPacket  = true;
-        mTx_Virtual[i].mFields.mReportStatus = true;
-    }
+        unsigned int i;
+
+        for (i = 0; i < PACKET_BUFFER_QTY; i++)
+        {
+            SkipDangerousBoundary(&lLogical, &lVirtual, mConfig.mPacketSize_byte, mTx_PacketBuffer_Logical + i, reinterpret_cast<volatile uint8_t **>(mTx_PacketBuffer_Virtual + i));
+        }
+
+        for (i = 0; i < TX_DESCRIPTOR_QTY; i++)
+        {
+            mTx_Virtual[i].mFields.mEndOfPacket  = true;
+            mTx_Virtual[i].mFields.mReportStatus = true;
+        }
+
+    mZone0->Unlock();
 }
 
 // NOT TESTED  ONK_Pro1000.Pro1000.ErrorHandling
@@ -125,6 +144,8 @@ bool Pro1000::SetMemory(unsigned int aIndex, volatile void * aVirtual, unsigned 
 
     ASSERT(NULL != aVirtual);
 
+    ASSERT(NULL != mZone0);
+
     switch (aIndex)
     {
     case 0:
@@ -133,16 +154,20 @@ bool Pro1000::SetMemory(unsigned int aIndex, volatile void * aVirtual, unsigned 
             return false;
         }
 
-        mBAR1 = reinterpret_cast< volatile Pro1000_BAR1 * >( aVirtual );
+        mZone0->Lock();
 
-        Interrupt_Disable();
+            mBAR1 = reinterpret_cast< volatile Pro1000_BAR1 * >( aVirtual );
 
-        mInfo.mEthernetAddress.mAddress[0] = mBAR1->mRx_AddressLow0 .mFields.mA;
-        mInfo.mEthernetAddress.mAddress[1] = mBAR1->mRx_AddressLow0 .mFields.mB;
-        mInfo.mEthernetAddress.mAddress[2] = mBAR1->mRx_AddressLow0 .mFields.mC;
-        mInfo.mEthernetAddress.mAddress[3] = mBAR1->mRx_AddressLow0 .mFields.mD;
-        mInfo.mEthernetAddress.mAddress[4] = mBAR1->mRx_AddressHigh0.mFields.mE;
-        mInfo.mEthernetAddress.mAddress[5] = mBAR1->mRx_AddressHigh0.mFields.mF;
+            Interrupt_Disable_Zone0();
+
+            mInfo.mEthernetAddress.mAddress[0] = mBAR1->mRx_AddressLow0 .mFields.mA;
+            mInfo.mEthernetAddress.mAddress[1] = mBAR1->mRx_AddressLow0 .mFields.mB;
+            mInfo.mEthernetAddress.mAddress[2] = mBAR1->mRx_AddressLow0 .mFields.mC;
+            mInfo.mEthernetAddress.mAddress[3] = mBAR1->mRx_AddressLow0 .mFields.mD;
+            mInfo.mEthernetAddress.mAddress[4] = mBAR1->mRx_AddressHigh0.mFields.mE;
+            mInfo.mEthernetAddress.mAddress[5] = mBAR1->mRx_AddressHigh0.mFields.mF;
+
+        mZone0->Unlock();
         break;
     }
 
@@ -153,25 +178,31 @@ bool Pro1000::D0_Entry()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
-    mRx_In  = 0;
-    mRx_Out = 0;
+    ASSERT(NULL != mZone0);
 
-    mTx_In  = 0;
-    mTx_Out = 0;
+    mZone0->Lock();
 
-    memset(&mTx_Counter, 0, sizeof(mTx_Counter));
+        mRx_In  = 0;
+        mRx_Out = 0;
 
-    mTx_PacketBuffer_In = 0;
+        mTx_In  = 0;
+        mTx_Out = 0;
 
-    Reset();
+        memset(&mTx_Counter, 0, sizeof(mTx_Counter));
 
-    mBAR1->mDeviceControl.mFields.mInvertLossOfSignal = false;
-    mBAR1->mDeviceControl.mFields.mSetLinkUp          = true ;
+        mTx_PacketBuffer_In = 0;
 
-    mBAR1->mGeneralPurposeInterruptEnable.mFields.mExtendedInterruptAutoMaskEnable = true;
+        Reset_Zone0();
 
-    Rx_Config();
-    Tx_Config();
+        mBAR1->mDeviceControl.mFields.mInvertLossOfSignal = false;
+        mBAR1->mDeviceControl.mFields.mSetLinkUp          = true ;
+
+        mBAR1->mGeneralPurposeInterruptEnable.mFields.mExtendedInterruptAutoMaskEnable = true;
+
+        Rx_Config_Zone0();
+        Tx_Config_Zone0();
+
+    mZone0->Unlock();
 
     return Hardware::D0_Entry();
 }
@@ -189,21 +220,33 @@ void Pro1000::Interrupt_Disable()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
-    ASSERT(NULL != mBAR1);
+    ASSERT(NULL != mZone0);
 
     Hardware::Interrupt_Disable();
 
-    mBAR1->mInterruptMaskClear.mValue = 0xffffffff;
+    mZone0->Lock();
+
+        Interrupt_Disable_Zone0();
+
+    mZone0->Unlock();
 }
 
 void Pro1000::Interrupt_Enable()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
+    ASSERT(NULL != mZone0);
+
     Hardware::Interrupt_Enable();
 
-    mBAR1->mInterruptMaskSet.mFields.mTx_DescriptorWritten = true;
-    mBAR1->mInterruptMaskSet.mFields.mRx_DescriptorWritten = true;
+    mZone0->Lock();
+
+        ASSERT(NULL != mBAR1);
+
+        mBAR1->mInterruptMaskSet.mFields.mTx_DescriptorWritten = true;
+        mBAR1->mInterruptMaskSet.mFields.mRx_DescriptorWritten = true;
+
+    mZone0->Unlock();
 }
 
 bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing)
@@ -226,8 +269,14 @@ void Pro1000::Interrupt_Process2()
 {
     // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
-    Rx_Process();
-    Tx_Process();
+    ASSERT(NULL != mZone0);
+
+    mZone0->Lock();
+
+        Rx_Process_Zone0();
+        Tx_Process_Zone0();
+
+    mZone0->Unlock();
 
     Hardware::Interrupt_Process2();
 }
@@ -239,48 +288,64 @@ void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, v
     ASSERT(NULL != aPacketInfo);
     ASSERT(NULL != aCounter   );
 
-    ASSERT(NULL              != mBAR1      );
-    ASSERT(RX_DESCRIPTOR_QTY >  mRx_In     );
-    ASSERT(NULL              != mRx_Virtual);
+    ASSERT(NULL != mZone0);
 
-    mRx_Counter   [mRx_In] = aCounter   ;
-    mRx_PacketInfo[mRx_In] = aPacketInfo;
+    mZone0->Lock();
 
-    mRx_PacketInfo[mRx_In]->mPacketState = OPEN_NET_PACKET_STATE_RECEIVING;
+        ASSERT(NULL              != mBAR1      );
+        ASSERT(RX_DESCRIPTOR_QTY >  mRx_In     );
+        ASSERT(NULL              != mRx_Virtual);
 
-    memset((Pro1000_Rx_Descriptor *)(mRx_Virtual) + mRx_In, 0, sizeof(Pro1000_Rx_Descriptor)); // volatile_cast
+        mRx_Counter   [mRx_In] = aCounter   ;
+        mRx_PacketInfo[mRx_In] = aPacketInfo;
 
-    mRx_Virtual[mRx_In].mLogicalAddress = aData;
+        mRx_PacketInfo[mRx_In]->mPacketState = OPEN_NET_PACKET_STATE_RX_RUNNING;
 
-    InterlockedIncrement(mRx_Counter[mRx_In]);
+        memset((Pro1000_Rx_Descriptor *)(mRx_Virtual) + mRx_In, 0, sizeof(Pro1000_Rx_Descriptor)); // volatile_cast
 
-    mRx_In = (mRx_In + 1) % RX_DESCRIPTOR_QTY;
+        mRx_Virtual[mRx_In].mLogicalAddress = aData;
 
-    mBAR1->mRx_DescriptorTail0.mFields.mValue = mRx_In;
+        InterlockedIncrement(mRx_Counter[mRx_In]);
+
+        mRx_In = (mRx_In + 1) % RX_DESCRIPTOR_QTY;
+
+        mBAR1->mRx_DescriptorTail0.mFields.mValue = mRx_In;
+
+    mZone0->Unlock();
 
     mStats.mPacket_Receive++;
 }
 
 void Pro1000::Packet_Send(uint64_t aData, unsigned int aSize_byte, volatile long * aCounter)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u,  )" DEBUG_EOL, aSize_byte);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u,  )" DEBUG_EOL, aSize_byte);
 
     ASSERT(OPEN_NET_PACKET_SIZE_MAX_byte >= aSize_byte);
 
-    mTx_Counter[mTx_In] = aCounter;
+    ASSERT(NULL != mZone0);
 
-    mTx_Virtual[mTx_In].mFields.mDescriptorDone = false     ;
-    mTx_Virtual[mTx_In].mFields.mSize_byte      = aSize_byte;
-    mTx_Virtual[mTx_In].mLogicalAddress         = aData     ;
+    mZone0->Lock();
 
-    if (NULL != mTx_Counter[mTx_In])
-    {
-        InterlockedIncrement(mTx_Counter[mTx_In]);
-    }
+        ASSERT(NULL              != mBAR1      );
+        ASSERT(TX_DESCRIPTOR_QTY >  mTx_In     );
+        ASSERT(NULL              != mTx_Virtual);
 
-    mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
+        mTx_Counter[mTx_In] = aCounter;
 
-    mBAR1->mTx_DescriptorTail0.mFields.mValue = mTx_In;
+        mTx_Virtual[mTx_In].mFields.mDescriptorDone = false     ;
+        mTx_Virtual[mTx_In].mFields.mSize_byte      = aSize_byte;
+        mTx_Virtual[mTx_In].mLogicalAddress         = aData     ;
+
+        if (NULL != mTx_Counter[mTx_In])
+        {
+            InterlockedIncrement(mTx_Counter[mTx_In]);
+        }
+
+        mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
+
+        mBAR1->mTx_DescriptorTail0.mFields.mValue = mTx_In;
+
+    mZone0->Unlock();
 
     mStats.mPacket_Send++;
 }
@@ -289,40 +354,57 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes )" DEBUG_EOL, aSize_byte);
 
-    UNREFERENCED_PARAMETER(aPacket);
+    ASSERT(NULL != mZone0);
 
-    memcpy((void *)(mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In]), aPacket, aSize_byte); // volatile_cast
+    uint64_t lPacket_PA;
 
-    Packet_Send(mTx_PacketBuffer_Logical[mTx_PacketBuffer_In], aSize_byte, NULL);
+    mZone0->Lock();
 
-    mTx_PacketBuffer_In++;
+        ASSERT(PACKET_BUFFER_QTY >  mTx_PacketBuffer_In     );
+        ASSERT(NULL              != mTx_PacketBuffer_Virtual);
+
+        memcpy((void *)(mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In]), aPacket, aSize_byte); // volatile_cast
+
+        lPacket_PA = mTx_PacketBuffer_Logical[mTx_PacketBuffer_In];
+
+        mTx_PacketBuffer_In = ( mTx_PacketBuffer_In + 1 ) % PACKET_BUFFER_QTY;
+
+    mZone0->Unlock();
+
+    Packet_Send(lPacket_PA, aSize_byte, NULL);
 }
 
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
-void Pro1000::Reset()
+void Pro1000::Interrupt_Disable_Zone0()
+{
+    ASSERT(NULL != mBAR1);
+
+    mBAR1->mInterruptMaskClear.mValue = 0xffffffff;
+}
+
+void Pro1000::Reset_Zone0()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     ASSERT(NULL != mBAR1);
 
-    Interrupt_Disable();
+    Interrupt_Disable_Zone0();
 
     mBAR1->mDeviceControl.mFields.mReset = true;
 
     while (mBAR1->mDeviceControl.mFields.mReset);
 
-    Interrupt_Disable();
+    Interrupt_Disable_Zone0();
 
     uint32_t lValue = mBAR1->mInterruptCauseRead.mValue;
-
     (void)(lValue);
 }
 
 // Level   Thread
 // Thread  Init
-void Pro1000::Rx_Config()
+void Pro1000::Rx_Config_Zone0()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
@@ -357,7 +439,7 @@ void Pro1000::Rx_Config()
 
 // Level   SoftInt
 // Thread  SoftInt
-void Pro1000::Rx_Process()
+void Pro1000::Rx_Process_Zone0()
 {
     ASSERT(RX_DESCRIPTOR_QTY >  mRx_In     );
     ASSERT(RX_DESCRIPTOR_QTY >  mRx_Out    );
@@ -370,13 +452,13 @@ void Pro1000::Rx_Process()
             break;
         }
 
-        ASSERT(NULL                            != mRx_Counter   [mRx_Out]              );
-        ASSERT(NULL                            != mRx_PacketInfo[mRx_Out]              );
-        ASSERT(OPEN_NET_PACKET_STATE_RECEIVING == mRx_PacketInfo[mRx_Out]->mPacketState);
-        ASSERT(OPEN_NET_PACKET_SIZE_MAX_byte   >= mRx_Virtual   [mRx_Out].mSize_byte   );
+        ASSERT(NULL                             != mRx_Counter   [mRx_Out]              );
+        ASSERT(NULL                             != mRx_PacketInfo[mRx_Out]              );
+        ASSERT(OPEN_NET_PACKET_STATE_RX_RUNNING == mRx_PacketInfo[mRx_Out]->mPacketState);
+        ASSERT(OPEN_NET_PACKET_SIZE_MAX_byte    >= mRx_Virtual   [mRx_Out].mSize_byte   );
 
-        mRx_PacketInfo[mRx_Out]->mPacketSize_byte = mRx_Virtual[mRx_Out].mSize_byte;
-        mRx_PacketInfo[mRx_Out]->mPacketState     = OPEN_NET_PACKET_STATE_RECEIVED ;
+        mRx_PacketInfo[mRx_Out]->mPacketSize_byte = mRx_Virtual[mRx_Out].mSize_byte   ;
+        mRx_PacketInfo[mRx_Out]->mPacketState     = OPEN_NET_PACKET_STATE_RX_COMPLETED;
 
         InterlockedDecrement(mRx_Counter[mRx_Out]);
 
@@ -388,7 +470,7 @@ void Pro1000::Rx_Process()
 
 // Level   Thread
 // Thread  Init
-void Pro1000::Tx_Config()
+void Pro1000::Tx_Config_Zone0()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
@@ -406,7 +488,7 @@ void Pro1000::Tx_Config()
 
 // Level   SoftInt
 // Thread  SoftInt
-void Pro1000::Tx_Process()
+void Pro1000::Tx_Process_Zone0()
 {
     ASSERT(TX_DESCRIPTOR_QTY >  mTx_In     );
     ASSERT(TX_DESCRIPTOR_QTY >  mTx_Out    );

@@ -117,7 +117,8 @@ Adapter_Internal::~Adapter_Internal()
         case STATE_RUNNING :
         case STATE_STARTING:
         case STATE_STOPPING:
-            Stop_Zone0();
+            Stop_Request_Zone0();
+            Stop_Wait_Zone0   ();
             break;
 
         default: assert(false);
@@ -202,13 +203,24 @@ void Adapter_Internal::Start()
 
 // Exception  KmsLib::Exception *  CODE_THREAD_ERROR
 // Threads  Apps
-void Adapter_Internal::Stop()
+void Adapter_Internal::Stop_Request()
 {
     EnterCriticalSection(&mZone0);
-        Stop_Zone0();
+        Stop_Request_Zone0();
     LeaveCriticalSection(&mZone0);
 
-    mStats.mStop++;
+    mStats.mStop_Request++;
+}
+
+// Exception  KmsLib::Exception *  CODE_THREAD_ERROR
+// Threads  Apps
+void Adapter_Internal::Stop_Wait()
+{
+    EnterCriticalSection(&mZone0);
+        Stop_Wait_Zone0();
+    LeaveCriticalSection(&mZone0);
+
+    mStats.mStop_Wait++;
 }
 
 // ===== OpenNet::Adapter ===================================================
@@ -622,7 +634,7 @@ OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
     return OpenNet::STATUS_OK;
 }
 
-OpenNet::Status Adapter_Internal::Packet_Send(void * aData, unsigned int aSize_byte)
+OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int aSize_byte)
 {
     assert(NULL != mHandle);
 
@@ -798,14 +810,6 @@ void Adapter_Internal::Run_Loop()
         State_Change(STATE_STOP_REQUESTED, STATE_STOPPING);
 
         mHandle->Control(OPEN_NET_IOCTL_STOP, NULL, 0, NULL, 0);
-
-        for (unsigned int i = 0; i < mBufferCount; i++)
-        {
-            mProcessor->Processing_Wait(mBufferData + lIndex);
-            mStats.mRun_Loop_Wait++;
-
-            lIndex = (lIndex + 1) % mBufferCount;
-        }
     }
     catch (KmsLib::Exception * eE)
     {
@@ -878,11 +882,8 @@ void Adapter_Internal::State_Change(unsigned int aFrom, unsigned int aTo)
     }
 }
 
-// This method release the Zone0 when it throw an exception.
-//
-// Exception  KmsLib::Exception *  CODE_THREAD_ERROR
 // Threads  Apps
-void Adapter_Internal::Stop_Zone0()
+void Adapter_Internal::Stop_Request_Zone0()
 {
     assert(NULL != mThread);
 
@@ -894,6 +895,24 @@ void Adapter_Internal::Stop_Zone0()
         // no break;
 
     case STATE_STOPPING :
+        break;
+
+    default: assert(false);
+    }
+}
+
+// This method release the Zone0 when it throw an exception.
+//
+// Exception  KmsLib::Exception *  CODE_THREAD_ERROR
+// Threads  Apps
+void Adapter_Internal::Stop_Wait_Zone0()
+{
+    assert(NULL != mThread);
+
+    switch (mState)
+    {
+    case STATE_STOP_REQUESTED:
+    case STATE_STOPPING      :
         DWORD lRet;
 
         LeaveCriticalSection(&mZone0);
@@ -909,12 +928,12 @@ void Adapter_Internal::Stop_Zone0()
         //       buffer.
 
         LeaveCriticalSection(&mZone0);
-            if (!TerminateThread(mThread, __LINE__))
-            {
-                mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-                throw new KmsLib::Exception(KmsLib::Exception::CODE_THREAD_ERROR,
-                    "TerminateThread( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
-            }
+        if (!TerminateThread(mThread, __LINE__))
+        {
+            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+            throw new KmsLib::Exception(KmsLib::Exception::CODE_THREAD_ERROR,
+                "TerminateThread( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
+        }
         EnterCriticalSection(&mZone0);
         break;
 
@@ -925,8 +944,8 @@ void Adapter_Internal::Stop_Zone0()
 
     BOOL lRetB = CloseHandle(mThread);
 
-    mThread   = NULL;
-    mThreadId =    0;
+    mThread = NULL;
+    mThreadId = 0;
 
     if (!lRetB)
     {

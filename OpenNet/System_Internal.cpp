@@ -40,18 +40,17 @@ static OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE);
 System_Internal::System_Internal()
     : mDebugLog( "K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "OpenNet" )
     , mAdapterRunning           (0)
-    , mEnqueueMakeBufferResident(NULL)
-    , mEnqueueWaitSignal        (NULL)
     , mPacketSize_byte          (OPEN_NET_PACKET_SIZE_MAX_byte)
     , mPlatform                 (0)
 {
+    memset(&mConnect           , 0, sizeof(mConnect           ));
+    memset(&mExtensionFunctions, 0, sizeof(mExtensionFunctions));
+
     FindAdapters  ();
     FindPlatform  ();
     FindExtension ();
     FindProcessors();
 
-    memset(&mConnect, 0, sizeof(mConnect));
-    
     // CreateEvent ==> CloseHandle  See the destructor
     mConnect.mEvent = reinterpret_cast<uint64_t>(CreateEvent(NULL, FALSE, TRUE, NULL));
     assert(NULL != mConnect.mEvent);
@@ -188,6 +187,7 @@ OpenNet::Status System_Internal::Adapter_Connect(OpenNet::Adapter * aAdapter)
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog.Log(eE);
+
         lResult = ExceptionToStatus(eE);
     }
 
@@ -309,7 +309,18 @@ OpenNet::Status System_Internal::Stop()
 
             if (lAdapter->IsConnected(*this))
             {
-                lAdapter->Stop();
+                lAdapter->Stop_Request();
+            }
+        }
+
+        for (unsigned int i = 0; (i < mAdapters.size()) && (0 < mAdapterRunning); i++)
+        {
+            Adapter_Internal * lAdapter = mAdapters[i];
+            assert(NULL != lAdapter);
+
+            if (lAdapter->IsConnected(*this))
+            {
+                lAdapter->Stop_Wait();
                 mAdapterRunning--;
                 lResult = OpenNet::STATUS_OK;
             }
@@ -366,16 +377,16 @@ void System_Internal::FindAdapters()
 // Threads  Apps
 void System_Internal::FindExtension()
 {
-    assert(NULL == mEnqueueMakeBufferResident);
-    assert(NULL == mEnqueueWaitSignal        );
+    assert(NULL == mExtensionFunctions.mEnqueueMakeBufferResident);
+    assert(NULL == mExtensionFunctions.mEnqueueWaitSignal        );
 
     if (0 != mPlatform)
     {
-        mEnqueueMakeBufferResident = reinterpret_cast<clEnqueueMakeBuffersResidentAMD_fn>(OCLW_GetExtensionFunctionAddressForPlatform(mPlatform, "clEnqueueMakeBuffersResidentAMD"));
-        mEnqueueWaitSignal         = reinterpret_cast<clEnqueueWaitSignalAMD_fn         >(OCLW_GetExtensionFunctionAddressForPlatform(mPlatform, "clEnqueueWaitSignalAMD"         ));
+        mExtensionFunctions.mEnqueueMakeBufferResident = reinterpret_cast<clEnqueueMakeBuffersResidentAMD_fn>(OCLW_GetExtensionFunctionAddressForPlatform(mPlatform, "clEnqueueMakeBuffersResidentAMD"));
+        mExtensionFunctions.mEnqueueWaitSignal         = reinterpret_cast<clEnqueueWaitSignalAMD_fn         >(OCLW_GetExtensionFunctionAddressForPlatform(mPlatform, "clEnqueueWaitSignalAMD"         ));
 
-        assert(NULL != mEnqueueMakeBufferResident);
-        assert(NULL != mEnqueueWaitSignal        );
+        assert(NULL != mExtensionFunctions.mEnqueueMakeBufferResident);
+        assert(NULL != mExtensionFunctions.mEnqueueWaitSignal        );
     }
 }
 
@@ -427,7 +438,7 @@ void System_Internal::FindProcessors()
                 if (IsExtensionSupported(lDevices[i]))
                 {
                     // new ==> Delete  See ~System_Internal
-                    mProcessors.push_back( new Processor_Internal(mPlatform, lDevices[i], mEnqueueMakeBufferResident, mEnqueueWaitSignal, &mDebugLog) );
+                    mProcessors.push_back( new Processor_Internal(mPlatform, lDevices[i], &mExtensionFunctions, &mDebugLog) );
                 }
             }
         }

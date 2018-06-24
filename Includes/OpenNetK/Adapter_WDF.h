@@ -11,6 +11,7 @@
 
 // ===== Includes/OpenNetK ==================================================
 #include <OpenNetK/Interface.h>
+#include <OpenNetK/SpinLock_WDF.h>
 
 namespace OpenNetK
 {
@@ -38,16 +39,14 @@ namespace OpenNetK
         /// \param  aAdapter      [-K-;RW-] The Adapter
         /// \param  aDevice       [-K-;RW-] The WDFDEVICE
         /// \param  aHardware_WDF [-K-;RW-] The Hardware_WDF
-        /// \param  aZone0        [-K-;RW-] The WDFSPINLOCK
         /// \endcond
         /// \cond fr
         /// \brief  Initialise l'instance
         /// \param  aAdapter      [-K-;RW-] L'Adapter
         /// \param  aDevice       [-K-;RW-] Le WDFDEVICE
         /// \param  aHardware_WDF [-K-;RW-] Le Hardware_WDF
-        /// \param  aZone0        [-K-;RW-] Le WDFSPINLOCK
         /// \endcond
-        void Init(Adapter * aAdapter, WDFDEVICE aDevice, Hardware_WDF * aHardware_WDF, WDFSPINLOCK aZone0);
+        void Init(Adapter * aAdapter, WDFDEVICE aDevice, Hardware_WDF * aHardware_WDF);
 
         /// \cond en
         /// \brief  Cleanup file
@@ -101,6 +100,7 @@ namespace OpenNetK
 
         NTSTATUS ResultToStatus(WDFREQUEST aRequest, int aResult);
 
+        Adapter      * mAdapter         ;
         WDFDEVICE      mDevice          ;
         KEVENT       * mEvent           ;
         WDFFILEOBJECT  mFileObject      ;
@@ -108,9 +108,7 @@ namespace OpenNetK
         MDL          * mSharedMemory_MDL;
 
         // ===== Zone 0 =====================================================
-        WDFSPINLOCK mZone0;
-
-        Adapter * mAdapter;
+        SpinLock_WDF mZone0;
 
     };
 

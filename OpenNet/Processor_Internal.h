@@ -41,13 +41,21 @@ public:
 
     typedef struct
     {
-        OpenNet::Filter * mFilter ;
-        cl_kernel         mKernel ;
-        cl_program        mProgram;
+        clEnqueueMakeBuffersResidentAMD_fn mEnqueueMakeBufferResident;
+        clEnqueueWaitSignalAMD_fn          mEnqueueWaitSignal        ;
+    }
+    ExtensionFunctions;
+
+    typedef struct
+    {
+        cl_command_queue  mCommandQueue;
+        OpenNet::Filter * mFilter      ;
+        cl_kernel         mKernel      ;
+        cl_program        mProgram     ;
     }
     FilterData;
 
-    Processor_Internal(cl_platform_id aPlatform, cl_device_id aDevice, clEnqueueMakeBuffersResidentAMD_fn aEnqueueMakeBufferResident, clEnqueueWaitSignalAMD_fn aEnqueueWaitSignal, KmsLib::DebugLog * aDebugLog);
+    Processor_Internal(cl_platform_id aPlatform, cl_device_id aDevice, ExtensionFunctions * aExtensionFunctions, KmsLib::DebugLog * aDebugLog);
 
     ~Processor_Internal();
 
@@ -75,12 +83,10 @@ private:
 
     void GetKernelWorkGroupInfo(cl_kernel aKernel, cl_kernel_work_group_info aParam, size_t aOutSize_byte, void * aOut);
 
-    cl_context                         mContext                  ;
-    KmsLib::DebugLog                 * mDebugLog                 ;
-    cl_device_id                       mDevice                   ;
-    clEnqueueMakeBuffersResidentAMD_fn mEnqueueMakeBufferResident;
-    clEnqueueWaitSignalAMD_fn          mEnqueueWaitSignal        ;
-    Info                               mInfo                     ;
-    cl_command_queue                   mQueue                    ;
+    cl_context           mContext           ;
+    KmsLib::DebugLog   * mDebugLog          ;
+    cl_device_id         mDevice            ;
+    ExtensionFunctions * mExtensionFunctions;
+    Info                 mInfo              ;
 
 };

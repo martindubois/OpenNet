@@ -13,30 +13,32 @@
 
 //                  +--> STOPPED
 //                  |
-// --> INVALID --> SENDING <---------------------------+
-//                  |                                  |
-//                  +--> RECEIVING --> PROCESSING --> PROCESSED
+// --> INVALID --> TX_RUNNING <-- TX_PROGRAMMING <----- PX_COMPLETED <--+
+//                  |                                                   |
+//                  +--> RX_PROGRAMMING --> RX_RUNNING --> PX_RUNNING --+
 
-#define OPEN_NET_BUFFER_STATE_INVALID    (0)
-#define OPEN_NET_BUFFER_STATE_PROCESSED  (1)
-#define OPEN_NET_BUFFER_STATE_PROCESSING (2)
-#define OPEN_NET_BUFFER_STATE_RECEIVING  (3)
-#define OPEN_NET_BUFFER_STATE_SENDING    (4)
-#define OPEN_NET_BUFFER_STATE_STOPPED    (5)
-#define OPEN_NET_BUFFER_STATE_QTY        (6)
+#define OPEN_NET_BUFFER_STATE_INVALID        (0)
+#define OPEN_NET_BUFFER_STATE_PX_COMPLETED   (1)
+#define OPEN_NET_BUFFER_STATE_PX_RUNNING     (2)
+#define OPEN_NET_BUFFER_STATE_RX_PROGRAMMING (3)
+#define OPEN_NET_BUFFER_STATE_RX_RUNNING     (4)
+#define OPEN_NET_BUFFER_STATE_STOPPED        (5)
+#define OPEN_NET_BUFFER_STATE_TX_PROGRAMMING (6)
+#define OPEN_NET_BUFFER_STATE_TX_RUNNING     (7)
+#define OPEN_NET_BUFFER_STATE_QTY            (8)
 
 // ===== Packet state / Etat d'un paquet ====================================
 
-// --> INVALID --> SENDING <------------------------+
-//                  |                               |
-//                  +--> RECEVING --> RECEIVED --> PROCESSED
+// --> INVALID --> TX_RUNNING <------------------------- PX_COMPLETED --+
+//                  |                                                   |
+//                  +----------   > RX_RUNNING --> RX_COMPLETED --------+
 
-#define OPEN_NET_PACKET_STATE_INVALID    (0)
-#define OPEN_NET_PACKET_STATE_PROCESSED  (1)
-#define OPEN_NET_PACKET_STATE_RECEIVED   (2)
-#define OPEN_NET_PACKET_STATE_RECEIVING  (3)
-#define OPEN_NET_PACKET_STATE_SENDING    (4)
-#define OPEN_NET_PACKET_STATE_QTY        (5)
+#define OPEN_NET_PACKET_STATE_INVALID      (0)
+#define OPEN_NET_PACKET_STATE_PX_COMPLETED (1)
+#define OPEN_NET_PACKET_STATE_RX_COMPLETED (2)
+#define OPEN_NET_PACKET_STATE_RX_RUNNING   (3)
+#define OPEN_NET_PACKET_STATE_TX_RUNNING   (4)
+#define OPEN_NET_PACKET_STATE_QTY          (5)
 
 // Data type / Type de donnees
 /////////////////////////////////////////////////////////////////////////////

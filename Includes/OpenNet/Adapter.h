@@ -54,9 +54,10 @@ namespace OpenNet
             unsigned int mRun_Queue                    ;
             unsigned int mRun_UnexpectedException      ;
             unsigned int mStart                        ;
-            unsigned int mStop                         ;
+            unsigned int mStop_Request                 ;
+            unsigned int mStop_Wait                    ; // 15
 
-            unsigned int mReserved0[113];
+            unsigned int mReserved0[112];
         }
         Stats_Dll;
 
@@ -373,7 +374,7 @@ namespace OpenNet
         /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
         /// \retval STATUS_PACKET_TO_LARGE
         /// \retval STATUS_PACKET_TO_SMALL
-        virtual Status Packet_Send(void * aData, unsigned int aSize_byte) = 0;
+        virtual Status Packet_Send(const void * aData, unsigned int aSize_byte) = 0;
 
     protected:
 

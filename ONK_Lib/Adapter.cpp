@@ -19,7 +19,9 @@
 #include <OpenNetK/StdInt.h>
 
 #include <OpenNetK/Constants.h>
+#include <OpenNetK/Debug.h>
 #include <OpenNetK/Hardware.h>
+#include <OpenNetK/SpinLock.h>
 
 #include <OpenNetK/Adapter.h>
 
@@ -80,10 +82,14 @@ namespace OpenNetK
         return true;
     }
 
+    // aZone0 [-K-;RW-]
+    //
     // Level   Thread
     // Thread  Initialisation
-    void Adapter::Init()
+    void Adapter::Init(SpinLock * aZone0)
     {
+        ASSERT(NULL != aZone0);
+
         memset(&mStats        , 0, sizeof(mStats        ));
         memset(&mStats_NoReset, 0, sizeof(mStats_NoReset));
 
@@ -93,6 +99,7 @@ namespace OpenNetK
         mEvent       = NULL;
         mHardware    = NULL;
         mSystemId    =    0;
+        mZone0       = aZone0;
     }
 
     // aBuffer [-K-;RW-]
@@ -120,16 +127,16 @@ namespace OpenNetK
 
             switch (lPacketInfo[i].mPacketState)
             {
-            case OPEN_NET_PACKET_STATE_RECEIVED :
-            case OPEN_NET_PACKET_STATE_RECEIVING:
+            case OPEN_NET_PACKET_STATE_RX_COMPLETED:
+            case OPEN_NET_PACKET_STATE_RX_RUNNING  :
                 // TODO  ONK_Lib.Adapter.PartialBuffer  Add statistics
                 break;
 
-            case OPEN_NET_PACKET_STATE_PROCESSED:
-                lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_SENDING;
+            case OPEN_NET_PACKET_STATE_PX_COMPLETED:
+                lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_TX_RUNNING;
                 // no break;
 
-            case OPEN_NET_PACKET_STATE_SENDING:
+            case OPEN_NET_PACKET_STATE_TX_RUNNING:
                 if (0 != (lPacketInfo[i].mToSendTo & lAdapterBit))
                 {
                     mHardware->Packet_Send(aBuffer->mBufferInfo.mBuffer_PA + lPacketInfo[i].mPacketOffset_byte, lPacketInfo[i].mPacketSize_byte, &aBuffer->mTx_Counter);
@@ -148,61 +155,55 @@ namespace OpenNetK
     // Threada  Queue or SoftInt
     void Adapter::Buffers_Process()
     {
-        ASSERT(OPEN_NET_BUFFER_QTY >= mBufferCount);
+        ASSERT(NULL != mZone0);
 
-        for (unsigned int i = 0; i < mBufferCount; i++)
-        {
-            ASSERT(NULL != mBuffers[i].mHeader);
+        mZone0->Lock();
 
-            switch (mBuffers[i].mHeader->mBufferState)
+            ASSERT(OPEN_NET_BUFFER_QTY >= mBufferCount);
+
+            for (unsigned int i = 0; i < mBufferCount; i++)
             {
-            case OPEN_NET_BUFFER_STATE_PROCESSED : Buffer_Send(mBuffers + i); break;
-            case OPEN_NET_BUFFER_STATE_PROCESSING:                            break;
+                ASSERT(NULL != mBuffers[i].mHeader);
 
-            case OPEN_NET_BUFFER_STATE_RECEIVING:
-                if (0 == mBuffers[i].mRx_Counter)
+                switch (mBuffers[i].mHeader->mBufferState)
                 {
-                    Buffer_Process(mBuffers + i);
-                }
-                break;
+                case OPEN_NET_BUFFER_STATE_PX_COMPLETED  : Buffer_PxCompleted_Zone0(mBuffers + i); break;
+                case OPEN_NET_BUFFER_STATE_PX_RUNNING    : Buffer_PxRunning_Zone0  (mBuffers + i); break;
+                case OPEN_NET_BUFFER_STATE_RX_PROGRAMMING:                                         break;
+                case OPEN_NET_BUFFER_STATE_RX_RUNNING    : Buffer_RxRunning_Zone0  (mBuffers + i); break;
+                case OPEN_NET_BUFFER_STATE_STOPPED       : Buffer_Stopped_Zone0    (           i); break;
+                case OPEN_NET_BUFFER_STATE_TX_PROGRAMMING:                                         break;
+                case OPEN_NET_BUFFER_STATE_TX_RUNNING    : Buffer_TxRunning_Zone0  (mBuffers + i); break;
 
-            case OPEN_NET_BUFFER_STATE_SENDING:
-                if (0 == mBuffers[i].mTx_Counter)
-                {
-                    if (mBuffers[i].mFlags.mStopRequested) { Buffer_Stop   (mBuffers + i); }
-                    else                                   { Buffer_Receive(mBuffers + i); }
+                default: ASSERT(false);
                 }
-                break;
-
-            case OPEN_NET_BUFFER_STATE_STOPPED:
-                if (i == (mBufferCount - 1))
-                {
-                    mBufferCount--;
-                }
-                break;
-
-            default: ASSERT(false);
             }
-        }
+
+        mZone0->Unlock();
 
         mStats.mBuffers_Process++;
     }
 
+    // AdapterNo may be OPEN_NET_ADAPTER_NO_UNKNOW if Disconnect is called
+    // from Connect after an error occured.
+    //
     // Level   Thread
     // Thread  User
     void Adapter::Disconnect()
     {
-        // AdapterNo is not set if Disconnect is called by Connect on an
-        // error
-
         ASSERT(NULL != mAdapters);
         ASSERT(NULL != mEvent   );
         ASSERT(   0 != mSystemId);
+        ASSERT(NULL != mZone0   );
 
-        if (0 < mBufferCount)
-        {
-            Stop();
-        }
+        mZone0->Lock();
+
+            if (0 < mBufferCount)
+            {
+                Stop_Zone0();
+            }
+
+        mZone0->Unlock();
 
         mAdapters  = NULL                       ;
         mAdapterNo = OPEN_NET_ADAPTER_NO_UNKNOWN;
@@ -255,7 +256,7 @@ namespace OpenNetK
     //
     // Levels   SoftInt or Thread
     // Threads  Queue
-    void Adapter::Buffer_InitHeader(OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo)
+    void Adapter::Buffer_InitHeader_Zone0(OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo)
     {
         ASSERT(NULL !=   aHeader               );
         ASSERT(NULL != (&aBufferInfo)          );
@@ -274,14 +275,14 @@ namespace OpenNetK
 
         memset(aHeader, 0, lPacketOffset_byte);
 
-        aHeader->mBufferState           = OPEN_NET_BUFFER_STATE_SENDING;
+        aHeader->mBufferState           = OPEN_NET_BUFFER_STATE_TX_RUNNING;
         aHeader->mPacketInfoOffset_byte = sizeof(OpenNet_BufferHeader);
         aHeader->mPacketQty             = lPacketQty;
         aHeader->mPacketSize_byte       = lPacketSize_byte;
 
         for (unsigned int i = 0; i < lPacketQty; i++)
         {
-            lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_SENDING;
+            lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_TX_RUNNING;
 
             SkipDangerousBoundary(aBufferInfo.mBuffer_PA, &lPacketOffset_byte, lPacketSize_byte, &lPacketInfo[i].mPacketOffset_byte);
         }
@@ -289,30 +290,11 @@ namespace OpenNetK
         mStats.mBuffer_InitHeader++;
     }
 
-    // aBuffer [---;R--]
-    //
-    // Level   SoftInt
-    // Thread  SoftInt
-    void Adapter::Buffer_Process(BufferInfo * aBuffer)
-    {
-        ASSERT(NULL != aBuffer         );
-        ASSERT(NULL != aBuffer->mHeader);
-        ASSERT(NULL != aBuffer->mMarker);
-
-        aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_PROCESSING;
-
-        aBuffer->mMarkerValue++;
-
-        (*aBuffer->mMarker) = aBuffer->mMarkerValue;
-
-        mStats.mBuffer_Process++;
-    }
-
     // aBufferInfo [---;R--]
     //
     // Level   SoftInt or Thread
     // Thread  Queue
-    void Adapter::Buffer_Queue(const OpenNet_BufferInfo & aBufferInfo)
+    void Adapter::Buffer_Queue_Zone0(const OpenNet_BufferInfo & aBufferInfo)
     {
         ASSERT(NULL != (&aBufferInfo)        );
         ASSERT(   0 <  aBufferInfo.mPacketQty);
@@ -337,7 +319,7 @@ namespace OpenNetK
         mBuffers[mBufferCount].mMarker = reinterpret_cast<uint32_t *>(MmMapIoSpace(lPA, PAGE_SIZE, MmNonCached));
         ASSERT(NULL != mBuffers[mBufferCount].mMarker);
 
-        Buffer_InitHeader(mBuffers[mBufferCount].mHeader, aBufferInfo);
+        Buffer_InitHeader_Zone0(mBuffers[mBufferCount].mHeader, aBufferInfo);
         
         mBufferCount++;
 
@@ -348,28 +330,30 @@ namespace OpenNetK
     //
     // Level    SoftInt
     // Threads  Queue or SoftInt
-    void Adapter::Buffer_Receive(BufferInfo * aBuffer)
+    void Adapter::Buffer_Receive_Zone0(BufferInfo * aBuffer)
     {
-        ASSERT(NULL                          != aBuffer                                 );
-        ASSERT(NULL                          != aBuffer->mHeader                        );
-        ASSERT(OPEN_NET_BUFFER_STATE_SENDING == aBuffer->mHeader->mBufferState          );
-        ASSERT(0                             <  aBuffer->mHeader->mPacketInfoOffset_byte);
-        ASSERT(0                             <  aBuffer->mHeader->mPacketQty            );
+        ASSERT(NULL != aBuffer                                 );
+        ASSERT(NULL != aBuffer->mHeader                        );
+        ASSERT(0    <  aBuffer->mHeader->mPacketInfoOffset_byte);
+        ASSERT(0    <  aBuffer->mHeader->mPacketQty            );
 
         ASSERT(NULL != mHardware);
+        ASSERT(NULL != mZone0   );
 
         uint8_t * lBase = reinterpret_cast<uint8_t *>(aBuffer->mHeader);
 
         OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<OpenNet_PacketInfo *>(lBase + aBuffer->mHeader->mPacketInfoOffset_byte);
 
-        for (unsigned int i = 0; i < aBuffer->mHeader->mPacketQty; i++)
-        {
-            ASSERT(0 < lPacketInfo[i].mPacketOffset_byte);
+        mZone0->Unlock();
 
-            mHardware->Packet_Receive(aBuffer->mBufferInfo.mBuffer_PA + lPacketInfo[i].mPacketOffset_byte, lPacketInfo + i, &aBuffer->mRx_Counter);
-        }
+            for (unsigned int i = 0; i < aBuffer->mHeader->mPacketQty; i++)
+            {
+                ASSERT(0 < lPacketInfo[i].mPacketOffset_byte);
 
-        aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RECEIVING;
+                mHardware->Packet_Receive(aBuffer->mBufferInfo.mBuffer_PA + lPacketInfo[i].mPacketOffset_byte, lPacketInfo + i, &aBuffer->mRx_Counter);
+            }
+
+        mZone0->Lock();
 
         mStats.mBuffer_Receive++;
     }
@@ -378,61 +362,147 @@ namespace OpenNetK
     //
     // Level   SoftInt
     // Thread  SoftInt
-    void Adapter::Buffer_Send(BufferInfo * aBuffer)
+    void Adapter::Buffer_Send_Zone0(BufferInfo * aBuffer)
     {
-        ASSERT(NULL                            != aBuffer                       );
-        ASSERT(NULL                            != aBuffer->mHeader              );
-        ASSERT(OPEN_NET_BUFFER_STATE_PROCESSED == aBuffer->mHeader->mBufferState);
+        ASSERT(NULL != aBuffer);
 
-        if (NULL != mAdapters)
-        {
+        ASSERT(NULL != mAdapters);
+        ASSERT(NULL != mZone0   );
+
+        mZone0->Unlock();
+
             for (unsigned int i = 0; i < OPEN_NET_ADAPTER_NO_QTY; i++)
             {
                 if (NULL != mAdapters[i])
                 {
-                    // TODO  ONL_Lib.Adapter
-                    //       Here, the Buffer_SendPackets of the other
-                    //       adapter is called without holding the mZone0 of
-                    //       this other adapter. Worst, mZone adapter of the
-                    //       firs adapter is locked, what could cause a dead
-                    //       lock if we try to lock the mZone of the other
-                    //       adapter. A solution could be to use a shared
-                    //       lock once the adapter is locked.
                     mAdapters[i]->Buffer_SendPackets(aBuffer);
                 }
             }
 
-            aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_SENDING;
-        }
-        else
-        {
-            aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
-        }
+        mZone0->Unlock();
 
         mStats.mBuffer_Send++;
     }
 
-    // Level   SoftInt
-    // Thread  SoftInt
-    void Adapter::Buffer_Stop(BufferInfo * aBuffer)
+    void Adapter::Buffer_WriteMarker_Zone0(BufferInfo * aBuffer)
     {
         ASSERT(NULL != aBuffer         );
-        ASSERT(NULL != aBuffer->mHeader);
+        ASSERT(NULL != aBuffer->mMarker);
 
-        aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
+        aBuffer->mMarkerValue++;
 
-        mStats.mBuffer_Stop++;
+        (*aBuffer->mMarker) = aBuffer->mMarkerValue;
     }
 
     // Level   Thread or SoftInt
     // Thread  Queue or User
-    void Adapter::Stop()
+    void Adapter::Stop_Zone0()
     {
         ASSERT(0 < mBufferCount);
 
         for (unsigned int i = 0; i < mBufferCount; i++)
         {
             mBuffers[i].mFlags.mStopRequested = true;
+        }
+    }
+
+    // ===== Buffer_State ===================================================
+    // aBuffer [---;RW-]
+    //
+    // Level   SoftInt
+    // Thread  SoftInt
+
+    void Adapter::Buffer_PxCompleted_Zone0(BufferInfo * aBuffer)
+    {
+        ASSERT(NULL                               != aBuffer                       );
+        ASSERT(NULL                               != aBuffer->mHeader              );
+        ASSERT(OPEN_NET_BUFFER_STATE_PX_COMPLETED == aBuffer->mHeader->mBufferState);
+
+        if (NULL == mAdapters)
+        {
+            aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
+
+            Buffer_WriteMarker_Zone0(aBuffer);
+        }
+        else
+        {
+            // Here, we use a temporary state because Buffer_Send_Zone0
+            // release the gate to avoid deadlock with the other adapter's
+            // gates.
+            aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_PROGRAMMING;
+
+            Buffer_Send_Zone0(aBuffer);
+
+            ASSERT(OPEN_NET_BUFFER_STATE_TX_PROGRAMMING == aBuffer->mHeader->mBufferState);
+
+            aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_RUNNING;
+        }
+    }
+
+    void Adapter::Buffer_PxRunning_Zone0(BufferInfo * aBuffer)
+    {
+        ASSERT(NULL                             != aBuffer                       );
+        ASSERT(NULL                             != aBuffer->mHeader              );
+        ASSERT(OPEN_NET_BUFFER_STATE_PX_RUNNING == aBuffer->mHeader->mBufferState);
+
+        if (aBuffer->mFlags.mStopRequested)
+        {
+            aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
+        }
+    }
+
+    void Adapter::Buffer_RxRunning_Zone0(BufferInfo * aBuffer)
+    {
+        ASSERT(NULL                             != aBuffer                       );
+        ASSERT(NULL                             != aBuffer->mHeader              );
+        ASSERT(OPEN_NET_BUFFER_STATE_RX_RUNNING == aBuffer->mHeader->mBufferState);
+
+        if (0 == aBuffer->mRx_Counter)
+        {
+            aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_RUNNING;
+            Buffer_WriteMarker_Zone0(aBuffer);
+        }
+    }
+
+    void Adapter::Buffer_Stopped_Zone0(unsigned int aIndex)
+    {
+        ASSERT(OPEN_NET_BUFFER_QTY > aIndex);
+
+        ASSERT(OPEN_NET_BUFFER_QTY >= mBufferCount);
+
+        if (aIndex == (mBufferCount - 1))
+        {
+            mBufferCount--;
+        }
+    }
+
+    void Adapter::Buffer_TxRunning_Zone0(BufferInfo * aBuffer)
+    {
+        ASSERT(NULL                             != aBuffer                       );
+        ASSERT(NULL                             != aBuffer->mHeader              );
+        ASSERT(OPEN_NET_BUFFER_STATE_TX_RUNNING == aBuffer->mHeader->mBufferState);
+
+        if (0 == aBuffer->mTx_Counter)
+        {
+            if (aBuffer->mFlags.mStopRequested)
+            {
+                aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
+
+                Buffer_WriteMarker_Zone0(aBuffer);
+            }
+            else
+            {
+                // Here, we use a temporary state because Buffer_Receivd_Zone
+                // release the gate to avoid deadlock with the Hardware's
+                // gates.
+                aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RX_PROGRAMMING;
+
+                Buffer_Receive_Zone0(aBuffer);
+
+                ASSERT(OPEN_NET_BUFFER_STATE_RX_PROGRAMMING == aBuffer->mHeader->mBufferState);
+
+                aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RX_RUNNING;
+            }
         }
     }
 
@@ -536,23 +606,35 @@ namespace OpenNetK
         ASSERT(NULL                       != aIn         );
         ASSERT(sizeof(OpenNet_BufferInfo) <= aInSize_byte);
 
-        ASSERT(OPEN_NET_BUFFER_QTY >= mBufferCount);
+        ASSERT(NULL != mZone0);
 
         mStats.mIoCtl_Start++;
 
         unsigned int lCount = aInSize_byte / sizeof(OpenNet_BufferInfo);
 
-        if (OPEN_NET_BUFFER_QTY < (mBufferCount + lCount))
-        {
-            return IOCTL_RESULT_TOO_MANY_BUFFER;
-        }
+        int lResult;
 
-        for (unsigned int i = 0; i < lCount; i++)
-        {
-            Buffer_Queue(aIn[i]);
-        }
+        mZone0->Lock();
 
-        return IOCTL_RESULT_PROCESSING_NEEDED;
+            ASSERT(OPEN_NET_BUFFER_QTY >= mBufferCount);
+
+            if (OPEN_NET_BUFFER_QTY >= (mBufferCount + lCount))
+            {
+                for (unsigned int i = 0; i < lCount; i++)
+                {
+                    Buffer_Queue_Zone0(aIn[i]);
+                }
+
+                lResult = IOCTL_RESULT_PROCESSING_NEEDED;
+            }
+            else
+            {
+                lResult = IOCTL_RESULT_TOO_MANY_BUFFER;
+            }
+
+        mZone0->Unlock();
+
+        return lResult;
     }
 
     int Adapter::IoCtl_State_Get(OpenNet_State * aOut)
@@ -605,16 +687,28 @@ namespace OpenNetK
 
     int Adapter::IoCtl_Stop()
     {
-        if (0 >= mBufferCount)
-        {
-            return IOCTL_RESULT_NO_BUFFER;
-        }
+        ASSERT(NULL != mZone0);
 
-        Stop();
+        int lResult;
+
+        mZone0->Lock();
+
+            if (0 < mBufferCount)
+            {
+                Stop_Zone0();
+
+                lResult = IOCTL_RESULT_OK;
+            }
+            else
+            {
+                lResult = IOCTL_RESULT_NO_BUFFER;
+            }
+
+        mZone0->Unlock();
 
         mStats.mIoCtl_Stop++;
 
-        return IOCTL_RESULT_OK;
+        return lResult;
     }
 
 }

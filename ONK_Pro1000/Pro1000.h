@@ -49,13 +49,17 @@ private:
         TX_DESCRIPTOR_QTY = 1024,
     };
 
-    void Reset();
+    void Interrupt_Disable_Zone0();
 
-    void Rx_Config ();
-    void Rx_Process();
+    void Reset_Zone0();
 
-    void Tx_Config ();
-    void Tx_Process();
+    void Rx_Config_Zone0 ();
+    void Rx_Process_Zone0();
+
+    void Tx_Config_Zone0 ();
+    void Tx_Process_Zone0();
+
+    // ===== Zone 0 =========================================================
 
     volatile Pro1000_BAR1 * mBAR1;
 

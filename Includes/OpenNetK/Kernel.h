@@ -30,8 +30,8 @@
                                                                                                                                   \
     lPacketInfo += get_global_id( 0 );
 
-#define OPEN_NET_KERNEL_END                                            \
-    if ( 0 == get_global_id( 0 ) )                                     \
-    {                                                                  \
-        aBufferHeader->mBufferState = OPEN_NET_BUFFER_STATE_PROCESSED; \
+#define OPEN_NET_KERNEL_END                                               \
+    if ( 0 == get_global_id( 0 ) )                                        \
+    {                                                                     \
+        aBufferHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_COMPLETED; \
     }

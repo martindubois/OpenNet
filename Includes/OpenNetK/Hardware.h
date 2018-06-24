@@ -16,7 +16,8 @@
 namespace OpenNetK
 {
 
-    class Adapter;
+    class Adapter ;
+    class SpinLock;
 
     // Class
     /////////////////////////////////////////////////////////////////////////
@@ -248,6 +249,8 @@ namespace OpenNetK
 
     // internal:
 
+        void Init(SpinLock * aZone0);
+
         unsigned int GetCommonBufferSize() const;
 
         void GetConfig(OpenNet_Config * aConfig);
@@ -298,6 +301,9 @@ namespace OpenNetK
 
         mutable OpenNet_Stats_Hardware         mStats        ;
         mutable OpenNet_Stats_Hardware_NoReset mStats_NoReset;
+
+        // ===== Zone 0 =====================================================
+        SpinLock * mZone0;
 
     private:
 

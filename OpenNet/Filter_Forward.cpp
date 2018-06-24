@@ -25,20 +25,20 @@
 #define EOL "\n"
 
 static const char * CODE =
-"#include <OpenNetK/Kernel.h>"                                           EOL
-                                                                         EOL
-"OPEN_NET_KERNEL_DECLARE"                                                EOL
-"{"                                                                      EOL
-"    OPEN_NET_KERNEL_BEGIN"                                              EOL
-                                                                         EOL
-"    if ( OPEN_NET_PACKET_STATE_RECEIVED == lPacketInfo->mPacketState )" EOL
-"    {"                                                                  EOL
-"        lPacketInfo->mPacketState = OPEN_NET_PACKET_STATE_PROCESSED;"   EOL
-"        lPacketInfo->mToSendTo    = DESTINATIONS;"                      EOL
-"    }"                                                                  EOL
-                                                                         EOL
-"    OPEN_NET_KERNEL_END"                                                EOL
-"}"                                                                      EOL;
+"#include <OpenNetK/Kernel.h>"                                                EOL
+                                                                              EOL
+"OPEN_NET_KERNEL_DECLARE"                                                     EOL
+"{"                                                                           EOL
+"    OPEN_NET_KERNEL_BEGIN"                                                   EOL
+                                                                              EOL
+"    if ( OPEN_NET_PACKET_STATE_RX_COMPLETED == lPacketInfo->mPacketState )"  EOL
+"    {"                                                                       EOL
+"        lPacketInfo->mPacketState = OPEN_NET_PACKET_STATE_PX_COMPLETED;"     EOL
+"        lPacketInfo->mToSendTo    = DESTINATIONS;"                           EOL
+"    }"                                                                       EOL
+                                                                              EOL
+"    OPEN_NET_KERNEL_END"                                                     EOL
+"}"                                                                           EOL;
 
 namespace OpenNet
 {

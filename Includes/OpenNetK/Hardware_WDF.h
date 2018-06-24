@@ -6,6 +6,12 @@
 
 #pragma once
 
+// Includes
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== Includes ===========================================================
+#include <OpenNetK/SpinLock_WDF.h>
+
 namespace OpenNetK
 {
     class Hardware;
@@ -32,16 +38,14 @@ namespace OpenNetK
         /// \brief  Initialize the instance.
         /// \param  aDevice   [-K-;RW-] The WDFDEVICE
         /// \param  aHardware [-K-;RW-] The Hardware
-        /// \param  aZone0    [-K-;RW-] The WDFSPINLOCK
         /// \endcond
         /// \cond fr
         /// \brief  Initialise l'instance
         /// \param  aDevice   [-K-;RW-] Le WDFDEVICE
         /// \param  aHardware [-K-;RW-] L'Hardware
-        /// \param  aZone0    [-K-;RW-] Le WDFSPINLOCK
         /// \endcond
         /// \retval STATUS_SUCCESS
-        NTSTATUS Init(WDFDEVICE aDevice, Hardware * aHardware, WDFSPINLOCK aZone0);
+        NTSTATUS Init(WDFDEVICE aDevice, Hardware * aHardware);
 
         /// \cond en
         /// \brief  Enter the D0 state
@@ -110,6 +114,7 @@ namespace OpenNetK
         WDFCOMMONBUFFER mCommonBuffer;
         WDFDEVICE       mDevice      ;
         WDFDMAENABLER   mDmaEnabler  ;
+        Hardware      * mHardware    ;
 
         unsigned int mIntCount ;
         WDFINTERRUPT mInterrupt;
@@ -121,9 +126,7 @@ namespace OpenNetK
         WDFTIMER mTimer;
 
         // ===== Zone 0 =====================================================
-        WDFSPINLOCK mZone0;
-
-        Hardware * mHardware;
+        SpinLock_WDF mZone0;
 
     };
 

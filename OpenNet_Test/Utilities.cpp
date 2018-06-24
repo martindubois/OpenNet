@@ -17,6 +17,20 @@
 // ===== OpenNet_Test =======================================================
 #include "Utilities.h"
 
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+static const char * MASK_NAMES[UTL_MASK_QTY] =
+{
+    "EQUAL"         ,
+    "IGNORE"        ,
+    "ABOVE"         ,
+    "ABOVE_OR_EQUAL",
+    "BELOW"         ,
+    "BELOW_OR_EQUAL",
+    "DIFFERENT"     ,
+};
+
 // Macro
 /////////////////////////////////////////////////////////////////////////////
 
@@ -55,12 +69,10 @@ unsigned int Utl_Validate(const OpenNet::Adapter::Stats & aIn, const OpenNet::Ad
     VALIDATE(mDll.mRun_UnexpectedException              );
     VALIDATE(mDriver.mAdapter.mBuffers_Process          );
     VALIDATE(mDriver.mAdapter.mBuffer_InitHeader        );
-    VALIDATE(mDriver.mAdapter.mBuffer_Process           );
     VALIDATE(mDriver.mAdapter.mBuffer_Queue             );
     VALIDATE(mDriver.mAdapter.mBuffer_Receive           );
     VALIDATE(mDriver.mAdapter.mBuffer_Send              );
     VALIDATE(mDriver.mAdapter.mBuffer_SendPackets       );
-    VALIDATE(mDriver.mAdapter.mBuffer_Stop              );
     VALIDATE(mDriver.mAdapter.mIoCtl                    );
     VALIDATE(mDriver.mAdapter.mIoCtl_Config_Get         );
     VALIDATE(mDriver.mAdapter.mIoCtl_Config_Set         );
@@ -113,14 +125,20 @@ unsigned int Validate(unsigned int aIn, unsigned int aExpected, unsigned int aMa
 
     switch (aMask)
     {
-    case UTL_MASK_ABOVE         : lResult = aIn <= aExpected; break;
-    case UTL_MASK_ABOVE_OR_EQUAL: lResult = aIn <  aExpected; break;
-    case UTL_MASK_BELOW         : lResult = aIn >= aExpected; break;
-    case UTL_MASK_BELOW_OR_EQUAL: lResult = aIn >  aExpected; break;
-    case UTL_MASK_DIFFERENT     : lResult = aIn == aExpected; break;
-    case UTL_MASK_IGNORE        : lResult =                0; break;
+    case UTL_MASK_ABOVE         : lResult = (aIn <= aExpected); break;
+    case UTL_MASK_ABOVE_OR_EQUAL: lResult = (aIn <  aExpected); break;
+    case UTL_MASK_BELOW         : lResult = (aIn >= aExpected); break;
+    case UTL_MASK_BELOW_OR_EQUAL: lResult = (aIn >  aExpected); break;
+    case UTL_MASK_DIFFERENT     : lResult = (aIn == aExpected); break;
+    case UTL_MASK_EQUAL         : lResult = (aIn != aExpected); break;
+    case UTL_MASK_IGNORE        : lResult =                 0 ; break;
 
     default: assert(false);
+    }
+
+    if (lResult)
+    {
+        printf("%s - In = %u, Expected = %u , Mask = %s\n", aName, aIn, aExpected, MASK_NAMES[aMask]);
     }
 
     return lResult;

@@ -62,17 +62,19 @@ namespace OpenNetK
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    NTSTATUS Hardware_WDF::Init(WDFDEVICE aDevice, Hardware * aHardware, WDFSPINLOCK aZone0)
+    NTSTATUS Hardware_WDF::Init(WDFDEVICE aDevice, Hardware * aHardware)
     {
         ASSERT(NULL != aDevice  );
         ASSERT(NULL != aHardware);
-        ASSERT(NULL != aZone0   );
 
         mDevice   = aDevice  ;
         mHardware = aHardware;
-        mZone0    = aZone0   ;
 
         mMemCount = 0;
+
+        new (&mZone0) SpinLock_WDF(aDevice);
+
+        mHardware->Init(&mZone0);
 
         NTSTATUS lResult = STATUS_SUCCESS;
 
@@ -200,11 +202,8 @@ namespace OpenNetK
     NTSTATUS Hardware_WDF::Interrupt_Disable()
     {
         ASSERT(NULL != mHardware);
-        ASSERT(NULL != mZone0   );
 
-        WdfSpinLockAcquire(mZone0);
-            mHardware->Interrupt_Disable();
-        WdfSpinLockRelease(mZone0);
+        mHardware->Interrupt_Disable();
 
         return STATUS_SUCCESS;
     }
@@ -212,21 +211,15 @@ namespace OpenNetK
     void Hardware_WDF::Interrupt_Dpc()
     {
         ASSERT(NULL != mHardware);
-        ASSERT(NULL != mZone0   );
 
-        WdfSpinLockAcquire(mZone0);
-            mHardware->Interrupt_Process2();
-        WdfSpinLockRelease(mZone0);
+        mHardware->Interrupt_Process2();
     }
 
     NTSTATUS Hardware_WDF::Interrupt_Enable()
     {
         ASSERT(NULL != mHardware);
-        ASSERT(NULL != mZone0   );
 
-        WdfSpinLockAcquire(mZone0);
-            mHardware->Interrupt_Enable();
-        WdfSpinLockRelease(mZone0);
+        mHardware->Interrupt_Enable();
 
         return STATUS_SUCCESS;
     }
@@ -281,7 +274,8 @@ namespace OpenNetK
 
         NTSTATUS lStatus = WdfTimerCreate(&lConfig, &lAttr, &mTimer);
         ASSERT(STATUS_SUCCESS == lStatus);
-        ASSERT(NULL != mTimer);
+        ASSERT(NULL           != mTimer );
+        (void)(lStatus);
 
         TimerContext * lTimerContext = GetTimerContext(mTimer);
         ASSERT(NULL != lTimerContext);
