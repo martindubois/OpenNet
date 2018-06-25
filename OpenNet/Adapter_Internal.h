@@ -31,15 +31,19 @@ class Adapter_Internal : public OpenNet::Adapter
 
 public:
 
+    typedef void(*TryToSolveHang)(void *, Adapter_Internal *);
+
     Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog);
 
     virtual ~Adapter_Internal();
 
     void Connect(OpenNet_Connect * aConnect);
 
+    void SendLoopBackPackets();
+
     void Start       ();
     void Stop_Request();
-    void Stop_Wait   ();
+    void Stop_Wait   (TryToSolveHang aTryToSolveHang, void * aContext);
 
     // ===== OpenNet::Adapter ===============================================
 
@@ -85,7 +89,7 @@ private:
     void State_Change(unsigned int aFrom, unsigned int aTo);
 
     void Stop_Request_Zone0();
-    void Stop_Wait_Zone0   ();
+    void Stop_Wait_Zone0   (TryToSolveHang aTryToSolveHang, void * aContext);
 
     unsigned int                    mBufferCount;
     Processor_Internal::BufferData  mBufferData[OPEN_NET_BUFFER_QTY];

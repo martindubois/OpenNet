@@ -33,9 +33,14 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-// --> INIT <-- STOPPING <---------------------------------+
-//      |                                                  |
-//      +--> START_REQUESTED --> STARTING --> RUNNING --> STOP_REQUESTED
+// --> INIT <--+<------------------------------------------------------+
+//      |      |                                                       |
+//      |     STOPPING <--+<------+<--------+<--------------+          |
+//      |                 |       |         |               |          |
+//      |                 |       |    +--> RUNNING --+     |          |
+//      |                 |       |    |              |     |          |
+//      +--> START_REQUESTED --> STARTING ----------->+--> STOP_REQUESTED
+
 #define STATE_INIT            (0)
 #define STATE_RUNNING         (1)
 #define STATE_START_REQUESTED (2)
@@ -55,6 +60,12 @@ static const char * STATE_NAMES[STATE_QTY] =
     "STOPPING"       ,
 };
 
+static const uint8_t LOOP_BACK_PACKET[] =
+{
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x01, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
+};
+
 // Static functions declaration
 /////////////////////////////////////////////////////////////////////////////
 
@@ -66,10 +77,11 @@ static DWORD WINAPI Run(LPVOID aParameter);
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-// aHandle [DK-;RW-]
+// aHandle   [DK-;RW-]
+// aDebugLog [-K-;RW-]
 //
 // Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
-// Threads  Apps
+// Threads    Apps
 Adapter_Internal::Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog)
     : mBufferCount(0)
     , mDebugLog   (aDebugLog)
@@ -118,7 +130,7 @@ Adapter_Internal::~Adapter_Internal()
         case STATE_STARTING:
         case STATE_STOPPING:
             Stop_Request_Zone0();
-            Stop_Wait_Zone0   ();
+            Stop_Wait_Zone0   (NULL, NULL);
             break;
 
         default: assert(false);
@@ -140,12 +152,13 @@ Adapter_Internal::~Adapter_Internal()
 //
 // Exception  KmsLib::Exception *  CODE_TIMEOUT
 //                                 See KmsLib::Windows::DriverHandle::Control
-// Threads  Apps
+// Threads    Apps
 void Adapter_Internal::Connect(OpenNet_Connect * aConnect)
 {
     assert(NULL != aConnect);
 
-    assert(NULL != mHandle);
+    assert(NULL != mDebugLog);
+    assert(NULL != mHandle  );
 
     HANDLE lEvent = reinterpret_cast<HANDLE>(aConnect->mEvent);
     assert(NULL != lEvent);
@@ -172,12 +185,24 @@ void Adapter_Internal::Connect(OpenNet_Connect * aConnect)
     }
 }
 
+// Thread  Apps
+void Adapter_Internal::SendLoopBackPackets()
+{
+    assert(NULL != mHandle);
+
+    for (unsigned i = 0; i < 64; i++)
+    {
+        mHandle->Control(OPEN_NET_IOCTL_PACKET_SEND, LOOP_BACK_PACKET, sizeof(LOOP_BACK_PACKET), NULL, 0);
+    }
+}
+
 // Exception  KmsLib::Exception *  CODE_STATE_ERROR
 //                                 CODE_THREAD_ERROR
 // Threads  Apps
 void Adapter_Internal::Start()
 {
     assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
+    assert(NULL                != mDebugLog   );
     assert(NULL                == mThread     );
     assert(0                   == mThreadId   );
 
@@ -202,7 +227,7 @@ void Adapter_Internal::Start()
 }
 
 // Exception  KmsLib::Exception *  CODE_THREAD_ERROR
-// Threads  Apps
+// Threads    Apps
 void Adapter_Internal::Stop_Request()
 {
     EnterCriticalSection(&mZone0);
@@ -214,10 +239,10 @@ void Adapter_Internal::Stop_Request()
 
 // Exception  KmsLib::Exception *  CODE_THREAD_ERROR
 // Threads  Apps
-void Adapter_Internal::Stop_Wait()
+void Adapter_Internal::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
 {
     EnterCriticalSection(&mZone0);
-        Stop_Wait_Zone0();
+        Stop_Wait_Zone0(aTryToSolveHang, aContext);
     LeaveCriticalSection(&mZone0);
 
     mStats.mStop_Wait++;
@@ -227,6 +252,8 @@ void Adapter_Internal::Stop_Wait()
 
 OpenNet::Status Adapter_Internal::GetAdapterNo(unsigned int * aOut)
 {
+    assert(NULL != mDebugLog);
+
     if (NULL == aOut)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -262,6 +289,8 @@ OpenNet::Status Adapter_Internal::GetAdapterNo(unsigned int * aOut)
 
 OpenNet::Status Adapter_Internal::GetConfig(Config * aOut) const
 {
+    assert(NULL != mDebugLog);
+
     if (NULL == aOut)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -275,6 +304,8 @@ OpenNet::Status Adapter_Internal::GetConfig(Config * aOut) const
 
 OpenNet::Status Adapter_Internal::GetInfo(Info * aOut) const
 {
+    assert(NULL != mDebugLog);
+
     if (NULL == aOut)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -301,26 +332,28 @@ unsigned int Adapter_Internal::GetPacketSize() const
 
 OpenNet::Status Adapter_Internal::GetState(State * aOut)
 {
+    assert(NULL != mDebugLog);
+    assert(NULL != mHandle  );
+
     if (NULL == aOut)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
-
-    assert(NULL != mHandle);
 
     return Control(OPEN_NET_IOCTL_STATE_GET, NULL, 0, aOut, sizeof(State));
 }
 
 OpenNet::Status Adapter_Internal::GetStats(Stats * aOut)
 {
+    assert(NULL != mDebugLog);
+    assert(NULL != mHandle  );
+
     if (NULL == aOut)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
-
-    assert(NULL != mHandle);
 
     memcpy(&aOut->mDll, &mStats, sizeof(mStats));
 
@@ -359,6 +392,8 @@ bool Adapter_Internal::IsConnected(const OpenNet::System & aSystem)
 
 OpenNet::Status Adapter_Internal::ResetInputFilter()
 {
+    assert(NULL != mDebugLog);
+
     if (NULL == mFilter)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -391,6 +426,8 @@ OpenNet::Status Adapter_Internal::ResetInputFilter()
 
 OpenNet::Status Adapter_Internal::ResetProcessor()
 {
+    assert(NULL != mDebugLog);
+
     if (NULL == mProcessor)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -421,6 +458,8 @@ OpenNet::Status Adapter_Internal::ResetStats()
 
 OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
 {
+    assert(NULL != mDebugLog);
+
     if (NULL == (&aConfig))
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -434,6 +473,8 @@ OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
 
 OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::Filter * aFilter)
 {
+    assert(NULL != mDebugLog);
+
     if (NULL == aFilter)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -470,6 +511,8 @@ OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::Filter * aFilter)
 
 OpenNet::Status Adapter_Internal::SetPacketSize(unsigned int aSize_byte)
 {
+    assert(NULL != mDebugLog);
+
     if (OPEN_NET_PACKET_SIZE_MAX_byte < aSize_byte)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -518,6 +561,8 @@ OpenNet::Status Adapter_Internal::SetPacketSize(unsigned int aSize_byte)
 
 OpenNet::Status Adapter_Internal::SetProcessor(OpenNet::Processor * aProcessor)
 {
+    assert(NULL != mDebugLog);
+
     if (NULL == aProcessor)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -543,6 +588,8 @@ OpenNet::Status Adapter_Internal::SetProcessor(OpenNet::Processor * aProcessor)
 
 OpenNet::Status Adapter_Internal::Buffer_Allocate(unsigned int aCount)
 {
+    assert(NULL != mDebugLog);
+
     if (0 >= aCount)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -586,6 +633,8 @@ OpenNet::Status Adapter_Internal::Buffer_Allocate(unsigned int aCount)
 
 OpenNet::Status Adapter_Internal::Buffer_Release(unsigned int aCount)
 {
+    assert(NULL != mDebugLog);
+
     if (0 >= aCount)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -612,6 +661,7 @@ OpenNet::Status Adapter_Internal::Buffer_Release(unsigned int aCount)
 OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
 {
     assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
+    assert(NULL                != mDebugLog   );
     assert(STATE_QTY           >  mState      );
 
     if (NULL == aOut)
@@ -636,7 +686,7 @@ OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
 
 OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int aSize_byte)
 {
-    assert(NULL != mHandle);
+    assert(NULL != mDebugLog);
 
     if (NULL == aData)
     {
@@ -667,6 +717,9 @@ OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int a
 // Thread  Worker
 void Adapter_Internal::Run()
 {
+    assert(NULL != mDebugLog);
+    assert(NULL != mHandle  );
+
     mStats.mRun_Entry++;
 
     try
@@ -717,10 +770,11 @@ void Adapter_Internal::Run()
 
 // Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
 //                                 See Process_Internal::Buffer_Allocate
-// Threads  Apps
+// Threads    Apps
 void Adapter_Internal::Buffer_Allocate()
 {
     assert(OPEN_NET_BUFFER_QTY <= mBufferCount);
+    assert(NULL                != mDebugLog   );
     assert(NULL                != mProcessor  );
 
     if (OPEN_NET_BUFFER_QTY <= mBufferCount)
@@ -740,7 +794,7 @@ void Adapter_Internal::Buffer_Allocate()
 // Exception  KmsLib::Exception *  CODE_INVALID_DATA
 //                                 See KmsLib::Windows::DriverHandle::Control
 //                                 See Processor_Internal::Buffer_Release
-// Threads  Apps
+// Threads    Apps
 void Adapter_Internal::Buffer_Release()
 {
     assert(                  0 <  mBufferCount);
@@ -761,8 +815,10 @@ void Adapter_Internal::Buffer_Release()
 // Threads  Apps
 OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte)
 {
-    assert(   0 != aCode  );
-    assert(NULL != mHandle);
+    assert(0 != aCode);
+
+    assert(NULL != mDebugLog);
+    assert(NULL != mHandle  );
 
     try
     {
@@ -782,6 +838,8 @@ void Adapter_Internal::Run_Iteration(unsigned int aIndex)
 {
     assert(OPEN_NET_BUFFER_QTY > aIndex);
 
+    assert(NULL != mProcessor);
+
     mProcessor->Processing_Wait(mBufferData + aIndex);
     mStats.mRun_Iteration_Wait++;
 
@@ -793,6 +851,7 @@ void Adapter_Internal::Run_Loop()
 {
     assert(                  0 <  mBufferCount);
     assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
+    assert(NULL                != mDebugLog   );
     assert(NULL                != mHandle     );
     try
     {
@@ -828,7 +887,8 @@ void Adapter_Internal::Run_Loop()
 
 void Adapter_Internal::Run_Wait()
 {
-    assert(NULL != mHandle);
+    assert(NULL != mDebugLog);
+    assert(NULL != mHandle  );
 
     OpenNet_State lState;
 
@@ -859,6 +919,8 @@ void Adapter_Internal::State_Change(unsigned int aFrom, unsigned int aTo)
 {
     assert(STATE_QTY > aFrom);
     assert(STATE_QTY < aTo  );
+
+    assert(NULL != mDebugLog);
 
     bool lOK = false;
 
@@ -901,13 +963,17 @@ void Adapter_Internal::Stop_Request_Zone0()
     }
 }
 
+// aTryToSolveHang [--O;--X]
+// aContext        [--O;---]
+//
 // This method release the Zone0 when it throw an exception.
 //
 // Exception  KmsLib::Exception *  CODE_THREAD_ERROR
 // Threads  Apps
-void Adapter_Internal::Stop_Wait_Zone0()
+void Adapter_Internal::Stop_Wait_Zone0(TryToSolveHang aTryToSolveHang, void * aContext)
 {
-    assert(NULL != mThread);
+    assert(NULL != mDebugLog);
+    assert(NULL != mThread  );
 
     switch (mState)
     {
@@ -915,9 +981,25 @@ void Adapter_Internal::Stop_Wait_Zone0()
     case STATE_STOPPING      :
         DWORD lRet;
 
-        LeaveCriticalSection(&mZone0);
-            lRet = WaitForSingleObject(mThread, 600000);
-        EnterCriticalSection(&mZone0);
+        if (NULL != aTryToSolveHang)
+        {
+            for (unsigned int i = 0; i < 120; i ++)
+            {
+                LeaveCriticalSection(&mZone0);
+                    lRet = WaitForSingleObject(mThread, 5000);
+                EnterCriticalSection(&mZone0);
+
+                if (WAIT_OBJECT_0 == lRet) { break; }
+
+                aTryToSolveHang(aContext, this);
+            }
+        }
+        else
+        {
+            LeaveCriticalSection(&mZone0);
+               lRet = WaitForSingleObject(mThread, 600000);
+            EnterCriticalSection(&mZone0);
+        }
 
         if (WAIT_OBJECT_0 == lRet) { break; }
 
@@ -944,8 +1026,8 @@ void Adapter_Internal::Stop_Wait_Zone0()
 
     BOOL lRetB = CloseHandle(mThread);
 
-    mThread = NULL;
-    mThreadId = 0;
+    mThread   = NULL;
+    mThreadId = 0   ;
 
     if (!lRetB)
     {
@@ -974,6 +1056,7 @@ OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE)
     case KmsLib::Exception::CODE_OPEN_CL_ERROR    : return OpenNet::STATUS_OPEN_CL_ERROR  ;
     }
 
+    printf("%s ==> STATUS_EXCEPTION\n", KmsLib::Exception::GetCodeName(aE->GetCode()));
     return OpenNet::STATUS_EXCEPTION;
 }
 

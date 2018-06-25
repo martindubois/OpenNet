@@ -56,7 +56,7 @@ KMS_TEST_BEGIN(Mirror_SetupA)
 
     Sleep(2000);
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lS0->Stop());
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lS0->Stop(0));
 
 Cleanup2:
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->Buffer_Release(BUFFER_QTY));

@@ -19,6 +19,7 @@
 #include <OpenNet/System.h>
 
 // ===== OpenNet ============================================================
+#include "Adapter_Internal.h"
 #include "System_Internal.h"
 
 namespace OpenNet
@@ -26,6 +27,8 @@ namespace OpenNet
 
     // Public
     /////////////////////////////////////////////////////////////////////////
+
+    const unsigned int System::STOP_FLAG_LOOPBACK = 0x00000001;
 
     // NOT TESTED  OpenNet.System.ErrorHandling
     //             System_Internal contructor raise an exception

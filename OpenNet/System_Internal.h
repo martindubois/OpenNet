@@ -51,7 +51,11 @@ public:
     virtual unsigned int         Processor_GetCount() const;
 
     virtual OpenNet::Status Start();
-    virtual OpenNet::Status Stop ();
+    virtual OpenNet::Status Stop (unsigned int aFlags);
+
+// internal
+
+    void SendLoopBackPackets(Adapter_Internal * aAdapter);
 
 private:
 

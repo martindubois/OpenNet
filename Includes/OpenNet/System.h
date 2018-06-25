@@ -34,6 +34,19 @@ namespace OpenNet
     public:
 
         /// \cond en
+        /// \brief  Use this flag when adapters are physically connected to
+        ///         each other. If force the system to send packet to unblock
+        ///         reception operations.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Utiliser ce drapeau quand des adaptateur sont
+        ///         physiquement connectes entre eux. Il force le system a
+        ///         envoyer des paquets pour debloquer d'eventuelles
+        ///         operations de reception.
+        /// \endcond
+        static OPEN_NET_PUBLIC const unsigned int STOP_FLAG_LOOPBACK;
+
+        /// \cond en
         /// \brief   This static methode create an instance of the System
         ///          class.
         /// \return  This static methode return the new instance address.
@@ -145,12 +158,14 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Stop
+        /// \param  aFlags  STOP_FLAG_LOOPBACK
         /// \endcond
         /// \cond fr
         /// \brief  Arreter
+        /// \param  aFlags  STOP_FLAG_LOOPBACK
         /// \endcond
         /// \retval STATUS_OK
-        virtual Status Stop() = 0;
+        virtual Status Stop(unsigned int aFlags) = 0;
 
     protected:
 

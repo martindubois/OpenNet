@@ -141,6 +141,8 @@ static const KmsLib::ToolBase::CommandInfo COMMANDS[] =
 // Static functions declaration
 /////////////////////////////////////////////////////////////////////////////
 
+static void DisplaySpeed(const char * aLabel, double aPackets, unsigned int aPacketSize_byte);
+
 static void ReportStatus(OpenNet::Status aStatus, const char * aMsgOK);
 
 static void SendPackets(OpenNet::Adapter * aA0, OpenNet::Adapter * aA1, unsigned int aPacketSize_byte, unsigned int aPacketQty);
@@ -930,7 +932,7 @@ void Stop(KmsLib::ToolBase * aToolBase, const char * aArg)
     printf("Stop %s\n", aArg);
     printf("Stop\n");
 
-    OpenNet::Status lStatus = sSystem->Stop();
+    OpenNet::Status lStatus = sSystem->Stop(0);
     if (OpenNet::STATUS_OK != lStatus)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System::Stop failed");
@@ -961,6 +963,22 @@ void Start(KmsLib::ToolBase * aToolBase, const char * aArg)
 
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
+
+void DisplaySpeed(const char * aLabel, double aPackets, unsigned int aPacketSize_byte)
+{
+    assert(NULL != aLabel);
+
+    printf("%s\n", aLabel);
+
+    printf("    %f packets/s\n", aPackets / 10.0);
+
+    double lData = aPackets * aPacketSize_byte / 10.0;
+
+    printf("    %f bytes/s\n", lData); lData /= 1024.0;
+    printf("    %f KB/s\n"   , lData); lData /= 1024.0;
+    printf("    %f MB/s\n"   , lData); lData /= 1024.0;
+    printf("    %f GB/s\n"   , lData);
+}
 
 void ReportStatus(OpenNet::Status aStatus, const char * aMsgOK)
 {
@@ -1115,8 +1133,29 @@ void Test_Loop(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned 
     printf("Running...\n");
     Sleep(10000);
 
+    OpenNet::Adapter::Stats lStats0;
+    OpenNet::Adapter::Stats lStats1;
+
+    printf("Retrieving statistics...\n");
+    lS0 = lA0->GetStats(&lStats0);
+    lS1 = lA1->GetStats(&lStats1);
+    if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::GetStats(  ) failed");
+    }
+    else
+    {
+        double lRx_Packets = static_cast<double>(lStats0.mDriver.mHardware.mRx_Packet + lStats1.mDriver.mHardware.mRx_Packet);
+        double lTx_Packets = static_cast<double>(lStats0.mDriver.mHardware.mTx_Packet + lStats1.mDriver.mHardware.mTx_Packet);
+
+        DisplaySpeed("Rx", lRx_Packets, aPacketSize_byte);
+        DisplaySpeed("Tx", lTx_Packets, aPacketSize_byte);
+
+        printf("Rx / Tx = %f %%\n", (lRx_Packets * 100.0) / lTx_Packets);
+    }
+
     printf("Stopping...\n");
-    lS = sSystem->Stop();
+    lS = sSystem->Stop(OpenNet::System::STOP_FLAG_LOOPBACK);
     if (OpenNet::STATUS_OK != lS)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "System::Stop(  ) failed");
@@ -1140,28 +1179,12 @@ Error1:
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::ResetInputFilter(  ) failed");
     }
 
-    OpenNet::Adapter::Stats lStats0;
-    OpenNet::Adapter::Stats lStats1;
-
     printf("Retrieving statistics...\n");
     lS0 = lA0->GetStats(&lStats0);
     lS1 = lA1->GetStats(&lStats1);
     if ((OpenNet::STATUS_OK != lS0) || (OpenNet::STATUS_OK != lS1))
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Adapter::GetStats(  ) failed");
-    }
-    else
-    {
-        double lPackets = static_cast<double>(lStats0.mDriver.mHardware.mRx_Packet + lStats1.mDriver.mHardware.mRx_Packet);
-
-        printf("%f packets/s\n", lPackets / 10.0);
-
-        double lBytes = lPackets * aPacketSize_byte;
-
-        printf("%f bytes/s\n", lPackets / 10.0);
-        printf("%f KB/s\n"   , lBytes / 10.0 / 1024.0);
-        printf("%f MB/s\n"   , lBytes / 10.0 / 1024.0 / 1024.0);
-        printf("%f GB/s\n"   , lBytes / 10.0 / 1024.0 / 1024.0 / 1024.0);
     }
 
 Error3:

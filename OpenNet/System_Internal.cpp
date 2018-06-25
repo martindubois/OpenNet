@@ -30,6 +30,8 @@
 
 static OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE);
 
+static void SendLoopBackPackets(void * aThis, Adapter_Internal * aAdapter);
+
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
@@ -201,8 +203,6 @@ OpenNet::Adapter * System_Internal::Adapter_Get(unsigned int aIndex)
         return NULL;
     }
 
-    // TODO  Test
-
     return mAdapters[aIndex];
 }
 
@@ -238,8 +238,6 @@ OpenNet::Processor * System_Internal::Processor_Get(unsigned int aIndex)
     {
         return NULL;
     }
-
-    // TODO  Test
 
     return mProcessors[aIndex];
 }
@@ -283,14 +281,14 @@ OpenNet::Status System_Internal::Start()
 
         lResult = ExceptionToStatus(eE);
 
-        OpenNet::Status lStatus = Stop();
+        OpenNet::Status lStatus = Stop(0);
         assert(OpenNet::STATUS_OK == lStatus);
     }
 
     return lResult;
 }
 
-OpenNet::Status System_Internal::Stop()
+OpenNet::Status System_Internal::Stop(unsigned int aFlags)
 {
     if (0 >= mAdapterRunning)
     {
@@ -320,7 +318,15 @@ OpenNet::Status System_Internal::Stop()
 
             if (lAdapter->IsConnected(*this))
             {
-                lAdapter->Stop_Wait();
+                if (0 != (aFlags & STOP_FLAG_LOOPBACK))
+                {
+                    lAdapter->Stop_Wait(::SendLoopBackPackets, this);
+                }
+                else
+                {
+                    lAdapter->Stop_Wait(NULL, NULL);
+                }
+
                 mAdapterRunning--;
                 lResult = OpenNet::STATUS_OK;
             }
@@ -335,6 +341,25 @@ OpenNet::Status System_Internal::Stop()
     }
 
     return lResult;
+}
+
+// Internal
+/////////////////////////////////////////////////////////////////////////////
+
+void System_Internal::SendLoopBackPackets(Adapter_Internal * aAdapter)
+{
+    assert(NULL != aAdapter);
+
+    for (unsigned int i = 0; i < mAdapters.size(); i++)
+    {
+        Adapter_Internal * lAdapter = mAdapters[i];
+        assert(NULL != lAdapter);
+
+        if (aAdapter != lAdapter)
+        {
+            lAdapter->SendLoopBackPackets();
+        }
+    }
 }
 
 // Private
@@ -507,4 +532,14 @@ OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE)
     }
 
     return OpenNet::STATUS_EXCEPTION;
+}
+
+void SendLoopBackPackets(void * aThis, Adapter_Internal * aAdapter)
+{
+    assert(NULL != aThis   );
+    assert(NULL != aAdapter);
+
+    System_Internal * lThis = reinterpret_cast<System_Internal *>(aThis);
+
+    lThis->SendLoopBackPackets(aAdapter);
 }
