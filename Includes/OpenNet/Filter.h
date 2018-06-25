@@ -164,7 +164,7 @@ namespace OpenNet
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
-        virtual OPEN_NET_PUBLIC void AddKernelArgs(void * aKernal);
+        virtual OPEN_NET_PUBLIC void AddKernelArgs(void * aKernel);
 
         /// \cond en
         /// \brief  Display

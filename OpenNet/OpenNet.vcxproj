@@ -110,6 +110,9 @@
     <ClInclude Include="Processor_Internal.h" />
     <ClInclude Include="System_Internal.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="_DocUser\ReadMe.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

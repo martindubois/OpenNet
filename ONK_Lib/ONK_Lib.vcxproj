@@ -18,6 +18,9 @@
     <ClCompile Include="SpinLock.cpp" />
     <ClCompile Include="SpinLock_WDF.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="_DocUser\ReadMe.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{03ADF26E-74F0-4F2A-989B-F408B0AAC441}</ProjectGuid>
     <TemplateGuid>{0a049372-4c4d-4ea0-a64e-dc6ad88ceca1}</TemplateGuid>

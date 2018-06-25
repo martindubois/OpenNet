@@ -95,7 +95,7 @@ NTSTATUS Queue_Create(WDFDEVICE aDevice, OpenNetK::Adapter_WDF * aAdapter)
 
 VOID IoDeviceControl(WDFQUEUE aQueue, WDFREQUEST aRequest, size_t aOutSize_byte, size_t aInSize_byte, ULONG aIoControlCode)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, __FUNCTION__ "( , , %u bytes, %u bytes, 0x%08x )" DEBUG_EOL, aOutSize_byte, aInSize_byte, aIoControlCode);
+    // DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, __FUNCTION__ "( , , %u bytes, %u bytes, 0x%08x )" DEBUG_EOL, aOutSize_byte, aInSize_byte, aIoControlCode);
 
     ASSERT(NULL != aQueue  );
     ASSERT(NULL != aRequest);

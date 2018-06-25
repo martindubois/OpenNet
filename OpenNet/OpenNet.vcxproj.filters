@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="_DocUser">
+      <UniqueIdentifier>{487ca310-df0b-4dc5-91fe-7ad82be177e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Common\Version.rc">
@@ -73,5 +76,10 @@
     <ClInclude Include="OCLW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="_DocUser\ReadMe.txt">
+      <Filter>_DocUser</Filter>
+    </Text>
   </ItemGroup>
 </Project>

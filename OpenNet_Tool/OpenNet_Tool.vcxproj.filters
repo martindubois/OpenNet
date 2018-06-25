@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="_DocUser">
+      <UniqueIdentifier>{1d296f6e-2492-4d3c-9631-c18d8a835c71}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Common\Version.rc">
@@ -23,5 +26,10 @@
     <ClCompile Include="OpenNet_Tool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="_DocUser\ReadMe.txt">
+      <Filter>_DocUser</Filter>
+    </Text>
   </ItemGroup>
 </Project>

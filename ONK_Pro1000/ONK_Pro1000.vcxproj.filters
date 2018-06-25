@@ -17,6 +17,9 @@
       <UniqueIdentifier>{8E41214B-6785-4CFE-B992-037D68949A14}</UniqueIdentifier>
       <Extensions>inf;inv;inx;mof;mc;</Extensions>
     </Filter>
+    <Filter Include="_DocUser">
+      <UniqueIdentifier>{d441608a-9109-448c-bcdc-f7367f6b3591}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="ONK_Pro1000.inf">
@@ -61,5 +64,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="kdfile_debug" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="_DocUser\ReadMe.txt">
+      <Filter>_DocUser</Filter>
+    </Text>
   </ItemGroup>
 </Project>

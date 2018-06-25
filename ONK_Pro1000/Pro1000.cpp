@@ -352,7 +352,7 @@ void Pro1000::Packet_Send(uint64_t aData, unsigned int aSize_byte, volatile long
 
 void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes )" DEBUG_EOL, aSize_byte);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes )" DEBUG_EOL, aSize_byte);
 
     ASSERT(NULL != mZone0);
 

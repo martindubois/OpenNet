@@ -60,6 +60,9 @@
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <AdditionalDependencies>ONK_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Inf>
+      <TimeStamp>0.0.2.0</TimeStamp>
+    </Inf>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -69,6 +72,9 @@
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <AdditionalDependencies>ONK_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Inf>
+      <TimeStamp>0.0.2.0</TimeStamp>
+    </Inf>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Inf Include="ONK_Pro1000.inf" />
@@ -94,6 +100,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="kdfile_debug" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="_DocUser\ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

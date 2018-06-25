@@ -49,22 +49,22 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Enter the D0 state
-        /// \param  aPreviousState
+        /// \param  aPreviousState  Previous state
         /// \endcond
         /// \cond fr
         /// \brief  Entrer dans l'etat D0
-        /// \param  aPreviousState
+        /// \param  aPreviousState  Etat precedent
         /// \endcond
         /// \retval STATUS_SUCCESS
         NTSTATUS D0Entry(WDF_POWER_DEVICE_STATE aPreviousState);
 
         /// \cond en
         /// \brief  Exit the D0 state
-        /// \param  aTargetState
+        /// \param  aTargetState  Target state
         /// \endcond
         /// \cond fr
         /// \brief  Sortir de l'etat D0
-        /// \param  aTargetState
+        /// \param  aTargetState  Etat cible
         /// \endcond
         /// \retval STATUS_SUCCESS
         NTSTATUS D0Exit(WDF_POWER_DEVICE_STATE aTargetState);

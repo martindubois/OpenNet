@@ -10,9 +10,50 @@
 . Includes
 . Tests
 
+.
+	DoxyFile_en.txt
+	DoxyFile_fr.txt
+	RunDoxygen.cmd
+
+_DocUser .
+	ReadMe.txt
+
+Includes/OpenNet
+	Adapter.h
+	EthernetAddress.h
+	Filter.h
+	Filter_Forward.h
+	OpenNet.h
+	Processor.h
+	Status.h
+	System.h
+	VersionInfo.h
+
 Includes/OpenNetK
     Adapter.h
+	Adapter_WDF.h
+	Constants.h
+	Debug.h
+	Hardware.h
+	Hardware_WDF.h
     Interface.h
+	Kernel.h
+	SpinLock.h
+	Spinlock_WDF.h
+	StdInt.h
+	Types.h
+
+ONK_Lib/_DocUser ONK_Lib
+	ReadMe.txt
+
+ONK_Pro1000/_DocUser ONK_Pro1000
+	ReadMe.txt
+
+OpenNet/_DocUser OpenNet
+	ReadMe.txt
+
+OpenNet_Tool/_DocUser OpenNet_Tool
+	ReadMe.txt
 
 x64/Debug Binaries/Debug_64
     OpenNet.dll

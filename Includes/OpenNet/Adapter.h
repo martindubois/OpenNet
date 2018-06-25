@@ -38,6 +38,15 @@ namespace OpenNet
         typedef OpenNet_Info   Info  ;
         typedef OpenNet_State  State ;
 
+        /// \cond en
+        /// \brief  This structure contains statistics about the Dll internal
+        ///         operation. The fields may change in future versions.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette structure contient des statistiques au sujet du
+        ///         fonctionnement inerne de la DLL.
+        ///         Les champs peuvent changer dans les versions futures.
+        /// \endcond
         typedef struct
         {
             unsigned int mBuffer_Allocated             ; //  0
@@ -61,6 +70,12 @@ namespace OpenNet
         }
         Stats_Dll;
 
+        /// \cond en
+        /// \brief  This structure contains statistics.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette structure contient des statistiques.
+        /// \endcond
         typedef struct
         {
             Stats_Dll      mDll   ;

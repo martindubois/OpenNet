@@ -67,6 +67,12 @@ namespace OpenNetK
             IOCTL_RESULT_TOO_MANY_BUFFER   = 0xffffffff,
         };
 
+        /// \cond en
+        /// \brief  BufferInfo is an internal structure. Do not use it.
+        /// \endcond
+        /// \cond fr
+        /// \brief  BufferInfo est une structure interne. Ne pas utiliser.
+        /// \endcond
         typedef struct
         {
             OpenNet_BufferInfo mBufferInfo;
@@ -90,6 +96,12 @@ namespace OpenNetK
         }
         BufferInfo;
 
+        /// \cond en
+        /// \brief  IoCtlInfo is an internal structure. Do not use it.
+        /// \endcond
+        /// \cond fr
+        /// \brief  IoCtlInfo est une structure interne. Ne pas utiliser.
+        /// \endcond
         typedef struct
         {
             unsigned int mIn_MinSize_byte ;

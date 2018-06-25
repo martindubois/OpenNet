@@ -254,7 +254,7 @@ void FileCreate(WDFDEVICE aDevice, WDFREQUEST aRequest, WDFFILEOBJECT aFileObjec
 // Threads  Users
 void IoInCallerContext(WDFDEVICE aDevice, WDFREQUEST aRequest)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
 
     ASSERT(NULL != aDevice );
     ASSERT(NULL != aRequest);
