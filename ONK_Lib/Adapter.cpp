@@ -175,7 +175,17 @@ namespace OpenNetK
                 case OPEN_NET_BUFFER_STATE_TX_PROGRAMMING:                                         break;
                 case OPEN_NET_BUFFER_STATE_TX_RUNNING    : Buffer_TxRunning_Zone0  (mBuffers + i); break;
 
-                default: ASSERT(false);
+                default:
+                    // The buffer is clearly corrupted! We don't write to it
+                    // and if possible we simply forget about it.
+
+                    // TODO  ONK_Lib.Adapter  Add statistic counter
+                    if (i == (mBufferCount - 1))
+                    {
+                        // TODO  ONK_Lib.Adapter  Add statistic counter
+                        DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %u Corrupted ==> Released" DEBUG_EOL, mAdapterNo, i);
+                        mBufferCount--;
+                    }
                 }
             }
 
@@ -420,6 +430,7 @@ namespace OpenNetK
 
         if (NULL == mAdapters)
         {
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_COMPLETED ==> STOPPED" DEBUG_EOL, mAdapterNo, aBuffer);
             aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
 
             Buffer_WriteMarker_Zone0(aBuffer);
@@ -429,24 +440,28 @@ namespace OpenNetK
             // Here, we use a temporary state because Buffer_Send_Zone0
             // release the gate to avoid deadlock with the other adapter's
             // gates.
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_COMPLETED ==> TX_PROGRAMMING" DEBUG_EOL, mAdapterNo, aBuffer);
             aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_PROGRAMMING;
 
             Buffer_Send_Zone0(aBuffer);
 
             ASSERT(OPEN_NET_BUFFER_STATE_TX_PROGRAMMING == aBuffer->mHeader->mBufferState);
 
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_PROGRAMMING ==> TX_RUNNING" DEBUG_EOL, mAdapterNo, aBuffer);
             aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_RUNNING;
         }
     }
 
+    // We do not put assert on the buffer state because the GPU may change it
+    // at any time.
     void Adapter::Buffer_PxRunning_Zone0(BufferInfo * aBuffer)
     {
-        ASSERT(NULL                             != aBuffer                       );
-        ASSERT(NULL                             != aBuffer->mHeader              );
-        ASSERT(OPEN_NET_BUFFER_STATE_PX_RUNNING == aBuffer->mHeader->mBufferState);
+        ASSERT(NULL != aBuffer         );
+        ASSERT(NULL != aBuffer->mHeader);
 
         if (aBuffer->mFlags.mStopRequested)
         {
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_RUNNING ==> STOPPED" DEBUG_EOL, mAdapterNo, aBuffer);
             aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
         }
     }
@@ -459,6 +474,7 @@ namespace OpenNetK
 
         if (0 == aBuffer->mRx_Counter)
         {
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p RX_RUNNING ==> PX_RUNNING" DEBUG_EOL, mAdapterNo, aBuffer);
             aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_RUNNING;
             Buffer_WriteMarker_Zone0(aBuffer);
         }
@@ -472,6 +488,7 @@ namespace OpenNetK
 
         if (aIndex == (mBufferCount - 1))
         {
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %u STOPPED ==> Released" DEBUG_EOL, mAdapterNo, aIndex);
             mBufferCount--;
         }
     }
@@ -486,6 +503,7 @@ namespace OpenNetK
         {
             if (aBuffer->mFlags.mStopRequested)
             {
+                DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_RUNNING ==> STOPPED" DEBUG_EOL, mAdapterNo, aBuffer);
                 aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
 
                 Buffer_WriteMarker_Zone0(aBuffer);
@@ -495,12 +513,14 @@ namespace OpenNetK
                 // Here, we use a temporary state because Buffer_Receivd_Zone
                 // release the gate to avoid deadlock with the Hardware's
                 // gates.
+                DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_RUNNING ==> RX_PROGRAMMING" DEBUG_EOL, mAdapterNo, aBuffer);
                 aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RX_PROGRAMMING;
 
                 Buffer_Receive_Zone0(aBuffer);
 
                 ASSERT(OPEN_NET_BUFFER_STATE_RX_PROGRAMMING == aBuffer->mHeader->mBufferState);
 
+                DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p RX_PROGRAMMING ==> RX_RUNNING" DEBUG_EOL, mAdapterNo, aBuffer);
                 aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RX_RUNNING;
             }
         }
