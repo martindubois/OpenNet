@@ -3,6 +3,8 @@
 // Product  OpenNet
 // File     OpenNet/Filter.cpp
 
+// TODO  OpenNet.Filter  Create 2 execution mode : QUEUED or CONTINUE
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -32,7 +34,7 @@ namespace OpenNet
 
     const unsigned int Filter::BUILD_LOG_MAX_SIZE_byte = 64 * 1024;
 
-    Filter::Filter() : mCode(NULL), mCodeLineBuffer(NULL), mCodeLineCount(0), mCodeLines(NULL), mCodeSize_byte(0)
+    Filter::Filter() : mBuildLog(NULL), mCode(NULL), mCodeLineBuffer(NULL), mCodeLineCount(0), mCodeLines(NULL), mCodeSize_byte(0)
     {
         memset(&mName, 0, sizeof(mName));
     }
@@ -158,10 +160,10 @@ namespace OpenNet
             return STATUS_CODE_ALREADY_SET;
         }
 
-        mCode = Allocate(aSize_byte);
+        mCode = Allocate(aSize_byte + 1);
         assert(NULL != mCode);
 
-        memcpy(mCode, aCode, aSize_byte);
+        memcpy(mCode, aCode, aSize_byte + 1);
 
         mCodeSize_byte = aSize_byte;
 
