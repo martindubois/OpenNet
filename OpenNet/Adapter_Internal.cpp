@@ -983,15 +983,21 @@ void Adapter_Internal::Stop_Wait_Zone0(TryToSolveHang aTryToSolveHang, void * aC
 
         if (NULL != aTryToSolveHang)
         {
-            for (unsigned int i = 0; i < 120; i ++)
+            LeaveCriticalSection(&mZone0);
+                lRet = WaitForSingleObject(mThread, 3000);
+            EnterCriticalSection(&mZone0);
+
+            if (WAIT_OBJECT_0 == lRet) { break; }
+
+            for (unsigned int i = 0; i < 1104; i ++)
             {
+                aTryToSolveHang(aContext, this);
+
                 LeaveCriticalSection(&mZone0);
-                    lRet = WaitForSingleObject(mThread, 5000);
+                    lRet = WaitForSingleObject(mThread, 500);
                 EnterCriticalSection(&mZone0);
 
                 if (WAIT_OBJECT_0 == lRet) { break; }
-
-                aTryToSolveHang(aContext, this);
             }
         }
         else
