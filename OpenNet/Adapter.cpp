@@ -37,13 +37,6 @@ static const char * ADAPTER_TYPE_NAMES[OPEN_NET_ADAPTER_TYPE_QTY] =
     "NDIS"    ,
 };
 
-static const char * LINK_STATE_NAMES[OPEN_NET_LINK_STATE_QTY] =
-{
-    "UNKNOWN",
-    "DOWN"   ,
-    "UP"     ,
-};
-
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
 
@@ -328,7 +321,8 @@ void Display(const OpenNet_Stats_Hardware_NoReset & aIn, FILE * aOut)
     assert(NULL !=   aOut);
 
     fprintf(aOut, "    Hardware Statistics (No Reset) :\n");
-    fprintf(aOut, "      Stats - Reset = %u\n", aIn.mStats_Reset);
+    DisplayStats( "      Interrupt - Process - Last - MessageId = %u\n", aIn.mInterrupt_Process_Last_MessageId, aOut);
+    DisplayStats( "      Stats - Reset                          = %u\n", aIn.mStats_Reset                     , aOut);
 }
 
 void DisplayStats(const char * aFormat, unsigned int aValue, FILE * aOut)

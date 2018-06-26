@@ -3,6 +3,9 @@
 // Product  OpenNet
 // File     ONK_Pro1000/Pro1000.cpp
 
+// REQUIREMENT  ONK_X.InterruptRateLimitation
+//              The adapter driver limit the interruption rate.
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -199,6 +202,16 @@ bool Pro1000::D0_Entry()
 
         mBAR1->mGeneralPurposeInterruptEnable.mFields.mExtendedInterruptAutoMaskEnable = true;
 
+        mBAR1->mInterruptVectorAllocation[0].mFields.mVector0Valid = true;
+        mBAR1->mInterruptVectorAllocation[0].mFields.mVector1Valid = true;
+        mBAR1->mInterruptVectorAllocation[0].mFields.mVector2Valid = true;
+        mBAR1->mInterruptVectorAllocation[0].mFields.mVector3Valid = true;
+
+        mBAR1->mInterruptVectorAllocationMisc.mFields.mVector32Valid = true;
+        mBAR1->mInterruptVectorAllocationMisc.mFields.mVector33Valid = true;
+
+        mBAR1->mInterruptTrottle[0].mFields.mInterval_us = 175;
+
         Rx_Config_Zone0();
         Tx_Config_Zone0();
 
@@ -261,6 +274,8 @@ bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcess
     (*aNeedMoreProcessing) = true;
 
     mStats.mInterrupt_Process++;
+
+    mStats_NoReset.mInterrupt_Process_Last_MessageId = aMessageId;
 
     return true;
 }

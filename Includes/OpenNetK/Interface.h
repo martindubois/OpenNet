@@ -6,6 +6,16 @@
 
 #pragma once
 
+// TODO  OpenNetK.Interface  Move the OPEN_NET_ADAPTER...,
+//                           OPEN_NET_ADAPTER_TYPE_...,
+//                           OPEN_NET_PACKET_SIZE_... and
+//                           OPEN_NET_SHARED_MEMORY_SIZE_byte constants to
+//                           the file Common/OpenNetK/Constants.h
+
+// TODO  OpenNetK.Interface  Move the OPEN_NET_IOCTL_... constants and the
+//                           OpenNet_BufferInfo data type to the file
+//                           Common/OpenNetK/IoCtl.h
+
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
@@ -62,12 +72,6 @@ static const GUID OPEN_NET_DRIVER_INTERFACE = { 0xC0BE33A0, 0xFFBA, 0x46BA,{ 0xB
 // Input   None
 // Output  None
 #define OPEN_NET_IOCTL_STOP            CTL_CODE( 0x8000, 0x870, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// ===== Link state =========================================================
-#define OPEN_NET_LINK_STATE_UNKNOWN (0)
-#define OPEN_NET_LINK_STATE_DOWN    (1)
-#define OPEN_NET_LINK_STATE_UP      (2)
-#define OPEN_NET_LINK_STATE_QTY     (3)
 
 // ===== Mode ===============================================================
 #define OPEN_NET_MODE_UNKNOWN     (0)
@@ -202,6 +206,8 @@ typedef struct
 }
 OpenNet_Info;
 
+// TODO  OpenNetK.Interface  Add queued buffer state
+
 /// \cond en
 /// \brief  This structure is used to return the status.
 /// \endcond
@@ -228,6 +234,8 @@ typedef struct
     uint32_t mReserved0[123];
 }
 OpenNet_State;
+
+// TODO  OpenNetK.Interface  Add statistics about kernel execution time.
 
 /// \cond en
 /// \brief  This structure is used to return the adapter's statistics.
@@ -277,6 +285,8 @@ typedef struct
 }
 OpenNet_Stats_Adapter_NoReset;
 
+// TODO  OpenNetK.Interface  Add real hardware statistics
+
 /// \cond en
 /// \brief  This structure is used to return the adapter's statistics.
 /// \endcond
@@ -312,9 +322,10 @@ OpenNet_Stats_Hardware;
 /// \endcond
 typedef struct
 {
-    uint32_t mStats_Reset; //  0
+    uint32_t mInterrupt_Process_Last_MessageId; // 0
+    uint32_t mStats_Reset                     ;
 
-    uint32_t mReserved0[127];
+    uint32_t mReserved0[126];
 }
 OpenNet_Stats_Hardware_NoReset;
 

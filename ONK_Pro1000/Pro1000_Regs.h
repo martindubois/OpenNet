@@ -196,6 +196,79 @@ typedef union
 
     struct
     {
+        unsigned mReserved0 : 2;
+
+        unsigned mInterval_us : 13;
+
+        unsigned mLliModerationEnable :  1;
+        unsigned mLlCounter           :  5;
+        unsigned mModerationCounter   : 10;
+        unsigned mCounterIgnore       :  1;
+    }
+    mFields;
+}
+Pro1000_InterruptThrottle;
+
+typedef union
+{
+    uint32_t mValue;
+
+    struct
+    {
+        unsigned mVector0 : 5;
+
+        unsigned mReserved0 : 2;
+
+        unsigned mVector0Valid : 1;
+        unsigned mVector1      : 5;
+
+        unsigned mReserved1 : 2;
+
+        unsigned mVector1Valid : 1;
+        unsigned mVector2      : 5;
+
+        unsigned mReserved2 : 2;
+
+        unsigned mVector2Valid : 1;
+        unsigned mVector3      : 5;
+
+        unsigned mReserved3 : 2;
+
+        unsigned mVector3Valid : 1;
+    }
+    mFields;
+}
+Pro1000_InterruptVectorAllocation;
+
+typedef union
+{
+    uint32_t mValue;
+
+    struct
+    {
+        unsigned mVector32 : 5;
+
+        unsigned mReserved0 : 2;
+
+        unsigned mVector32Valid : 1;
+        unsigned mVector33 : 5;
+
+        unsigned mReserved1 : 2;
+
+        unsigned mVector33Valid : 1;
+
+        unsigned mReserved2 : 16;
+    }
+    mFields;
+}
+Pro1000_InterruptVectorAllocationMisc;
+
+typedef union
+{
+    uint32_t mValue;
+
+    struct
+    {
         unsigned mData            : 16;
         unsigned mRegisterAddress :  5;
         unsigned mPhyAddress      :  5;
@@ -640,7 +713,19 @@ typedef struct
     Pro1000_InterruptMask                 mInterruptAcknowledgeAutoMask ; // 0x01510
     Pro1000_GeneralPurposeInterruptEnable mGeneralPurposeInterruptEnable; // 0x01514
 
-	uint32_t mReserved_01518[(0x02404 - 0x01518) / 4];
+	uint32_t mReserved_01518[(0x01680 - 0x01518) / 4];
+
+    Pro1000_InterruptThrottle mInterruptTrottle[25]; // 0x01680
+
+    uint32_t mReserved_016e4[(0x01700 - 0x016e4) / 4];
+
+    Pro1000_InterruptVectorAllocation mInterruptVectorAllocation[8]; // 0x01700
+
+    uint32_t mReserved_01720[(0x01740 - 0x01720) / 4];
+
+    Pro1000_InterruptVectorAllocationMisc mInterruptVectorAllocationMisc; // 0x01740
+
+    uint32_t mReserved_01744[(0x02404 - 0x01744) / 4];
 
     Pro1000_Rx_PacketBufferSize mRx_PacketBufferSize; // 0x02404
 
