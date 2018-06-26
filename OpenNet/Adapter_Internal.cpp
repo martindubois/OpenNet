@@ -20,11 +20,11 @@
 #include <KmsLib/Exception.h>
 
 // ===== Includes ===========================================================
-#include <OpenNet/EthernetAddress.h>
 #include <OpenNet/Processor.h>
 #include <OpenNet/Status.h>
 
 // ===== OpenNet ============================================================
+#include "EthernetAddress.h"
 #include "OCLW.h"
 #include "Processor_Internal.h"
 

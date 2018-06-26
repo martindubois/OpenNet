@@ -1,7 +1,7 @@
 
 // Author   KMS - Martin Dubois, ing.
 // Product  OpenNet
-// File     Include/OpenNet/VersionInfo.h
+// File     Common/OpenNet/EthernetAddress.h
 
 #pragma once
 
@@ -18,6 +18,8 @@
 namespace OpenNet
 {
 
-    extern OPEN_NET_PUBLIC Status VersionInfo_Display(const OpenNet_VersionInfo & aIn, FILE * aOut);
+    extern OPEN_NET_PUBLIC bool EthernetAddress_IsBroadcast(const OpenNet_EthernetAddress & aIn);
+    extern OPEN_NET_PUBLIC bool EthernetAddress_IsMulticast(const OpenNet_EthernetAddress & aIn);
+    extern OPEN_NET_PUBLIC bool EthernetAddress_IsZero     (const OpenNet_EthernetAddress & aIn);
 
 }

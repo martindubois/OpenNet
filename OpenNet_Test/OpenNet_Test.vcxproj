@@ -102,7 +102,6 @@
     <ClCompile Include="Status.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="Utilities.cpp" />
-    <ClCompile Include="VersionInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utilities.h" />

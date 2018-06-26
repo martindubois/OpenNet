@@ -76,6 +76,12 @@
     <ClInclude Include="OCLW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EthernetAddress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VersionInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="_DocUser\ReadMe.txt">

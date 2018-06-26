@@ -106,9 +106,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Adapter_Internal.h" />
+    <ClInclude Include="EthernetAddress.h" />
     <ClInclude Include="OCLW.h" />
     <ClInclude Include="Processor_Internal.h" />
     <ClInclude Include="System_Internal.h" />
+    <ClInclude Include="VersionInfo.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="_DocUser\ReadMe.txt" />

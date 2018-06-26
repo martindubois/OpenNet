@@ -44,8 +44,6 @@ extern int Status_Base();
 extern int System_Base  ();
 extern int System_SetupA();
 
-extern int VersionInfo_Base();
-
 KMS_TEST_LIST_BEGIN
     KMS_TEST_LIST_ENTRY(Adapter_Base        , "Adapter - Base"        , 0, 0)
     KMS_TEST_LIST_ENTRY(Adapter_SetupA      , "Adapter - SetupA"      , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
@@ -59,7 +57,6 @@ KMS_TEST_LIST_BEGIN
     KMS_TEST_LIST_ENTRY(Status_Base         , "Status - Base"         , 0, 0)
     KMS_TEST_LIST_ENTRY(System_Base         , "System - Base"         , 0, 0)
     KMS_TEST_LIST_ENTRY(System_SetupA       , "System - SetupA"       , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(VersionInfo_Base    , "VersionInfo - Base"    , 0, 0)
 KMS_TEST_LIST_END
 
 KMS_TEST_MAIN

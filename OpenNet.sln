@@ -13,14 +13,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{6D01BCC7-C19F-4709-A2C6-39FC2CAC8392}"
 	ProjectSection(SolutionItems) = preProject
 		Includes\OpenNet\Adapter.h = Includes\OpenNet\Adapter.h
-		Includes\OpenNet\EthernetAddress.h = Includes\OpenNet\EthernetAddress.h
 		Includes\OpenNet\Filter.h = Includes\OpenNet\Filter.h
 		Includes\OpenNet\Filter_Forward.h = Includes\OpenNet\Filter_Forward.h
 		Includes\OpenNet\OpenNet.h = Includes\OpenNet\OpenNet.h
 		Includes\OpenNet\Processor.h = Includes\OpenNet\Processor.h
 		Includes\OpenNet\Status.h = Includes\OpenNet\Status.h
 		Includes\OpenNet\System.h = Includes\OpenNet\System.h
-		Includes\OpenNet\VersionInfo.h = Includes\OpenNet\VersionInfo.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC513D0F-734D-4F5A-816A-911BAA9F2061}"
@@ -90,6 +88,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Pro1000", "ONK_Pro1000\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocUser", "_DocUser", "{5714C93D-2416-4B15-9AA1-490A1D131BFE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{B4675DF3-6BF9-483B-AB9F-11FAF0BFC219}"
+	ProjectSection(SolutionItems) = preProject
+		Common\OpenNet\EthernetAddress.h = Common\OpenNet\EthernetAddress.h
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -138,6 +141,7 @@ Global
 		{6D01BCC7-C19F-4709-A2C6-39FC2CAC8392} = {71B9DF04-676B-40FF-8B9F-DC35FC9B8A3C}
 		{CC513D0F-734D-4F5A-816A-911BAA9F2061} = {71B9DF04-676B-40FF-8B9F-DC35FC9B8A3C}
 		{F6D48D20-B04B-47E1-AB5E-C84AF52E70C4} = {2347E8F1-0547-43FF-9456-724FC9DAC35F}
+		{B4675DF3-6BF9-483B-AB9F-11FAF0BFC219} = {B19569F8-BE7B-4B34-9AB9-8104A177AC85}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3390872B-D3FA-4AAE-8BB2-0888DA87EF63}

@@ -14,8 +14,10 @@
 
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/Adapter.h>
-#include <OpenNet/EthernetAddress.h>
 #include <OpenNet/System.h>
+
+// ====== Common ============================================================
+#include "../Common/OpenNet/EthernetAddress.h"
 
 // ====== OpenNet_Test ======================================================
 #include "Utilities.h"

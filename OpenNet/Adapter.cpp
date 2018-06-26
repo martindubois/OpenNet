@@ -15,10 +15,14 @@
 #include <Windows.h>
 
 // ===== Includes/OpenNet ===================================================
-#include <OpenNet/EthernetAddress.h>
-#include <OpenNet/VersionInfo.h>
-
 #include <OpenNet/Adapter.h>
+
+// ===== Common =============================================================
+#include "../Common/OpenNet/EthernetAddress.h"
+
+// ===== OpenNet ============================================================
+#include "EthernetAddress.h"
+#include "VersionInfo.h"
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
