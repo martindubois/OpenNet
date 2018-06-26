@@ -3,6 +3,12 @@
 // Product  OpenNet
 // File     ONK_Lib/Adapter.cpp
 
+// TODO  ONK_Lib.Adapter  Move the IOCTL_RESULT_... constant into the
+//                        common/OpenNetK/IoCtl.h file and use an enum
+
+// TODO  ONK_Lib.Adapter  Move the IoCtlInfo type declaration into the
+//                        common/OpenNetK/IoCtl.h
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -424,31 +430,34 @@ namespace OpenNetK
 
     void Adapter::Buffer_PxCompleted_Zone0(BufferInfo * aBuffer)
     {
-        ASSERT(NULL                               != aBuffer                       );
-        ASSERT(NULL                               != aBuffer->mHeader              );
-        ASSERT(OPEN_NET_BUFFER_STATE_PX_COMPLETED == aBuffer->mHeader->mBufferState);
+        ASSERT(NULL != aBuffer         );
+        ASSERT(NULL != aBuffer->mHeader);
 
         if (NULL == mAdapters)
         {
-            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_COMPLETED ==> STOPPED" DEBUG_EOL, mAdapterNo, aBuffer);
-            aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
+            if (OPEN_NET_BUFFER_STATE_PX_COMPLETED == InterlockedCompareExchange(reinterpret_cast<LONG *>(&aBuffer->mHeader->mBufferState), OPEN_NET_BUFFER_STATE_STOPPED, OPEN_NET_BUFFER_STATE_PX_COMPLETED))
+            {
+                DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_COMPLETED ==> STOPPED" DEBUG_EOL, mAdapterNo, aBuffer);
 
-            Buffer_WriteMarker_Zone0(aBuffer);
+                Buffer_WriteMarker_Zone0(aBuffer);
+            }
         }
         else
         {
             // Here, we use a temporary state because Buffer_Send_Zone0
             // release the gate to avoid deadlock with the other adapter's
             // gates.
-            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_COMPLETED ==> TX_PROGRAMMING" DEBUG_EOL, mAdapterNo, aBuffer);
-            aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_PROGRAMMING;
+            if (OPEN_NET_BUFFER_STATE_PX_COMPLETED == InterlockedCompareExchange(reinterpret_cast<LONG *>(&aBuffer->mHeader->mBufferState), OPEN_NET_BUFFER_STATE_TX_PROGRAMMING, OPEN_NET_BUFFER_STATE_PX_COMPLETED))
+            {
+                DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_COMPLETED ==> TX_PROGRAMMING" DEBUG_EOL, mAdapterNo, aBuffer);
 
-            Buffer_Send_Zone0(aBuffer);
+                Buffer_Send_Zone0(aBuffer);
 
-            ASSERT(OPEN_NET_BUFFER_STATE_TX_PROGRAMMING == aBuffer->mHeader->mBufferState);
+                ASSERT(OPEN_NET_BUFFER_STATE_TX_PROGRAMMING == aBuffer->mHeader->mBufferState);
 
-            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_PROGRAMMING ==> TX_RUNNING" DEBUG_EOL, mAdapterNo, aBuffer);
-            aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_RUNNING;
+                DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_PROGRAMMING ==> TX_RUNNING" DEBUG_EOL, mAdapterNo, aBuffer);
+                aBuffer->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_RUNNING;
+            }
         }
     }
 
