@@ -104,7 +104,7 @@ namespace OpenNetK
         ///                                   par le logiciel
         /// \endcond
         /// \note   Level = Thread, Thread = Initialisation
-        virtual void SetCommonBuffer(uint64_t aLogicalAddress, volatile void * aVirtualAddress);
+        virtual void SetCommonBuffer(uint64_t aLogicalAddress, void * aVirtualAddress);
 
         /// \cond en
         /// \brief  Set the configuation
@@ -133,7 +133,7 @@ namespace OpenNetK
         /// \endcond
         /// \retval true  OK
         /// \note   Level = Thread, Thread = Initialisation
-        virtual bool SetMemory(unsigned int aIndex, volatile void * aVirtual, unsigned int aSize_byte);
+        virtual bool SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize_byte);
 
         /// \cond en
         /// \brief  Enter the D0 state
@@ -214,7 +214,7 @@ namespace OpenNetK
         /// \param  aCounter    [-K-;RW-] Le compteur d'operation
         /// \retval false  Erreur
         /// \endcond
-        virtual void Packet_Receive(uint64_t aLogicalAddress, volatile OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter) = 0;
+        virtual void Packet_Receive(uint64_t aLogicalAddress, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter) = 0;
 
         /// \cond en
         /// \brief  Add the packet to the send queue.
@@ -275,7 +275,7 @@ namespace OpenNetK
         /// \param  aOutVirtual [---;-W-]
         /// \endcond
         /// \note   Thread = Initialisation
-        static void SkipDangerousBoundary(uint64_t * aLogical, volatile uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, volatile uint8_t ** aOutVirtual);
+        static void SkipDangerousBoundary(uint64_t * aLogical, uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, uint8_t ** aOutVirtual);
 
         /// \cond en
         /// \brief  The default constructor

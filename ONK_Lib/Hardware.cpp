@@ -71,7 +71,7 @@ namespace OpenNetK
     // NOT TESTED  ONK_Lib.Hardware
     //             The SetCommonBuffer is only there to fill the virtual
     //             table entry when the driver does not need a common buffer.
-    void Hardware::SetCommonBuffer(uint64_t aLogicalAddress, volatile void * aVirtualAddress)
+    void Hardware::SetCommonBuffer(uint64_t aLogicalAddress, void * aVirtualAddress)
     {
         ASSERT(NULL != aVirtualAddress);
 
@@ -90,7 +90,7 @@ namespace OpenNetK
         mStats.mSetConfig++;
     }
 
-    bool Hardware::SetMemory(unsigned int aIndex, volatile void * aVirtual, unsigned int aSize_byte)
+    bool Hardware::SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize_byte)
     {
         ASSERT(NULL != aVirtual  );
         ASSERT(   0 <  aSize_byte);
@@ -159,8 +159,9 @@ namespace OpenNetK
 
         if (aReset)
         {
-            memset(&mStats        , 0, sizeof(mStats        ));
-            memset(&mStats_NoReset, 0, sizeof(mStats_NoReset));
+            memset(&mStats, 0, sizeof(mStats));
+
+            mStats_NoReset.mStats_Get_Reset++;
         }
 
         mStats.mStats_Get++;
@@ -207,7 +208,7 @@ namespace OpenNetK
     // Protected
     /////////////////////////////////////////////////////////////////////////
 
-    void Hardware::SkipDangerousBoundary(uint64_t * aLogical, volatile uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, volatile uint8_t ** aOutVirtual)
+    void Hardware::SkipDangerousBoundary(uint64_t * aLogical, uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, uint8_t ** aOutVirtual)
     {
         ASSERT(NULL                                  !=   aLogical   );
         ASSERT(NULL                                  !=   aVirtual   );

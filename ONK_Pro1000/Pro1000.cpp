@@ -107,7 +107,7 @@ void Pro1000::ResetMemory()
     mZone0->Unlock();
 }
 
-void Pro1000::SetCommonBuffer(uint64_t aLogical, volatile void * aVirtual)
+void Pro1000::SetCommonBuffer(uint64_t aLogical, void * aVirtual)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
 
@@ -117,17 +117,17 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, volatile void * aVirtual)
 
     mZone0->Lock();
 
-        uint64_t           lLogical = aLogical;
-        volatile uint8_t * lVirtual = reinterpret_cast<volatile uint8_t *>(aVirtual);
+        uint64_t  lLogical = aLogical;
+        uint8_t * lVirtual = reinterpret_cast<uint8_t *>(aVirtual);
 
-        SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY, &mRx_Logical, reinterpret_cast<volatile uint8_t **>(&mRx_Virtual));
-        SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY, &mTx_Logical, reinterpret_cast<volatile uint8_t **>(&mTx_Virtual));
+        SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY, &mRx_Logical, reinterpret_cast<uint8_t **>(&mRx_Virtual));
+        SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY, &mTx_Logical, reinterpret_cast<uint8_t **>(&mTx_Virtual));
 
         unsigned int i;
 
         for (i = 0; i < PACKET_BUFFER_QTY; i++)
         {
-            SkipDangerousBoundary(&lLogical, &lVirtual, mConfig.mPacketSize_byte, mTx_PacketBuffer_Logical + i, reinterpret_cast<volatile uint8_t **>(mTx_PacketBuffer_Virtual + i));
+            SkipDangerousBoundary(&lLogical, &lVirtual, mConfig.mPacketSize_byte, mTx_PacketBuffer_Logical + i, reinterpret_cast<uint8_t **>(mTx_PacketBuffer_Virtual + i));
         }
 
         for (i = 0; i < TX_DESCRIPTOR_QTY; i++)
@@ -142,7 +142,7 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, volatile void * aVirtual)
 
 // NOT TESTED  ONK_Pro1000.Pro1000.ErrorHandling
 //             Memory 0 too small
-bool Pro1000::SetMemory(unsigned int aIndex, volatile void * aVirtual, unsigned int aSize_byte)
+bool Pro1000::SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize_byte)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( %u, , %u bytes )" DEBUG_EOL, aIndex, aSize_byte);
 
@@ -299,7 +299,7 @@ void Pro1000::Interrupt_Process2()
     Hardware::Interrupt_Process2();
 }
 
-void Pro1000::Packet_Receive(uint64_t aData, volatile OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
+void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
 {
     // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , ,  )" DEBUG_EOL);
 

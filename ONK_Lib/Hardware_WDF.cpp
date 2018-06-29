@@ -92,7 +92,7 @@ namespace OpenNetK
                 if (STATUS_SUCCESS == lResult)
                 {
                     PHYSICAL_ADDRESS lLogicalAddress = WdfCommonBufferGetAlignedLogicalAddress(mCommonBuffer);
-                    volatile void  * lVirtualAddress = WdfCommonBufferGetAlignedVirtualAddress(mCommonBuffer);
+                    void           * lVirtualAddress = WdfCommonBufferGetAlignedVirtualAddress(mCommonBuffer);
 
                     ASSERT(NULL != lVirtualAddress);
 

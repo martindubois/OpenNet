@@ -12,10 +12,10 @@
 
 typedef struct
 {
-    uint64_t       mLogicalAddress;
-    unsigned short mSize_byte     ;
-    unsigned short mCheckSum      ;
-    struct
+    uint64_t                mLogicalAddress;
+    volatile unsigned short mSize_byte     ;
+    volatile unsigned short mCheckSum      ;
+    volatile struct
     {
         unsigned mDescriptorDone : 1;
         unsigned mEndOfPacket    : 1;
@@ -43,8 +43,8 @@ typedef struct
 Pro1000_Rx_Descriptor;
 
 typedef struct {
-    uint64_t       mLogicalAddress;
-    struct
+    uint64_t mLogicalAddress;
+    volatile struct
     {
         unsigned mSize_byte      : 16;
         unsigned mCheckSumOffset :  8;

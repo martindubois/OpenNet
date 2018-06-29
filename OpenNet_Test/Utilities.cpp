@@ -91,10 +91,11 @@ unsigned int Utl_Validate(const OpenNet::Adapter::Stats & aIn, const OpenNet::Ad
     VALIDATE(mDriver.mAdapter.mReserved0         );
     VALIDATE(mDriver.mAdapter.mTx_Packet         );
 
-    VALIDATE(mDriver.mAdapter_NoReset.mIoCtl_Last       );
-    VALIDATE(mDriver.mAdapter_NoReset.mIoCtl_Last_Result);
-    VALIDATE(mDriver.mAdapter_NoReset.mIoCtl_Stats_Reset);
-    VALIDATE(mDriver.mAdapter_NoReset.mReserved0        );
+    VALIDATE(mDriver.mAdapter_NoReset.mIoCtl_Last           );
+    VALIDATE(mDriver.mAdapter_NoReset.mIoCtl_Last_Result    );
+    VALIDATE(mDriver.mAdapter_NoReset.mIoCtl_Stats_Get_Reset);
+    VALIDATE(mDriver.mAdapter_NoReset.mIoCtl_Stats_Reset    );
+    VALIDATE(mDriver.mAdapter_NoReset.mReserved0            );
 
     VALIDATE(mDriver.mHardware.mD0_Entry          );
     VALIDATE(mDriver.mHardware.mD0_Exit           );
@@ -123,8 +124,9 @@ unsigned int Utl_Validate(const OpenNet::Adapter::Stats & aIn, const OpenNet::Ad
     VALIDATE(mDriver.mHardware.mTx_NoCrs_packet                    );
     VALIDATE(mDriver.mHardware.mTx_HostCircuitBreakerDropped_packet);
 
-    VALIDATE(mDriver.mHardware_NoReset.mReserved0  );
-    VALIDATE(mDriver.mHardware_NoReset.mStats_Reset);
+    VALIDATE(mDriver.mHardware_NoReset.mReserved0      );
+    VALIDATE(mDriver.mHardware_NoReset.mStats_Get_Reset);
+    VALIDATE(mDriver.mHardware_NoReset.mStats_Reset    );
 
     return lResult;
 }

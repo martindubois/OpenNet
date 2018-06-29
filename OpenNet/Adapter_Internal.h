@@ -20,6 +20,9 @@
 #include <OpenNet/System.h>
 #include <OpenNetK/Constants.h>
 
+// ===== Common =============================================================
+#include "../Common/IoCtl.h"
+
 // ===== OpenNet ============================================================
 #include "Processor_Internal.h"
 
@@ -37,7 +40,7 @@ public:
 
     virtual ~Adapter_Internal();
 
-    void Connect(OpenNet_Connect * aConnect);
+    void Connect(IoCtl_Connect_In * aConnect);
 
     void SendLoopBackPackets();
 

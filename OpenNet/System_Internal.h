@@ -72,7 +72,7 @@ private:
 
     unsigned int                           mAdapterRunning    ;
     AdapterVector                          mAdapters          ;
-    OpenNet_Connect                        mConnect           ;
+    IoCtl_Connect_In                       mConnect           ;
     KmsLib::DebugLog                       mDebugLog          ;
     Processor_Internal::ExtensionFunctions mExtensionFunctions;
     clEnqueueWaitSignalAMD_fn              mEnqueueWaitSignal ;

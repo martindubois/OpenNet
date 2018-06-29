@@ -7,14 +7,9 @@
 #pragma once
 
 // TODO  OpenNetK.Interface  Move the OPEN_NET_ADAPTER...,
-//                           OPEN_NET_ADAPTER_TYPE_...,
-//                           OPEN_NET_PACKET_SIZE_... and
-//                           OPEN_NET_SHARED_MEMORY_SIZE_byte constants to
+//                           OPEN_NET_ADAPTER_TYPE_... and
+//                           OPEN_NET_PACKET_SIZE_... constants to
 //                           the file Common/OpenNetK/Constants.h
-
-// TODO  OpenNetK.Interface  Move the OPEN_NET_IOCTL_... constants and the
-//                           OpenNet_BufferInfo data type to the file
-//                           Common/OpenNetK/IoCtl.h
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
@@ -32,47 +27,6 @@ static const GUID OPEN_NET_DRIVER_INTERFACE = { 0xC0BE33A0, 0xFFBA, 0x46BA,{ 0xB
 #define  OPEN_NET_ADAPTER_TYPE_NDIS     (2)
 #define  OPEN_NET_ADAPTER_TYPE_QTY      (3)
 
-// ===== IoCtl ==============================================================
-
-// Input   None
-// Output  OpenNet_Config
-#define OPEN_NET_IOCTL_CONFIG_GET      CTL_CODE( 0x8000, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// Input   OpenNet_Config
-// Output  OpenNet_Config
-#define OPEN_NET_IOCTL_CONFIG_SET      CTL_CODE( 0x8000, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// Input   OpenNet_AdapterConnect_In
-// Output  None
-#define OPEN_NET_IOCTL_CONNECT         CTL_CODE( 0x8000, 0x810, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// Output  OpenNet_AdatperInfo
-#define OPEN_NET_IOCTL_INFO_GET        CTL_CODE( 0x8000, 0x820, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// Input   The paquet
-// Output  None
-#define OPEN_NET_IOCTL_PACKET_SEND     CTL_CODE( 0x8000, 0x830, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// Input   OpenNet_BufferInfo[ 1 .. N ]
-// Output  None
-#define OPEN_NET_IOCTL_START           CTL_CODE( 0x8000, 0x840, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// Input   None// Input   None
-// Output  OpenNet_State
-#define OPEN_NET_IOCTL_STATE_GET       CTL_CODE( 0x8000, 0x850, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// Input   IoCtl_Stats_Get_In
-// Output  OpenNet_AdapterStats
-#define OPEN_NET_IOCTL_STATS_GET       CTL_CODE( 0x8000, 0x860, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// Input   None
-// Output  None
-#define OPEN_NET_IOCTL_STATS_RESET     CTL_CODE( 0x8000, 0x861, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
-// Input   None
-// Output  None
-#define OPEN_NET_IOCTL_STOP            CTL_CODE( 0x8000, 0x870, METHOD_BUFFERED, FILE_ANY_ACCESS )
-
 // ===== Mode ===============================================================
 #define OPEN_NET_MODE_UNKNOWN     (0)
 #define OPEN_NET_MODE_NORMAL      (1)
@@ -82,9 +36,6 @@ static const GUID OPEN_NET_DRIVER_INTERFACE = { 0xC0BE33A0, 0xFFBA, 0x46BA,{ 0xB
 // ===== Packet size ========================================================
 #define OPEN_NET_PACKET_SIZE_MAX_byte (16384)
 #define OPEN_NET_PACKET_SIZE_MIN_byte ( 1536)
-
-// ===== Shared Memory ======================================================
-#define OPEN_NET_SHARED_MEMORY_SIZE_byte (8192)
 
 // Data types
 /////////////////////////////////////////////////////////////////////////////
@@ -160,23 +111,6 @@ typedef struct
     uint8_t  mReserved1[112];
 }
 OpenNet_Config;
-
-/// \cond en
-/// \brief  This structure is used to pass the connection information.
-/// \endcond
-/// \cond fr
-/// \brief  Cette structure est utilise pour passer les information de
-///         connexion.
-/// \endcond
-typedef struct
-{
-    uint64_t mEvent       ;
-    void *   mSharedMemory;
-    uint32_t mSystemId    ;
-
-    uint8_t  mReserved0[44];
-}
-OpenNet_Connect;
 
 /// \cond en
 /// \brief  This structure is used to return the information about an
@@ -277,15 +211,14 @@ OpenNet_Stats_Adapter;
 /// \endcond
 typedef struct
 {
-    uint32_t mIoCtl_Last       ;
-    uint32_t mIoCtl_Last_Result;
-    uint32_t mIoCtl_Stats_Reset;
+    uint32_t mIoCtl_Last           ; //  0
+    uint32_t mIoCtl_Last_Result    ;
+    uint32_t mIoCtl_Stats_Get_Reset;
+    uint32_t mIoCtl_Stats_Reset    ;
 
-    uint32_t mReserved0[125];
+    uint32_t mReserved0[124];
 }
 OpenNet_Stats_Adapter_NoReset;
-
-// TODO  OpenNetK.Interface  Add real hardware statistics
 
 /// \cond en
 /// \brief  This structure is used to return the adapter's statistics.
@@ -336,9 +269,10 @@ OpenNet_Stats_Hardware;
 typedef struct
 {
     uint32_t mInterrupt_Process_Last_MessageId; // 0
+    uint32_t mStats_Get_Reset                 ;
     uint32_t mStats_Reset                     ;
 
-    uint32_t mReserved0[126];
+    uint32_t mReserved0[125];
 }
 OpenNet_Stats_Hardware_NoReset;
 

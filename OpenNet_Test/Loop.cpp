@@ -83,24 +83,29 @@ KMS_TEST_BEGIN(Loop_SetupC)
     lStatsM.mDll.mRun_Iteration_Queue = UTL_MASK_ABOVE;
     lStatsM.mDll.mRun_Iteration_Wait  = UTL_MASK_ABOVE;
 
-    lStatsM.mDriver.mAdapter.mBuffers_Process           = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mBuffer_Receive            = UTL_MASK_ABOVE_OR_EQUAL;
-    lStatsM.mDriver.mAdapter.mBuffer_Send               = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mBuffer_SendPackets        = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mIoCtl                     = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mIoCtl_State_Get           = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mTx_Packet                 = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Last        = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Last_Result = UTL_MASK_IGNORE;
-    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Stats_Reset = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mInterrupt_Process        = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mInterrupt_Process2       = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mPacket_Receive           = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mPacket_Send              = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mRx_Packet                = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mTx_Packet                = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mRx_NoBuffer_packet       = UTL_MASK_IGNORE;
-    lStatsM.mDriver.mHardware_NoReset.mStats_Reset      = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter.mBuffers_Process    = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter.mBuffer_Receive     = UTL_MASK_ABOVE_OR_EQUAL;
+    lStatsM.mDriver.mAdapter.mBuffer_Send        = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter.mBuffer_SendPackets = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter.mIoCtl              = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter.mIoCtl_State_Get    = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter.mTx_Packet          = UTL_MASK_ABOVE;
+
+    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Last            = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Last_Result     = UTL_MASK_IGNORE;
+    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Stats_Get_Reset = UTL_MASK_IGNORE;
+    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Stats_Reset     = UTL_MASK_ABOVE;
+
+    lStatsM.mDriver.mHardware.mInterrupt_Process   = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mHardware.mInterrupt_Process2  = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mHardware.mPacket_Receive      = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mHardware.mPacket_Send         = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mHardware.mRx_Packet           = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mHardware.mTx_Packet           = UTL_MASK_ABOVE;
+    lStatsM.mDriver.mHardware.mRx_NoBuffer_packet  = UTL_MASK_IGNORE;
+    lStatsM.mDriver.mHardware_NoReset.mStats_Reset = UTL_MASK_ABOVE;
+
+    lStatsM.mDriver.mHardware_NoReset.mStats_Get_Reset = UTL_MASK_IGNORE;
 
     KMS_TEST_COMPARE(0, Utl_Validate(lSetup.mStats[0], lStatsE, lStatsM));
 }

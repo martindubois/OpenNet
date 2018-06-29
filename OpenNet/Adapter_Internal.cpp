@@ -103,8 +103,8 @@ Adapter_Internal::Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsL
     memset(&mName  , 0, sizeof(mName  ));
     memset(&mStats , 0, sizeof(mStats ));
 
-    mHandle->Control(OPEN_NET_IOCTL_CONFIG_GET, NULL, 0, &mConfig, sizeof(mConfig));
-    mHandle->Control(OPEN_NET_IOCTL_INFO_GET  , NULL, 0, &mInfo  , sizeof(mInfo  ));
+    mHandle->Control(IOCTL_CONFIG_GET, NULL, 0, &mConfig, sizeof(mConfig));
+    mHandle->Control(IOCTL_INFO_GET  , NULL, 0, &mInfo  , sizeof(mInfo  ));
 
     strncpy_s(mName, mInfo.mVersion_Hardware.mComment, sizeof(mName) - 1);
 
@@ -155,7 +155,7 @@ Adapter_Internal::~Adapter_Internal()
 // Exception  KmsLib::Exception *  CODE_TIMEOUT
 //                                 See KmsLib::Windows::DriverHandle::Control
 // Threads    Apps
-void Adapter_Internal::Connect(OpenNet_Connect * aConnect)
+void Adapter_Internal::Connect(IoCtl_Connect_In * aConnect)
 {
     assert(NULL != aConnect);
 
@@ -175,7 +175,7 @@ void Adapter_Internal::Connect(OpenNet_Connect * aConnect)
 
     try
     {
-        mHandle->Control(OPEN_NET_IOCTL_CONNECT, aConnect, sizeof(OpenNet_Connect), NULL, 0);
+        mHandle->Control(IOCTL_CONNECT, aConnect, sizeof(IoCtl_Connect_In), NULL, 0);
 
         SetEvent(lEvent);
     }
@@ -194,7 +194,7 @@ void Adapter_Internal::SendLoopBackPackets()
 
     for (unsigned i = 0; i < 64; i++)
     {
-        mHandle->Control(OPEN_NET_IOCTL_PACKET_SEND, LOOP_BACK_PACKET, sizeof(LOOP_BACK_PACKET), NULL, 0);
+        mHandle->Control(IOCTL_PACKET_SEND, LOOP_BACK_PACKET, sizeof(LOOP_BACK_PACKET), NULL, 0);
         mStats.mLoopBackPacket++;
     }
 }
@@ -344,7 +344,7 @@ OpenNet::Status Adapter_Internal::GetState(State * aOut)
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
-    return Control(OPEN_NET_IOCTL_STATE_GET, NULL, 0, aOut, sizeof(State));
+    return Control(IOCTL_STATE_GET, NULL, 0, aOut, sizeof(State));
 }
 
 OpenNet::Status Adapter_Internal::GetStats(Stats * aOut, bool aReset)
@@ -371,7 +371,7 @@ OpenNet::Status Adapter_Internal::GetStats(Stats * aOut, bool aReset)
 
     lIn.mFlags.mReset = aReset;
 
-    return Control(OPEN_NET_IOCTL_STATS_GET, &lIn, sizeof(lIn), &aOut->mDriver, sizeof(aOut->mDriver));
+    return Control(IOCTL_STATS_GET, &lIn, sizeof(lIn), &aOut->mDriver, sizeof(aOut->mDriver));
 }
 
 bool Adapter_Internal::IsConnected()
@@ -469,7 +469,7 @@ OpenNet::Status Adapter_Internal::ResetStats()
 {
     memset(&mStats, 0, sizeof(mStats));
 
-    return Control(OPEN_NET_IOCTL_STATS_RESET, NULL, 0, NULL, 0);
+    return Control(IOCTL_STATS_RESET, NULL, 0, NULL, 0);
 }
 
 OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
@@ -484,7 +484,7 @@ OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
 
     memcpy(&mConfig, &aConfig, sizeof(mConfig));
 
-    return Control(OPEN_NET_IOCTL_CONFIG_SET, &mConfig, sizeof(mConfig), &mConfig, sizeof(mConfig));
+    return Control(IOCTL_CONFIG_SET, &mConfig, sizeof(mConfig), &mConfig, sizeof(mConfig));
 }
 
 OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::Filter * aFilter)
@@ -724,7 +724,7 @@ OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int a
 
     mStats.mPacket_Send++;
 
-    return Control(OPEN_NET_IOCTL_PACKET_SEND, aData, aSize_byte, NULL, 0);
+    return Control(IOCTL_PACKET_SEND, aData, aSize_byte, NULL, 0);
 }
 
 // Internal
@@ -757,7 +757,7 @@ void Adapter_Internal::Run()
             mStats.mRun_Queue++;
         }
 
-        mHandle->Control(OPEN_NET_IOCTL_START, mBuffers, sizeof(OpenNet_BufferInfo) * mBufferCount, NULL, 0);
+        mHandle->Control(IOCTL_START, mBuffers, sizeof(OpenNet_BufferInfo) * mBufferCount, NULL, 0);
 
         Run_Loop();
         Run_Wait();
@@ -884,7 +884,7 @@ void Adapter_Internal::Run_Loop()
 
         State_Change(STATE_STOP_REQUESTED, STATE_STOPPING);
 
-        mHandle->Control(OPEN_NET_IOCTL_STOP, NULL, 0, NULL, 0);
+        mHandle->Control(IOCTL_STOP, NULL, 0, NULL, 0);
     }
     catch (KmsLib::Exception * eE)
     {
@@ -910,7 +910,7 @@ void Adapter_Internal::Run_Wait()
 
     for (unsigned int i = 0; i < 600; i++)
     {
-        mHandle->Control(OPEN_NET_IOCTL_STATE_GET, NULL, 0, &lState, sizeof(lState));
+        mHandle->Control(IOCTL_STATE_GET, NULL, 0, &lState, sizeof(lState));
 
         if (0 >= lState.mBufferCount)
         {

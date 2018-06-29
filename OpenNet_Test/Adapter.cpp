@@ -17,6 +17,7 @@
 #include <OpenNet/System.h>
 
 // ====== Common ============================================================
+#include "../Common/IoCtl.h"
 #include "../Common/OpenNet/EthernetAddress.h"
 
 // ====== OpenNet_Test ======================================================
@@ -120,10 +121,11 @@ KMS_TEST_BEGIN(Adapter_SetupA)
     Utl_ValidateInit(&lSsE, &lSsM);
 
     lSsE.mDriver.mAdapter.mIoCtl              = 1;
-    lSsE.mDriver.mAdapter_NoReset.mIoCtl_Last = OPEN_NET_IOCTL_STATS_RESET;
+    lSsE.mDriver.mAdapter_NoReset.mIoCtl_Last = IOCTL_STATS_RESET;
 
     lSsM.mDriver.mAdapter_NoReset.mIoCtl_Stats_Reset = UTL_MASK_ABOVE;
-    lSsM.mDriver.mHardware_NoReset.mStats_Reset      = UTL_MASK_ABOVE;
+
+    lSsM.mDriver.mHardware_NoReset.mStats_Reset = UTL_MASK_ABOVE;
 
     KMS_TEST_COMPARE(0, Utl_Validate(lSs0, lSsE, lSsM));
 

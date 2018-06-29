@@ -20,9 +20,12 @@
 
 #include <OpenNetK/Adapter.h>
 #include <OpenNetK/Hardware_WDF.h>
-#include <OpenNetK/Interface.h>
 
 #include <OpenNetK/Adapter_WDF.h>
+
+// ===== Common =============================================================
+#include "../Common/Constants.h"
+#include "../Common/IoCtl.h"
 
 namespace OpenNetK
 {
@@ -115,20 +118,20 @@ namespace OpenNetK
 
         WdfRequestGetParameters(aRequest, &lParameters);
 
-        if ( (WdfRequestTypeDeviceControl == lParameters.Type) && (OPEN_NET_IOCTL_CONNECT == lParameters.Parameters.DeviceIoControl.IoControlCode) )
+        if ( (WdfRequestTypeDeviceControl == lParameters.Type) && (IOCTL_CONNECT == lParameters.Parameters.DeviceIoControl.IoControlCode) )
         {
             NTSTATUS lStatus;
 
             if (NULL == mFileObject)
             {
-                OpenNet_Connect * lIn         ;
-                size_t            lInSize_byte;
+                IoCtl_Connect_In * lIn         ;
+                size_t             lInSize_byte;
 
-                lStatus = WdfRequestRetrieveInputBuffer(aRequest, sizeof(OpenNet_Connect), reinterpret_cast<PVOID *>(&lIn), &lInSize_byte);
+                lStatus = WdfRequestRetrieveInputBuffer(aRequest, sizeof(IoCtl_Connect_In), reinterpret_cast<PVOID *>(&lIn), &lInSize_byte);
                 if (STATUS_SUCCESS == lStatus)
                 {
-                    ASSERT(NULL                    != lIn         );
-                    ASSERT(sizeof(OpenNet_Connect) <= lInSize_byte);
+                    ASSERT(NULL                     != lIn         );
+                    ASSERT(sizeof(IoCtl_Connect_In) <= lInSize_byte);
 
                     lStatus = Connect(lIn, WdfRequestGetFileObject(aRequest));
                 }
@@ -160,19 +163,21 @@ namespace OpenNetK
     //
     // Level    PASSIVE
     // Threads  Users
-    NTSTATUS Adapter_WDF::Connect(OpenNet_Connect * aIn, WDFFILEOBJECT aFileObject)
+    NTSTATUS Adapter_WDF::Connect(void * aIn, WDFFILEOBJECT aFileObject)
     {
         ASSERT(NULL != aIn        );
         ASSERT(NULL != aFileObject);
 
+        IoCtl_Connect_In * lIn = reinterpret_cast<IoCtl_Connect_In *>(aIn);
+
         // Event_Translate ==> Event_Release  See FileCleanup
-        NTSTATUS lResult = Event_Translate(&aIn->mEvent);
+        NTSTATUS lResult = Event_Translate(&lIn->mEvent);
         if (STATUS_SUCCESS == lResult)
         {
-            ASSERT(NULL != aIn->mEvent);
+            ASSERT(NULL != lIn->mEvent);
 
             // SharedMemory_Translate ==> SharedMemory_Release  See FileCleanup
-            lResult = SharedMemory_Translate(&aIn->mSharedMemory);
+            lResult = SharedMemory_Translate(&lIn->mSharedMemory);
             if (STATUS_SUCCESS == lResult)
             {
                 mFileObject = aFileObject;
@@ -325,7 +330,7 @@ namespace OpenNetK
         }
 
         // IoAllocateMdl ==> IoFreeMdl  See SharedMemory_Release
-        mSharedMemory_MDL = IoAllocateMdl(*aSharedMemory, OPEN_NET_SHARED_MEMORY_SIZE_byte, FALSE, FALSE, NULL);
+        mSharedMemory_MDL = IoAllocateMdl(*aSharedMemory, SHARED_MEMORY_SIZE_byte, FALSE, FALSE, NULL);
         if (NULL == mSharedMemory_MDL)
         {
             return STATUS_INSUFFICIENT_RESOURCES;

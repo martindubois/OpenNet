@@ -119,9 +119,9 @@ namespace OpenNetK
         unsigned int mIntCount ;
         WDFINTERRUPT mInterrupt;
 
-        unsigned int    mMemCount;
-        unsigned int    mMemSize_byte[6];
-        volatile void * mMemVirtual  [6];
+        unsigned int mMemCount;
+        unsigned int mMemSize_byte[6];
+        void       * mMemVirtual  [6];
 
         WDFTIMER mTimer;
 

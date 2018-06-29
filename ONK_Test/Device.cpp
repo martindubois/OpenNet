@@ -20,6 +20,9 @@
 // ===== Includes ===========================================================
 #include <OpenNetK/Interface.h>
 
+// ===== Common =============================================================
+#include "../Common/IoCtl.h"
+
 // Tests
 /////////////////////////////////////////////////////////////////////////////
 
@@ -47,7 +50,7 @@ KMS_TEST_BEGIN(Device_SetupA)
 
     try
     {
-        lDH0.Control(OPEN_NET_IOCTL_CONNECT, NULL, 0, NULL, 0);
+        lDH0.Control(IOCTL_CONNECT, NULL, 0, NULL, 0);
         KMS_TEST_ERROR();
     }
     catch (KmsLib::Exception * eE)
@@ -59,9 +62,9 @@ KMS_TEST_BEGIN(Device_SetupA)
 
     try
     {
-        OpenNet_Connect lC;
+        IoCtl_Connect_In lC;
 
-        lDH0.Control(OPEN_NET_IOCTL_CONNECT, &lC, sizeof(lC), NULL, 0);
+        lDH0.Control(IOCTL_CONNECT, &lC, sizeof(lC), NULL, 0);
         KMS_TEST_ERROR();
     }
     catch (KmsLib::Exception * eE)

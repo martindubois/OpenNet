@@ -72,16 +72,16 @@ namespace OpenNetK
 
         switch (aCode)
         {
-        case OPEN_NET_IOCTL_CONFIG_GET :                                                       aInfo->mOut_MinSize_byte = sizeof(OpenNet_Config    ); break;
-        case OPEN_NET_IOCTL_CONFIG_SET : aInfo->mIn_MinSize_byte = sizeof(OpenNet_Config    ); aInfo->mOut_MinSize_byte = sizeof(OpenNet_Config    ); break;
-        case OPEN_NET_IOCTL_CONNECT    : aInfo->mIn_MinSize_byte = sizeof(OpenNet_Connect   );                                                        break;
-        case OPEN_NET_IOCTL_INFO_GET   :                                                       aInfo->mOut_MinSize_byte = sizeof(OpenNet_Info      ); break;
-        case OPEN_NET_IOCTL_PACKET_SEND:                                                                                                              break;
-        case OPEN_NET_IOCTL_START      : aInfo->mIn_MinSize_byte = sizeof(OpenNet_BufferInfo);                                                        break;
-        case OPEN_NET_IOCTL_STATE_GET  :                                                       aInfo->mOut_MinSize_byte = sizeof(OpenNet_State     ); break;
-        case OPEN_NET_IOCTL_STATS_GET  : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Stats_Get_In); aInfo->mOut_MinSize_byte = sizeof(OpenNet_Stats     ); break;
-        case OPEN_NET_IOCTL_STATS_RESET:                                                                                                              break;
-        case OPEN_NET_IOCTL_STOP       :                                                                                                              break;
+        case IOCTL_CONFIG_GET :                                                       aInfo->mOut_MinSize_byte = sizeof(OpenNet_Config    ); break;
+        case IOCTL_CONFIG_SET : aInfo->mIn_MinSize_byte = sizeof(OpenNet_Config    ); aInfo->mOut_MinSize_byte = sizeof(OpenNet_Config    ); break;
+        case IOCTL_CONNECT    : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Connect_In  );                                                        break;
+        case IOCTL_INFO_GET   :                                                       aInfo->mOut_MinSize_byte = sizeof(OpenNet_Info      ); break;
+        case IOCTL_PACKET_SEND:                                                                                                              break;
+        case IOCTL_START      : aInfo->mIn_MinSize_byte = sizeof(OpenNet_BufferInfo);                                                        break;
+        case IOCTL_STATE_GET  :                                                       aInfo->mOut_MinSize_byte = sizeof(OpenNet_State     ); break;
+        case IOCTL_STATS_GET  : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Stats_Get_In); aInfo->mOut_MinSize_byte = sizeof(OpenNet_Stats     ); break;
+        case IOCTL_STATS_RESET:                                                                                                              break;
+        case IOCTL_STOP       :                                                                                                              break;
 
         default : return false;
         }
@@ -243,16 +243,16 @@ namespace OpenNetK
 
         switch (aCode)
         {
-        case OPEN_NET_IOCTL_CONFIG_GET : lResult = IoCtl_Config_Get (reinterpret_cast<      OpenNet_Config     *>(aOut)); break;
-        case OPEN_NET_IOCTL_CONFIG_SET : lResult = IoCtl_Config_Set (reinterpret_cast<const OpenNet_Config     *>(aIn ), reinterpret_cast<OpenNet_Config *>(aOut)); break;
-        case OPEN_NET_IOCTL_CONNECT    : lResult = IoCtl_Connect    (reinterpret_cast<const OpenNet_Connect    *>(aIn )); break;
-        case OPEN_NET_IOCTL_INFO_GET   : lResult = IoCtl_Info_Get   (reinterpret_cast<      OpenNet_Info       *>(aOut)); break;
-        case OPEN_NET_IOCTL_PACKET_SEND: lResult = IoCtl_Packet_Send(                                             aIn  , aInSize_byte ); break;
-        case OPEN_NET_IOCTL_START      : lResult = IoCtl_Start      (reinterpret_cast<const OpenNet_BufferInfo *>(aIn ), aInSize_byte ); break;
-        case OPEN_NET_IOCTL_STATE_GET  : lResult = IoCtl_State_Get  (reinterpret_cast<      OpenNet_State      *>(aOut)); break;
-        case OPEN_NET_IOCTL_STATS_GET  : lResult = IoCtl_Stats_Get  (                                             aIn  , reinterpret_cast<OpenNet_Stats  *>(aOut)); break;
-        case OPEN_NET_IOCTL_STATS_RESET: lResult = IoCtl_Stats_Reset(); break;
-        case OPEN_NET_IOCTL_STOP       : lResult = IoCtl_Stop       (); break;
+        case IOCTL_CONFIG_GET : lResult = IoCtl_Config_Get (reinterpret_cast<      OpenNet_Config     *>(aOut)); break;
+        case IOCTL_CONFIG_SET : lResult = IoCtl_Config_Set (reinterpret_cast<const OpenNet_Config     *>(aIn ), reinterpret_cast<OpenNet_Config *>(aOut)); break;
+        case IOCTL_CONNECT    : lResult = IoCtl_Connect    (                                             aIn  ); break;
+        case IOCTL_INFO_GET   : lResult = IoCtl_Info_Get   (reinterpret_cast<      OpenNet_Info       *>(aOut)); break;
+        case IOCTL_PACKET_SEND: lResult = IoCtl_Packet_Send(                                             aIn  , aInSize_byte ); break;
+        case IOCTL_START      : lResult = IoCtl_Start      (reinterpret_cast<const OpenNet_BufferInfo *>(aIn ), aInSize_byte ); break;
+        case IOCTL_STATE_GET  : lResult = IoCtl_State_Get  (reinterpret_cast<      OpenNet_State      *>(aOut)); break;
+        case IOCTL_STATS_GET  : lResult = IoCtl_Stats_Get  (                                             aIn  , reinterpret_cast<OpenNet_Stats  *>(aOut)); break;
+        case IOCTL_STATS_RESET: lResult = IoCtl_Stats_Reset(); break;
+        case IOCTL_STOP       : lResult = IoCtl_Stop       (); break;
 
         default: ASSERT(false);
         }
@@ -273,7 +273,7 @@ namespace OpenNetK
     //
     // Levels   SoftInt or Thread
     // Threads  Queue
-    void Adapter::Buffer_InitHeader_Zone0(volatile OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo)
+    void Adapter::Buffer_InitHeader_Zone0(OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo)
     {
         ASSERT(NULL !=   aHeader               );
         ASSERT(NULL != (&aBufferInfo)          );
@@ -357,9 +357,9 @@ namespace OpenNetK
         ASSERT(NULL != mHardware);
         ASSERT(NULL != mZone0   );
 
-        volatile uint8_t * lBase = reinterpret_cast<volatile uint8_t *>(aBuffer->mHeader);
+        uint8_t * lBase = reinterpret_cast<uint8_t *>(aBuffer->mHeader);
 
-        volatile OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<volatile OpenNet_PacketInfo *>(lBase + aBuffer->mHeader->mPacketInfoOffset_byte);
+        OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<OpenNet_PacketInfo *>(lBase + aBuffer->mHeader->mPacketInfoOffset_byte);
 
         mZone0->Unlock();
 
@@ -568,12 +568,9 @@ namespace OpenNetK
         return sizeof(OpenNet_Config);
     }
 
-    int Adapter::IoCtl_Connect(const OpenNet_Connect * aIn)
+    int Adapter::IoCtl_Connect(const void * aIn)
     {
         ASSERT(NULL != aIn);
-
-        ASSERT(   0 != aIn->mEvent       );
-        ASSERT(NULL != aIn->mSharedMemory);
 
         ASSERT(NULL                        == mAdapters );
         ASSERT(OPEN_NET_ADAPTER_NO_UNKNOWN == mAdapterNo);
@@ -582,14 +579,19 @@ namespace OpenNetK
 
         mStats.mIoCtl_Connect++;
 
-        if (0 == aIn->mSystemId)
+        const IoCtl_Connect_In * lIn = reinterpret_cast<const IoCtl_Connect_In *>(aIn);
+
+        ASSERT(   0 != lIn->mEvent       );
+        ASSERT(NULL != lIn->mSharedMemory);
+
+        if (0 == lIn->mSystemId)
         {
             return IOCTL_RESULT_INVALID_SYSTEM_ID;
         }
 
-        mEvent    = reinterpret_cast<KEVENT   *>(aIn->mEvent       );
-        mAdapters = reinterpret_cast<Adapter **>(aIn->mSharedMemory);
-        mSystemId =                              aIn->mSystemId     ;
+        mEvent    = reinterpret_cast<KEVENT   *>(lIn->mEvent       );
+        mAdapters = reinterpret_cast<Adapter **>(lIn->mSharedMemory);
+        mSystemId =                              lIn->mSystemId     ;
 
         for (unsigned int i = 0; i < OPEN_NET_ADAPTER_NO_QTY; i++)
         {
@@ -704,8 +706,9 @@ namespace OpenNetK
 
         if (lReset)
         {
-            memset(&mStats        , 0, sizeof(mStats        ));
-            memset(&mStats_NoReset, 0, sizeof(mStats_NoReset));
+            memset(&mStats, 0, sizeof(mStats));
+
+            mStats_NoReset.mIoCtl_Stats_Get_Reset++;
         }
 
         mHardware->Stats_Get(aOut, lReset);

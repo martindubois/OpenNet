@@ -18,6 +18,7 @@
 #include <OpenNet/Adapter.h>
 
 // ===== Common =============================================================
+#include "../Common/IoCtl.h"
 #include "../Common/OpenNet/EthernetAddress.h"
 
 // ===== OpenNet ============================================================
@@ -211,16 +212,16 @@ const char * GetIoCtlName(unsigned int aCode)
 {
     switch (aCode)
     {
-    case OPEN_NET_IOCTL_CONFIG_GET : return "CONFIG_GET" ;
-    case OPEN_NET_IOCTL_CONFIG_SET : return "CONFIG_SET" ;
-    case OPEN_NET_IOCTL_CONNECT    : return "CONNECT"    ;
-    case OPEN_NET_IOCTL_INFO_GET   : return "INFO_GET"   ;
-    case OPEN_NET_IOCTL_PACKET_SEND: return "PACKET_SEND";
-    case OPEN_NET_IOCTL_START      : return "START"      ;
-    case OPEN_NET_IOCTL_STATE_GET  : return "STATE_GET"  ;
-    case OPEN_NET_IOCTL_STATS_GET  : return "STATS_GET"  ;
-    case OPEN_NET_IOCTL_STATS_RESET: return "STATS_RESET";
-    case OPEN_NET_IOCTL_STOP       : return "STOP"       ;
+    case IOCTL_CONFIG_GET : return "CONFIG_GET" ;
+    case IOCTL_CONFIG_SET : return "CONFIG_SET" ;
+    case IOCTL_CONNECT    : return "CONNECT"    ;
+    case IOCTL_INFO_GET   : return "INFO_GET"   ;
+    case IOCTL_PACKET_SEND: return "PACKET_SEND";
+    case IOCTL_START      : return "START"      ;
+    case IOCTL_STATE_GET  : return "STATE_GET"  ;
+    case IOCTL_STATS_GET  : return "STATS_GET"  ;
+    case IOCTL_STATS_RESET: return "STATS_RESET";
+    case IOCTL_STOP       : return "STOP"       ;
     }
 
     return "Invalid IoCtl code";
@@ -294,9 +295,10 @@ void Display(const OpenNet_Stats_Adapter_NoReset & aIn, FILE * aOut)
     assert(NULL !=   aOut);
 
     fprintf(aOut, "    Adapter statistics (No Reset) :\n");
-    fprintf(aOut, "      IoCtl - Last          = 0x%08x - %s\n", aIn.mIoCtl_Last, GetIoCtlName(aIn.mIoCtl_Last));
-    DisplayStats( "                - Result    = 0x%08x\n"     , aIn.mIoCtl_Last_Result, aOut);
-    DisplayStats( "            - Stats - Reset = %u\n"         , aIn.mIoCtl_Stats_Reset, aOut);
+    fprintf(aOut, "      IoCtl - Last                = 0x%08x - %s\n", aIn.mIoCtl_Last, GetIoCtlName(aIn.mIoCtl_Last));
+    DisplayStats( "                   - Result       = 0x%08x\n"     , aIn.mIoCtl_Last_Result, aOut);
+    fprintf(aOut, "      IoCtl - Stats - Get - Reset = %u\n"         , aIn.mIoCtl_Stats_Get_Reset);
+    DisplayStats( "                    - Reset       = %u\n"         , aIn.mIoCtl_Stats_Reset, aOut);
 }
 
 void Display(const OpenNet_Stats_Hardware & aIn, FILE * aOut)
@@ -339,7 +341,8 @@ void Display(const OpenNet_Stats_Hardware_NoReset & aIn, FILE * aOut)
 
     fprintf(aOut, "    Hardware Statistics (No Reset) :\n");
     DisplayStats( "      Interrupt - Process - Last - MessageId = %u\n", aIn.mInterrupt_Process_Last_MessageId, aOut);
-    DisplayStats( "      Stats - Reset                          = %u\n", aIn.mStats_Reset                     , aOut);
+    fprintf(aOut, "      Stats - Get - Reset                    = %u\n", aIn.mStats_Get_Reset);
+    DisplayStats( "            - Reset                          = %u\n", aIn.mStats_Reset                     , aOut);
 }
 
 void DisplayStats(const char * aFormat, unsigned int aValue, FILE * aOut)

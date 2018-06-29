@@ -18,6 +18,9 @@
 #include <KmsLib/Exception.h>
 #include <KmsLib/Windows/DriverHandle.h>
 
+// ===== Common =============================================================
+#include "../Common/Constants.h"
+
 // ===== OpenNet ============================================================
 #include "Adapter_Internal.h"
 #include "OCLW.h"
@@ -58,7 +61,7 @@ System_Internal::System_Internal()
     assert(NULL != mConnect.mEvent);
 
     // VirtualAlloc ==> VirtualAlloc  See the destructor
-    mConnect.mSharedMemory = VirtualAlloc(NULL, OPEN_NET_SHARED_MEMORY_SIZE_byte, MEM_COMMIT, PAGE_READWRITE);
+    mConnect.mSharedMemory = VirtualAlloc(NULL, SHARED_MEMORY_SIZE_byte, MEM_COMMIT, PAGE_READWRITE);
     assert(NULL != mConnect.mSharedMemory);
 
     mConnect.mSystemId = GetCurrentProcessId();
@@ -94,7 +97,7 @@ System_Internal::~System_Internal()
     assert(lRetB);
 
     // VirtualAlloc ==> VirtualAlloc  See the default constructor
-    void * lRetVP = VirtualAlloc(mConnect.mSharedMemory, OPEN_NET_SHARED_MEMORY_SIZE_byte, MEM_RESET, 0);
+    void * lRetVP = VirtualAlloc(mConnect.mSharedMemory, SHARED_MEMORY_SIZE_byte, MEM_RESET, 0);
     assert(NULL == lRetVP);
 }
 

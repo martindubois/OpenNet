@@ -86,7 +86,7 @@ namespace OpenNetK
 
     private:
 
-        NTSTATUS Connect   (OpenNet_Connect * aIn, WDFFILEOBJECT aFileObject);
+        NTSTATUS Connect   (void * aIn, WDFFILEOBJECT aFileObject);
         void     Disconnect();
 
         void     Event_Release  ();

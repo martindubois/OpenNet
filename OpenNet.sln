@@ -5,6 +5,7 @@ VisualStudioVersion = 15.0.27428.2043
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B19569F8-BE7B-4B34-9AB9-8104A177AC85}"
 	ProjectSection(SolutionItems) = preProject
+		Common\Constants.h = Common\Constants.h
 		Common\IoCtl.h = Common\IoCtl.h
 		Common\Version.h = Common\Version.h
 	EndProjectSection
