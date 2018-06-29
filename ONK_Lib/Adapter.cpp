@@ -3,12 +3,6 @@
 // Product  OpenNet
 // File     ONK_Lib/Adapter.cpp
 
-// TODO  ONK_Lib.Adapter  Move the IOCTL_RESULT_... constant into the
-//                        common/OpenNetK/IoCtl.h file and use an enum
-
-// TODO  ONK_Lib.Adapter  Move the IoCtlInfo type declaration into the
-//                        common/OpenNetK/IoCtl.h
-
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -34,6 +28,9 @@
 // ===== Common =============================================================
 #include "../Common/IoCtl.h"
 #include "../Common/Version.h"
+
+// ===== ONL_Lib ============================================================
+#include "IoCtl.h"
 
 // Static function declaration
 /////////////////////////////////////////////////////////////////////////////
@@ -64,24 +61,26 @@ namespace OpenNetK
     //
     // Level   SoftInt
     // Thread  Queue
-    bool Adapter::IoCtl_GetInfo(unsigned int aCode, IoCtlInfo * aInfo)
+    bool Adapter::IoCtl_GetInfo(unsigned int aCode, void * aInfo)
     {
         ASSERT(NULL != aInfo);
 
-        memset(aInfo, 0, sizeof(IoCtlInfo));
+        IoCtl_Info * lInfo = reinterpret_cast<IoCtl_Info *>(aInfo);
+
+        memset(lInfo, 0, sizeof(IoCtl_Info));
 
         switch (aCode)
         {
-        case IOCTL_CONFIG_GET :                                                       aInfo->mOut_MinSize_byte = sizeof(OpenNet_Config    ); break;
-        case IOCTL_CONFIG_SET : aInfo->mIn_MinSize_byte = sizeof(OpenNet_Config    ); aInfo->mOut_MinSize_byte = sizeof(OpenNet_Config    ); break;
-        case IOCTL_CONNECT    : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Connect_In  );                                                        break;
-        case IOCTL_INFO_GET   :                                                       aInfo->mOut_MinSize_byte = sizeof(OpenNet_Info      ); break;
-        case IOCTL_PACKET_SEND:                                                                                                              break;
-        case IOCTL_START      : aInfo->mIn_MinSize_byte = sizeof(OpenNet_BufferInfo);                                                        break;
-        case IOCTL_STATE_GET  :                                                       aInfo->mOut_MinSize_byte = sizeof(OpenNet_State     ); break;
-        case IOCTL_STATS_GET  : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Stats_Get_In); aInfo->mOut_MinSize_byte = sizeof(OpenNet_Stats     ); break;
-        case IOCTL_STATS_RESET:                                                                                                              break;
-        case IOCTL_STOP       :                                                                                                              break;
+        case IOCTL_CONFIG_GET :                                                       lInfo->mOut_MinSize_byte = sizeof(OpenNet_Config); break;
+        case IOCTL_CONFIG_SET : lInfo->mIn_MinSize_byte = sizeof(OpenNet_Config    ); lInfo->mOut_MinSize_byte = sizeof(OpenNet_Config); break;
+        case IOCTL_CONNECT    : lInfo->mIn_MinSize_byte = sizeof(IoCtl_Connect_In  );                                                    break;
+        case IOCTL_INFO_GET   :                                                       lInfo->mOut_MinSize_byte = sizeof(OpenNet_Info  ); break;
+        case IOCTL_PACKET_SEND:                                                                                                          break;
+        case IOCTL_START      : lInfo->mIn_MinSize_byte = sizeof(OpenNet_BufferInfo);                                                    break;
+        case IOCTL_STATE_GET  :                                                       lInfo->mOut_MinSize_byte = sizeof(OpenNet_State ); break;
+        case IOCTL_STATS_GET  : lInfo->mIn_MinSize_byte = sizeof(IoCtl_Stats_Get_In); lInfo->mOut_MinSize_byte = sizeof(OpenNet_Stats ); break;
+        case IOCTL_STATS_RESET:                                                                                                          break;
+        case IOCTL_STOP       :                                                                                                          break;
 
         default : return false;
         }
@@ -646,7 +645,7 @@ namespace OpenNetK
 
         unsigned int lCount = aInSize_byte / sizeof(OpenNet_BufferInfo);
 
-        int lResult;
+        IoCtl_Result lResult;
 
         mZone0->Lock();
 
@@ -735,7 +734,7 @@ namespace OpenNetK
     {
         ASSERT(NULL != mZone0);
 
-        int lResult;
+        IoCtl_Result lResult;
 
         mZone0->Lock();
 

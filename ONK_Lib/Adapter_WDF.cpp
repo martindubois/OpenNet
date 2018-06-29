@@ -27,6 +27,9 @@
 #include "../Common/Constants.h"
 #include "../Common/IoCtl.h"
 
+// ===== ONK_Lib ============================================================
+#include "IoCtl.h"
+
 namespace OpenNetK
 {
 
@@ -72,7 +75,7 @@ namespace OpenNetK
 
         NTSTATUS lStatus = STATUS_NOT_SUPPORTED;
 
-        Adapter::IoCtlInfo lInfo;
+        IoCtl_Info lInfo;
 
         if (mAdapter->IoCtl_GetInfo(aCode, &lInfo))
         {
@@ -252,18 +255,20 @@ namespace OpenNetK
 
     // Level   DISPATCH
     // Thread  Queue
-    void Adapter_WDF::ProcessIoCtlResult(int aResult)
+    void Adapter_WDF::ProcessIoCtlResult(int aIoCtlResult)
     {
         ASSERT(NULL != mHardware_WDF);
 
-        switch (aResult)
+        IoCtl_Result lIoCtlResult = static_cast<IoCtl_Result>(aIoCtlResult);
+
+        switch (lIoCtlResult)
         {
-        case Adapter::IOCTL_RESULT_INVALID_SYSTEM_ID:
-        case Adapter::IOCTL_RESULT_TOO_MANY_ADAPTER :
+        case IOCTL_RESULT_INVALID_SYSTEM_ID:
+        case IOCTL_RESULT_TOO_MANY_ADAPTER :
             Disconnect();
             break;
 
-        case Adapter::IOCTL_RESULT_PROCESSING_NEEDED:
+        case IOCTL_RESULT_PROCESSING_NEEDED:
             mHardware_WDF->TrigProcess2();
             break;
         }
@@ -357,25 +362,27 @@ namespace OpenNetK
         return lResult;
     }
 
-    NTSTATUS Adapter_WDF::ResultToStatus(WDFREQUEST aRequest, int aResult)
+    NTSTATUS Adapter_WDF::ResultToStatus(WDFREQUEST aRequest, int aIoCtlResult)
     {
         ASSERT(NULL != aRequest);
 
+        IoCtl_Result lIoCtlResult = static_cast<IoCtl_Result>(aIoCtlResult);
+
         NTSTATUS lResult;
 
-        switch (aResult)
+        switch (lIoCtlResult)
         {
-        case Adapter::IOCTL_RESULT_OK               :
-        case Adapter::IOCTL_RESULT_PROCESSING_NEEDED:
+        case IOCTL_RESULT_OK               :
+        case IOCTL_RESULT_PROCESSING_NEEDED:
             lResult = STATUS_SUCCESS;
             break;
 
-        case Adapter::IOCTL_RESULT_ERROR           : lResult = STATUS_UNSUCCESSFUL      ; break;
-        case Adapter::IOCTL_RESULT_TOO_MANY_ADAPTER: lResult = STATUS_TOO_MANY_NODES    ; break;
-        case Adapter::IOCTL_RESULT_TOO_MANY_BUFFER : lResult = STATUS_TOO_MANY_ADDRESSES; break;
+        case IOCTL_RESULT_ERROR           : lResult = STATUS_UNSUCCESSFUL      ; break;
+        case IOCTL_RESULT_TOO_MANY_ADAPTER: lResult = STATUS_TOO_MANY_NODES    ; break;
+        case IOCTL_RESULT_TOO_MANY_BUFFER : lResult = STATUS_TOO_MANY_ADDRESSES; break;
 
         default:
-            WdfRequestSetInformation(aRequest, aResult);
+            WdfRequestSetInformation(aRequest, lIoCtlResult);
             lResult = STATUS_SUCCESS;
         }
 

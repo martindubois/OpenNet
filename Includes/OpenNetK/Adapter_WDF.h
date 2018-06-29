@@ -92,13 +92,13 @@ namespace OpenNetK
         void     Event_Release  ();
         NTSTATUS Event_Translate(uint64_t * aEvent);
 
-        void ProcessIoCtlResult(int aResult);
+        void ProcessIoCtlResult(int aIoCtlResult);
 
         NTSTATUS SharedMemory_ProbeAndLock();
         void     SharedMemory_Release     ();
         NTSTATUS SharedMemory_Translate   (void ** aSharedMemory);
 
-        NTSTATUS ResultToStatus(WDFREQUEST aRequest, int aResult);
+        NTSTATUS ResultToStatus(WDFREQUEST aRequest, int aIoCtlResult);
 
         Adapter      * mAdapter         ;
         WDFDEVICE      mDevice          ;

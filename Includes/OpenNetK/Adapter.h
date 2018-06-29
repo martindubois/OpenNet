@@ -53,20 +53,6 @@ namespace OpenNetK
 
     // Internal
 
-        enum
-        {
-            IOCTL_RESULT_OK                = 0x00000000,
-
-            IOCTL_RESULT_PROCESSING_NEEDED = 0xffffffe0,
-
-            IOCTL_RESULT_ERROR             = 0xfffffffa,
-            IOCTL_RESULT_INVALID_SYSTEM_ID = 0xfffffffb,
-            IOCTL_RESULT_NO_BUFFER         = 0xfffffffc,
-            IOCTL_RESULT_NOT_SET           = 0xfffffffd,
-            IOCTL_RESULT_TOO_MANY_ADAPTER  = 0xfffffffe,
-            IOCTL_RESULT_TOO_MANY_BUFFER   = 0xffffffff,
-        };
-
         /// \cond en
         /// \brief  BufferInfo is an internal structure. Do not use it.
         /// \endcond
@@ -96,20 +82,7 @@ namespace OpenNetK
         }
         BufferInfo;
 
-        /// \cond en
-        /// \brief  IoCtlInfo is an internal structure. Do not use it.
-        /// \endcond
-        /// \cond fr
-        /// \brief  IoCtlInfo est une structure interne. Ne pas utiliser.
-        /// \endcond
-        typedef struct
-        {
-            unsigned int mIn_MinSize_byte ;
-            unsigned int mOut_MinSize_byte;
-        }
-        IoCtlInfo;
-
-        static bool IoCtl_GetInfo(unsigned int aCode, IoCtlInfo * aInfo);
+        static bool IoCtl_GetInfo(unsigned int aCode, void * aInfo);
 
         void Init(SpinLock * aZone0);
 

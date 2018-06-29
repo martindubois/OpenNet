@@ -42,4 +42,9 @@
       <Filter>_DocUser</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IoCtl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
