@@ -243,7 +243,7 @@ namespace OpenNetK
         /// \note   Thread = Queue
         virtual void Packet_Send(const void * aPacket, unsigned int aSize_byte) = 0;
 
-        virtual void Stats_Get(OpenNet_Stats * aStats);
+        virtual void Stats_Get(OpenNet_Stats * aStats, bool aReset);
 
         virtual void Stats_Reset();
 

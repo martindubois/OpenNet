@@ -45,7 +45,7 @@ static const KmsLib::ToolBase::CommandInfo ADAPTER_COMMANDS[] =
     { "Display"  , Adapter_Display  , "Display                       Display the adapter"  , NULL },
     { "GetConfig", Adapter_GetConfig, "GetConfig                     Display configuration", NULL },
     { "GetState" , Adapter_GetState , "GetState                      Display state"        , NULL },
-    { "GetStats" , Adapter_GetStats , "GetStats                      Display statistics"   , NULL },
+    { "GetStats" , Adapter_GetStats , "GetStats [false|true]         Display statistics"   , NULL },
 	{ "List"     , Adapter_List     , "List                          List the adapters"    , NULL },
 	{ "Select"   , Adapter_Select   , "Select {Index}                Select an adapter"    , NULL },
 
@@ -247,7 +247,6 @@ void Adapter_GetStats(KmsLib::ToolBase * aToolBase, const char * aArg)
     assert(NULL != aArg);
 
     printf("Adapter GetStats %s\n", aArg);
-    printf("Adapter GetStats\n");
 
     if (NULL == sAdapter)
     {
@@ -255,9 +254,13 @@ void Adapter_GetStats(KmsLib::ToolBase * aToolBase, const char * aArg)
         return;
     }
 
+    bool lReset = (0 == strcmp("true", aArg));
+
+    printf("Adapter GetStats %s\n", lReset ? "true" : "false");
+
     OpenNet::Adapter::Stats lStats;
 
-    OpenNet::Status lStatus = sAdapter->GetStats(&lStats);
+    OpenNet::Status lStatus = sAdapter->GetStats(&lStats, lReset);
     assert(OpenNet::STATUS_OK == lStatus);
 
     OpenNet::Adapter::Display(lStats, stdout);

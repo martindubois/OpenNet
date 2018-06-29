@@ -392,13 +392,13 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
     Packet_Send(lPacket_PA, aSize_byte, NULL);
 }
 
-void Pro1000::Stats_Get(OpenNet_Stats * aStats)
+void Pro1000::Stats_Get(OpenNet_Stats * aStats, bool aReset)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
     Stats_Update();
 
-    Hardware::Stats_Get(aStats);
+    Hardware::Stats_Get(aStats, aReset);
 }
 
 void Pro1000::Stats_Reset()

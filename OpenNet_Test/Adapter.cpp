@@ -82,7 +82,7 @@ KMS_TEST_BEGIN(Adapter_SetupA)
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lA0->GetConfig(NULL));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , lA0->GetConfig(&lC0));
 
-    KMS_TEST_COMPARE(true                , OpenNet::EthernetAddress_IsZero(lC0.mEthernetAddress[0]));
+    KMS_TEST_ASSERT (OpenNet::EthernetAddress_IsZero(lC0.mEthernetAddress[0]));
     KMS_TEST_COMPARE(OPEN_NET_MODE_NORMAL, lC0.mMode);
 
     KMS_TEST_ASSERT(OPEN_NET_PACKET_SIZE_MAX_byte >= lC0.mPacketSize_byte);
@@ -111,8 +111,8 @@ KMS_TEST_BEGIN(Adapter_SetupA)
 
     OpenNet::Adapter::Stats lSs0;
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lA0->GetStats(NULL ));
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , lA0->GetStats(&lSs0));
+    KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lA0->GetStats(NULL , false));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , lA0->GetStats(&lSs0, false));
 
     OpenNet::Adapter::Stats lSsE;
     OpenNet::Adapter::Stats lSsM;

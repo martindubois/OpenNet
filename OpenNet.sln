@@ -5,6 +5,7 @@ VisualStudioVersion = 15.0.27428.2043
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B19569F8-BE7B-4B34-9AB9-8104A177AC85}"
 	ProjectSection(SolutionItems) = preProject
+		Common\IoCtl.h = Common\IoCtl.h
 		Common\Version.h = Common\Version.h
 	EndProjectSection
 EndProject
@@ -93,6 +94,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{B467
 		Common\OpenNet\EthernetAddress.h = Common\OpenNet\EthernetAddress.h
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{2CF49A29-C06C-4972-B8BE-262E1FE62244}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -142,6 +145,7 @@ Global
 		{CC513D0F-734D-4F5A-816A-911BAA9F2061} = {71B9DF04-676B-40FF-8B9F-DC35FC9B8A3C}
 		{F6D48D20-B04B-47E1-AB5E-C84AF52E70C4} = {2347E8F1-0547-43FF-9456-724FC9DAC35F}
 		{B4675DF3-6BF9-483B-AB9F-11FAF0BFC219} = {B19569F8-BE7B-4B34-9AB9-8104A177AC85}
+		{2CF49A29-C06C-4972-B8BE-262E1FE62244} = {B19569F8-BE7B-4B34-9AB9-8104A177AC85}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3390872B-D3FA-4AAE-8BB2-0888DA87EF63}

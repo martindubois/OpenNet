@@ -76,7 +76,7 @@ Cleanup1:
 
     OpenNet::Adapter::Stats lStats;
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->GetStats(&lStats));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->GetStats(&lStats, true));
 
     OpenNet::Adapter::Stats lStatsE;
     OpenNet::Adapter::Stats lStatsM;

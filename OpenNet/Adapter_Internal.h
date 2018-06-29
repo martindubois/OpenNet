@@ -53,7 +53,7 @@ public:
     virtual const char    * GetName         () const;
     virtual unsigned int    GetPacketSize   () const;
     virtual OpenNet::Status GetState        (State        * aOut);
-    virtual OpenNet::Status GetStats        (Stats        * aOut);
+    virtual OpenNet::Status GetStats        (Stats        * aOut, bool aReset);
     virtual bool            IsConnected     ();
     virtual bool            IsConnected     (const OpenNet::System & aSystem);
     virtual OpenNet::Status ResetInputFilter();

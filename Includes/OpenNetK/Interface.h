@@ -61,7 +61,7 @@ static const GUID OPEN_NET_DRIVER_INTERFACE = { 0xC0BE33A0, 0xFFBA, 0x46BA,{ 0xB
 // Output  OpenNet_State
 #define OPEN_NET_IOCTL_STATE_GET       CTL_CODE( 0x8000, 0x850, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
-// Input   None
+// Input   IoCtl_Stats_Get_In
 // Output  OpenNet_AdapterStats
 #define OPEN_NET_IOCTL_STATS_GET       CTL_CODE( 0x8000, 0x860, METHOD_BUFFERED, FILE_ANY_ACCESS )
 

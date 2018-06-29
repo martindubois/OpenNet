@@ -144,9 +144,9 @@ namespace OpenNetK
         int IoCtl_Connect    (const OpenNet_Connect    * aIn );
         int IoCtl_Info_Get   (      OpenNet_Info       * aOut) const;
         int IoCtl_Packet_Send(const void               * aIn , unsigned int aInSize_byte );
-        int IoCtl_Start      (const OpenNet_BufferInfo * aIn, unsigned int aInSize_byte);
+        int IoCtl_Start      (const OpenNet_BufferInfo * aIn , unsigned int aInSize_byte );
         int IoCtl_State_Get  (      OpenNet_State      * aOut);
-        int IoCtl_Stats_Get  (      OpenNet_Stats      * aOut) const;
+        int IoCtl_Stats_Get  (const void               * aIn , OpenNet_Stats  * aOut) const;
         int IoCtl_Stats_Reset();
         int IoCtl_Stop       ();
 

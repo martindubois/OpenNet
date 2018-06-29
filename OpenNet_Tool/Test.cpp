@@ -310,7 +310,7 @@ void Loop_GetStats(OpenNet::Adapter ** aA, OpenNet::Adapter::Stats * aStats)
     {
         assert(NULL != aA[i]);
 
-        OpenNet::Status lStatus = aA[i]->GetStats(aStats + i);
+        OpenNet::Status lStatus = aA[i]->GetStats(aStats + i, true);
         if (OpenNet::STATUS_OK != lStatus)
         {
             throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,

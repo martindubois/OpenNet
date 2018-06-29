@@ -150,12 +150,18 @@ namespace OpenNetK
         mStats.mInterrupt_Process2++;
     }
 
-    void Hardware::Stats_Get(OpenNet_Stats * aStats)
+    void Hardware::Stats_Get(OpenNet_Stats * aStats, bool aReset)
     {
         ASSERT(NULL != aStats);
 
         memcpy(&aStats->mHardware        , &mStats        , sizeof(mStats        ));
         memcpy(&aStats->mHardware_NoReset, &mStats_NoReset, sizeof(mStats_NoReset));
+
+        if (aReset)
+        {
+            memset(&mStats        , 0, sizeof(mStats        ));
+            memset(&mStats_NoReset, 0, sizeof(mStats_NoReset));
+        }
 
         mStats.mStats_Get++;
     }

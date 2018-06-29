@@ -28,7 +28,7 @@
 // Tests
 /////////////////////////////////////////////////////////////////////////////
 
-KMS_TEST_BEGIN(BlackHole_SetupA)
+KMS_TEST_BEGIN(BlackHole_SetupB)
 {
     OpenNet::Filter_Forward lFF0;
 
@@ -65,7 +65,7 @@ Cleanup1:
 
     OpenNet::Adapter::Stats lStats;
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->GetStats(&lStats));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->GetStats(&lStats, true));
 
     OpenNet::Adapter::Stats lStatsE;
     OpenNet::Adapter::Stats lStatsM;
@@ -76,7 +76,6 @@ Cleanup1:
     lStatsE.mDll.mBuffer_Released  = BUFFER_QTY;
     lStatsE.mDll.mRun_Entry        = 1;
     lStatsE.mDll.mRun_Exit         = 1;
-    lStatsE.mDll.mRun_Loop_Wait    = BUFFER_QTY;
     lStatsE.mDll.mRun_Queue        = BUFFER_QTY;
     lStatsE.mDll.mStart            = 1;
     lStatsE.mDll.mStop_Request     = 1;

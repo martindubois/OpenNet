@@ -213,22 +213,20 @@ namespace OpenNet
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         virtual Status GetState(State * aOut) = 0;
 
-        // TODO  Includes.Adapter
-        //       Ajouter un argument a GetStats pour effectuer ou non le
-        //       reset en meme temps.
-
         /// \cond en
         /// \brief  This methode return the statistics of the adapter.
         /// \param  aOut [---;-W-] The methode return the statistics here.
+        /// \param  aReset         Reset statistics to 0
         /// \endcond
         /// \cond fr
         /// \brief Cette methode retourne les statistiques de l'adaptateur.
         /// \param aOut [---;-W-] La medhode retourne les statistiques ici.
+        /// \param aReset         Remettre les statistiques a zero
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_IOCTL_ERROR
         /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
-        virtual Status GetStats(Stats * aOut) = 0;
+        virtual Status GetStats(Stats * aOut, bool aReset) = 0;
 
         /// \cond en
         /// \brief  This methode indicate if the adapter is connected to a

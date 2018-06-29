@@ -39,7 +39,7 @@ public:
     virtual void Packet_Receive    (uint64_t aLogicalAddres, volatile OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
     virtual void Packet_Send       (uint64_t aData, unsigned int aSize_byte, volatile long * aCounter);
     virtual void Packet_Send       (const void * aPacket, unsigned int aSize_byte);
-    virtual void Stats_Get         (OpenNet_Stats * aStats);
+    virtual void Stats_Get         (OpenNet_Stats * aStats, bool aReset);
     virtual void Stats_Reset       ();
 
 private:

@@ -23,6 +23,9 @@
 #include <OpenNet/Processor.h>
 #include <OpenNet/Status.h>
 
+// ===== Common =============================================================
+#include "../Common/IoCtl.h"
+
 // ===== OpenNet ============================================================
 #include "EthernetAddress.h"
 #include "OCLW.h"
@@ -344,7 +347,7 @@ OpenNet::Status Adapter_Internal::GetState(State * aOut)
     return Control(OPEN_NET_IOCTL_STATE_GET, NULL, 0, aOut, sizeof(State));
 }
 
-OpenNet::Status Adapter_Internal::GetStats(Stats * aOut)
+OpenNet::Status Adapter_Internal::GetStats(Stats * aOut, bool aReset)
 {
     assert(NULL != mDebugLog);
     assert(NULL != mHandle  );
@@ -357,7 +360,18 @@ OpenNet::Status Adapter_Internal::GetStats(Stats * aOut)
 
     memcpy(&aOut->mDll, &mStats, sizeof(mStats));
 
-    return Control(OPEN_NET_IOCTL_STATS_GET, NULL, 0, &aOut->mDriver, sizeof(aOut->mDriver));
+    if (aReset)
+    {
+        memset(&mStats, 0, sizeof(mStats));
+    }
+
+    IoCtl_Stats_Get_In lIn;
+
+    memset(&lIn, 0, sizeof(lIn));
+
+    lIn.mFlags.mReset = aReset;
+
+    return Control(OPEN_NET_IOCTL_STATS_GET, &lIn, sizeof(lIn), &aOut->mDriver, sizeof(aOut->mDriver));
 }
 
 bool Adapter_Internal::IsConnected()

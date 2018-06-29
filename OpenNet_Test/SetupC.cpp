@@ -123,7 +123,7 @@ int SetupC::Stats_Get()
 {
     for (unsigned int i = 0; i < 2; i++)
     {
-        if (OpenNet::STATUS_OK != mAdapters[i]->GetStats(mStats + i)) { return __LINE__; }
+        if (OpenNet::STATUS_OK != mAdapters[i]->GetStats(mStats + i, true)) { return __LINE__; }
     }
 
     return 0;
