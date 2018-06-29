@@ -23,6 +23,14 @@
 // ===== OpenNet_Tool =======================================================
 #include "Test.h"
 
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+static const unsigned char PACKET[OPEN_NET_PACKET_SIZE_MAX_byte] =
+{
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x88, 0x88
+};
+
 // Static functions declaration
 /////////////////////////////////////////////////////////////////////////////
 
@@ -322,21 +330,15 @@ void Loop_SendPackets(OpenNet::Adapter ** aA, unsigned int aPacketSize_byte, uns
 
     printf("Sending packets...\n");
 
-    unsigned char * lPacket = new unsigned char[aPacketSize_byte];
-    assert(NULL != lPacket);
-
-    memset(lPacket, 0xff, aPacketSize_byte);
-
     for (unsigned int i = 0; i < aPacketQty; i++)
     {
         for (unsigned int j = 0; j < 2; j++)
         {
             assert(NULL != aA[j]);
 
-            OpenNet::Status lStatus = aA[j]->Packet_Send(lPacket, aPacketSize_byte);
+            OpenNet::Status lStatus = aA[j]->Packet_Send(PACKET, aPacketSize_byte);
             if (OpenNet::STATUS_OK != lStatus)
             {
-                delete[] lPacket;
                 throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
                     "Adapter::Packet_Send( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
             }
