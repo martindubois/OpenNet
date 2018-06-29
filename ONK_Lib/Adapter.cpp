@@ -37,7 +37,7 @@
 // Static function declaration
 /////////////////////////////////////////////////////////////////////////////
 
-static void SkipDangerousBoundary(uint64_t aLogical, unsigned int * aOffset_byte, unsigned int aSize_byte, unsigned int * aOutOffset_byte);
+static void SkipDangerousBoundary(uint64_t aLogical, unsigned int * aOffset_byte, unsigned int aSize_byte, volatile unsigned int * aOutOffset_byte);
 
 namespace OpenNetK
 {
@@ -122,10 +122,10 @@ namespace OpenNetK
         ASSERT(OPEN_NET_ADAPTER_NO_QTY >  mAdapterNo);
         ASSERT(NULL                    != mHardware );
 
-        uint32_t  lAdapterBit = 1 << mAdapterNo;
-        uint8_t * lBase       = reinterpret_cast<uint8_t *>(aBuffer->mHeader);
+                 uint32_t  lAdapterBit = 1 << mAdapterNo;
+        volatile uint8_t * lBase       = reinterpret_cast<volatile uint8_t *>(aBuffer->mHeader);
 
-        OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<OpenNet_PacketInfo *>(lBase + aBuffer->mHeader->mPacketInfoOffset_byte);
+        volatile OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<volatile OpenNet_PacketInfo *>(lBase + aBuffer->mHeader->mPacketInfoOffset_byte);
 
         for (unsigned int i = 0; i < aBuffer->mHeader->mPacketQty; i++)
         {
@@ -272,7 +272,7 @@ namespace OpenNetK
     //
     // Levels   SoftInt or Thread
     // Threads  Queue
-    void Adapter::Buffer_InitHeader_Zone0(OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo)
+    void Adapter::Buffer_InitHeader_Zone0(volatile OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo)
     {
         ASSERT(NULL !=   aHeader               );
         ASSERT(NULL != (&aBufferInfo)          );
@@ -280,16 +280,16 @@ namespace OpenNetK
 
         ASSERT(NULL != mHardware);
 
-        OpenNet_PacketInfo * lPacketInfo      = reinterpret_cast<OpenNet_PacketInfo *>(aHeader + 1);
-        unsigned int         lPacketQty       = aBufferInfo.mPacketQty;
-        unsigned int         lPacketSize_byte = mHardware->GetPacketSize();
+        volatile OpenNet_PacketInfo * lPacketInfo      = reinterpret_cast<volatile OpenNet_PacketInfo *>(aHeader + 1);
+        unsigned int                  lPacketQty       = aBufferInfo.mPacketQty;
+        unsigned int                  lPacketSize_byte = mHardware->GetPacketSize();
 
         ASSERT(OPEN_NET_PACKET_SIZE_MAX_byte >= lPacketSize_byte);
         ASSERT(OPEN_NET_PACKET_SIZE_MIN_byte <= lPacketSize_byte);
 
         unsigned int lPacketOffset_byte = sizeof(OpenNet_BufferHeader) + (sizeof(OpenNet_PacketInfo) * lPacketQty);
 
-        memset(aHeader, 0, lPacketOffset_byte);
+        memset((OpenNet_BufferHeader *)(aHeader), 0, lPacketOffset_byte); // volatile_cast
 
         aHeader->mBufferState           = OPEN_NET_BUFFER_STATE_TX_RUNNING;
         aHeader->mPacketInfoOffset_byte = sizeof(OpenNet_BufferHeader);
@@ -356,9 +356,9 @@ namespace OpenNetK
         ASSERT(NULL != mHardware);
         ASSERT(NULL != mZone0   );
 
-        uint8_t * lBase = reinterpret_cast<uint8_t *>(aBuffer->mHeader);
+        volatile uint8_t * lBase = reinterpret_cast<volatile uint8_t *>(aBuffer->mHeader);
 
-        OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<OpenNet_PacketInfo *>(lBase + aBuffer->mHeader->mPacketInfoOffset_byte);
+        volatile OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<volatile OpenNet_PacketInfo *>(lBase + aBuffer->mHeader->mPacketInfoOffset_byte);
 
         mZone0->Unlock();
 
@@ -428,6 +428,8 @@ namespace OpenNetK
     // Level   SoftInt
     // Thread  SoftInt
 
+    // TODO  ONK_Lib.Adapetr
+    //       Verifier si les Interlocked sont necessaire
     void Adapter::Buffer_PxCompleted_Zone0(BufferInfo * aBuffer)
     {
         ASSERT(NULL != aBuffer         );
@@ -435,7 +437,7 @@ namespace OpenNetK
 
         if (NULL == mAdapters)
         {
-            if (OPEN_NET_BUFFER_STATE_PX_COMPLETED == InterlockedCompareExchange(reinterpret_cast<LONG *>(&aBuffer->mHeader->mBufferState), OPEN_NET_BUFFER_STATE_STOPPED, OPEN_NET_BUFFER_STATE_PX_COMPLETED))
+            if (OPEN_NET_BUFFER_STATE_PX_COMPLETED == InterlockedCompareExchange(reinterpret_cast<volatile LONG *>(&aBuffer->mHeader->mBufferState), OPEN_NET_BUFFER_STATE_STOPPED, OPEN_NET_BUFFER_STATE_PX_COMPLETED))
             {
                 DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_COMPLETED ==> STOPPED" DEBUG_EOL, mAdapterNo, aBuffer);
 
@@ -447,7 +449,7 @@ namespace OpenNetK
             // Here, we use a temporary state because Buffer_Send_Zone0
             // release the gate to avoid deadlock with the other adapter's
             // gates.
-            if (OPEN_NET_BUFFER_STATE_PX_COMPLETED == InterlockedCompareExchange(reinterpret_cast<LONG *>(&aBuffer->mHeader->mBufferState), OPEN_NET_BUFFER_STATE_TX_PROGRAMMING, OPEN_NET_BUFFER_STATE_PX_COMPLETED))
+            if (OPEN_NET_BUFFER_STATE_PX_COMPLETED == InterlockedCompareExchange(reinterpret_cast<volatile LONG *>(&aBuffer->mHeader->mBufferState), OPEN_NET_BUFFER_STATE_TX_PROGRAMMING, OPEN_NET_BUFFER_STATE_PX_COMPLETED))
             {
                 DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_COMPLETED ==> TX_PROGRAMMING" DEBUG_EOL, mAdapterNo, aBuffer);
 
@@ -750,7 +752,7 @@ namespace OpenNetK
 //
 // Levels  SoftInt or Thread
 // Thread  Queue
-void SkipDangerousBoundary(uint64_t aLogical, unsigned int * aOffset_byte, unsigned int aSize_byte, unsigned int * aOutOffset_byte)
+void SkipDangerousBoundary(uint64_t aLogical, unsigned int * aOffset_byte, unsigned int aSize_byte, volatile unsigned int * aOutOffset_byte)
 {
     ASSERT(NULL                                  != aOffset_byte   );
     ASSERT(                                    0 <  aSize_byte     );

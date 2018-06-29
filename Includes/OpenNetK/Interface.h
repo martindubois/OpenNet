@@ -246,12 +246,12 @@ OpenNet_State;
 /// \endcond
 typedef struct
 {
-    uint32_t mBuffer_InitHeader ; //  0
+    uint32_t mBuffers_Process   ; //  0
+    uint32_t mBuffer_InitHeader ;
     uint32_t mBuffer_Queue      ;
     uint32_t mBuffer_Receive    ;
     uint32_t mBuffer_Send       ;
-    uint32_t mBuffer_SendPackets;
-    uint32_t mBuffers_Process   ; //  5
+    uint32_t mBuffer_SendPackets; //  5
     uint32_t mIoCtl             ;
     uint32_t mIoCtl_Config_Get  ;
     uint32_t mIoCtl_Config_Set  ;
@@ -309,7 +309,20 @@ typedef struct
     uint32_t mStats_Get         ; // 10
     uint32_t mTx_Packet         ;
 
-    uint32_t mReserved0[116];
+    uint32_t mReserved0[104];
+
+    uint32_t mRx_BmcManagementDropper_packet     ;
+    uint32_t mRx_CircuitBreakerDropped_packet    ;
+    uint32_t mRx_LengthErrors_packet             ;
+    uint32_t mRx_ManagementDropped_packet        ;
+    uint32_t mRx_Missed_packet                   ; // 120
+    uint32_t mRx_NoBuffer_packet                 ;
+    uint32_t mRx_Oversize_packet                 ;
+    uint32_t mRx_Undersize_packet                ;
+    uint32_t mTx_DeferEvents                     ;
+    uint32_t mTx_Discarded_packet                ; // 125
+    uint32_t mTx_NoCrs_packet                    ;
+    uint32_t mTx_HostCircuitBreakerDropped_packet; // 127
 }
 OpenNet_Stats_Hardware;
 

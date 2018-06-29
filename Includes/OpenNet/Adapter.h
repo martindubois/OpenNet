@@ -51,15 +51,15 @@ namespace OpenNet
         {
             unsigned int mBuffer_Allocated             ; //  0
             unsigned int mBuffer_Released              ;
+            unsigned int mLoopBackPacket               ;
             unsigned int mPacket_Send                  ;
             unsigned int mRun_Entry                    ;
-            unsigned int mRun_Exception                ;
-            unsigned int mRun_Exit                     ; //  5
+            unsigned int mRun_Exception                ; //  5
+            unsigned int mRun_Exit                     ;
             unsigned int mRun_Iteration_Queue          ;
             unsigned int mRun_Iteration_Wait           ;
             unsigned int mRun_Loop_Exception           ;
-            unsigned int mRun_Loop_UnexpectedException ;
-            unsigned int mRun_Loop_Wait                ; // 10
+            unsigned int mRun_Loop_UnexpectedException ; // 10
             unsigned int mRun_Queue                    ;
             unsigned int mRun_UnexpectedException      ;
             unsigned int mStart                        ;
@@ -212,6 +212,10 @@ namespace OpenNet
         /// \retval STATUS_IOCTL_ERROR
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         virtual Status GetState(State * aOut) = 0;
+
+        // TODO  Includes.Adapter
+        //       Ajouter un argument a GetStats pour effectuer ou non le
+        //       reset en meme temps.
 
         /// \cond en
         /// \brief  This methode return the statistics of the adapter.

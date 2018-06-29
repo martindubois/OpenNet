@@ -234,6 +234,7 @@ void Display(const OpenNet::Adapter::Stats_Dll & aIn, FILE * aOut)
     fprintf(aOut, "  Dll Statistics :\n");
     fprintf(aOut, "    Buffer - Allocated                = %u\n", aIn.mBuffer_Allocated   );
     DisplayStats( "           - Released                 = %u\n", aIn.mBuffer_Released             , aOut);
+    DisplayStats( "    Loop Back Packet                  = %u\n", aIn.mLoopBackPacket              , aOut);
     DisplayStats( "    Packet - Send                     = %u\n", aIn.mPacket_Send                 , aOut);
     fprintf(aOut, "    Run - Entry                       = %u\n", aIn.mRun_Entry          );
     DisplayStats( "        - Exception                   = %u\n", aIn.mRun_Exception               , aOut);
@@ -242,7 +243,6 @@ void Display(const OpenNet::Adapter::Stats_Dll & aIn, FILE * aOut)
     DisplayStats( "                    - Wait            = %u\n", aIn.mRun_Iteration_Wait          , aOut);
     fprintf(aOut, "        - Loop - Exception            = %u\n", aIn.mRun_Loop_Exception );
     DisplayStats( "               - Unexpected Exception = %u\n", aIn.mRun_Loop_UnexpectedException, aOut);
-    DisplayStats( "               - Wait                 = %u\n", aIn.mRun_Loop_Wait               , aOut);
     DisplayStats( "        - Queue                       = %u\n", aIn.mRun_Queue                   , aOut);
     DisplayStats( "        - Unexpected Exception        = %u\n", aIn.mRun_UnexpectedException     , aOut);
     DisplayStats( "    Start                             = %u\n", aIn.mStart                       , aOut);
@@ -269,12 +269,12 @@ void Display(const OpenNet_Stats_Adapter & aIn, FILE * aOut)
     assert(NULL !=   aOut);
 
     fprintf(aOut, "    Adapter Statistics :\n");
+    DisplayStats( "      Buffers - Process    = %u\n", aIn.mBuffers_Process, aOut);
     fprintf(aOut, "      Buffer - InitHeader  = %u\n", aIn.mBuffer_InitHeader);
     DisplayStats( "             - Queue       = %u\n", aIn.mBuffer_Queue      , aOut);
     DisplayStats( "             - Receive     = %u\n", aIn.mBuffer_Receive    , aOut);
     DisplayStats( "             - Send        = %u\n", aIn.mBuffer_Send       , aOut);
     DisplayStats( "             - SendPackets = %u\n", aIn.mBuffer_SendPackets, aOut);
-    DisplayStats( "      Buffers - Process    = %u\n", aIn.mBuffers_Process   , aOut);
     fprintf(aOut, "      IoCtl                = %u\n", aIn.mIoCtl            );
     fprintf(aOut, "        - Config - Get     = %u\n", aIn.mIoCtl_Config_Get );
     DisplayStats( "                 - Set     = %u\n", aIn.mIoCtl_Config_Set  , aOut);
@@ -317,6 +317,19 @@ void Display(const OpenNet_Stats_Hardware & aIn, FILE * aOut)
     DisplayStats( "      SetConfig            = %u\n", aIn.mSetConfig         , aOut);
     DisplayStats( "      Stats - Get          = %u\n", aIn.mStats_Get         , aOut);
     DisplayStats( "      Tx - Packet          = %u\n", aIn.mTx_Packet         , aOut);
+
+    fprintf(aOut, "    Rx - BMC Management - Dropped      = %u packets\n", aIn.mRx_BmcManagementDropper_packet);
+    DisplayStats( "       - Circuit Breaker - Dropped     = %u packets\n", aIn.mRx_CircuitBreakerDropped_packet    , aOut);
+    DisplayStats( "       - Length Errors                 = %u packets\n", aIn.mRx_LengthErrors_packet             , aOut);
+    DisplayStats( "       - Management - Dropper          = %u packets\n", aIn.mRx_ManagementDropped_packet        , aOut);
+    DisplayStats( "       - Missed                        = %u packets\n", aIn.mRx_Missed_packet                   , aOut);
+    DisplayStats( "       - No Buffer                     = %u packets\n", aIn.mRx_NoBuffer_packet                 , aOut);
+    DisplayStats( "       - Oversize                      = %u packets\n", aIn.mRx_Oversize_packet                 , aOut);
+    DisplayStats( "       - Undersize                     = %u packets\n", aIn.mRx_Undersize_packet                , aOut);
+    fprintf(aOut, "    Tx - Defer Events                  = %u\n"        , aIn.mTx_DeferEvents                );
+    DisplayStats( "       - Discarded                     = %u packets\n", aIn.mTx_Discarded_packet                , aOut);
+    DisplayStats( "       - No CRS                        = %u packets\n", aIn.mTx_NoCrs_packet                    , aOut);
+    DisplayStats( "       - Host CircuitBreaker - Dropped = %u packets\n", aIn.mTx_HostCircuitBreakerDropped_packet, aOut);
 }
 
 void Display(const OpenNet_Stats_Hardware_NoReset & aIn, FILE * aOut)

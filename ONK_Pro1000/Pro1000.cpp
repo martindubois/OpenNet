@@ -133,6 +133,7 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, volatile void * aVirtual)
         for (i = 0; i < TX_DESCRIPTOR_QTY; i++)
         {
             mTx_Virtual[i].mFields.mEndOfPacket  = true;
+            mTx_Virtual[i].mFields.mInsertCRC    = true;
             mTx_Virtual[i].mFields.mReportStatus = true;
         }
 
@@ -197,8 +198,10 @@ bool Pro1000::D0_Entry()
 
         Reset_Zone0();
 
-        mBAR1->mDeviceControl.mFields.mInvertLossOfSignal = false;
-        mBAR1->mDeviceControl.mFields.mSetLinkUp          = true ;
+        mBAR1->mDeviceControl.mFields.mInvertLossOfSignal   = false;
+        mBAR1->mDeviceControl.mFields.mRx_FlowControlEnable = true ;
+        mBAR1->mDeviceControl.mFields.mSetLinkUp            = true ;
+        mBAR1->mDeviceControl.mFields.mTx_FlowControlEnable = true ;
 
         mBAR1->mGeneralPurposeInterruptEnable.mFields.mExtendedInterruptAutoMaskEnable = true;
 
@@ -296,7 +299,7 @@ void Pro1000::Interrupt_Process2()
     Hardware::Interrupt_Process2();
 }
 
-void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
+void Pro1000::Packet_Receive(uint64_t aData, volatile OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
 {
     // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , ,  )" DEBUG_EOL);
 
@@ -389,6 +392,24 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
     Packet_Send(lPacket_PA, aSize_byte, NULL);
 }
 
+void Pro1000::Stats_Get(OpenNet_Stats * aStats)
+{
+    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+
+    Stats_Update();
+
+    Hardware::Stats_Get(aStats);
+}
+
+void Pro1000::Stats_Reset()
+{
+    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+
+    Stats_Update();
+
+    Hardware::Stats_Reset();
+}
+
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
@@ -433,7 +454,7 @@ void Pro1000::Rx_Config_Zone0()
     mBAR1->mRx_Control.mFields.mBroadcastAcceptMode         = true ; // TODO Config
     mBAR1->mRx_Control.mFields.mLongPacketEnabled           = true ;
     mBAR1->mRx_Control.mFields.mMulticastPromiscuousEnabled = true ; // TODO Config
-    mBAR1->mRx_Control.mFields.mPassMacControlFrames        = true ; // TODO Config
+    mBAR1->mRx_Control.mFields.mPassMacControlFrames        = false; // TODO Config
     mBAR1->mRx_Control.mFields.mStoreBadPackets             = true ; // TODO Config
     mBAR1->mRx_Control.mFields.mUnicastPromiscuousEnabled   = true ; // TODO Config
 
@@ -472,7 +493,7 @@ void Pro1000::Rx_Process_Zone0()
         ASSERT(OPEN_NET_PACKET_STATE_RX_RUNNING == mRx_PacketInfo[mRx_Out]->mPacketState);
         ASSERT(OPEN_NET_PACKET_SIZE_MAX_byte    >= mRx_Virtual   [mRx_Out].mSize_byte   );
 
-        mRx_PacketInfo[mRx_Out]->mPacketSize_byte = mRx_Virtual[mRx_Out].mSize_byte   ;
+        mRx_PacketInfo[mRx_Out]->mPacketSize_byte = mRx_Virtual[mRx_Out].mSize_byte;
         mRx_PacketInfo[mRx_Out]->mPacketState     = OPEN_NET_PACKET_STATE_RX_COMPLETED;
 
         InterlockedDecrement(mRx_Counter[mRx_Out]);
@@ -481,6 +502,26 @@ void Pro1000::Rx_Process_Zone0()
 
         mStats.mRx_Packet++;
     }
+}
+
+void Pro1000::Stats_Update()
+{
+    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+
+    ASSERT(NULL != mBAR1);
+
+    mStats.mRx_BmcManagementDropper_packet      += mBAR1->mRx_BmcManagementDropper_packet     ;
+    mStats.mRx_CircuitBreakerDropped_packet     += mBAR1->mRx_CircuitBreakerDropped_packet    ;
+    mStats.mRx_LengthErrors_packet              += mBAR1->mRx_LengthErrors_packet             ;
+    mStats.mRx_ManagementDropped_packet         += mBAR1->mRx_ManagementDropped_packet        ;
+    mStats.mRx_Missed_packet                    += mBAR1->mRx_Missed_packet                   ;
+    mStats.mRx_NoBuffer_packet                  += mBAR1->mRx_NoBuffer_packet                 ;
+    mStats.mRx_Oversize_packet                  += mBAR1->mRx_Oversize_packet                 ;
+    mStats.mRx_Undersize_packet                 += mBAR1->mRx_Undersize_packet                ;
+    mStats.mTx_DeferEvents                      += mBAR1->mTx_DeferEvents                     ;
+    mStats.mTx_Discarded_packet                 += mBAR1->mTx_Discarded_packet                ;
+    mStats.mTx_NoCrs_packet                     += mBAR1->mTx_NoCrs_packet                    ;
+    mStats.mTx_HostCircuitBreakerDropped_packet += mBAR1->mTx_HostCircuitBreakerDropped_packet;
 }
 
 // Level   Thread

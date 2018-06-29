@@ -60,10 +60,9 @@ static const char * STATE_NAMES[STATE_QTY] =
     "STOPPING"       ,
 };
 
-static const uint8_t LOOP_BACK_PACKET[] =
+static const uint8_t LOOP_BACK_PACKET[64] =
 {
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x01, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x88, 0x88
 };
 
 // Static functions declaration
@@ -193,6 +192,7 @@ void Adapter_Internal::SendLoopBackPackets()
     for (unsigned i = 0; i < 64; i++)
     {
         mHandle->Control(OPEN_NET_IOCTL_PACKET_SEND, LOOP_BACK_PACKET, sizeof(LOOP_BACK_PACKET), NULL, 0);
+        mStats.mLoopBackPacket++;
     }
 }
 
@@ -453,6 +453,8 @@ OpenNet::Status Adapter_Internal::ResetProcessor()
 
 OpenNet::Status Adapter_Internal::ResetStats()
 {
+    memset(&mStats, 0, sizeof(mStats));
+
     return Control(OPEN_NET_IOCTL_STATS_RESET, NULL, 0, NULL, 0);
 }
 

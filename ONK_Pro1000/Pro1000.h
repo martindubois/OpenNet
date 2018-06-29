@@ -36,9 +36,11 @@ public:
     virtual void Interrupt_Enable  ();
     virtual bool Interrupt_Process (unsigned int aMessageId, bool * aNeedMoreProcessing);
     virtual void Interrupt_Process2();
-    virtual void Packet_Receive    (uint64_t aLogicalAddres, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
+    virtual void Packet_Receive    (uint64_t aLogicalAddres, volatile OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
     virtual void Packet_Send       (uint64_t aData, unsigned int aSize_byte, volatile long * aCounter);
     virtual void Packet_Send       (const void * aPacket, unsigned int aSize_byte);
+    virtual void Stats_Get         (OpenNet_Stats * aStats);
+    virtual void Stats_Reset       ();
 
 private:
 
@@ -56,6 +58,8 @@ private:
     void Rx_Config_Zone0 ();
     void Rx_Process_Zone0();
 
+    void Stats_Update();
+
     void Tx_Config_Zone0 ();
     void Tx_Process_Zone0();
 
@@ -67,7 +71,7 @@ private:
     unsigned int                     mRx_In     ;
     uint64_t                         mRx_Logical;
     unsigned int                     mRx_Out    ;
-    OpenNet_PacketInfo             * mRx_PacketInfo[RX_DESCRIPTOR_QTY];
+    volatile OpenNet_PacketInfo    * mRx_PacketInfo[RX_DESCRIPTOR_QTY];
     volatile Pro1000_Rx_Descriptor * mRx_Virtual;
 
     volatile long                  * mTx_Counter[TX_DESCRIPTOR_QTY];

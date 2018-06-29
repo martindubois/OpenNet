@@ -77,8 +77,8 @@ namespace OpenNetK
         {
             OpenNet_BufferInfo mBufferInfo;
 
-            OpenNet_BufferHeader * mHeader;
-            volatile uint32_t    * mMarker;
+            volatile OpenNet_BufferHeader * mHeader;
+            volatile uint32_t             * mMarker;
 
             struct
             {
@@ -123,7 +123,7 @@ namespace OpenNetK
 
     private:
 
-        void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo);
+        void Buffer_InitHeader_Zone0 (volatile OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo);
         void Buffer_Queue_Zone0      (const OpenNet_BufferInfo & aBufferInfo);
         void Buffer_Receive_Zone0    (BufferInfo * aBuffer);
         void Buffer_Send_Zone0       (BufferInfo * aBuffer);

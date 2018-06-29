@@ -743,98 +743,98 @@ typedef struct
 
     uint32_t mReserved_03594[(0x04000 - 0x03594) / 4];
 
-    uint32_t mCrcErrorCount          ; // 0x04000
-    uint32_t mAlignmentErrorCount    ; // 0x04004
-    uint32_t mSymbolErrorCount       ; // 0x04008
-    uint32_t mRx_ErrorCount          ; // 0x0400c
-    uint32_t mMissedPacketsCount     ; // 0x04010
-    uint32_t mSingleCollisionCount   ; // 0x04014
-    uint32_t mExcessiveCollisionCount; // 0x04018
-    uint32_t mMultipleCollisionCount ; // 0x0401c
-    uint32_t mLateCollisionsCount    ; // 0x04020
+    uint32_t mRx_CrcError_packet          ; // 0x04000 - Page 581
+    uint32_t mRx_AlignmentError_packet    ; // 0x04004 - Page 582
+    uint32_t mRx_SymbolError_packet       ; // 0x04008
+    uint32_t mRx_Error_packet             ; // 0x0400c
+    uint32_t mRx_Missed_packet            ; // 0x04010
+    uint32_t mTx_SingleCollision_packet   ; // 0x04014
+    uint32_t mTx_ExcessiveCollision_packet; // 0x04018 - Page 583
+    uint32_t mTx_MultipleCollision_packet ; // 0x0401c
+    uint32_t mTx_LateCollision_packet     ; // 0x04020
 
     uint32_t mReserved_04024[(0x04028 - 0x04024) / 4];
 
-    uint32_t mCollisionCount; // 0x04028
+    uint32_t mTx_Collisions; // 0x04028
 
     uint32_t mReserved_0402c[(0x04030 - 0x0402c) / 4];
 
-    uint32_t mDeferCount; // 0x04030
-    uint32_t mTx_NoCrs  ; // 0x04034
+    uint32_t mTx_DeferEvents ; // 0x04030
+    uint32_t mTx_NoCrs_packet; // 0x04034 - Page 584
 
     uint32_t mReserved_04038[(0x0403c - 0x04038) / 4];
 
-    uint32_t mTx_DiscardedPacket            ; // 0x0403c
-    uint32_t mRx_LengthError                ; // 0x04040
-    uint32_t mRx_CircuitBreakerDroppedPacket; // 0x04044
-    uint32_t mRx_XOn                        ; // 0x04048
-    uint32_t mTx_XOn                        ; // 0x0404c
-    uint32_t mRx_XOff                       ; // 0x04050
-    uint32_t mTx_XOff                       ; // 0x04054
-    uint32_t mRx_FlowControlUnsupported     ; // 0x04058
-    uint32_t mRx_Packets_64_bytes           ; // 0x0405c
-    uint32_t mRx_Packets_64_127_byte        ; // 0x04060
-    uint32_t mRx_Packets_128_255_byte       ; // 0x04064
-    uint32_t mRx_Packets_256_511_byte       ; // 0x04068
-    uint32_t mRx_Packets_512_1023_byte      ; // 0x0406c
-    uint32_t mRx_Packets_1024_Max_byte      ; // 0x04070
-    uint32_t mRx_GoodPacket                 ; // 0x04074
-    uint32_t mRx_BroadcastPacket            ; // 0x04078
-    uint32_t mRx_MulticastPacket            ; // 0x0407c
-    uint32_t mTx_GoodPacket                 ; // 0x04080
+    uint32_t mTx_Discarded_packet             ; // 0x0403c
+    uint32_t mRx_LengthError_packet           ; // 0x04040
+    uint32_t mRx_CircuitBreakerDropped_packet ; // 0x04044 - Page 585
+    uint32_t mRx_XOn_packet                   ; // 0x04048
+    uint32_t mTx_XOn_packet                   ; // 0x0404c
+    uint32_t mRx_XOff_packet                  ; // 0x04050
+    uint32_t mTx_XOff_packet                  ; // 0x04054
+    uint32_t mRx_FlowControlUnsupported_packet; // 0x04058 - Page 586
+    uint32_t mRx_64_Bytes_packet              ; // 0x0405c
+    uint32_t mRx_64_127_Bytes_packet          ; // 0x04060
+    uint32_t mRx_128_255_Bytes_packet         ; // 0x04064
+    uint32_t mRx_256_511_Bytes_packet         ; // 0x04068 - Page 587
+    uint32_t mRx_512_1023_Bytes_packet        ; // 0x0406c
+    uint32_t mRx_1024_Max_Bytes_packet        ; // 0x04070 - Page 588
+    uint32_t mRx_Good_packet                  ; // 0x04074
+    uint32_t mRx_Broadcast_packet             ; // 0x04078
+    uint32_t mRx_Multicast_packet             ; // 0x0407c
+    uint32_t mTx_Good_packet                  ; // 0x04080
 
     uint32_t mReserved_04084[(0x04088 - 0x04084) / 4];
 
-    uint32_t mRx_GoodOctetLow ; // 0x04088
-    uint32_t mRx_GoodOctetHigh; // 0x0408c
-    uint32_t mTx_GoodOctetLow ; // 0x04090
-    uint32_t mTx_GoodOctetHigh; // 0x04094
+    uint32_t mRx_GoodLow_byte ; // 0x04088 - Page 589
+    uint32_t mRx_GoodHigh_byte; // 0x0408c
+    uint32_t mTx_GoodLow_byte ; // 0x04090
+    uint32_t mTx_GoodHigh_byte; // 0x04094
 
     uint32_t mReserved_04098[(0x040a0 - 0x04098) / 4];
 
-    uint32_t mRx_NoBuffer                         ; // 0x040a0
-    uint32_t mRx_Undersize                        ; // 0x040a4
-    uint32_t mRx_Fragment                         ; // 0x040a8
-    uint32_t mRx_Oversize                         ; // 0x040ac
-    uint32_t mRx_Jabber                           ; // 0x040b0
-    uint32_t mRx_ManagementPacket                 ; // 0x040b4
-    uint32_t mManagementPacketDropped             ; // 0x040b8
-    uint32_t mTx_ManagementPacket                 ; // 0x040bc
-    uint32_t mRx_TotalOctetLow                    ; // 0x040c0
-    uint32_t mRx_TotalOctetHigh                   ; // 0x040c4
-    uint32_t mTx_TotalOctetLow                    ; // 0x040c8
-    uint32_t mTx_TotalOctetHigh                   ; // 0x040cc
-    uint32_t mRx_TotalPacket                      ; // 0x040d0
-    uint32_t mTx_TotalPacket                      ; // 0x040d4
-    uint32_t mTx_Packet_64_byte                   ; // 0x040d8
-    uint32_t mTx_Packet_65_127_byte               ; // 0x040dc
-    uint32_t mTx_Packet_128_255_byte              ; // 0x040e0
-    uint32_t mTx_Packet_256_511_byte              ; // 0x040e4
-    uint32_t mTx_Packet_512_1023_byte             ; // 0x040e8
-    uint32_t mTx_Packet_1024_Max_byte             ; // 0x040ec
-    uint32_t mTx_MulticastPacket                  ; // 0x040f0
-    uint32_t mTx_BroadcastPacket                  ; // 0x040f4
-    uint32_t mTx_TcpSegmentationContext           ; // 0x040f8
-    uint32_t mRx_CircuitBreakerManageabilityPacket; // 0x040fc
-    uint32_t mInterruptionAssertion               ; // 0x04100
-    uint32_t mRx_PacketToHost                     ; // 0x04104
+    uint32_t mRx_NoBuffer_packet                   ; // 0x040a0 - Page 590
+    uint32_t mRx_Undersize_packet                  ; // 0x040a4
+    uint32_t mRx_Fragment_packet                   ; // 0x040a8
+    uint32_t mRx_Oversize_packet                   ; // 0x040ac
+    uint32_t mRx_Jabber_packet                     ; // 0x040b0 - Page 591
+    uint32_t mRx_Management_packet                 ; // 0x040b4
+    uint32_t mRx_ManagementDropped_packet          ; // 0x040b8 - Page 592
+    uint32_t mTx_Management_packet                 ; // 0x040bc
+    uint32_t mRx_TotatLow_byte                     ; // 0x040c0
+    uint32_t mRx_TotalHigh_byte                    ; // 0x040c4 - Page 593
+    uint32_t mTx_TotalLow_byte                     ; // 0x040c8
+    uint32_t mTx_TotalHigh_byte                    ; // 0x040cc
+    uint32_t mRx_Total_packet                      ; // 0x040d0
+    uint32_t mTx_Total_packet                      ; // 0x040d4 - Page 594
+    uint32_t mTx_64_Bytes_packet                   ; // 0x040d8
+    uint32_t mTx_65_127_Bytes_packet               ; // 0x040dc
+    uint32_t mTx_128_255_Bytes_packet              ; // 0x040e0 - Page 595
+    uint32_t mTx_256_511_Bytes_packet              ; // 0x040e4
+    uint32_t mTx_512_1023_Bytes_packet             ; // 0x040e8
+    uint32_t mTx_1024_Max_Bytes_packet             ; // 0x040ec
+    uint32_t mTx_Multicast_packet                  ; // 0x040f0 - Page 596
+    uint32_t mTx_Broadcast_packet                  ; // 0x040f4
+    uint32_t mTx_TcpSegmentationContexts           ; // 0x040f8
+    uint32_t mRx_CircuitBreakerManageability_packet; // 0x040fc
+    uint32_t mInterruptionAssertions               ; // 0x04100 - Page  597
+    uint32_t mRx_ToHost_packet                     ; // 0x04104
 
     uint32_t mReserved_04108[(0x04118 - 0x04108) / 4];
 
-    uint32_t mTx_HostGoodPacket; // 0x04118
+    uint32_t mTx_HostGood_packet; // 0x04118 - Page 599
 
     uint32_t mReserved_0411c[(0x04120 - 0x0411c) / 4];
 
-    uint32_t mRx_DescriptorMinimumThreshold     ; // 0x04120
-    uint32_t mTx_HostCircuitBreakerDroppedPacket; // 0x04124
-    uint32_t mRx_HostGoodOctetLow               ; // 0x04128
-    uint32_t mRx_HostGoodOctetHigh              ; // 0x0412c
-    uint32_t mTx_HostGoodOctetLow               ; // 0x04130
-    uint32_t mTx_HostGoodOctetHigh              ; // 0x04134
-    uint32_t mLengthError                       ; // 0x04138
-    uint32_t mRx_BmcManagementPacket            ; // 0x0413c
-    uint32_t mRx_BmcManagementPacketDropper     ; // 0x04140
-    uint32_t mTx_DmcManagementPacket            ; // 0x04144
+    uint32_t mRx_DescriptorMinimumThreshold      ; // 0x04120
+    uint32_t mTx_HostCircuitBreakerDropped_packet; // 0x04124 - Page 600
+    uint32_t mRx_HostGoodLow_byte                ; // 0x04128
+    uint32_t mRx_HostGoodHigh_byte               ; // 0x0412c
+    uint32_t mTx_HostGoodLow_byte                ; // 0x04130
+    uint32_t mTx_HostGoodHigh_byte               ; // 0x04134 - Page 601
+    uint32_t mRx_LengthErrors_packet             ; // 0x04138
+    uint32_t mRx_BmcManagement_packet            ; // 0x0413c - Page 591
+    uint32_t mRx_BmcManagementDropper_packet     ; // 0x04140 - Page 592
+    uint32_t mTx_DmcManagementPacket             ; // 0x04144 -
 
     uint32_t mReserved_04148[(0x05000 - 0x04148) / 4];
 

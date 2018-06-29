@@ -214,7 +214,7 @@ namespace OpenNetK
         /// \param  aCounter    [-K-;RW-] Le compteur d'operation
         /// \retval false  Erreur
         /// \endcond
-        virtual void Packet_Receive(uint64_t aLogicalAddress, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter) = 0;
+        virtual void Packet_Receive(uint64_t aLogicalAddress, volatile OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter) = 0;
 
         /// \cond en
         /// \brief  Add the packet to the send queue.
