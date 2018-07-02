@@ -18,7 +18,7 @@
 #include <OpenNet/System.h>
 
 // ===== OpenNet_Test =======================================================
-#include "Utilities.h"
+#include "SetupA.h"
 
 // Configuration
 /////////////////////////////////////////////////////////////////////////////
@@ -30,43 +30,27 @@
 
 KMS_TEST_BEGIN(BlackHole_SetupB)
 {
-    OpenNet::Filter_Forward lFF0;
+    SetupA lSetup(BUFFER_QTY);
 
-    OpenNet::System * lS0 = OpenNet::System::Create();
-    KMS_TEST_ASSERT_RETURN(NULL != lS0);
+    KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
-    OpenNet::Adapter * lA0 = lS0->Adapter_Get(0);
-    KMS_TEST_ASSERT_GOTO(NULL != lA0, Cleanup0);
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem->Adapter_Connect(lSetup.mAdapter));
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->ResetStats());
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mAdapter->SetProcessor  ( lSetup.mProcessor));
 
-    OpenNet::Processor * lP0 = lS0->Processor_Get(0);
-    KMS_TEST_ASSERT_GOTO(NULL != lP0, Cleanup0);
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Reset());
 
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lS0->Adapter_Connect(lA0), Cleanup0);
-
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lA0->SetProcessor   ( lP0      ), Cleanup0);
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lA0->SetInputFilter (&lFF0     ), Cleanup0);
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lA0->Buffer_Allocate(BUFFER_QTY), Cleanup1);
-
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lS0->Start(), Cleanup2);
+    KMS_TEST_COMPARE(0, lSetup.Start());
 
     Sleep(2000);
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lS0->Stop(0));
-
-Cleanup2:
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->Buffer_Release(BUFFER_QTY));
-
-Cleanup1:
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->ResetInputFilter());
+    KMS_TEST_COMPARE(0, lSetup.Stop(0));
 
     Sleep(2000);
 
-    OpenNet::Adapter::Stats lStats;
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Get());
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->GetStats(&lStats, true));
-
+    /*
     OpenNet::Adapter::Stats lStatsE;
     OpenNet::Adapter::Stats lStatsM;
 
@@ -95,8 +79,6 @@ Cleanup1:
     lStatsM.mDriver.mHardware.mRx_Packet          = UTL_MASK_ABOVE;
 
     KMS_TEST_COMPARE(0, Utl_Validate(lStats, lStatsE, lStatsM));
-
-Cleanup0:
-    lS0->Delete();
+    */
 }
 KMS_TEST_END

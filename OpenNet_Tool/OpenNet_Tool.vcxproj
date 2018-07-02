@@ -90,6 +90,7 @@
     <ResourceCompile Include="..\Common\Version.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Loop.cpp" />
     <ClCompile Include="OpenNet_Tool.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
@@ -97,6 +98,7 @@
     <Text Include="_DocUser\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Loop.h" />
     <ClInclude Include="Test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

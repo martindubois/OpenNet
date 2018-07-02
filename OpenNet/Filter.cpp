@@ -10,12 +10,44 @@
 
 // ===== C ==================================================================
 #include <assert.h>
+#include <stdint.h>
 
 // ===== Windows ============================================================
 #include <Windows.h>
 
+// ===== Import/Includes ====================================================
+#include <KmsLib/ValueVector.h>
+
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/Filter.h>
+
+// ===== Common =============================================================
+#include "../Common/OpenNet/Filter_Statistics.h"
+
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS[] =
+{
+    { "EXECUTION                  ", ""  , 0 }, //  0
+    { "EXECUTION - DURATION - AVG ", "us", 1 },
+    { "EXECUTION - DURATION - MAX ", "us", 1 },
+    { "EXECUTION - DURATION - MIN ", "us", 1 },
+    { "QUEUE     - DURATION - AVG ", "us", 1 },
+    { "QUEUE     - DURATION - MAX ", "us", 1 }, //  5
+    { "QUEUE     - DURATION - MIN ", "us", 1 },
+    { "SUBMIT    - DURATION - AVG ", "us", 1 },
+    { "SUBMIT    - DURATION - MAX ", "us", 1 },
+    { "SUBMIT    - DURATION - MIN ", "us", 1 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 10
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
+    { "EXECUTION - DURATION - LAST", "us", 0 },
+    { "QUEUE     - DURATION - LAST", "us", 0 },
+    { "SUBMIT    - DURATION - LAST", "us", 0 }, // 15
+};
 
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
@@ -34,9 +66,26 @@ namespace OpenNet
 
     const unsigned int Filter::BUILD_LOG_MAX_SIZE_byte = 64 * 1024;
 
-    Filter::Filter() : mBuildLog(NULL), mCode(NULL), mCodeLineBuffer(NULL), mCodeLineCount(0), mCodeLines(NULL), mCodeSize_byte(0)
+    Filter::Filter()
+        : StatisticsProvider(STATISTICS_DESCRIPTIONS, FILTER_STATS_QTY)
+        , mBuildLog        (NULL )
+        , mCode            (NULL )
+        , mCodeLineBuffer  (NULL )
+        , mCodeLineCount   (    0)
+        , mCodeLines       (NULL )
+        , mCodeSize_byte   (    0)
+        , mProfilingEnabled(false)
+        , mStatistics      (new unsigned int [FILTER_STATS_QTY])
     {
+        assert(NULL != mStatistics);
+
         memset(&mName, 0, sizeof(mName));
+
+        memset(mStatistics, 0, sizeof(unsigned int) * FILTER_STATS_QTY);
+
+        Status lStatus = ResetStatistics();
+        assert(STATUS_OK == lStatus);
+        (void)(lStatus);
     }
 
     Filter::~Filter()
@@ -47,6 +96,30 @@ namespace OpenNet
         {
             delete mCode;
         }
+    }
+
+    Status Filter::DisableProfiling()
+    {
+        if (!mProfilingEnabled)
+        {
+            return STATUS_PROFILING_ALREADY_DISABLED;
+        }
+
+        mProfilingEnabled = false;
+
+        return STATUS_OK;
+    }
+
+    Status Filter::EnableProfiling()
+    {
+        if (mProfilingEnabled)
+        {
+            return STATUS_PROFILING_ALREADY_ENABLED;
+        }
+
+        mProfilingEnabled = true;
+
+        return STATUS_OK;
     }
 
     unsigned int Filter::GetCodeLineCount()
@@ -84,6 +157,11 @@ namespace OpenNet
     const char * Filter::GetName() const
     {
         return mName;
+    }
+
+    bool Filter::IsProfilingEnabled() const
+    {
+        return mProfilingEnabled;
     }
 
     Status Filter::ResetCode()
@@ -339,8 +417,93 @@ namespace OpenNet
         return lResult;
     }
 
+    // ===== StatisticsProvider =============================================
+
+    Status Filter::GetStatistics(unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset)
+    {
+        if (NULL == aOut)
+        {
+            return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
+        }
+
+        if (0 >= aOutSize_byte)
+        {
+            return STATUS_BUFFER_TOO_SMALL;
+        }
+
+        unsigned int lCount = aOutSize_byte / sizeof(unsigned int);
+
+        if (lCount > FILTER_STATS_QTY)
+        {
+            lCount = FILTER_STATS_QTY;
+        }
+
+        unsigned int lSize_byte = lCount * sizeof(unsigned int);
+
+        memcpy(aOut, mStatistics, lSize_byte);
+
+        if (aReset)
+        {
+            ResetStatistics();
+        }
+
+        if (NULL != aInfo_byte)
+        {
+            (*aInfo_byte) = lSize_byte;
+        }
+
+        return STATUS_OK;
+    }
+
+    Status Filter::ResetStatistics()
+    {
+        memset(mStatistics, 0, FILTER_STATS_RESET_QTY * sizeof(unsigned int));
+
+        mStatistics[FILTER_STATS_EXECUTION_DURATION_MIN_us] = 0xffffffff;
+        mStatistics[FILTER_STATS_QUEUE_DURATION_MIN_us    ] = 0xffffffff;
+        mStatistics[FILTER_STATS_SUBMIT_DURATION_MIN_us   ] = 0xffffffff;
+
+        memset(&mStatisticsSums, 0, sizeof(mStatisticsSums));
+
+        return STATUS_OK;
+    }
+
     // Internal
     /////////////////////////////////////////////////////////////////////////
+
+    void Filter::AddStatistics(uint64_t aQueue, uint64_t aSubmit, uint64_t aStart, uint64_t aEnd)
+    {
+        uint64_t lLast[3];
+
+        lLast[0] = (aSubmit - aQueue ) / 1000;
+        lLast[1] = (aStart  - aSubmit) / 1000;
+        lLast[2] = (aEnd    - aStart ) / 1000;
+
+        for (unsigned int i = 0; i < 3; i++)
+        {
+            mStatisticsSums[i] += lLast[i];
+        }
+
+        mStatistics[FILTER_STATS_EXECUTION] ++;
+
+        mStatistics[FILTER_STATS_EXECUTION_DURATION_AVG_us ] = static_cast<unsigned int>(mStatisticsSums[2] / mStatistics[FILTER_STATS_EXECUTION]);
+        mStatistics[FILTER_STATS_EXECUTION_DURATION_LAST_us] = static_cast<unsigned int>(lLast[2]);
+
+        if (mStatistics[FILTER_STATS_EXECUTION_DURATION_MAX_us] < lLast[2]) { mStatistics[FILTER_STATS_EXECUTION_DURATION_MAX_us] = static_cast<unsigned int>(lLast[2]); }
+        if (mStatistics[FILTER_STATS_EXECUTION_DURATION_MIN_us] > lLast[2]) { mStatistics[FILTER_STATS_EXECUTION_DURATION_MIN_us] = static_cast<unsigned int>(lLast[2]); }
+
+        mStatistics[FILTER_STATS_QUEUE_DURATION_AVG_us ] = static_cast<unsigned int>(mStatisticsSums[0] / mStatistics[FILTER_STATS_EXECUTION]);
+        mStatistics[FILTER_STATS_QUEUE_DURATION_LAST_us] = static_cast<unsigned int>(lLast[0]);
+
+        if (mStatistics[FILTER_STATS_QUEUE_DURATION_MAX_us] < lLast[0]) { mStatistics[FILTER_STATS_QUEUE_DURATION_MAX_us] = static_cast<unsigned int>(lLast[0]); }
+        if (mStatistics[FILTER_STATS_QUEUE_DURATION_MIN_us] > lLast[0]) { mStatistics[FILTER_STATS_QUEUE_DURATION_MIN_us] = static_cast<unsigned int>(lLast[0]); }
+
+        mStatistics[FILTER_STATS_SUBMIT_DURATION_AVG_us ] = static_cast<unsigned int>(mStatisticsSums[1] / mStatistics[FILTER_STATS_EXECUTION]);
+        mStatistics[FILTER_STATS_SUBMIT_DURATION_LAST_us] = static_cast<unsigned int>(lLast[1]);
+
+        if (mStatistics[FILTER_STATS_SUBMIT_DURATION_MAX_us] < lLast[1]) { mStatistics[FILTER_STATS_SUBMIT_DURATION_MAX_us] = static_cast<unsigned int>(lLast[1]); }
+        if (mStatistics[FILTER_STATS_SUBMIT_DURATION_MIN_us] > lLast[1]) { mStatistics[FILTER_STATS_SUBMIT_DURATION_MIN_us] = static_cast<unsigned int>(lLast[1]); }
+    }
 
     void * Filter::AllocateBuildLog()
     {

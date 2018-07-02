@@ -1,7 +1,7 @@
 
 // Author   KMA - Martin Dubois, ing.
 // Product  OpenNet
-// File     OpenNet_Test/SetupC.h
+// File     OpenNet_Test/SetupA.h
 
 #pragma once
 
@@ -27,7 +27,7 @@
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
-class SetupC : public Base
+class SetupA : public Base
 {
 
 public:
@@ -37,9 +37,9 @@ public:
         STATISTICS_QTY = (OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_QTY + OpenNetK::HARDWARE_STATS_QTY),
     };
 
-    SetupC(unsigned int aBufferQty);
+    SetupA(unsigned int aBufferQty);
 
-    ~SetupC();
+    ~SetupA();
 
     int Init ();
     int Start();
@@ -50,13 +50,13 @@ public:
     int Statistics_Get          ();
     int Statistics_GetAndDisplay(unsigned int aMinLevel = 0);
     int Statistics_Reset        ();
-    int Statistics_Verify       (unsigned int aAdapter, const KmsLib::ValueVector::Constraint_UInt32 * aConstraints);
+    int Statistics_Verify       (const KmsLib::ValueVector::Constraint_UInt32 * aConstraints);
 
-    OpenNet::Adapter      * mAdapters[2];
-    unsigned int            mBufferQty  ;
-    OpenNet::Filter_Forward mFilters [2];
-    OpenNet::Processor    * mProcessor  ;
+    OpenNet::Adapter      * mAdapter  ;
+    unsigned int            mBufferQty;
+    OpenNet::Filter_Forward mFilter   ;
+    OpenNet::Processor    * mProcessor;
 
-    unsigned int mStatistics[2][STATISTICS_QTY];
+    unsigned int mStatistics[STATISTICS_QTY];
 
 };

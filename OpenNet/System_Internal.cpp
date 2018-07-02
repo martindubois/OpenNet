@@ -44,9 +44,9 @@ static void SendLoopBackPackets(void * aThis, Adapter_Internal * aAdapter);
 // Threads  Apps
 System_Internal::System_Internal()
     : mDebugLog( "K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "OpenNet" )
-    , mAdapterRunning           (0)
-    , mPacketSize_byte          (OPEN_NET_PACKET_SIZE_MAX_byte)
-    , mPlatform                 (0)
+    , mAdapterRunning (0)
+    , mPacketSize_byte(PACKET_SIZE_MAX_byte)
+    , mPlatform       (0)
 {
     memset(&mConnect           , 0, sizeof(mConnect           ));
     memset(&mExtensionFunctions, 0, sizeof(mExtensionFunctions));
@@ -78,16 +78,12 @@ System_Internal::~System_Internal()
     
     for (i = 0; i < mAdapters.size(); i++)
     {
-        // TODO  Test
-
         // new ==> delete
         delete mAdapters[i];
     }
 
     for (i = 0; i < mProcessors.size(); i++)
     {
-        // TODO  Test
-
         // new ==> delete
         delete mProcessors[i];
     }
@@ -112,16 +108,16 @@ unsigned int System_Internal::GetSystemId() const
 
 OpenNet::Status System_Internal::SetPacketSize(unsigned int aSize_byte)
 {
-    assert(OPEN_NET_PACKET_SIZE_MAX_byte >= mPacketSize_byte);
-    assert(OPEN_NET_PACKET_SIZE_MIN_byte <= mPacketSize_byte);
+    assert(PACKET_SIZE_MAX_byte >= mPacketSize_byte);
+    assert(PACKET_SIZE_MIN_byte <= mPacketSize_byte);
 
-    if (OPEN_NET_PACKET_SIZE_MAX_byte < aSize_byte)
+    if (PACKET_SIZE_MAX_byte < aSize_byte)
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_PACKET_TOO_LARGE;
     }
 
-    if (OPEN_NET_PACKET_SIZE_MIN_byte > aSize_byte)
+    if (PACKET_SIZE_MIN_byte > aSize_byte)
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_PACKET_TOO_SMALL;
@@ -158,8 +154,6 @@ OpenNet::Status System_Internal::Adapter_Connect(OpenNet::Adapter * aAdapter)
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         return lResult;
     }
-
-    // TODO  Test
 
     if (aAdapter->IsConnected())
     {
@@ -391,8 +385,6 @@ void System_Internal::FindAdapters()
             break;
         }
 
-        // TODO  Test
-
         // new ==> delete  See ~System_Internal
         Adapter_Internal * lAdapter = new Adapter_Internal(lHandle, &mDebugLog);
         assert(NULL != lAdapter);
@@ -459,8 +451,6 @@ void System_Internal::FindProcessors()
         OCLW_GetDeviceIDs(mPlatform, CL_DEVICE_TYPE_GPU, sizeof(lDevices) / sizeof(lDevices[0]), lDevices, &lCount);
         if (0 < lCount)
         {
-            // TODO  Test
-
             for (unsigned int i = 0; i < lCount; i++)
             {
                 if (IsExtensionSupported(lDevices[i]))
@@ -473,8 +463,6 @@ void System_Internal::FindProcessors()
     }
 }
 
-// TODO  Test
-//
 // Threads  Apps
 bool System_Internal::IsExtensionSupported(cl_device_id aDevice)
 {
@@ -508,7 +496,6 @@ OpenNet::Status System_Internal::ValidateAdapter(OpenNet::Adapter * aAdapter)
 
     for (unsigned int i = 0; i < mAdapters.size(); i++)
     {
-        // TODO  Test
         if (mAdapters[i] == aAdapter)
         {
             return OpenNet::STATUS_OK;

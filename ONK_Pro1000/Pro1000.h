@@ -26,21 +26,21 @@ public:
     Pro1000();
 
     // ===== OpenNetK::Hardware =============================================
-    virtual void GetState          (OpenNet_State * aStatus);
-    virtual void ResetMemory       ();
-    virtual void SetCommonBuffer   (uint64_t aLogicalAddress, void * aVirtualAddress);
-    virtual bool SetMemory         (unsigned int aIndex, void * aVirtual, unsigned int aSize_byte);
-    virtual bool D0_Entry          ();
-    virtual bool D0_Exit           ();
-    virtual void Interrupt_Disable ();
-    virtual void Interrupt_Enable  ();
-    virtual bool Interrupt_Process (unsigned int aMessageId, bool * aNeedMoreProcessing);
-    virtual void Interrupt_Process2();
-    virtual void Packet_Receive    (uint64_t aLogicalAddres, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
-    virtual void Packet_Send       (uint64_t aData, unsigned int aSize_byte, volatile long * aCounter);
-    virtual void Packet_Send       (const void * aPacket, unsigned int aSize_byte);
-    virtual void Stats_Get         (OpenNet_Stats * aStats, bool aReset);
-    virtual void Stats_Reset       ();
+    virtual void         GetState          (OpenNetK::Adapter_State * aStats);
+    virtual void         ResetMemory       ();
+    virtual void         SetCommonBuffer   (uint64_t aLogicalAddress, void * aVirtualAddress);
+    virtual bool         SetMemory         (unsigned int aIndex, void * aVirtual, unsigned int aSize_byte);
+    virtual bool         D0_Entry          ();
+    virtual bool         D0_Exit           ();
+    virtual void         Interrupt_Disable ();
+    virtual void         Interrupt_Enable  ();
+    virtual bool         Interrupt_Process (unsigned int aMessageId, bool * aNeedMoreProcessing);
+    virtual void         Interrupt_Process2();
+    virtual void         Packet_Receive    (uint64_t aLogicalAddres, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
+    virtual void         Packet_Send       (uint64_t aData, unsigned int aSize_byte, volatile long * aCounter);
+    virtual void         Packet_Send       (const void * aPacket, unsigned int aSize_byte);
+    virtual unsigned int Statistics_Get    (uint32_t * aOut, unsigned int aOutSize_byte, bool aReset);
+    virtual void         Statistics_Reset  ();
 
 private:
 
@@ -58,7 +58,7 @@ private:
     void Rx_Config_Zone0 ();
     void Rx_Process_Zone0();
 
-    void Stats_Update();
+    void Statistics_Update();
 
     void Tx_Config_Zone0 ();
     void Tx_Process_Zone0();

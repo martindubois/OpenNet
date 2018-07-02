@@ -9,9 +9,6 @@
 // ===== C ==================================================================
 #include <stdint.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
-
 // ===== OpenNet ============================================================
 #include "VersionInfo.h"
 
@@ -21,7 +18,7 @@ namespace OpenNet
     // Functions
     /////////////////////////////////////////////////////////////////////////
 
-    Status VersionInfo_Display(const OpenNet_VersionInfo & aIn, FILE * aOut)
+    Status VersionInfo_Display(const VersionInfo & aIn, FILE * aOut)
     {
         if (NULL == (&aIn))
         {

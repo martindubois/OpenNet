@@ -9,14 +9,8 @@
 // ===== C ==================================================================
 #include <stdint.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
-
 // ===== Common =============================================================
 #include "../Common/OpenNet/EthernetAddress.h"
-
-// ===== OpenNet ============================================================
-#include "EthernetAddress.h"
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
@@ -47,7 +41,7 @@ namespace OpenNet
     // Functions
     /////////////////////////////////////////////////////////////////////////
 
-    bool EthernetAddress_IsBroadcast(const OpenNet_EthernetAddress & aIn)
+    bool EthernetAddress_IsBroadcast(const EthernetAddress & aIn)
     {
         if (NULL == (&aIn))
         {
@@ -65,7 +59,7 @@ namespace OpenNet
         return true;
     }
 
-    bool EthernetAddress_IsMulticast(const OpenNet_EthernetAddress & aIn)
+    bool EthernetAddress_IsMulticast(const EthernetAddress & aIn)
     {
         if (NULL == (&aIn))
         {
@@ -93,7 +87,7 @@ namespace OpenNet
         return false;
     }
 
-    bool EthernetAddress_IsZero(const OpenNet_EthernetAddress & aIn)
+    bool EthernetAddress_IsZero(const EthernetAddress & aIn)
     {
         if (NULL == (&aIn))
         {
@@ -111,7 +105,7 @@ namespace OpenNet
         return true;
     }
 
-    Status EthernetAddress_Display(const OpenNet_EthernetAddress & aIn, FILE * aOut)
+    Status EthernetAddress_Display(const EthernetAddress & aIn, FILE * aOut)
     {
         if (NULL == (&aIn))
         {
@@ -143,7 +137,7 @@ namespace OpenNet
         return STATUS_OK;
     }
 
-    Status EthernetAddress_GetText(const OpenNet_EthernetAddress & aIn, char * aOut, unsigned int aOutSize_byte)
+    Status EthernetAddress_GetText(const EthernetAddress & aIn, char * aOut, unsigned int aOutSize_byte)
     {
         if (NULL == (&aIn))
         {
@@ -164,4 +158,5 @@ namespace OpenNet
 
         return STATUS_OK;
     }
+
 }

@@ -55,8 +55,6 @@ namespace OpenNet
     {
         if (NULL == aAdapter) { return STATUS_NOT_ALLOWED_NULL_ARGUMENT; }
 
-        // TODO  Test
-
         unsigned int lAdapterNo;
 
         Status lResult = aAdapter->GetAdapterNo(&lAdapterNo);
@@ -88,8 +86,6 @@ namespace OpenNet
         {
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
         }
-
-        // TODO  Test
 
         if (0 == mDestinations)
         {
@@ -131,8 +127,6 @@ namespace OpenNet
             return STATUS_NO_DESTINATION_SET;
         }
 
-        // TODO  Test
-
         mDestinations = 0;
 
         Status lResult = ResetCode();
@@ -152,7 +146,6 @@ namespace OpenNet
     // Private
     /////////////////////////////////////////////////////////////////////////
 
-    // TODO  Test
     void Filter_Forward::GenerateCode()
     {
         Status lStatus = SetCode(CODE, static_cast<unsigned int>(strlen(CODE)));

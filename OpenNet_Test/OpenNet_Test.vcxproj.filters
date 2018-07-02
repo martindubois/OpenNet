@@ -50,9 +50,6 @@
     <ClCompile Include="Loop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EthernetAddress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -62,12 +59,21 @@
     <ClCompile Include="SetupC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SetupA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Utilities.h">
+    <ClInclude Include="SetupC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SetupC.h">
+    <ClInclude Include="Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SetupA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

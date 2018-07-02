@@ -4,15 +4,18 @@
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Adapter.h
 
+// TODO  Includes.OpenNet.Adapter
+//       Definir la structure BufferInfo dans un fichier prive.
+
 #pragma once
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes/OpenNetK ==================================================
+#include <OpenNetK/Adapter_Types.h>
 #include <OpenNetK/Constants.h>
 #include <OpenNetK/Types.h>
-#include <OpenNetK/Interface.h>
 
 namespace OpenNetK
 {
@@ -53,15 +56,9 @@ namespace OpenNetK
 
     // Internal
 
-        /// \cond en
-        /// \brief  BufferInfo is an internal structure. Do not use it.
-        /// \endcond
-        /// \cond fr
-        /// \brief  BufferInfo est une structure interne. Ne pas utiliser.
-        /// \endcond
         typedef struct
         {
-            OpenNet_BufferInfo mBufferInfo;
+            Buffer mBuffer;
 
             OpenNet_BufferHeader * mHeader;
             volatile uint32_t    * mMarker;
@@ -86,7 +83,7 @@ namespace OpenNetK
 
         void Init(SpinLock * aZone0);
 
-        void Buffer_SendPackets(BufferInfo * aInfo);
+        void Buffer_SendPackets(BufferInfo * aBufferInfo);
 
         void Buffers_Process();
 
@@ -96,32 +93,32 @@ namespace OpenNetK
 
     private:
 
-        void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader, const OpenNet_BufferInfo & aBufferInfo);
-        void Buffer_Queue_Zone0      (const OpenNet_BufferInfo & aBufferInfo);
-        void Buffer_Receive_Zone0    (BufferInfo * aBuffer);
-        void Buffer_Send_Zone0       (BufferInfo * aBuffer);
-        void Buffer_WriteMarker_Zone0(BufferInfo * aBuffer);
+        void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader, const Buffer & aBuffer);
+        void Buffer_Queue_Zone0      (const Buffer & aBuffer);
+        void Buffer_Receive_Zone0    (BufferInfo * aBufferInfo);
+        void Buffer_Send_Zone0       (BufferInfo * aBufferInfo);
+        void Buffer_WriteMarker_Zone0(BufferInfo * aBufferInfo);
 
         void Stop_Zone0();
 
         // ===== Buffer_State ===============================================
-        void Buffer_PxCompleted_Zone0(BufferInfo * aBuffer);
-        void Buffer_PxRunning_Zone0  (BufferInfo * aBuffer);
-        void Buffer_RxRunning_Zone0  (BufferInfo * aBuffer);
-        void Buffer_Stopped_Zone0    (unsigned int aIndex );
-        void Buffer_TxRunning_Zone0  (BufferInfo * aBuffer);
+        void Buffer_PxCompleted_Zone0(BufferInfo * aBufferInfo);
+        void Buffer_PxRunning_Zone0  (BufferInfo * aBufferInfo);
+        void Buffer_RxRunning_Zone0  (BufferInfo * aBufferInfo);
+        void Buffer_Stopped_Zone0    (unsigned int aIndex     );
+        void Buffer_TxRunning_Zone0  (BufferInfo * aBufferInfo);
 
         // ===== IoCtl ======================================================
-        int IoCtl_Config_Get (      OpenNet_Config     * aOut);
-        int IoCtl_Config_Set (const OpenNet_Config     * aIn , OpenNet_Config * aOut);
-        int IoCtl_Connect    (const void               * aIn );
-        int IoCtl_Info_Get   (      OpenNet_Info       * aOut) const;
-        int IoCtl_Packet_Send(const void               * aIn , unsigned int aInSize_byte );
-        int IoCtl_Start      (const OpenNet_BufferInfo * aIn , unsigned int aInSize_byte );
-        int IoCtl_State_Get  (      OpenNet_State      * aOut);
-        int IoCtl_Stats_Get  (const void               * aIn , OpenNet_Stats  * aOut) const;
-        int IoCtl_Stats_Reset();
-        int IoCtl_Stop       ();
+        int IoCtl_Config_Get      (      Adapter_Config * aOut);
+        int IoCtl_Config_Set      (const Adapter_Config * aIn , Adapter_Config * aOut);
+        int IoCtl_Connect         (const void           * aIn );
+        int IoCtl_Info_Get        (      Adapter_Info   * aOut) const;
+        int IoCtl_Packet_Send     (const void           * aIn , unsigned int aInSize_byte );
+        int IoCtl_Start           (const Buffer         * aIn , unsigned int aInSize_byte );
+        int IoCtl_State_Get       (      Adapter_State  * aOut);
+        int IoCtl_Statistics_Get  (const void           * aIn , uint32_t * aOut, unsigned int aOutSize_byte) const;
+        int IoCtl_Statistics_Reset();
+        int IoCtl_Stop            ();
 
         Adapter   ** mAdapters ;
         unsigned int mAdapterNo;
@@ -129,8 +126,7 @@ namespace OpenNetK
         Hardware   * mHardware ;
         unsigned int mSystemId ;
 
-        mutable OpenNet_Stats_Adapter         mStats        ;
-        mutable OpenNet_Stats_Adapter_NoReset mStats_NoReset;
+        mutable uint32_t mStatistics[32];
 
         // ===== Zone 0 =====================================================
         SpinLock * mZone0;

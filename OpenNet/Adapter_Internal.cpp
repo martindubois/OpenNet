@@ -24,7 +24,9 @@
 #include <OpenNet/Status.h>
 
 // ===== Common =============================================================
+#include "../Common/Constants.h"
 #include "../Common/IoCtl.h"
+#include "../Common/OpenNet/Adapter_Statistics.h"
 
 // ===== OpenNet ============================================================
 #include "EthernetAddress.h"
@@ -101,7 +103,8 @@ Adapter_Internal::Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsL
     memset(&mConfig, 0, sizeof(mConfig));
     memset(&mInfo  , 0, sizeof(mInfo  ));
     memset(&mName  , 0, sizeof(mName  ));
-    memset(&mStats , 0, sizeof(mStats ));
+
+    memset(&mStatistics , 0, sizeof(mStatistics));
 
     mHandle->Control(IOCTL_CONFIG_GET, NULL, 0, &mConfig, sizeof(mConfig));
     mHandle->Control(IOCTL_INFO_GET  , NULL, 0, &mInfo  , sizeof(mInfo  ));
@@ -195,7 +198,7 @@ void Adapter_Internal::SendLoopBackPackets()
     for (unsigned i = 0; i < 64; i++)
     {
         mHandle->Control(IOCTL_PACKET_SEND, LOOP_BACK_PACKET, sizeof(LOOP_BACK_PACKET), NULL, 0);
-        mStats.mLoopBackPacket++;
+        mStatistics[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET] ++;
     }
 }
 
@@ -226,7 +229,7 @@ void Adapter_Internal::Start()
             "CreateThread( , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
     }
 
-    mStats.mStart++;
+    mStatistics[OpenNet::ADAPTER_STATS_START] ++;
 }
 
 // Exception  KmsLib::Exception *  CODE_THREAD_ERROR
@@ -237,7 +240,7 @@ void Adapter_Internal::Stop_Request()
         Stop_Request_Zone0();
     LeaveCriticalSection(&mZone0);
 
-    mStats.mStop_Request++;
+    mStatistics[OpenNet::ADAPTER_STATS_STOP_REQUEST] ++;
 }
 
 // Exception  KmsLib::Exception *  CODE_THREAD_ERROR
@@ -248,7 +251,7 @@ void Adapter_Internal::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext
         Stop_Wait_Zone0(aTryToSolveHang, aContext);
     LeaveCriticalSection(&mZone0);
 
-    mStats.mStop_Wait++;
+    mStatistics[OpenNet::ADAPTER_STATS_STOP_WAIT] ++;
 }
 
 // ===== OpenNet::Adapter ===================================================
@@ -268,14 +271,14 @@ OpenNet::Status Adapter_Internal::GetAdapterNo(unsigned int * aOut)
     OpenNet::Status lResult = GetState(&lState);
     if (OpenNet::STATUS_OK == lResult)
     {
-        if (OPEN_NET_ADAPTER_NO_UNKNOWN == lState.mAdapterNo)
+        if (ADAPTER_NO_UNKNOWN == lState.mAdapterNo)
         {
             mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
             lResult = OpenNet::STATUS_ADAPTER_NOT_CONNECTED;
         }
         else
         {
-            if (OPEN_NET_ADAPTER_NO_QTY <= lState.mAdapterNo)
+            if (ADAPTER_NO_QTY <= lState.mAdapterNo)
             {
                 mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
                 lResult = OpenNet::STATUS_CORRUPTED_DRIVER_DATA;
@@ -327,8 +330,8 @@ const char * Adapter_Internal::GetName() const
 
 unsigned int Adapter_Internal::GetPacketSize() const
 {
-    assert(OPEN_NET_PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
-    assert(OPEN_NET_PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte);
+    assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
+    assert(PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte);
 
     return mConfig.mPacketSize_byte;
 }
@@ -347,22 +350,42 @@ OpenNet::Status Adapter_Internal::GetState(State * aOut)
     return Control(IOCTL_STATE_GET, NULL, 0, aOut, sizeof(State));
 }
 
-OpenNet::Status Adapter_Internal::GetStats(Stats * aOut, bool aReset)
+OpenNet::Status Adapter_Internal::GetStatistics(unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset)
 {
     assert(NULL != mDebugLog);
     assert(NULL != mHandle  );
 
-    if (NULL == aOut)
+    if ((NULL == aOut) && (0 < aOutSize_byte))
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
-    memcpy(&aOut->mDll, &mStats, sizeof(mStats));
+    unsigned int * lOut          = aOut;
+    unsigned int   lOutSize_byte = aOutSize_byte;
+    unsigned int   lSize_byte    = 0;
+
+    if (sizeof(mStatistics) < lOutSize_byte)
+    {
+        memcpy(lOut, &mStatistics, sizeof(mStatistics));
+        lSize_byte    += sizeof(mStatistics);
+        lOut          += sizeof(mStatistics) / sizeof(unsigned int);
+        lOutSize_byte -= sizeof(mStatistics);
+    }
+    else
+    {
+        if (0 < lOutSize_byte)
+        {
+            memcpy(lOut, &mStatistics, lOutSize_byte);
+            lSize_byte   += lOutSize_byte;
+            lOut          = NULL;
+            lOutSize_byte = 0;
+        }
+    }
 
     if (aReset)
     {
-        memset(&mStats, 0, sizeof(mStats));
+        memset(&mStatistics, 0, sizeof(unsigned int) * OpenNet::ADAPTER_STATS_RESET_QTY);
     }
 
     IoCtl_Stats_Get_In lIn;
@@ -371,7 +394,18 @@ OpenNet::Status Adapter_Internal::GetStats(Stats * aOut, bool aReset)
 
     lIn.mFlags.mReset = aReset;
 
-    return Control(IOCTL_STATS_GET, &lIn, sizeof(lIn), &aOut->mDriver, sizeof(aOut->mDriver));
+    unsigned int lInfo_byte;
+
+    OpenNet::Status lResult = Control(IOCTL_STATISTICS_GET, &lIn, sizeof(lIn), lOut, lOutSize_byte, &lInfo_byte);
+    if (OpenNet::STATUS_OK == lResult)
+    {
+        if (NULL != aInfo_byte)
+        {
+            (*aInfo_byte) = lSize_byte + lInfo_byte;
+        }
+    }
+
+    return lResult;
 }
 
 bool Adapter_Internal::IsConnected()
@@ -381,9 +415,9 @@ bool Adapter_Internal::IsConnected()
     OpenNet::Status lStatus = GetState(&lState);
     assert(OpenNet::STATUS_OK == lStatus);
 
-    assert((OPEN_NET_ADAPTER_NO_UNKNOWN == lState.mAdapterNo) || (OPEN_NET_ADAPTER_NO_QTY > lState.mAdapterNo));
+    assert((ADAPTER_NO_UNKNOWN == lState.mAdapterNo) || (ADAPTER_NO_QTY > lState.mAdapterNo));
 
-    return (OPEN_NET_ADAPTER_NO_UNKNOWN != lState.mAdapterNo);
+    return (ADAPTER_NO_UNKNOWN != lState.mAdapterNo);
 }
 
 bool Adapter_Internal::IsConnected(const OpenNet::System & aSystem)
@@ -399,9 +433,9 @@ bool Adapter_Internal::IsConnected(const OpenNet::System & aSystem)
     OpenNet::Status lStatus = GetState(&lState);
     assert(OpenNet::STATUS_OK == lStatus);
 
-    assert((OPEN_NET_ADAPTER_NO_UNKNOWN == lState.mAdapterNo) || (OPEN_NET_ADAPTER_NO_QTY > lState.mAdapterNo));
+    assert((ADAPTER_NO_UNKNOWN == lState.mAdapterNo) || (ADAPTER_NO_QTY > lState.mAdapterNo));
 
-    return ((OPEN_NET_ADAPTER_NO_UNKNOWN != lState.mAdapterNo) && (aSystem.GetSystemId() == lState.mSystemId));
+    return ((ADAPTER_NO_UNKNOWN != lState.mAdapterNo) && (aSystem.GetSystemId() == lState.mSystemId));
 }
 
 OpenNet::Status Adapter_Internal::ResetInputFilter()
@@ -465,11 +499,11 @@ OpenNet::Status Adapter_Internal::ResetProcessor()
     return OpenNet::STATUS_OK;
 }
 
-OpenNet::Status Adapter_Internal::ResetStats()
+OpenNet::Status Adapter_Internal::ResetStatistics()
 {
-    memset(&mStats, 0, sizeof(mStats));
+    memset(&mStatistics, 0, sizeof(mStatistics));
 
-    return Control(IOCTL_STATS_RESET, NULL, 0, NULL, 0);
+    return Control(IOCTL_STATISTICS_RESET, NULL, 0, NULL, 0);
 }
 
 OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
@@ -529,13 +563,13 @@ OpenNet::Status Adapter_Internal::SetPacketSize(unsigned int aSize_byte)
 {
     assert(NULL != mDebugLog);
 
-    if (OPEN_NET_PACKET_SIZE_MAX_byte < aSize_byte)
+    if (PACKET_SIZE_MAX_byte < aSize_byte)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_PACKET_TOO_LARGE;
     }
 
-    if (OPEN_NET_PACKET_SIZE_MIN_byte > aSize_byte)
+    if (PACKET_SIZE_MIN_byte > aSize_byte)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_PACKET_TOO_SMALL;
@@ -722,7 +756,7 @@ OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int a
         return OpenNet::STATUS_PACKET_TOO_LARGE;
     }
 
-    mStats.mPacket_Send++;
+    mStatistics[OpenNet::ADAPTER_STATS_PACKET_SEND] ++;
 
     return Control(IOCTL_PACKET_SEND, aData, aSize_byte, NULL, 0);
 }
@@ -730,13 +764,16 @@ OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int a
 // Internal
 /////////////////////////////////////////////////////////////////////////////
 
+// TODO  OpenNet.Adapter_Internal
+//       Augmenter la priorite du worker thread
+
 // Thread  Worker
 void Adapter_Internal::Run()
 {
     assert(NULL != mDebugLog);
     assert(NULL != mHandle  );
 
-    mStats.mRun_Entry++;
+    mStatistics[OpenNet::ADAPTER_STATS_RUN_ENTRY] ++;
 
     try
     {
@@ -754,12 +791,15 @@ void Adapter_Internal::Run()
             mBufferData[i].mMarkerValue = 0;
 
             mProcessor->Processing_Queue(&mFilterData, mBufferData + i);
-            mStats.mRun_Queue++;
+            mStatistics[OpenNet::ADAPTER_STATS_RUN_QUEUE] ++;
         }
 
-        mHandle->Control(IOCTL_START, mBuffers, sizeof(OpenNet_BufferInfo) * mBufferCount, NULL, 0);
+        mHandle->Control(IOCTL_START, mBuffers, sizeof(OpenNetK::Buffer) * mBufferCount, NULL, 0);
 
         Run_Loop();
+
+        mHandle->Control(IOCTL_STOP, NULL, 0, NULL, 0);
+
         Run_Wait();
     }
     catch (KmsLib::Exception * eE)
@@ -767,18 +807,18 @@ void Adapter_Internal::Run()
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog->Log(eE);
 
-        mStats.mRun_Exception++;
+        mStatistics[OpenNet::ADAPTER_STATS_RUN_EXCEPTION] ++;
     }
     catch (...)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
 
-        mStats.mRun_UnexpectedException++;
+        mStatistics[OpenNet::ADAPTER_STATS_RUN_UNEXPECTED_EXCEPTION] ++;
     }
 
     mState = STATE_STOPPING;
 
-    mStats.mRun_Exit++;
+    mStatistics[OpenNet::ADAPTER_STATS_RUN_EXIT] ++;
 }
 
 // Private
@@ -804,7 +844,7 @@ void Adapter_Internal::Buffer_Allocate()
 
     mBufferCount++;
 
-    mStats.mBuffer_Allocated++;
+    mStatistics[OpenNet::ADAPTER_STATS_BUFFER_ALLOCATED] ++;
 }
 
 // Exception  KmsLib::Exception *  CODE_INVALID_DATA
@@ -822,14 +862,14 @@ void Adapter_Internal::Buffer_Release()
 
     mProcessor->Buffer_Release(mBufferData + mBufferCount);
 
-    mStats.mBuffer_Released++;
+    mStatistics[OpenNet::ADAPTER_STATS_BUFFER_RELEASED] ++;
 }
 
 // aIn  [--O;R--]
 // aOut [--O;-W-]
 //
 // Threads  Apps
-OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte)
+OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte)
 {
     assert(0 != aCode);
 
@@ -838,7 +878,12 @@ OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, 
 
     try
     {
-        mHandle->Control(aCode, aIn, aInSize_byte, aOut, aOutSize_byte);
+        unsigned int lInfo_byte = mHandle->Control(aCode, aIn, aInSize_byte, aOut, aOutSize_byte);
+
+        if (NULL != aInfo_byte)
+        {
+            (*aInfo_byte) = lInfo_byte;
+        }
     }
     catch (KmsLib::Exception * eE)
     {
@@ -856,11 +901,11 @@ void Adapter_Internal::Run_Iteration(unsigned int aIndex)
 
     assert(NULL != mProcessor);
 
-    mProcessor->Processing_Wait(mBufferData + aIndex);
-    mStats.mRun_Iteration_Wait++;
+    mProcessor->Processing_Wait(&mFilterData, mBufferData + aIndex);
+    mStatistics[OpenNet::ADAPTER_STATS_RUN_ITERATION_WAIT] ++;
 
     mProcessor->Processing_Queue(&mFilterData, mBufferData + aIndex);
-    mStats.mRun_Iteration_Queue++;
+    mStatistics[OpenNet::ADAPTER_STATS_RUN_ITERATION_QUEUE] ++;
 }
 
 void Adapter_Internal::Run_Loop()
@@ -869,6 +914,7 @@ void Adapter_Internal::Run_Loop()
     assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
     assert(NULL                != mDebugLog   );
     assert(NULL                != mHandle     );
+
     try
     {
         unsigned lIndex = 0;
@@ -884,20 +930,25 @@ void Adapter_Internal::Run_Loop()
 
         State_Change(STATE_STOP_REQUESTED, STATE_STOPPING);
 
-        mHandle->Control(IOCTL_STOP, NULL, 0, NULL, 0);
+        for (unsigned int i = 0; i < mBufferCount; i++)
+        {
+            mProcessor->Processing_Wait(&mFilterData, mBufferData + lIndex);
+
+            lIndex = (lIndex + 1) % mBufferCount;
+        }
     }
     catch (KmsLib::Exception * eE)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog->Log(eE);
 
-        mStats.mRun_Loop_Exception++;
+        mStatistics[OpenNet::ADAPTER_STATS_RUN_LOOP_EXCEPTION] ++;
     }
     catch (...)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
 
-        mStats.mRun_Loop_UnexpectedException++;
+        mStatistics[OpenNet::ADAPTER_STATS_RUN_LOOP_UNEXPECTED_EXCEPTION] ++;
     }
 }
 
@@ -906,7 +957,7 @@ void Adapter_Internal::Run_Wait()
     assert(NULL != mDebugLog);
     assert(NULL != mHandle  );
 
-    OpenNet_State lState;
+    State lState;
 
     for (unsigned int i = 0; i < 600; i++)
     {

@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 // ===== Import/Includes ====================================================
+#include <KmsLib/ValueVector.h>
 #include <KmsTest.h>
 
 // ===== Includes ===========================================================
@@ -21,8 +22,8 @@
 #include "../Common/IoCtl.h"
 
 // ===== OpenNet_Test =======================================================
+#include "SetupA.h"
 #include "SetupC.h"
-#include "Utilities.h"
 
 // Configuration
 /////////////////////////////////////////////////////////////////////////////
@@ -36,51 +37,37 @@ static const uint8_t PACKET[PACKET_SIZE_byte] =
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x88, 0x88
 };
 
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define HARDWARE_BASE (OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_QTY)
+
 // Tests
 /////////////////////////////////////////////////////////////////////////////
 
 KMS_TEST_BEGIN(Mirror_SetupB)
 {
-    OpenNet::Filter_Forward lFF0;
+    SetupA lSetup(BUFFER_QTY);
 
-    OpenNet::System * lS0 = OpenNet::System::Create();
-    KMS_TEST_ASSERT_RETURN(NULL != lS0);
+    KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
-    OpenNet::Adapter * lA0 = lS0->Adapter_Get(0);
-    KMS_TEST_ASSERT_GOTO(NULL != lA0, Cleanup0);
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem ->Adapter_Connect(lSetup.mAdapter  ));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mAdapter->SetProcessor   (lSetup.mProcessor));
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->ResetStats());
+    lSetup.mFilter.AddDestination(lSetup.mAdapter);
 
-    OpenNet::Processor * lP0 = lS0->Processor_Get(0);
-    KMS_TEST_ASSERT_GOTO(NULL != lP0, Cleanup0);
-
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lS0->Adapter_Connect(lA0), Cleanup0);
-
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lA0->SetProcessor(lP0), Cleanup0);
-
-    lFF0.AddDestination(lA0);
-
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lA0->SetInputFilter (&lFF0     ), Cleanup0);
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lA0->Buffer_Allocate(BUFFER_QTY), Cleanup1);
-
-    KMS_TEST_COMPARE_GOTO(OpenNet::STATUS_OK, lS0->Start(), Cleanup2);
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Reset());
+    KMS_TEST_COMPARE(0, lSetup.Start           ());
 
     Sleep(2000);
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lS0->Stop(0));
-
-Cleanup2:
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->Buffer_Release(BUFFER_QTY));
-
-Cleanup1:
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->ResetInputFilter());
+    KMS_TEST_COMPARE(0, lSetup.Stop(0));
 
     Sleep(2000);
 
-    OpenNet::Adapter::Stats lStats;
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Get());
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lA0->GetStats(&lStats, true));
-
+    /*
     OpenNet::Adapter::Stats lStatsE;
     OpenNet::Adapter::Stats lStatsM;
 
@@ -111,9 +98,7 @@ Cleanup1:
     lStatsM.mDriver.mHardware.mPacket_Send        = UTL_MASK_ABOVE;
     lStatsM.mDriver.mHardware.mRx_Packet          = UTL_MASK_ABOVE;
     lStatsM.mDriver.mHardware.mTx_Packet          = UTL_MASK_ABOVE;
-
-Cleanup0:
-    lS0->Delete();
+    */
 }
 KMS_TEST_END
 
@@ -123,10 +108,9 @@ KMS_TEST_BEGIN(Mirror_SetupC)
 
     KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
-    KMS_TEST_COMPARE(0, lSetup.Stats_Reset());
-
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mFilters[0].AddDestination(lSetup.mAdapters[0]));
 
+    KMS_TEST_COMPARE       (0, lSetup.Statistics_Reset());
     KMS_TEST_COMPARE_RETURN(0, lSetup.Start());
 
     Sleep(1000);
@@ -138,13 +122,13 @@ KMS_TEST_BEGIN(Mirror_SetupC)
 
     Sleep(2000);
 
-    KMS_TEST_COMPARE(0, lSetup.Stats_GetAndDisplay());
+    KMS_TEST_COMPARE(0, lSetup.Statistics_GetAndDisplay());
 
-    OpenNet::Adapter::Stats lStatsE;
-    OpenNet::Adapter::Stats lStatsM;
+    KmsLib::ValueVector::Constraint_UInt32 lConstraints[SetupC::STATISTICS_QTY];
 
-    Utl_ValidateInit(&lStatsE, &lStatsM);
+    KmsLib::ValueVector::Constraint_Init(lConstraints, SetupC::STATISTICS_QTY);
 
+    /*
     lStatsE.mDll.mBuffer_Allocated    = BUFFER_QTY;
     lStatsE.mDll.mRun_Entry           = 1;
     lStatsE.mDll.mRun_Iteration_Queue = BUFFER_QTY;
@@ -193,11 +177,13 @@ KMS_TEST_BEGIN(Mirror_SetupC)
 
     lStatsM.mDriver.mHardware_NoReset.mStats_Get_Reset = UTL_MASK_ABOVE;
     lStatsM.mDriver.mHardware_NoReset.mStats_Reset     = UTL_MASK_ABOVE;
+    */
 
-    KMS_TEST_COMPARE(0, Utl_Validate(lSetup.mStats[0], lStatsE, lStatsM));
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(0, lConstraints));
 
-    Utl_ValidateInit(&lStatsE, &lStatsM);
+    KmsLib::ValueVector::Constraint_Init(lConstraints, SetupC::STATISTICS_QTY);
 
+    /*
     lStatsE.mDll.mBuffer_Allocated    = BUFFER_QTY;
     lStatsE.mDll.mPacket_Send         = PACKET_QTY;
     lStatsE.mDll.mRun_Entry           = 1;
@@ -243,114 +229,194 @@ KMS_TEST_BEGIN(Mirror_SetupC)
 
     lStatsM.mDriver.mHardware_NoReset.mStats_Get_Reset = UTL_MASK_ABOVE;
     lStatsM.mDriver.mHardware_NoReset.mStats_Reset     = UTL_MASK_ABOVE;
-
-    KMS_TEST_COMPARE(0, Utl_Validate(lSetup.mStats[1], lStatsE, lStatsM));
+    */
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(1, lConstraints));
 
     KMS_TEST_COMPARE(0, lSetup.Stop(OpenNet::System::STOP_FLAG_LOOPBACK));
 
     Sleep(1000);
 
-    KMS_TEST_COMPARE(0, lSetup.Stats_GetAndDisplay());
+    KMS_TEST_COMPARE(0, lSetup.Statistics_GetAndDisplay());
 
-    Utl_ValidateInit(&lStatsE, &lStatsM);
+    KmsLib::ValueVector::Constraint_Init(lConstraints, SetupC::STATISTICS_QTY);
 
-    lStatsE.mDll.mBuffer_Released = BUFFER_QTY;
-    lStatsE.mDll.mRun_Exit        = 1;
-    lStatsE.mDll.mStop_Request    = 1;
-    lStatsE.mDll.mStop_Wait       = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMin = 2;
+    lConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMax = 2;
 
-    lStatsE.mDriver.mAdapter.mBuffer_Send        = 1;
-    lStatsE.mDriver.mAdapter.mBuffer_SendPackets = 2;
-    lStatsE.mDriver.mAdapter.mIoCtl              = lSetup.mStats[0].mDll.mLoopBackPacket;
-    lStatsE.mDriver.mAdapter.mIoCtl_Packet_Send  = lSetup.mStats[0].mDll.mLoopBackPacket;
-    lStatsE.mDriver.mAdapter.mIoCtl_State_Get    = 4;
-    lStatsE.mDriver.mAdapter.mIoCtl_Stats_Get    = 1;
-    lStatsE.mDriver.mAdapter.mIoCtl_Stop         = 1;
-    lStatsE.mDriver.mAdapter.mTx_Packet          = 64;
+    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMin        =   0;
+    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMax        = 320;
+    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMultipleOf =  32;
 
-    lStatsE.mDriver.mHardware.mInterrupt_Process2 = lSetup.mStats[0].mDriver.mHardware.mInterrupt_Process;
-    lStatsE.mDriver.mHardware.mPacket_Send        = lSetup.mStats[0].mDll.mLoopBackPacket;
-    lStatsE.mDriver.mHardware.mTx_Packet          = lSetup.mStats[0].mDriver.mHardware.mPacket_Send;
+    lConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMax = 1;
 
-    lStatsM.mDll.mLoopBackPacket      = UTL_MASK_IGNORE;
-    lStatsM.mDll.mRun_Iteration_Queue = UTL_MASK_IGNORE;
-    lStatsM.mDll.mRun_Iteration_Wait  = UTL_MASK_IGNORE;
+    lConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_QUEUE].mMax = 1;
 
-    lStatsM.mDriver.mAdapter.mBuffers_Process    = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mBuffer_Receive     = UTL_MASK_IGNORE;
-    lStatsM.mDriver.mAdapter.mBuffer_Send        = UTL_MASK_ABOVE_OR_EQUAL;
-    lStatsM.mDriver.mAdapter.mBuffer_SendPackets = UTL_MASK_ABOVE_OR_EQUAL;
-    lStatsM.mDriver.mAdapter.mIoCtl              = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mIoCtl_State_Get    = UTL_MASK_ABOVE_OR_EQUAL;
-    lStatsM.mDriver.mAdapter.mTx_Packet          = UTL_MASK_ABOVE_OR_EQUAL;
+    lConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_WAIT].mMax = 1;
 
-    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Last            = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Last_Result     = UTL_MASK_IGNORE;
-    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Stats_Get_Reset = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Stats_Reset     = UTL_MASK_ABOVE;
+    lConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMax = 1;
 
-    lStatsM.mDriver.mHardware.mInterrupt_Process  = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mInterrupt_Process2 = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mPacket_Receive     = UTL_MASK_IGNORE;
-    lStatsM.mDriver.mHardware.mPacket_Send        = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mRx_NoBuffer_packet = UTL_MASK_IGNORE;
-    lStatsM.mDriver.mHardware.mRx_Packet          = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mStats_Get          = UTL_MASK_ABOVE;
+    lConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMax = 1;
 
-    lStatsM.mDriver.mHardware_NoReset.mStats_Get_Reset = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware_NoReset.mStats_Reset     = UTL_MASK_ABOVE;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 37;
 
-    KMS_TEST_COMPARE(0, Utl_Validate(lSetup.mStats[0], lStatsE, lStatsM));
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin = 0;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 1;
 
-    Utl_ValidateInit(&lStatsE, &lStatsM);
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 2;
 
-    lStatsE.mDll.mBuffer_Released = BUFFER_QTY;
-    lStatsE.mDll.mRun_Exit        = 1;
-    lStatsE.mDll.mStop_Request    = 1;
-    lStatsE.mDll.mStop_Wait       = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = 2;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 4;
 
-    lStatsE.mDriver.mAdapter.mBuffer_Send        = 1;
-    lStatsE.mDriver.mAdapter.mBuffer_SendPackets = 2;
-    lStatsE.mDriver.mAdapter.mIoCtl              = lSetup.mStats[1].mDll.mLoopBackPacket;
-    lStatsE.mDriver.mAdapter.mIoCtl_Packet_Send  = lSetup.mStats[1].mDll.mLoopBackPacket;
-    lStatsE.mDriver.mAdapter.mIoCtl_State_Get    = 4;
-    lStatsE.mDriver.mAdapter.mIoCtl_Stats_Get    = 1;
-    lStatsE.mDriver.mAdapter.mIoCtl_Stop         = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMin =   6;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMax = 327;
 
-    lStatsE.mDriver.mAdapter_NoReset.mIoCtl_Last        = IOCTL_STATE_GET;
-    lStatsE.mDriver.mAdapter_NoReset.mIoCtl_Last_Result = 0x200;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMax        = 320;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMultipleOf =  64;
 
-    lStatsE.mDriver.mHardware.mInterrupt_Process2 = lSetup.mStats[1].mDriver.mHardware.mInterrupt_Process;
-    lStatsE.mDriver.mHardware.mPacket_Send        = lSetup.mStats[1].mDll.mLoopBackPacket;
-    lStatsE.mDriver.mHardware.mStats_Get          = 1;
-    lStatsE.mDriver.mHardware.mTx_Packet          = lSetup.mStats[1].mDriver.mHardware.mPacket_Send;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMin = 4;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMax = 7;
 
-    lStatsM.mDll.mLoopBackPacket      = UTL_MASK_ABOVE;
-    lStatsM.mDll.mRun_Iteration_Queue = UTL_MASK_IGNORE;
-    lStatsM.mDll.mRun_Iteration_Wait  = UTL_MASK_IGNORE;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMax = 1;
 
-    lStatsM.mDriver.mAdapter.mBuffers_Process    = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mBuffer_Receive     = UTL_MASK_IGNORE;
-    lStatsM.mDriver.mAdapter.mBuffer_Send        = UTL_MASK_ABOVE_OR_EQUAL;
-    lStatsM.mDriver.mAdapter.mBuffer_SendPackets = UTL_MASK_ABOVE_OR_EQUAL;
-    lStatsM.mDriver.mAdapter.mIoCtl              = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter.mIoCtl_Packet_Send  = UTL_MASK_ABOVE_OR_EQUAL;
-    lStatsM.mDriver.mAdapter.mIoCtl_State_Get    = UTL_MASK_ABOVE_OR_EQUAL;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMax = 1;
 
-    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Stats_Get_Reset = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mAdapter_NoReset.mIoCtl_Stats_Reset     = UTL_MASK_ABOVE;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_TX_packet].mMin        =  64;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_TX_packet].mMax        = 128;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_TX_packet].mMultipleOf =  64;
 
-    lStatsM.mDriver.mHardware.mInterrupt_Process  = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mInterrupt_Process2 = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mPacket_Receive     = UTL_MASK_IGNORE;
-    lStatsM.mDriver.mHardware.mPacket_Send        = UTL_MASK_ABOVE_OR_EQUAL;
-    lStatsM.mDriver.mHardware.mRx_NoBuffer_packet = UTL_MASK_IGNORE;
-    lStatsM.mDriver.mHardware.mRx_Packet          = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware.mTx_Packet          = UTL_MASK_ABOVE_OR_EQUAL;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMin = IOCTL_CONNECT;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMax = IOCTL_STOP   ;
 
-    lStatsM.mDriver.mHardware_NoReset.mStats_Get_Reset = UTL_MASK_ABOVE;
-    lStatsM.mDriver.mHardware_NoReset.mStats_Reset     = UTL_MASK_ABOVE;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST_RESULT].mMax = 512;
 
-    KMS_TEST_COMPARE(0, Utl_Validate(lSetup.mStats[1], lStatsE, lStatsM));
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET_RESET].mMax = 0xffffffff;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 11;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 28;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 17;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 37;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin        =  64;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax        = 128;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMultipleOf =  64;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin        =  64;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax        = 448;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMultipleOf =  64;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =  64;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 149;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMin = 1;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMax = 1;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin        =  64;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax        = 448;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMultipleOf =  64;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_NO_BUFFER_packet].mMax = 1;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMin = 1;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMax = 0xffffffff;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMin = 1;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMax = 0xffffffff;
+
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(0, lConstraints));
+
+    KmsLib::ValueVector::Constraint_Init(lConstraints, SetupC::STATISTICS_QTY);
+
+    lConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMin = 2;
+    lConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMax = 2;
+
+    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMin        =   0;
+    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMax        = 576;
+    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMultipleOf =  64;
+
+    lConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMax = 1;
+
+    lConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_QUEUE].mMax = 1;
+
+    lConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_WAIT].mMax = 1;
+
+    lConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMax = 1;
+
+    lConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMax = 1;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin = 26;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 43;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 2;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = 2;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 4;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMin =   6;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMax = 589;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMax        = 576;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMultipleOf =  64;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMin =  4;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMax = 11;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMax = 1;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMin = 1;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMax = 1;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMin = IOCTL_CONNECT;
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMax = IOCTL_STOP   ;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST_RESULT].mMax = 512;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET_RESET].mMax = 0xffffffff;
+
+    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 11;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 34;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 17;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 43;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin        =  64;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax        = 576;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMultipleOf =  64;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =  64;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 118;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMin = 1;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMax = 1;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin        =  64;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax        = 576;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMultipleOf =  64;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_NO_BUFFER_packet].mMax = 1;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMin = 1;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMax = 0xffffffff;
+
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMin = 1;
+    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMax = 0xffffffff;
+
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(1, lConstraints));
 }
 KMS_TEST_END

@@ -9,8 +9,6 @@
 #include "Component.h"
 
 // ===== Includes/OpenNetK ==================================================
-#include <OpenNetK/Interface.h>
-
 #include <OpenNetK/Adapter.h>
 #include <OpenNetK/Adapter_WDF.h>
 #include <OpenNetK/Hardware_WDF.h>

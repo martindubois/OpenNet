@@ -18,8 +18,6 @@
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
-// TODO  Test
-//
 // OCLW_CreateContext ==> OCLW_ReleaseContext
 cl_context OCLW_CreateContext(const cl_context_properties * aProperties, cl_uint aDeviceCount, const cl_device_id * aDevices)
 {
@@ -52,7 +50,6 @@ void OCLW_GetPlatformIDs(cl_uint aCount, cl_platform_id * aOut, cl_uint * aInfo)
     }
 }
 
-// TODO  Test
 void OCLW_WaitForEvents(cl_uint aCount, const cl_event * aEvents)
 {
     assert(0    <  aCount );
@@ -68,7 +65,6 @@ void OCLW_WaitForEvents(cl_uint aCount, const cl_event * aEvents)
 
 // ===== cl_command_queue ===================================================
 
-// TODO  Test
 void OCLW_EnqueueNDRangeKernel(cl_command_queue aCommandQueue, cl_kernel aKernel, cl_uint aWorkDim, const size_t * aGlobalWorkOffset, const size_t * aGlobalWorkSize, const size_t * aLocalWorkSize, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent)
 {
     assert(NULL != aCommandQueue    );
@@ -86,7 +82,6 @@ void OCLW_EnqueueNDRangeKernel(cl_command_queue aCommandQueue, cl_kernel aKernel
     }
 }
 
-// TODO  Test
 void OCLW_EnqueueReadBuffer(cl_command_queue aCommandQueue, cl_mem aBuffer, cl_bool aBlockingRead, size_t aOffset_byte, size_t aSize_byte, void * aOut, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent)
 {
     assert(NULL != aCommandQueue);
@@ -102,8 +97,6 @@ void OCLW_EnqueueReadBuffer(cl_command_queue aCommandQueue, cl_mem aBuffer, cl_b
     }
 }
 
-// TODO  Test
-//
 // OCLW_CreateCommandQueueWithProperties ==> OCLW_ReleaseCommandQueue
 void OCLW_ReleaseCommandQueue(cl_command_queue aCommandQueue)
 {
@@ -120,8 +113,6 @@ void OCLW_ReleaseCommandQueue(cl_command_queue aCommandQueue)
 
 // ===== cl_context =========================================================
 
-// TODO  Test
-//
 // OCLE_CreateBuffer ==> OCLW_ReleaseMemObject
 cl_mem OCLW_CreateBuffer(cl_context aContext, cl_mem_flags aFlags, size_t aSize_byte)
 {
@@ -141,8 +132,6 @@ cl_mem OCLW_CreateBuffer(cl_context aContext, cl_mem_flags aFlags, size_t aSize_
     return lResult;
 }
 
-// TODO  Test
-//
 // OCLW_CreateCommandQueueWithProperties ==> OCLW_ReleaseCommandQueue
 cl_command_queue OCLW_CreateCommandQueueWithProperties(cl_context aContext, cl_device_id aDevice, const cl_queue_properties * aProperties)
 {
@@ -162,8 +151,6 @@ cl_command_queue OCLW_CreateCommandQueueWithProperties(cl_context aContext, cl_d
     return lResult;
 }
 
-// TODO  Test
-//
 // OCLW_CreateProgramWithSource ==> OCLW_ReleaseProgram
 cl_program OCLW_CreateProgramWithSource(cl_context aContext, cl_uint aLineCount, const char ** aLines, const size_t * aLineLengths)
 {
@@ -188,8 +175,6 @@ cl_program OCLW_CreateProgramWithSource(cl_context aContext, cl_uint aLineCount,
     return lResult;
 }
 
-// TODO  Test
-//
 // OCLW_CreateContext ==> OCLW_ReleaseContext
 void OCLW_ReleaseContext(cl_context aContext)
 {
@@ -206,7 +191,6 @@ void OCLW_ReleaseContext(cl_context aContext)
 
 // ===== cl_device_id =======================================================
 
-// TODO  Test
 void OCLW_GetDeviceInfo(cl_device_id aDevice, cl_device_info aParam, size_t aOutSize_byte, void * aOut)
 {
     assert(NULL != aDevice      );
@@ -231,6 +215,28 @@ void OCLW_GetDeviceInfo(cl_device_id aDevice, cl_device_info aParam, size_t aOut
 
 // ===== cl_event ===========================================================
 
+void OCLW_GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam, size_t aOutSize_byte, void * aOut)
+{
+    assert(NULL != aEvent       );
+    assert(   0 <  aOutSize_byte);
+    assert(NULL != aOut         );
+
+    size_t lInfo_byte;
+
+    cl_int lStatus = clGetEventProfilingInfo(aEvent, aParam, aOutSize_byte, aOut, &lInfo_byte);
+    if (CL_SUCCESS != lStatus)
+    {
+        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
+            "clGetEventProfilingInfo( , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+    }
+
+    if (aOutSize_byte < lInfo_byte)
+    {
+        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
+            "clGetEventProfilingInfo reported an invalid data size", NULL, __FILE__, __FUNCTION__, __LINE__, static_cast<unsigned int>(lInfo_byte));
+    }
+}
+
 void OCLW_ReleaseEvent(cl_event aEvent)
 {
     assert(NULL != aEvent);
@@ -245,7 +251,6 @@ void OCLW_ReleaseEvent(cl_event aEvent)
 
 // ===== cl_kernel ==========================================================
 
-// TODO  Test
 void OCLW_GetKernelWorkGroupInfo(cl_kernel aKernel, cl_device_id aDevice, cl_kernel_work_group_info aParam, size_t aOutSize_byte, void * aOut)
 {
     assert(NULL != aKernel      );
@@ -269,8 +274,6 @@ void OCLW_GetKernelWorkGroupInfo(cl_kernel aKernel, cl_device_id aDevice, cl_ker
     }
 }
 
-// TODO  Test
-//
 // OCLW_CreateKernel ==> OCLW_ReleaseKernel
 void OCLW_ReleaseKernel(cl_kernel aKernel)
 {
@@ -285,7 +288,6 @@ void OCLW_ReleaseKernel(cl_kernel aKernel)
     }
 }
 
-// TODO  Test
 void OCLW_SetKernelArg(cl_kernel aKernel, cl_uint aIndex, size_t aSize_byte, cl_mem * aMemObject)
 {
     assert(NULL != aKernel   );
@@ -302,8 +304,6 @@ void OCLW_SetKernelArg(cl_kernel aKernel, cl_uint aIndex, size_t aSize_byte, cl_
 
 // ===== cl_mem =============================================================
 
-// TODO  Test
-//
 // OCLW_CreateBuffer ==> OCLW_ReleaseMemObject
 void OCLW_ReleaseMemObject(cl_mem aMemObject)
 {
@@ -320,7 +320,6 @@ void OCLW_ReleaseMemObject(cl_mem aMemObject)
 
 // ===== cl_platform_id =====================================================
 
-// TODO  Test
 void OCLW_GetDeviceIDs(cl_platform_id aPlatform, cl_device_type aType, cl_uint aCount, cl_device_id * aOut, cl_uint * aInfo)
 {
     assert(   0 != aPlatform);
@@ -343,7 +342,6 @@ void OCLW_GetDeviceIDs(cl_platform_id aPlatform, cl_device_type aType, cl_uint a
     }
 }
 
-// TODO  Test
 void * OCLW_GetExtensionFunctionAddressForPlatform(cl_platform_id aPlatform, const char * aName)
 {
     void * lResult = clGetExtensionFunctionAddressForPlatform(aPlatform, aName);
@@ -356,7 +354,6 @@ void * OCLW_GetExtensionFunctionAddressForPlatform(cl_platform_id aPlatform, con
     return lResult;
 }
 
-// TODO  Test
 void OCLW_GetPlatformInfo(cl_platform_id aPlatform, cl_platform_info aParam, size_t aOutSize_byte, void * aOut)
 {
     assert(0    != aPlatform    );
@@ -381,7 +378,6 @@ void OCLW_GetPlatformInfo(cl_platform_id aPlatform, cl_platform_info aParam, siz
 
 // ===== cl_program =========================================================
 
-// TODO  Test
 void OCLW_BuildProgram(cl_program aProgram, cl_uint aDeviceCount, const cl_device_id * aDevices, const char * aOptions, void (*aNotify)(cl_program, void *), void * aUserData)
 {
     assert(NULL != aProgram    );
@@ -397,8 +393,6 @@ void OCLW_BuildProgram(cl_program aProgram, cl_uint aDeviceCount, const cl_devic
     }
 }
 
-// TODO  Test
-//
 // OCLW_CreateKernel ==> OCLW_ReleaseKernel
 cl_kernel OCLW_CreateKernel(cl_program aProgram, const char * aName)
 {
@@ -440,8 +434,6 @@ void OCLW_GetProgramBuildInfo(cl_program aProgram, cl_device_id aDevice, cl_prog
     }
 }
 
-// TODO  Test
-//
 // OCLW_CreateProgramWithSource ==> OCLW_ReleaseProgram
 void OCLW_ReleaseProgram(cl_program aProgram)
 {

@@ -2,9 +2,16 @@
 // Author   KMS - Martin Dubois, ing.
 // Product  OpenNet
 // File     Common/OpenNetK/IoCtl.h
+//
+// This file contains the definition of IoCtl code and the definition of data
+// type used only to pass data in or out of IoCtl.
 
 // TODO  Common.IoCtl
-//       Retirer le IOCTL_STATS_RESET
+//       Retirer le IOCTL_STATISTICS_RESET
+
+// TODO  Common.IoCtl
+//       Ajouter IOCTL_PACKET_SEND avec arguments (Remplacement de source,
+//       repetition...)
 
 #pragma once
 
@@ -14,43 +21,43 @@
 // ===== IoCtl ==============================================================
 
 // Input   None
-// Output  OpenNet_Config
-#define IOCTL_CONFIG_GET  CTL_CODE( 0x8000, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS )
+// Output  OpenNetK::Adapter_Config
+#define IOCTL_CONFIG_GET        CTL_CODE( 0x8000, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
-// Input   OpenNet_Config
-// Output  OpenNet_Config
-#define IOCTL_CONFIG_SET  CTL_CODE( 0x8000, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS )
+// Input   OpenNetK::Adapter_Config
+// Output  OpenNetK::Adapter_Config
+#define IOCTL_CONFIG_SET        CTL_CODE( 0x8000, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Input   IoCtl_Connect_In
 // Output  None
-#define IOCTL_CONNECT     CTL_CODE( 0x8000, 0x810, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define IOCTL_CONNECT           CTL_CODE( 0x8000, 0x810, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
-// Output  OpenNet_AdatperInfo
-#define IOCTL_INFO_GET    CTL_CODE( 0x8000, 0x820, METHOD_BUFFERED, FILE_ANY_ACCESS )
+// Output  OpenNetK::Adatper_Info
+#define IOCTL_INFO_GET          CTL_CODE( 0x8000, 0x820, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Input   The paquet
 // Output  None
-#define IOCTL_PACKET_SEND CTL_CODE( 0x8000, 0x830, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define IOCTL_PACKET_SEND       CTL_CODE( 0x8000, 0x830, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
-// Input   IoCtl_BufferInfo[ 1 .. N ]
+// Input   OpenNetK::Buffer[ 1 .. N ]
 // Output  None
-#define IOCTL_START       CTL_CODE( 0x8000, 0x840, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define IOCTL_START             CTL_CODE( 0x8000, 0x840, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
-// Input   None// Input   None
-// Output  OpenNet_State
-#define IOCTL_STATE_GET   CTL_CODE( 0x8000, 0x850, METHOD_BUFFERED, FILE_ANY_ACCESS )
+// Input   None
+// Output  OpenNetK::Adapter_State
+#define IOCTL_STATE_GET         CTL_CODE( 0x8000, 0x850, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
-// Input   IoCtl_Stats_Get_In
-// Output  OpenNet_AdapterStats
-#define IOCTL_STATS_GET   CTL_CODE( 0x8000, 0x860, METHOD_BUFFERED, FILE_ANY_ACCESS )
+// Input   IoCtl_Statistics_Get_In
+// Output  uint32_t[ 0 .. N ]
+#define IOCTL_STATISTICS_GET    CTL_CODE( 0x8000, 0x860, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Input   None
 // Output  None
-#define IOCTL_STATS_RESET CTL_CODE( 0x8000, 0x861, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define IOCTL_STATISTICS_RESET  CTL_CODE( 0x8000, 0x861, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Input   None
 // Output  None
-#define IOCTL_STOP        CTL_CODE( 0x8000, 0x870, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define IOCTL_STOP              CTL_CODE( 0x8000, 0x870, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Data types
 /////////////////////////////////////////////////////////////////////////////

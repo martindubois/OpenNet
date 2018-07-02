@@ -20,11 +20,13 @@
 
 #include <OpenNetK/Adapter.h>
 #include <OpenNetK/Constants.h>
+#include <OpenNetK/Hardware_Statistics.h>
 #include <OpenNetK/Interface.h>
 
 #include <OpenNetK/Hardware.h>
 
 // ===== Common =============================================================
+#include "../Common/Constants.h"
 #include "../Common/Version.h"
 
 namespace OpenNetK
@@ -48,7 +50,7 @@ namespace OpenNetK
         return mConfig.mPacketSize_byte;
     }
 
-    void Hardware::GetState(OpenNet_State * aState)
+    void Hardware::GetState(Adapter_State * aState)
     {
         ASSERT(NULL != aState);
 
@@ -81,13 +83,13 @@ namespace OpenNetK
         ASSERT(false);
     }
 
-    void Hardware::SetConfig(const OpenNet_Config & aConfig)
+    void Hardware::SetConfig(const Adapter_Config & aConfig)
     {
         ASSERT(NULL != (&aConfig));
 
         memcpy(&mConfig, &aConfig, sizeof(mConfig));
 
-        mStats.mSetConfig++;
+        mStatistics[HARDWARE_STATS_SET_CONFIG] ++;
     }
 
     bool Hardware::SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize_byte)
@@ -104,26 +106,26 @@ namespace OpenNetK
 
     bool Hardware::D0_Entry()
     {
-        mStats.mD0_Entry++;
+        mStatistics[HARDWARE_STATS_D0_ENTRY] ++;
 
         return true;
     }
 
     bool Hardware::D0_Exit()
     {
-        mStats.mD0_Exit++;
+        mStatistics[HARDWARE_STATS_D0_EXIT] ++;
 
         return true;
     }
 
     void Hardware::Interrupt_Disable()
     {
-        mStats.mInterrupt_Disable++;
+        mStatistics[HARDWARE_STATS_INTERRUPT_DISABLE] ++;
     }
 
     void Hardware::Interrupt_Enable()
     {
-        mStats.mInterrupt_Enable++;
+        mStatistics[HARDWARE_STATS_INTERRUPT_ENABLE] ++;
     }
 
     // NOT TESTED  ONK_Lib.Hardware
@@ -147,31 +149,48 @@ namespace OpenNetK
 
         mAdapter->Buffers_Process();
 
-        mStats.mInterrupt_Process2++;
+        mStatistics[HARDWARE_STATS_INTERRUPT_PROCESS2] ++;
     }
 
-    void Hardware::Stats_Get(OpenNet_Stats * aStats, bool aReset)
+    unsigned int Hardware::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)
     {
-        ASSERT(NULL != aStats);
+        unsigned int lResult_byte;
 
-        memcpy(&aStats->mHardware        , &mStats        , sizeof(mStats        ));
-        memcpy(&aStats->mHardware_NoReset, &mStats_NoReset, sizeof(mStats_NoReset));
+        if (sizeof(mStatistics) <= aOutSize_byte)
+        {
+            memcpy(aOut, &mStatistics, aOutSize_byte);
+            lResult_byte = sizeof(mStatistics);
+        }
+        else
+        {
+            if (0 < aOutSize_byte)
+            {
+                memcpy(aOut, &mStatistics, aOutSize_byte);
+                lResult_byte = aOutSize_byte;
+            }
+            else
+            {
+                lResult_byte = 0;
+            }
+        }
 
         if (aReset)
         {
-            memset(&mStats, 0, sizeof(mStats));
+            memset(&mStatistics, 0, sizeof(uint32_t) * HARDWARE_STATS_RESET_QTY);
 
-            mStats_NoReset.mStats_Get_Reset++;
+            mStatistics[HARDWARE_STATS_STATISTICS_GET_RESET] ++;
         }
 
-        mStats.mStats_Get++;
+        mStatistics[HARDWARE_STATS_STATISTICS_GET] ++;
+
+        return lResult_byte;
     }
 
-    void Hardware::Stats_Reset()
+    void Hardware::Statistics_Reset()
     {
-        memset(&mStats, 0, sizeof(mStats));
+        memset(&mStatistics, 0, sizeof(uint32_t) * HARDWARE_STATS_RESET_QTY);
 
-        mStats_NoReset.mStats_Reset++;
+        mStatistics[HARDWARE_STATS_STATISTICS_RESET] ++;
     }
 
     // Internal
@@ -191,14 +210,14 @@ namespace OpenNetK
         return mInfo.mCommonBufferSize_byte;
     }
 
-    void Hardware::GetConfig(OpenNet_Config * aConfig)
+    void Hardware::GetConfig(Adapter_Config * aConfig)
     {
         ASSERT(NULL != aConfig);
 
         memcpy(aConfig, &mConfig, sizeof(mConfig));
     }
 
-    void Hardware::GetInfo(OpenNet_Info * aInfo)
+    void Hardware::GetInfo(Adapter_Info * aInfo)
     {
         ASSERT(NULL != aInfo);
 
@@ -242,11 +261,10 @@ namespace OpenNetK
         memset(&mConfig, 0, sizeof(mConfig));
         memset(&mInfo  , 0, sizeof(mInfo  ));
 
-        mConfig.mMode            = OPEN_NET_MODE_NORMAL         ;
-        mConfig.mPacketSize_byte = OPEN_NET_PACKET_SIZE_MAX_byte;
+        mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
 
-        mInfo.mAdapterType     = OPEN_NET_ADAPTER_TYPE_ETHERNET;
-        mInfo.mPacketSize_byte = OPEN_NET_PACKET_SIZE_MAX_byte ;
+        mInfo.mAdapterType     = ADAPTER_TYPE_ETHERNET;
+        mInfo.mPacketSize_byte = PACKET_SIZE_MAX_byte ;
 
         mInfo.mVersion_Driver.mMajor         = VERSION_MAJOR;
         mInfo.mVersion_Driver.mMinor         = VERSION_MINOR;

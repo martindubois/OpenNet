@@ -13,6 +13,7 @@
 
 // ===== Includes ===========================================================
 #include <OpenNetK/Constants.h>
+#include <OpenNetK/Hardware_Statistics.h>
 #include <OpenNetK/Interface.h>
 #include <OpenNetK/SpinLock.h>
 
@@ -56,12 +57,13 @@ Pro1000::Pro1000()
 
 // ===== OpenNetK::Adapter ==================================================
 
-void Pro1000::GetState(OpenNet_State * aState)
+void Pro1000::GetState(OpenNetK::Adapter_State * aState)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
     ASSERT(NULL != aState);
 
+    ASSERT(NULL != mBAR1 );
     ASSERT(NULL != mZone0);
 
     Hardware::GetState(aState);
@@ -123,11 +125,16 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, void * aVirtual)
         SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY, &mRx_Logical, reinterpret_cast<uint8_t **>(&mRx_Virtual));
         SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY, &mTx_Logical, reinterpret_cast<uint8_t **>(&mTx_Virtual));
 
+        ASSERT(NULL != mRx_Virtual);
+        ASSERT(NULL != mTx_Virtual);
+
         unsigned int i;
 
         for (i = 0; i < PACKET_BUFFER_QTY; i++)
         {
             SkipDangerousBoundary(&lLogical, &lVirtual, mConfig.mPacketSize_byte, mTx_PacketBuffer_Logical + i, reinterpret_cast<uint8_t **>(mTx_PacketBuffer_Virtual + i));
+
+            ASSERT(NULL != mTx_PacketBuffer_Virtual[i]);
         }
 
         for (i = 0; i < TX_DESCRIPTOR_QTY; i++)
@@ -146,7 +153,8 @@ bool Pro1000::SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( %u, , %u bytes )" DEBUG_EOL, aIndex, aSize_byte);
 
-    ASSERT(NULL != aVirtual);
+    ASSERT(NULL != aVirtual  );
+    ASSERT(   0 <  aSize_byte);
 
     ASSERT(NULL != mZone0);
 
@@ -182,6 +190,7 @@ bool Pro1000::D0_Entry()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
+    ASSERT(NULL != mBAR1 );
     ASSERT(NULL != mZone0);
 
     mZone0->Lock();
@@ -251,13 +260,12 @@ void Pro1000::Interrupt_Enable()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
+    ASSERT(NULL != mBAR1 );
     ASSERT(NULL != mZone0);
 
     Hardware::Interrupt_Enable();
 
     mZone0->Lock();
-
-        ASSERT(NULL != mBAR1);
 
         mBAR1->mInterruptMaskSet.mFields.mTx_DescriptorWritten = true;
         mBAR1->mInterruptMaskSet.mFields.mRx_DescriptorWritten = true;
@@ -269,6 +277,8 @@ bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcess
 {
     ASSERT(NULL != aNeedMoreProcessing);
 
+    ASSERT(NULL != mBAR1);
+
     (void)(aMessageId);
 
     uint32_t lValue = mBAR1->mInterruptCauseRead.mValue;
@@ -276,9 +286,9 @@ bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcess
 
     (*aNeedMoreProcessing) = true;
 
-    mStats.mInterrupt_Process++;
+    mStatistics[OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS] ++;
 
-    mStats_NoReset.mInterrupt_Process_Last_MessageId = aMessageId;
+    mStatistics[OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID] = aMessageId;
 
     return true;
 }
@@ -306,13 +316,13 @@ void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, v
     ASSERT(NULL != aPacketInfo);
     ASSERT(NULL != aCounter   );
 
-    ASSERT(NULL != mZone0);
+    ASSERT(NULL != mBAR1      );
+    ASSERT(NULL != mRx_Virtual);
+    ASSERT(NULL != mZone0     );
 
     mZone0->Lock();
 
-        ASSERT(NULL              != mBAR1      );
         ASSERT(RX_DESCRIPTOR_QTY >  mRx_In     );
-        ASSERT(NULL              != mRx_Virtual);
 
         mRx_Counter   [mRx_In] = aCounter   ;
         mRx_PacketInfo[mRx_In] = aPacketInfo;
@@ -331,22 +341,20 @@ void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, v
 
     mZone0->Unlock();
 
-    mStats.mPacket_Receive++;
+    mStatistics[OpenNetK::HARDWARE_STATS_PACKET_RECEIVE] ++;
 }
 
 void Pro1000::Packet_Send(uint64_t aData, unsigned int aSize_byte, volatile long * aCounter)
 {
     // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u,  )" DEBUG_EOL, aSize_byte);
 
-    ASSERT(OPEN_NET_PACKET_SIZE_MAX_byte >= aSize_byte);
-
-    ASSERT(NULL != mZone0);
+    ASSERT(NULL != mBAR1      );
+    ASSERT(NULL != mTx_Virtual);
+    ASSERT(NULL != mZone0     );
 
     mZone0->Lock();
 
-        ASSERT(NULL              != mBAR1      );
         ASSERT(TX_DESCRIPTOR_QTY >  mTx_In     );
-        ASSERT(NULL              != mTx_Virtual);
 
         mTx_Counter[mTx_In] = aCounter;
 
@@ -365,7 +373,7 @@ void Pro1000::Packet_Send(uint64_t aData, unsigned int aSize_byte, volatile long
 
     mZone0->Unlock();
 
-    mStats.mPacket_Send++;
+    mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] ++;
 }
 
 void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
@@ -378,8 +386,8 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
 
     mZone0->Lock();
 
-        ASSERT(PACKET_BUFFER_QTY >  mTx_PacketBuffer_In     );
-        ASSERT(NULL              != mTx_PacketBuffer_Virtual);
+        ASSERT(PACKET_BUFFER_QTY >  mTx_PacketBuffer_In                          );
+        ASSERT(NULL              != mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In]);
 
         memcpy((void *)(mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In]), aPacket, aSize_byte); // volatile_cast
 
@@ -392,22 +400,22 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
     Packet_Send(lPacket_PA, aSize_byte, NULL);
 }
 
-void Pro1000::Stats_Get(OpenNet_Stats * aStats, bool aReset)
+unsigned int Pro1000::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
-    Stats_Update();
+    Statistics_Update();
 
-    Hardware::Stats_Get(aStats, aReset);
+    return Hardware::Statistics_Get(aOut, aOutSize_byte, aReset);
 }
 
-void Pro1000::Stats_Reset()
+void Pro1000::Statistics_Reset()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
-    Stats_Update();
+    Statistics_Update();
 
-    Hardware::Stats_Reset();
+    Hardware::Statistics_Reset();
 }
 
 // Private
@@ -444,7 +452,8 @@ void Pro1000::Rx_Config_Zone0()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
-    ASSERT(NULL != mBAR1);
+    ASSERT(NULL != mBAR1                   );
+    ASSERT(   0 <  mConfig.mPacketSize_byte);
 
     for (unsigned int i = 0; i < (sizeof(mBAR1->mMulticastTableArray) / sizeof(mBAR1->mMulticastTableArray[0])); i++)
     {
@@ -491,7 +500,6 @@ void Pro1000::Rx_Process_Zone0()
         ASSERT(NULL                             != mRx_Counter   [mRx_Out]              );
         ASSERT(NULL                             != mRx_PacketInfo[mRx_Out]              );
         ASSERT(OPEN_NET_PACKET_STATE_RX_RUNNING == mRx_PacketInfo[mRx_Out]->mPacketState);
-        ASSERT(OPEN_NET_PACKET_SIZE_MAX_byte    >= mRx_Virtual   [mRx_Out].mSize_byte   );
 
         mRx_PacketInfo[mRx_Out]->mPacketSize_byte = mRx_Virtual[mRx_Out].mSize_byte;
         mRx_PacketInfo[mRx_Out]->mPacketState     = OPEN_NET_PACKET_STATE_RX_COMPLETED;
@@ -500,28 +508,28 @@ void Pro1000::Rx_Process_Zone0()
 
         mRx_Out = (mRx_Out + 1) % RX_DESCRIPTOR_QTY;
 
-        mStats.mRx_Packet++;
+        mStatistics[OpenNetK::HARDWARE_STATS_RX_packet] ++;
     }
 }
 
-void Pro1000::Stats_Update()
+void Pro1000::Statistics_Update()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     ASSERT(NULL != mBAR1);
 
-    mStats.mRx_BmcManagementDropper_packet      += mBAR1->mRx_BmcManagementDropper_packet     ;
-    mStats.mRx_CircuitBreakerDropped_packet     += mBAR1->mRx_CircuitBreakerDropped_packet    ;
-    mStats.mRx_LengthErrors_packet              += mBAR1->mRx_LengthErrors_packet             ;
-    mStats.mRx_ManagementDropped_packet         += mBAR1->mRx_ManagementDropped_packet        ;
-    mStats.mRx_Missed_packet                    += mBAR1->mRx_Missed_packet                   ;
-    mStats.mRx_NoBuffer_packet                  += mBAR1->mRx_NoBuffer_packet                 ;
-    mStats.mRx_Oversize_packet                  += mBAR1->mRx_Oversize_packet                 ;
-    mStats.mRx_Undersize_packet                 += mBAR1->mRx_Undersize_packet                ;
-    mStats.mTx_DeferEvents                      += mBAR1->mTx_DeferEvents                     ;
-    mStats.mTx_Discarded_packet                 += mBAR1->mTx_Discarded_packet                ;
-    mStats.mTx_NoCrs_packet                     += mBAR1->mTx_NoCrs_packet                    ;
-    mStats.mTx_HostCircuitBreakerDropped_packet += mBAR1->mTx_HostCircuitBreakerDropped_packet;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_BMC_MANAGEMENT_DROPPED_packet      ] += mBAR1->mRx_BmcManagementDropper_packet     ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_CIRCUIT_BREAKER_DROPPED_packet     ] += mBAR1->mRx_CircuitBreakerDropped_packet    ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_LENGTH_ERRORS_packet               ] += mBAR1->mRx_LengthErrors_packet             ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_MANAGEMENT_DROPPED_packet          ] += mBAR1->mRx_ManagementDropped_packet        ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_MISSED_packet                      ] += mBAR1->mRx_Missed_packet                   ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_NO_BUFFER_packet                   ] += mBAR1->mRx_NoBuffer_packet                 ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_OVERSIZE_packet                    ] += mBAR1->mRx_Oversize_packet                 ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_UNDERSIZE_packet                   ] += mBAR1->mRx_Undersize_packet                ;
+    mStatistics[OpenNetK::HARDWARE_STATS_TX_DEFER_EVENTS                       ] += mBAR1->mTx_DeferEvents                     ;
+    mStatistics[OpenNetK::HARDWARE_STATS_TX_DISCARDED_packet                   ] += mBAR1->mTx_Discarded_packet                ;
+    mStatistics[OpenNetK::HARDWARE_STATS_TX_NO_CRS_packet                      ] += mBAR1->mTx_NoCrs_packet                    ;
+    mStatistics[OpenNetK::HARDWARE_STATS_TX_HOST_CIRCUIT_BREAKER_DROPPED_packet] += mBAR1->mTx_HostCircuitBreakerDropped_packet;
 }
 
 // Level   Thread
@@ -564,6 +572,6 @@ void Pro1000::Tx_Process_Zone0()
 
         mTx_Out = (mTx_Out + 1) % TX_DESCRIPTOR_QTY;
 
-        mStats.mTx_Packet++;
+        mStatistics[OpenNetK::HARDWARE_STATS_TX_packet] ++;
     }
 }

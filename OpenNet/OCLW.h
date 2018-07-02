@@ -33,7 +33,8 @@ void             OCLW_ReleaseContext                  (cl_context aContext);
 void OCLW_GetDeviceInfo(cl_device_id aDevice, cl_device_info aParam, size_t aOutSize_byte, void * aOut);
 
 // ===== cl_event ===========================================================
-void OCLW_ReleaseEvent(cl_event aEvent);
+void OCLW_GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam, size_t aOutSize_byte, void * aOut);
+void OCLW_ReleaseEvent         (cl_event aEvent);
 
 // ===== cl_kernel ==========================================================
 void OCLW_GetKernelWorkGroupInfo(cl_kernel aKernel, cl_device_id aDevice, cl_kernel_work_group_info aParam, size_t aOutSize_byte, void * aOut);

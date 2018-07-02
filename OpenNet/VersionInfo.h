@@ -9,14 +9,20 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
-
-#include <OpenNetK/Interface.h>
-
 #include <OpenNet/Status.h>
+#include <OpenNetK/Adapter_Types.h>
 
 namespace OpenNet
 {
 
-    extern Status VersionInfo_Display(const OpenNet_VersionInfo & aIn, FILE * aOut);
+    // Data type
+    /////////////////////////////////////////////////////////////////////////
+
+    typedef OpenNetK::VersionInfo VersionInfo;
+
+    // Function
+    /////////////////////////////////////////////////////////////////////////
+
+    extern Status VersionInfo_Display(const VersionInfo & aIn, FILE * aOut);
 
 }

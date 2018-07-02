@@ -10,6 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
+#include <OpenNetK/Adapter_Types.h>
 #include <OpenNetK/Interface.h>
 #include <OpenNetK/Types.h>
 
@@ -67,7 +68,7 @@ namespace OpenNetK
         /// \param  aState [---;-W-] L'instance d'OpenNet_State
         /// \endcond
         /// \note   Level = SoftInt or Thread, Thread = Queue
-        virtual void GetState(OpenNet_State * aState);
+        virtual void GetState(Adapter_State * aState);
 
         /// \cond en
         /// \brief  Reset all memory regions
@@ -115,7 +116,7 @@ namespace OpenNetK
         /// \param  aConfig [---;R--] La configuration
         /// \endcond
         /// \note   Level = SoftInt, Thread = Queue
-        virtual void SetConfig(const OpenNet_Config & aConfig);
+        virtual void SetConfig(const Adapter_Config & aConfig);
 
         /// \cond en
         /// \brief  Set a memory region
@@ -243,9 +244,34 @@ namespace OpenNetK
         /// \note   Thread = Queue
         virtual void Packet_Send(const void * aPacket, unsigned int aSize_byte) = 0;
 
-        virtual void Stats_Get(OpenNet_Stats * aStats, bool aReset);
+        /// \cond en
+        /// \brief  Retrieve statistics
+        /// \param  aOut [---;-W-] The output buffer
+        /// \param  aOutSize_byte  The output buffer size
+        /// \param  aReset         Reset the statitics after getting them?
+        /// \return This method returns the size of statistics writen into
+        ///         the output buffer.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Obtenir les statistiques
+        /// \param  aOut [---;-W-] L'espace de memoire de sortie
+        /// \param  aOutSize_byte  La taille de l'espace memoire de sortie
+        /// \param  aReset         Remettre les statistiques a zero apres les
+        ///                        avoir obtenus?
+        /// \return Cette methode retourne la taille des statistiques ecrites
+        ///         dans l'espace de memoire de sortie.
+        /// \endcond
+        /// \note   Thread = Queue
+        virtual unsigned int Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset);
 
-        virtual void Stats_Reset();
+        /// \cond en
+        /// \brief  Reset the statistics
+        /// \endcond
+        /// \cond fr
+        /// \brief  Remettre les statistiques a zero
+        /// \endcond
+        /// \note   Thread = Queue
+        virtual void Statistics_Reset();
 
     // internal:
 
@@ -253,8 +279,8 @@ namespace OpenNetK
 
         unsigned int GetCommonBufferSize() const;
 
-        void GetConfig(OpenNet_Config * aConfig);
-        void GetInfo  (OpenNet_Info   * aInfo  );
+        void GetConfig(Adapter_Config * aConfig);
+        void GetInfo  (Adapter_Info   * aInfo  );
 
     protected:
 
@@ -296,11 +322,10 @@ namespace OpenNetK
         /// \endcond
         Adapter * GetAdapter();
 
-        OpenNet_Config mConfig;
-        OpenNet_Info   mInfo  ;
+        Adapter_Config mConfig;
+        Adapter_Info   mInfo  ;
 
-        mutable OpenNet_Stats_Hardware         mStats        ;
-        mutable OpenNet_Stats_Hardware_NoReset mStats_NoReset;
+        mutable uint32_t mStatistics[64];
 
         // ===== Zone 0 =====================================================
         SpinLock * mZone0;

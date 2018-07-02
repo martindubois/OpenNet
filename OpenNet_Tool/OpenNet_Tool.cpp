@@ -146,7 +146,6 @@ static const KmsLib::ToolBase::CommandInfo COMMANDS[] =
 static void ReportStatus(OpenNet::Status aStatus, const char * aMsgOK);
 
 static void System_Connect();
-static void System_Reset  ();
 
 // Global variable
 /////////////////////////////////////////////////////////////////////////////
@@ -256,14 +255,19 @@ void Adapter_GetStats(KmsLib::ToolBase * aToolBase, const char * aArg)
 
     bool lReset = (0 == strcmp("true", aArg));
 
+    // TODO  OpenNet_Tool
+    //       Ajouter un argument pour le MinLevel
+
     printf("Adapter GetStats %s\n", lReset ? "true" : "false");
 
-    OpenNet::Adapter::Stats lStats;
+    unsigned int lInfo_byte;
+    unsigned int lStats[1024];
 
-    OpenNet::Status lStatus = sAdapter->GetStats(&lStats, lReset);
+    OpenNet::Status lStatus = sAdapter->GetStatistics(lStats, sizeof(lStats), &lInfo_byte, lReset);
     assert(OpenNet::STATUS_OK == lStatus);
 
-    OpenNet::Adapter::Display(lStats, stdout);
+    lStatus = sAdapter->DisplayStatistics(lStats, lInfo_byte, stdout);
+    assert(OpenNet::STATUS_OK == lStatus);
 }
 
 void Adapter_List(KmsLib::ToolBase * aToolBase, const char * aArg)
@@ -918,13 +922,12 @@ void Test_Loop(KmsLib::ToolBase * aToolBase, const char * aArg)
 
         try
         {
-            Test_Loop(sSystem, lBufferQty, lPacketSize_byte, lPacketQty);
+            Test_Loop(lBufferQty, lPacketSize_byte, lPacketQty);
         }
         catch (KmsLib::Exception * eE)
         {
             eE->Write(stdout);
         }
-        System_Reset();
         break;
 
     default:
@@ -995,20 +998,3 @@ void System_Connect()
         exit(__LINE__);
     }
 }
-
-void System_Reset()
-{
-    printf("Reseting the System...\n");
-
-    sAdapter   = NULL;
-    sProcessor = NULL;
-
-    sSystem->Delete();
-
-    System_Connect();
-}
-
-// TODO  OpenNet_Tool  Use sub function and exception
-
-// TODO  OpenNet_Tool  Move test function (other than direct command handler)
-//                     into Test.c and .h

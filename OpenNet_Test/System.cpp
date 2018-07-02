@@ -12,24 +12,27 @@
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/System.h>
 
+// ===== OpenNet_Test =======================================================
+#include "Base.h"
+#include "SetupA.h"
+
 // Tests
 /////////////////////////////////////////////////////////////////////////////
 
 KMS_TEST_BEGIN(System_Base)
 {
-    OpenNet::System * lS0 = OpenNet::System::Create();
-    KMS_TEST_ASSERT_RETURN(NULL != lS0);
+    Base lSetup;
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lS0->Adapter_Connect(NULL));
-    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_ADAPTER          , lS0->Adapter_Connect(reinterpret_cast<OpenNet::Adapter *>(1)));
+    KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
-    KMS_TEST_ASSERT(NULL == lS0->Adapter_Get(0));
-    KMS_TEST_COMPARE(0, lS0->Adapter_GetCount());
+    KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mSystem->Adapter_Connect(NULL));
+    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_ADAPTER          , lSetup.mSystem->Adapter_Connect(reinterpret_cast<OpenNet::Adapter *>(1)));
 
-    KMS_TEST_ASSERT(NULL == lS0->Processor_Get(0));
-    KMS_TEST_COMPARE(0, lS0->Processor_GetCount());
+    KMS_TEST_ASSERT(NULL == lSetup.mSystem->Adapter_Get(0));
+    KMS_TEST_COMPARE(0, lSetup.mSystem->Adapter_GetCount());
 
-    lS0->Delete();
+    KMS_TEST_ASSERT(NULL == lSetup.mSystem->Processor_Get(0));
+    KMS_TEST_COMPARE(0, lSetup.mSystem->Processor_GetCount());
 }
 KMS_TEST_END
 
@@ -38,15 +41,11 @@ KMS_TEST_END
 //            Enumerate processor
 KMS_TEST_BEGIN(System_SetupA)
 {
-    OpenNet::System * lS0 = OpenNet::System::Create();
-    KMS_TEST_ASSERT_RETURN(NULL != lS0);
+    SetupA lSetup(0);
 
-    KMS_TEST_ASSERT(NULL != lS0->Adapter_Get     (0));
-    KMS_TEST_ASSERT(0    <  lS0->Adapter_GetCount());
+    KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
-    KMS_TEST_ASSERT(NULL != lS0->Processor_Get     (0));
-    KMS_TEST_ASSERT(0    <  lS0->Processor_GetCount());
-
-    lS0->Delete();
+    KMS_TEST_ASSERT(0 < lSetup.mSystem->Adapter_GetCount  ());
+    KMS_TEST_ASSERT(0 < lSetup.mSystem->Processor_GetCount());
 }
 KMS_TEST_END

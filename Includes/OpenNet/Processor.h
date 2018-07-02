@@ -10,7 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
-#include <OpenNet/Status.h>
+#include <OpenNet/StatisticsProvider.h>
 
 namespace OpenNet
 {
@@ -24,7 +24,7 @@ namespace OpenNet
     /// \cond fr
     /// \brief  Cette classe definit l'interface au niveau du processeur.
     /// \endcond
-    class Processor
+    class Processor : public StatisticsProvider
     {
 
     public:

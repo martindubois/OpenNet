@@ -20,6 +20,7 @@
 // ===== Includes ===========================================================
 #include <OpenNet/Filter.h>
 #include <OpenNet/Processor.h>
+#include <OpenNetK/Adapter_Types.h>
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
@@ -59,18 +60,20 @@ public:
 
     ~Processor_Internal();
 
-    void Buffer_Allocate(unsigned int aPacketSize_byte, FilterData * aFilterData, OpenNet_BufferInfo * aBufferInfo, BufferData * aBufferData);
+    void Buffer_Allocate(unsigned int aPacketSize_byte, FilterData * aFilterData, OpenNetK::Buffer * aBuffer, BufferData * aBufferData);
     void Buffer_Release (BufferData * aBufferData);
 
     void Processing_Create (FilterData * aFilterData, OpenNet::Filter * aFilter);
     void Processing_Queue  (FilterData * aFilterData, BufferData * aBufferData);
     void Processing_Release(FilterData * aFilterData);
-    void Processing_Wait   (BufferData * aBufferData);
+    void Processing_Wait   (FilterData * aFilterData, BufferData * aBufferData);
 
     // ===== OpenNet::Processor =============================================
-    virtual OpenNet::Status GetInfo(Info * aOut) const;
-    virtual const char    * GetName() const;
-    virtual OpenNet::Status Display(FILE * aOut) const;
+    virtual OpenNet::Status GetInfo        (Info * aOut) const;
+    virtual const char    * GetName        () const;
+    virtual OpenNet::Status GetStatistics  (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
+    virtual OpenNet::Status ResetStatistics();
+    virtual OpenNet::Status Display        (FILE * aOut) const;
 
 private:
 

@@ -62,6 +62,9 @@
     <ClCompile Include="OCLW.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StatisticsProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="System_Internal.h">
@@ -76,10 +79,10 @@
     <ClInclude Include="OCLW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EthernetAddress.h">
+    <ClInclude Include="VersionInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VersionInfo.h">
+    <ClInclude Include="EthernetAddress.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

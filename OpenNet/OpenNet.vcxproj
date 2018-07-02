@@ -99,6 +99,7 @@
     <ClCompile Include="OpenNet.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="Processor_Internal.cpp" />
+    <ClCompile Include="StatisticsProvider.cpp" />
     <ClCompile Include="Status.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="System_Internal.cpp" />

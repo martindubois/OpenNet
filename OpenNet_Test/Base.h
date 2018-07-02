@@ -1,7 +1,7 @@
 
-// Author   KMS - Martin Dubois, ing.
+// Author   KMA - Martin Dubois, ing.
 // Product  OpenNet
-// File     OpenNet_Tool/Test.h
+// File     OpenNet_Test/Base.h
 
 #pragma once
 
@@ -11,7 +11,20 @@
 // ===== Includes ===========================================================
 #include <OpenNet/System.h>
 
-// Functions
+// Class
 /////////////////////////////////////////////////////////////////////////////
 
-extern void Test_Loop(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int aPacketQty);
+class Base
+{
+
+public:
+
+    Base();
+
+    ~Base();
+
+    int Init();
+
+    OpenNet::System * mSystem;
+
+};

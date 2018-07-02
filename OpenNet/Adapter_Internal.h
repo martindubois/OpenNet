@@ -22,6 +22,7 @@
 
 // ===== Common =============================================================
 #include "../Common/IoCtl.h"
+#include "../Common/OpenNet/Adapter_Statistics.h"
 
 // ===== OpenNet ============================================================
 #include "Processor_Internal.h"
@@ -56,12 +57,12 @@ public:
     virtual const char    * GetName         () const;
     virtual unsigned int    GetPacketSize   () const;
     virtual OpenNet::Status GetState        (State        * aOut);
-    virtual OpenNet::Status GetStats        (Stats        * aOut, bool aReset);
+    virtual OpenNet::Status GetStatistics   (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
     virtual bool            IsConnected     ();
     virtual bool            IsConnected     (const OpenNet::System & aSystem);
     virtual OpenNet::Status ResetInputFilter();
     virtual OpenNet::Status ResetProcessor  ();
-    virtual OpenNet::Status ResetStats      ();
+    virtual OpenNet::Status ResetStatistics ();
     virtual OpenNet::Status SetConfig       (const Config       & aConfig   );
     virtual OpenNet::Status SetInputFilter  (OpenNet::Filter    * aFilter   );
     virtual OpenNet::Status SetPacketSize   (unsigned int         aSize_byte);
@@ -83,7 +84,7 @@ private:
     void Buffer_Allocate();
     void Buffer_Release ();
 
-    OpenNet::Status Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte);
+    OpenNet::Status Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte = NULL);
 
     void Run_Iteration(unsigned int aIndex);
     void Run_Loop     ();
@@ -96,7 +97,7 @@ private:
 
     unsigned int                    mBufferCount;
     Processor_Internal::BufferData  mBufferData[OPEN_NET_BUFFER_QTY];
-    OpenNet_BufferInfo              mBuffers   [OPEN_NET_BUFFER_QTY];
+    OpenNetK::Buffer                mBuffers   [OPEN_NET_BUFFER_QTY];
     Config                          mConfig     ;
     KmsLib::DebugLog              * mDebugLog   ;
     OpenNet::Filter               * mFilter     ;
@@ -105,7 +106,7 @@ private:
     Info                            mInfo       ;
     char                            mName   [64];
     Processor_Internal            * mProcessor  ;
-    Stats_Dll                       mStats      ;
+    unsigned int                    mStatistics[OpenNet::ADAPTER_STATS_QTY];
     HANDLE                          mThread     ;
     DWORD                           mThreadId   ;
 

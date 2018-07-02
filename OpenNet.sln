@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{6D01
 		Includes\OpenNet\Filter_Forward.h = Includes\OpenNet\Filter_Forward.h
 		Includes\OpenNet\OpenNet.h = Includes\OpenNet\OpenNet.h
 		Includes\OpenNet\Processor.h = Includes\OpenNet\Processor.h
+		Includes\OpenNet\StatisticsProvider.h = Includes\OpenNet\StatisticsProvider.h
 		Includes\OpenNet\Status.h = Includes\OpenNet\Status.h
 		Includes\OpenNet\System.h = Includes\OpenNet\System.h
 	EndProjectSection
@@ -26,10 +27,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC513D0F-734D-4F5A-816A-911BAA9F2061}"
 	ProjectSection(SolutionItems) = preProject
 		Includes\OpenNetK\Adapter.h = Includes\OpenNetK\Adapter.h
+		Includes\OpenNetK\Adapter_Types.h = Includes\OpenNetK\Adapter_Types.h
 		Includes\OpenNetK\Adapter_WDF.h = Includes\OpenNetK\Adapter_WDF.h
 		Includes\OpenNetK\Constants.h = Includes\OpenNetK\Constants.h
 		Includes\OpenNetK\Debug.h = Includes\OpenNetK\Debug.h
 		Includes\OpenNetK\Hardware.h = Includes\OpenNetK\Hardware.h
+		Includes\OpenNetK\Hardware_Statistics.h = Includes\OpenNetK\Hardware_Statistics.h
 		Includes\OpenNetK\Hardware_WDF.h = Includes\OpenNetK\Hardware_WDF.h
 		Includes\OpenNetK\Interface.h = Includes\OpenNetK\Interface.h
 		Includes\OpenNetK\Kernel.h = Includes\OpenNetK\Kernel.h
@@ -92,10 +95,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocUser", "_DocUser", "{57
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{B4675DF3-6BF9-483B-AB9F-11FAF0BFC219}"
 	ProjectSection(SolutionItems) = preProject
+		Common\OpenNet\Adapter_Statistics.h = Common\OpenNet\Adapter_Statistics.h
 		Common\OpenNet\EthernetAddress.h = Common\OpenNet\EthernetAddress.h
+		Common\OpenNet\Filter_Statistics.h = Common\OpenNet\Filter_Statistics.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{2CF49A29-C06C-4972-B8BE-262E1FE62244}"
+	ProjectSection(SolutionItems) = preProject
+		Common\OpenNetK\Adapter_Statistics.h = Common\OpenNetK\Adapter_Statistics.h
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -7,6 +7,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== C ==================================================================
+#include <assert.h>
 #include <memory.h>
 #include <stdint.h>
 
@@ -19,33 +20,34 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-SetupC::SetupC(unsigned int aBufferQty) : mBufferQty(aBufferQty), mProcessor(NULL), mSystem(NULL)
+SetupC::SetupC(unsigned int aBufferQty) : mBufferQty(aBufferQty), mProcessor(NULL)
 {
     for (unsigned int i = 0; i < 2; i++)
     {
         mAdapters[i] = NULL;
     }
 
-    memset(&mStats, 0, sizeof(mStats));
+    memset(&mStatistics, 0, sizeof(mStatistics));
 }
 
 SetupC::~SetupC()
 {
-    if (NULL != mSystem)
-    {
-        mSystem->Delete();
-    }
 }
 
 int SetupC::Init()
 {
-    mSystem = OpenNet::System::Create();
-    if (NULL == mSystem) { return __LINE__; }
+    assert(NULL == mProcessor);
+
+    if (0 != Base::Init()) { return __LINE__; }
+
+    assert(NULL != mSystem);
 
     unsigned int i;
 
     for (i = 0; i < 2; i++)
     {
+        assert(NULL == mAdapters[i]);
+
         mAdapters[i] = mSystem->Adapter_Get(i);
         if (NULL == mAdapters[i]) { return __LINE__; }
     }
@@ -68,10 +70,15 @@ int SetupC::Init()
 
 int SetupC::Start()
 {
+    assert(   0 <  mBufferQty);
+    assert(NULL != mSystem   );
+
     unsigned int i;
 
     for (i = 0; i < 2; i++)
     {
+        assert(NULL != mAdapters[i]);
+
         if (OpenNet::STATUS_OK != mAdapters[i]->SetInputFilter(mFilters + i)) { return __LINE__; }
     }
 
@@ -89,12 +96,17 @@ int SetupC::Start()
 
 int SetupC::Stop(unsigned int aFlags)
 {
+    assert(   0 <  mBufferQty);
+    assert(NULL != mSystem   );
+
     if (OpenNet::STATUS_OK != mSystem->Stop(aFlags)) { return __LINE__; }
 
     unsigned int i;
 
     for (i = 0; i < 2; i++)
     {
+        assert(NULL != mAdapters[i]);
+
         if (OpenNet::STATUS_OK != mAdapters[i]->Buffer_Release(mBufferQty)) { return __LINE__; }
     }
 
@@ -106,12 +118,15 @@ int SetupC::Stop(unsigned int aFlags)
     return 0;
 }
 
+// aPacket [---;R--]
 int SetupC::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aCount)
 {
     for (unsigned int i = 0; i < aCount; i++)
     {
         for (unsigned int j = 0; j < 2; j++)
         {
+            assert(NULL != mAdapters[j]);
+
             if (OpenNet::STATUS_OK != mAdapters[j]->Packet_Send(aPacket, aSize_byte)) { return __LINE__; }
         }
     }
@@ -119,33 +134,55 @@ int SetupC::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned 
     return 0;
 }
 
-int SetupC::Stats_Get()
+int SetupC::Statistics_Get()
 {
     for (unsigned int i = 0; i < 2; i++)
     {
-        if (OpenNet::STATUS_OK != mAdapters[i]->GetStats(mStats + i, true)) { return __LINE__; }
+        assert(NULL != mAdapters[i]);
+
+        if (OpenNet::STATUS_OK != mAdapters[i]->GetStatistics(mStatistics[i], sizeof(mStatistics[i]), NULL, true)) { return __LINE__; }
     }
 
     return 0;
 }
 
-int SetupC::Stats_GetAndDisplay()
+int SetupC::Statistics_GetAndDisplay(unsigned int aMinLevel)
 {
-    if (0 != Stats_Get()) { return __LINE__; }
+    if (0 != Statistics_Get()) { return __LINE__; }
 
     for (unsigned int i = 0; i < 2; i++)
     {
-        if (OpenNet::STATUS_OK != OpenNet::Adapter::Display(mStats[i], stdout)) { return __LINE__; }
+        assert(NULL != mAdapters[i]);
+
+        if (OpenNet::STATUS_OK != mAdapters[i]->DisplayStatistics(mStatistics[i], sizeof(mStatistics[i]), stdout, aMinLevel)) { return __LINE__; }
     }
 
     return 0;
 }
 
-int SetupC::Stats_Reset()
+int SetupC::Statistics_Reset()
 {
     for (unsigned int i = 0; i < 2; i++)
     {
-        if (OpenNet::STATUS_OK != mAdapters[i]->ResetStats()) { return __LINE__; }
+        assert(NULL != mAdapters[i]);
+
+        if (OpenNet::STATUS_OK != mAdapters[i]->ResetStatistics()) { return __LINE__; }
+    }
+
+    return 0;
+}
+
+// aConstraints [---;R--]
+int SetupC::Statistics_Verify(unsigned int aAdapter, const KmsLib::ValueVector::Constraint_UInt32 * aConstraints)
+{
+    assert(2    >  aAdapter    );
+    assert(NULL != aConstraints);
+
+    assert(NULL != mAdapters[aAdapter]);
+
+    if (0 != KmsLib::ValueVector::Constraint_Verify(mStatistics[aAdapter], STATISTICS_QTY, aConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(mAdapters[aAdapter]->GetStatisticsDescriptions())))
+    {
+        return __LINE__;
     }
 
     return 0;

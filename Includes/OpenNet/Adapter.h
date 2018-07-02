@@ -11,8 +11,8 @@
 
 // ===== Includes ===========================================================
 #include <OpenNet/Processor.h>
-#include <OpenNet/Status.h>
-#include <OpenNetK/Interface.h>
+#include <OpenNet/StatisticsProvider.h>
+#include <OpenNetK/Adapter_Types.h>
 
 namespace OpenNet
 {
@@ -29,14 +29,14 @@ namespace OpenNet
     /// \cond fr
     /// \brief  Cette classe definit l'interface au niveau de l'adaptateur.
     /// \endcond
-    class Adapter
+    class Adapter : public StatisticsProvider
     {
 
     public:
 
-        typedef OpenNet_Config Config;
-        typedef OpenNet_Info   Info  ;
-        typedef OpenNet_State  State ;
+        typedef OpenNetK::Adapter_Config Config;
+        typedef OpenNetK::Adapter_Info   Info  ;
+        typedef OpenNetK::Adapter_State  State ;
 
         /// \cond en
         /// \brief  This structure contains statistics about the Dll internal
@@ -71,19 +71,6 @@ namespace OpenNet
         Stats_Dll;
 
         /// \cond en
-        /// \brief  This structure contains statistics.
-        /// \endcond
-        /// \cond fr
-        /// \brief  Cette structure contient des statistiques.
-        /// \endcond
-        typedef struct
-        {
-            Stats_Dll      mDll   ;
-            OpenNet_Stats  mDriver;
-        }
-        Stats;
-
-        /// \cond en
         /// \brief  Display
         /// \param  aIn  [---;R--] The Config instance to display
         /// \param  aOut [---;RW-] The output stream
@@ -111,7 +98,7 @@ namespace OpenNet
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         /// \retval STATUS_INVALID_REFERENCE
-        static OPEN_NET_PUBLIC Status Display(const Info & aIn  , FILE * aOut);
+        static OPEN_NET_PUBLIC Status Display(const Info & aIn, FILE * aOut);
 
         /// \cond en
         /// \brief  Display
@@ -126,20 +113,7 @@ namespace OpenNet
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         /// \retval STATUS_INVALID_REFERENCE
-        static OPEN_NET_PUBLIC Status Display(const State  & aIn, FILE * aOut);
-
-        /// \cond en
-        /// \brief  Display
-        /// \param  aIn  [---;R--] The Stats instance to display
-        /// \param  aOut [---;RW-] The output stream
-        /// \endcond
-        /// \cond fr
-        /// \brief  Afficher
-        /// \param  aIn  [---;R--] L'instance de Stats a afficher
-        /// \param  aOut [---;RW-] Le fichier de sortie
-        /// \endcond
-        /// \retval STATUS_OK
-        static OPEN_NET_PUBLIC Status Display(const Stats & aIn , FILE * aOut);
+        static OPEN_NET_PUBLIC Status Display(const State & aIn, FILE * aOut);
 
         /// \cond en
         /// \brief  This methode return the adapter numero.
@@ -214,21 +188,6 @@ namespace OpenNet
         virtual Status GetState(State * aOut) = 0;
 
         /// \cond en
-        /// \brief  This methode return the statistics of the adapter.
-        /// \param  aOut [---;-W-] The methode return the statistics here.
-        /// \param  aReset         Reset statistics to 0
-        /// \endcond
-        /// \cond fr
-        /// \brief Cette methode retourne les statistiques de l'adaptateur.
-        /// \param aOut [---;-W-] La medhode retourne les statistiques ici.
-        /// \param aReset         Remettre les statistiques a zero
-        /// \endcond
-        /// \retval STATUS_OK
-        /// \retval STATUS_IOCTL_ERROR
-        /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
-        virtual Status GetStats(Stats * aOut, bool aReset) = 0;
-
-        /// \cond en
         /// \brief  This methode indicate if the adapter is connected to a
         ///         system.
         /// \endcond
@@ -273,16 +232,6 @@ namespace OpenNet
         /// \retval STATUS_OK
         /// \retval STATUS_PROCESSOR_NOT_SET
         virtual Status ResetProcessor() = 0;
-
-        /// \cond en
-        /// \brief  This methode resets the statistics of the adapter.
-        /// \endcond
-        /// \cond fr
-        /// \brief Cette methode reset les statistiques de l'adaptateur.
-        /// \endcond
-        /// \retval STATUS_OK
-        /// \retval STATUS_IOCTL_ERROR
-        virtual Status ResetStats() = 0;
 
         /// \cond en
         /// \brief  This methode set the configuration.

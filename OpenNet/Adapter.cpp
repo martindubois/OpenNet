@@ -14,12 +14,15 @@
 // ===== Windows ============================================================
 #include <Windows.h>
 
-// ===== Includes/OpenNet ===================================================
+// ===== Import/Includes ====================================================
+#include <KmsLib/ValueVector.h>
+
+// ===== Includes ===========================================================
 #include <OpenNet/Adapter.h>
 
 // ===== Common =============================================================
+#include "../Common/Constants.h"
 #include "../Common/IoCtl.h"
-#include "../Common/OpenNet/EthernetAddress.h"
 
 // ===== OpenNet ============================================================
 #include "EthernetAddress.h"
@@ -28,18 +31,153 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-static const char * ADAPTER_MODE_NAMES[OPEN_NET_MODE_QTY] =
-{
-    "UNKNOWN"    ,
-    "NORMAL"     ,
-    "PROMISCUOUS",
-};
-
-static const char * ADAPTER_TYPE_NAMES[OPEN_NET_ADAPTER_TYPE_QTY] =
+static const char * ADAPTER_TYPE_NAMES[OpenNetK::ADAPTER_TYPE_QTY] =
 {
     "UNKNOWN" ,
     "ETHERNET",
     "NDIS"    ,
+};
+
+const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS[] =
+{
+    { "ADAPTER BUFFER_ALLOCATED             ", "", 0 }, //  0
+    { "ADAPTER BUFFER_RELEASED              ", "", 0 },
+    { "ADAPTER LOOP_BACK_PACKET             ", "", 0 },
+    { "ADAPTER PACKET_SEND                  ", "", 1 },
+    { "ADAPTER RUN_ENTRY                    ", "", 0 },
+    { "ADAPTER RUN_EXCEPTION                ", "", 1 }, //  5
+    { "ADAPTER RUN_EXIT                     ", "", 0 },
+    { "ADAPTER RUN_ITERATION_QUEUE          ", "", 0 },
+    { "ADAPTER RUN_ITERATION_WAIT           ", "", 0 },
+    { "ADAPTER RUN_LOOP_EXCEPTION           ", "", 0 },
+    { "ADAPTER RUN_LOOP_UNEXPECTED_EXCEPTION", "", 1 }, // 10
+    { "ADAPTER RUN_QUEUE                    ", "", 0 },
+    { "ADAPTER RUN_UNEXPECTED_EXCEPTION     ", "", 1 },
+    { "ADAPTER START                        ", "", 0 },
+    { "ADAPTER STOP_REQUEST                 ", "", 0 },
+    { "ADAPTER STOP_WAIT                    ", "", 0 }, // 15
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 20
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 25
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 30
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
+    { "ADAPTER BUFFERS_PROCESS     ", ""      , 0 },
+    { "ADAPTER BUFFER_INIT_HEADER  ", ""      , 0 },
+    { "ADAPTER BUFFER_QUEUE        ", ""      , 0 },
+    { "ADAPTER BUFFER_RECEIVE      ", ""      , 1 }, // 35
+    { "ADAPTER BUFFER_SEND         ", ""      , 1 },
+    { "ADAPTER BUFFER_SEND_PACKETS ", ""      , 1 },
+    { "ADAPTER IOCTL               ", ""      , 0 },
+    { "ADAPTER IOCTL_CONFIG_GET    ", ""      , 0 },
+    { "ADAPTER IOCTL_CONFIG_SET    ", ""      , 0 }, // 40
+    { "ADAPTER IOCTL_CONNECT       ", ""      , 0 },
+    { "ADAPTER IOCTL_INFO_GET      ", ""      , 0 },
+    { "ADAPTER IOCTL_PACKET_SEND   ", ""      , 1 },
+    { "ADAPTER IOCTL_START         ", ""      , 0 },
+    { "ADAPTER IOCTL_STATE_GET     ", ""      , 0 }, // 45
+    { "ADAPTER IOCTL_STATISTICS_GET", ""      , 0 },
+    { "ADAPTER IOCTL_STOP          ", ""      , 0 },
+    { "ADAPTER TX                  ", "packet", 1 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 50
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 55
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
+    { "ADAPTER IOCTL_LAST                 (NR)", "", 0 }, // 60
+    { "ADAPTER IOCTL_LAST_RESULT          (NR)", "", 0 },
+    { "ADAPTER IOCTL_STATISTICS_GET_RESET (NR)", "", 0 },
+    { "ADAPTER IOCTL_STATISTICS_RESET     (NR)", "", 0 },
+
+    { "HARDWRE D0_ENTRY          ", ""      , 0 },
+    { "HARDWRE D0_EXIT           ", ""      , 0 }, // 65
+    { "HARDWRE INTERRUPT_DISABLE ", ""      , 0 },
+    { "HARDWRE INTERRUPT_ENABLE  ", ""      , 0 },
+    { "HARDWRE INTERRUPT_PROCESS ", ""      , 1 },
+    { "HARDWRE INTERRUPT_PROCESS2", ""      , 1 },
+    { "HARDWRE PACKET_RECEIVE    ", ""      , 1 }, // 70
+    { "HARDWRE PACKET_SEND       ", ""      , 1 },
+    { "HARDWRE RX                ", "packet", 1 },
+    { "HARDWRE SET_CONFIG        ", ""      , 0 },
+    { "HARDWRE STATISTICS_GET    ", ""      , 0 },
+    { "HARDWRE TX                ", "packet", 1 }, // 75
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 80
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 85
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 90
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 95
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
+    { "HARDWARE RX_BMC_MANAGEMENT_DROPPED      ", "packet", 1 }, // 100
+    { "HARDWARE RX_CIRCUIT_BREAKER_DROPPED     ", "packet", 1 },
+    { "HARDWARE RX_LENGTH_ERRORS               ", "packet", 1 },
+    { "HARDWARE RX_MANAGEMENT_DROPPED          ", "packet", 1 },
+    { "HARDWARE RX_MISSED                      ", "packet", 1 },
+    { "HARDWARE RX_NO_BUFFER                   ", "packet", 0 }, // 105
+    { "HARDWARE RX_OVERSIZE                    ", "packet", 1 },
+    { "HARDWARE RX_UNDERSIZE                   ", "packet", 1 },
+    { "HARDWARE TX_DEFER_EVENTS                ", ""      , 0 },
+    { "HARDWARE TX_DISCARDED                   ", "packet", 1 },
+    { "HARDWARE TX_NO_CRS                      ", "packet", 1 }, // 110
+    { "HARDWARE TX_HOST_CIRCUIT_BREAKER_DROPPED", "packet", 1 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 115
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 120
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
+    { "HARDWARE INTERRUPT_PROCESS_LAST_MESSAGE_ID (NR)", "", 0 }, // 125
+    { "HARDWARE STATISTICS_GET_RESET              (NR)", "", 0 },
+    { "HARDWARE STATISTICS_RESET                  (NR)", "", 0 },
+
 };
 
 // Static function declarations
@@ -48,11 +186,6 @@ static const char * ADAPTER_TYPE_NAMES[OPEN_NET_ADAPTER_TYPE_QTY] =
 static const char * GetIoCtlName(unsigned int aCode);
 
 static void Display(const OpenNet::Adapter::Stats_Dll    & aIn, FILE * aOut);
-static void Display(const OpenNet_Stats                  & aIn, FILE * aOut);
-static void Display(const OpenNet_Stats_Adapter          & aIn, FILE * aOut);
-static void Display(const OpenNet_Stats_Adapter_NoReset  & aIn, FILE * aOut);
-static void Display(const OpenNet_Stats_Hardware         & aIn, FILE * aOut);
-static void Display(const OpenNet_Stats_Hardware_NoReset & aIn, FILE * aOut);
 
 static void DisplayStats(const char * aText, unsigned int aValue, FILE * aOut);
 
@@ -62,23 +195,14 @@ namespace OpenNet
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    Status Adapter::Display(const OpenNet::Adapter::Config & aIn, FILE * aOut)
+    Status Adapter::Display(const Adapter::Config & aIn, FILE * aOut)
     {
         if (NULL == (&aIn)) { return STATUS_INVALID_REFERENCE        ; }
         if (NULL ==   aOut) { return STATUS_NOT_ALLOWED_NULL_ARGUMENT; }
 
         fprintf(aOut, "  Adapter Configuration :\n");
 
-        if (OPEN_NET_MODE_QTY > aIn.mMode)
-        {
-            fprintf(aOut, "    Mode        = %u - %s\n", aIn.mMode, ADAPTER_MODE_NAMES[aIn.mMode]);
-        }
-        else
-        {
-            fprintf(aOut, "    Mode        = %u - ERROR  Invalid value\n", aIn.mMode);
-        }
-
-        if ((OPEN_NET_PACKET_SIZE_MAX_byte >= aIn.mPacketSize_byte) && (OPEN_NET_PACKET_SIZE_MIN_byte <= aIn.mPacketSize_byte))
+        if ((PACKET_SIZE_MAX_byte >= aIn.mPacketSize_byte) && (PACKET_SIZE_MIN_byte <= aIn.mPacketSize_byte))
         {
             fprintf(aOut, "    Packet Size = %u bytes\n", aIn.mPacketSize_byte);
         }
@@ -101,14 +225,14 @@ namespace OpenNet
         return STATUS_OK;
     }
 
-    Status Adapter::Display(const OpenNet::Adapter::Info & aIn, FILE * aOut)
+    Status Adapter::Display(const Adapter::Info & aIn, FILE * aOut)
     {
         if (NULL == (&aIn))	{ return STATUS_INVALID_REFERENCE        ; }
         if (NULL ==   aOut)	{ return STATUS_NOT_ALLOWED_NULL_ARGUMENT; }
 
         fprintf(aOut, "  Adapter Information :\n");
 
-        if (OPEN_NET_ADAPTER_TYPE_QTY > aIn.mAdapterType)
+        if ((0 <= aIn.mAdapterType) && (OpenNetK::ADAPTER_TYPE_QTY > aIn.mAdapterType))
         {
             fprintf(aOut, "    Adapter Type       = %u - %s\n", aIn.mAdapterType, ADAPTER_TYPE_NAMES[aIn.mAdapterType]);
         }
@@ -120,7 +244,7 @@ namespace OpenNet
         fprintf(aOut, "    Comment            = %s\n"      , aIn.mComment);
         fprintf(aOut, "    Common Buffer Size = %u bytes\n", aIn.mCommonBufferSize_byte);
 
-        if ((OPEN_NET_PACKET_SIZE_MAX_byte >= aIn.mPacketSize_byte) && (OPEN_NET_PACKET_SIZE_MIN_byte <= aIn.mPacketSize_byte))
+        if ((PACKET_SIZE_MAX_byte >= aIn.mPacketSize_byte) && (PACKET_SIZE_MIN_byte <= aIn.mPacketSize_byte))
         {
             fprintf(aOut, "    Packet Size        = %u bytes\n", aIn.mPacketSize_byte);
         }
@@ -150,7 +274,7 @@ namespace OpenNet
         return STATUS_OK;
     }
 
-    Status Adapter::Display(const OpenNet::Adapter::State & aIn, FILE * aOut)
+    Status Adapter::Display(const Adapter::State & aIn, FILE * aOut)
     {
         if (NULL == (&aIn))
         {
@@ -164,9 +288,9 @@ namespace OpenNet
 
         fprintf(aOut, "  Adapter State :\n");
 
-        if      (OPEN_NET_ADAPTER_NO_QTY     >  aIn.mAdapterNo) { fprintf(aOut, "    Adapter No  = %u\n"                       , aIn.mAdapterNo); }
-        else if (OPEN_NET_ADAPTER_NO_UNKNOWN == aIn.mAdapterNo) { fprintf(aOut, "    Adapter No  = %u - Unknown\n"             , aIn.mAdapterNo); }
-        else                                                    { fprintf(aOut, "    Adapter No  = %u - ERROR  Invalid value\n", aIn.mAdapterNo); }
+        if      (ADAPTER_NO_QTY     >  aIn.mAdapterNo) { fprintf(aOut, "    Adapter No  = %u\n"                       , aIn.mAdapterNo); }
+        else if (ADAPTER_NO_UNKNOWN == aIn.mAdapterNo) { fprintf(aOut, "    Adapter No  = Unknown\n"                                  ); }
+        else                                           { fprintf(aOut, "    Adapter No  = %u - ERROR  Invalid value\n", aIn.mAdapterNo); }
 
         fprintf(aOut, "    Full Duplxe = %s\n"     , aIn.mFlags.mFullDuplex ? "true" : "false");
         fprintf(aOut, "    Link Up     = %s\n"     , aIn.mFlags.mLinkUp     ? "true" : "false");
@@ -176,30 +300,10 @@ namespace OpenNet
         return STATUS_OK;
     }
 
-    Status Adapter::Display(const OpenNet::Adapter::Stats & aIn, FILE * aOut)
-    {
-        if (NULL == (&aIn))
-        {
-            return STATUS_INVALID_REFERENCE;
-        }
-
-        if (NULL == aOut)
-        {
-            return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
-        }
-
-        fprintf(aOut, "Adapter Statistics:\n");
-
-        ::Display(aIn.mDll   , aOut);
-        ::Display(aIn.mDriver, aOut);
-
-        return STATUS_OK;
-    }
-
     // Protected
     /////////////////////////////////////////////////////////////////////////
 
-    Adapter::Adapter()
+    Adapter::Adapter() : StatisticsProvider(STATISTICS_DESCRIPTIONS, sizeof(STATISTICS_DESCRIPTIONS) / sizeof(STATISTICS_DESCRIPTIONS[0]))
     {
     }
 
@@ -212,16 +316,16 @@ const char * GetIoCtlName(unsigned int aCode)
 {
     switch (aCode)
     {
-    case IOCTL_CONFIG_GET : return "CONFIG_GET" ;
-    case IOCTL_CONFIG_SET : return "CONFIG_SET" ;
-    case IOCTL_CONNECT    : return "CONNECT"    ;
-    case IOCTL_INFO_GET   : return "INFO_GET"   ;
-    case IOCTL_PACKET_SEND: return "PACKET_SEND";
-    case IOCTL_START      : return "START"      ;
-    case IOCTL_STATE_GET  : return "STATE_GET"  ;
-    case IOCTL_STATS_GET  : return "STATS_GET"  ;
-    case IOCTL_STATS_RESET: return "STATS_RESET";
-    case IOCTL_STOP       : return "STOP"       ;
+    case IOCTL_CONFIG_GET      : return "CONFIG_GET"      ;
+    case IOCTL_CONFIG_SET      : return "CONFIG_SET"      ;
+    case IOCTL_CONNECT         : return "CONNECT"         ;
+    case IOCTL_INFO_GET        : return "INFO_GET"        ;
+    case IOCTL_PACKET_SEND     : return "PACKET_SEND"     ;
+    case IOCTL_START           : return "START"           ;
+    case IOCTL_STATE_GET       : return "STATE_GET"       ;
+    case IOCTL_STATISTICS_GET  : return "STATISTICS_GET"  ;
+    case IOCTL_STATISTICS_RESET: return "STATISTICS_RESET";
+    case IOCTL_STOP            : return "STOP"            ;
     }
 
     return "Invalid IoCtl code";
@@ -249,100 +353,6 @@ void Display(const OpenNet::Adapter::Stats_Dll & aIn, FILE * aOut)
     DisplayStats( "    Start                             = %u\n", aIn.mStart                       , aOut);
     fprintf(aOut, "    Stop - Request                    = %u\n", aIn.mStop_Request       );
     DisplayStats( "         - Wait                       = %u\n", aIn.mStop_Wait                   , aOut);
-}
-
-void Display(const OpenNet_Stats & aIn, FILE * aOut)
-{
-    assert(NULL != (&aIn));
-    assert(NULL !=   aOut);
-
-    fprintf(aOut, "  Driver Statistics :\n");
-
-    ::Display(aIn.mAdapter         , aOut);
-    ::Display(aIn.mAdapter_NoReset , aOut);
-    ::Display(aIn.mHardware        , aOut);
-    ::Display(aIn.mHardware_NoReset, aOut);
-}
-
-void Display(const OpenNet_Stats_Adapter & aIn, FILE * aOut)
-{
-    assert(NULL != (&aIn));
-    assert(NULL !=   aOut);
-
-    fprintf(aOut, "    Adapter Statistics :\n");
-    DisplayStats( "      Buffers - Process    = %u\n", aIn.mBuffers_Process, aOut);
-    fprintf(aOut, "      Buffer - InitHeader  = %u\n", aIn.mBuffer_InitHeader);
-    DisplayStats( "             - Queue       = %u\n", aIn.mBuffer_Queue      , aOut);
-    DisplayStats( "             - Receive     = %u\n", aIn.mBuffer_Receive    , aOut);
-    DisplayStats( "             - Send        = %u\n", aIn.mBuffer_Send       , aOut);
-    DisplayStats( "             - SendPackets = %u\n", aIn.mBuffer_SendPackets, aOut);
-    fprintf(aOut, "      IoCtl                = %u\n", aIn.mIoCtl            );
-    fprintf(aOut, "        - Config - Get     = %u\n", aIn.mIoCtl_Config_Get );
-    DisplayStats( "                 - Set     = %u\n", aIn.mIoCtl_Config_Set  , aOut);
-    DisplayStats( "        - Connect          = %u\n", aIn.mIoCtl_Connect     , aOut);
-    DisplayStats( "        - Info - Get       = %u\n", aIn.mIoCtl_Info_Get    , aOut);
-    DisplayStats( "        - Packet - Send    = %u\n", aIn.mIoCtl_Packet_Send , aOut);
-    DisplayStats( "        - Start            = %u\n", aIn.mIoCtl_Start       , aOut);
-    DisplayStats( "        - State - Get      = %u\n", aIn.mIoCtl_State_Get   , aOut);
-    DisplayStats( "        - Stats - Get      = %u\n", aIn.mIoCtl_Stats_Get   , aOut);
-    DisplayStats( "        - Stop             = %u\n", aIn.mIoCtl_Stop        , aOut);
-    DisplayStats( "      Tx - Packet          = %u\n", aIn.mTx_Packet         , aOut);
-}
-
-void Display(const OpenNet_Stats_Adapter_NoReset & aIn, FILE * aOut)
-{
-    assert(NULL != (&aIn));
-    assert(NULL !=   aOut);
-
-    fprintf(aOut, "    Adapter statistics (No Reset) :\n");
-    fprintf(aOut, "      IoCtl - Last                = 0x%08x - %s\n", aIn.mIoCtl_Last, GetIoCtlName(aIn.mIoCtl_Last));
-    DisplayStats( "                   - Result       = 0x%08x\n"     , aIn.mIoCtl_Last_Result, aOut);
-    fprintf(aOut, "      IoCtl - Stats - Get - Reset = %u\n"         , aIn.mIoCtl_Stats_Get_Reset);
-    DisplayStats( "                    - Reset       = %u\n"         , aIn.mIoCtl_Stats_Reset, aOut);
-}
-
-void Display(const OpenNet_Stats_Hardware & aIn, FILE * aOut)
-{
-    assert(NULL != (&aIn));
-    assert(NULL !=   aOut);
-
-    fprintf(aOut, "    Hardware Statistics :\n");
-    fprintf(aOut, "      D0 - Entry           = %u\n", aIn.mD0_Entry         );
-    DisplayStats( "         - Exit            = %u\n", aIn.mD0_Exit           , aOut);
-    fprintf(aOut, "      Interrupt - Disable  = %u\n", aIn.mInterrupt_Disable);
-    DisplayStats( "                - Enable   = %u\n", aIn.mInterrupt_Enable  , aOut);
-    DisplayStats( "                - Process  = %u\n", aIn.mInterrupt_Process , aOut);
-    DisplayStats( "                - Process2 = %u\n", aIn.mInterrupt_Process2, aOut);
-    fprintf(aOut, "      Packet - Receive     = %u\n", aIn.mPacket_Receive   );
-    DisplayStats( "             - Send        = %u\n", aIn.mPacket_Send       , aOut);
-    DisplayStats( "      Rx - Packet          = %u\n", aIn.mRx_Packet         , aOut);
-    DisplayStats( "      SetConfig            = %u\n", aIn.mSetConfig         , aOut);
-    DisplayStats( "      Stats - Get          = %u\n", aIn.mStats_Get         , aOut);
-    DisplayStats( "      Tx - Packet          = %u\n", aIn.mTx_Packet         , aOut);
-
-    fprintf(aOut, "    Rx - BMC Management - Dropped      = %u packets\n", aIn.mRx_BmcManagementDropper_packet);
-    DisplayStats( "       - Circuit Breaker - Dropped     = %u packets\n", aIn.mRx_CircuitBreakerDropped_packet    , aOut);
-    DisplayStats( "       - Length Errors                 = %u packets\n", aIn.mRx_LengthErrors_packet             , aOut);
-    DisplayStats( "       - Management - Dropper          = %u packets\n", aIn.mRx_ManagementDropped_packet        , aOut);
-    DisplayStats( "       - Missed                        = %u packets\n", aIn.mRx_Missed_packet                   , aOut);
-    DisplayStats( "       - No Buffer                     = %u packets\n", aIn.mRx_NoBuffer_packet                 , aOut);
-    DisplayStats( "       - Oversize                      = %u packets\n", aIn.mRx_Oversize_packet                 , aOut);
-    DisplayStats( "       - Undersize                     = %u packets\n", aIn.mRx_Undersize_packet                , aOut);
-    fprintf(aOut, "    Tx - Defer Events                  = %u\n"        , aIn.mTx_DeferEvents                );
-    DisplayStats( "       - Discarded                     = %u packets\n", aIn.mTx_Discarded_packet                , aOut);
-    DisplayStats( "       - No CRS                        = %u packets\n", aIn.mTx_NoCrs_packet                    , aOut);
-    DisplayStats( "       - Host CircuitBreaker - Dropped = %u packets\n", aIn.mTx_HostCircuitBreakerDropped_packet, aOut);
-}
-
-void Display(const OpenNet_Stats_Hardware_NoReset & aIn, FILE * aOut)
-{
-    assert(NULL != (&aIn));
-    assert(NULL !=   aOut);
-
-    fprintf(aOut, "    Hardware Statistics (No Reset) :\n");
-    DisplayStats( "      Interrupt - Process - Last - MessageId = %u\n", aIn.mInterrupt_Process_Last_MessageId, aOut);
-    fprintf(aOut, "      Stats - Get - Reset                    = %u\n", aIn.mStats_Get_Reset);
-    DisplayStats( "            - Reset                          = %u\n", aIn.mStats_Reset                     , aOut);
 }
 
 void DisplayStats(const char * aFormat, unsigned int aValue, FILE * aOut)

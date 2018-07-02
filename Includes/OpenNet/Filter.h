@@ -10,8 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
-#include <OpenNet/OpenNet.h>
-#include <OpenNet/Status.h>
+#include <OpenNet/StatisticsProvider.h>
 
 namespace OpenNet
 {
@@ -25,7 +24,7 @@ namespace OpenNet
     /// \cond fr
     /// \brief  Cette classe definit l'interface au niveau du filtre.
     /// \endcond
-    class Filter
+    class Filter : public StatisticsProvider
     {
 
     public:
@@ -45,6 +44,24 @@ namespace OpenNet
         /// \brief  Destructeur
         /// \endcond
         virtual OPEN_NET_PUBLIC ~Filter();
+
+        /// \cond en
+        /// \brief  Disable OpenCL profiling
+        /// \endcond
+        /// \cond fr
+        /// \brief  Desactiver le profiling OpenCL
+        /// \endcond
+        /// \retval STATUS_PROFILING_ALREADY_DISABLED
+        OPEN_NET_PUBLIC Status DisableProfiling();
+
+        /// \cond en
+        /// \brief  Enable OpenCL profiling
+        /// \endcond
+        /// \cond fr
+        /// \brief  Activer le profiling OpenCL
+        /// \endcond
+        /// \retval STATUS_PROFILING_ALREADY_ENABLED
+        OPEN_NET_PUBLIC Status EnableProfiling();
 
         /// \cond en
         /// \brief  Retrieve the build log
@@ -98,6 +115,16 @@ namespace OpenNet
         ///         interne.
         /// \endcond
         OPEN_NET_PUBLIC const char * GetName() const;
+
+        /// \cond en
+        /// \brief  Is the OpenCL profiling enabled?
+        /// \endcond
+        /// \cond fr
+        /// \brief  Est-ce que le profiling OpenCL est active?
+        /// \endcond
+        /// \retval false
+        /// \retval true
+        OPEN_NET_PUBLIC bool IsProfilingEnabled() const;
 
         /// \cond en
         /// \brief  Reset the code using a source file
@@ -219,9 +246,20 @@ namespace OpenNet
         /// \endcond
         OPEN_NET_PUBLIC unsigned int Edit_Search(const char * aSearch);
 
+        // ===== StatisticsProvider =========================================
+        virtual Status GetStatistics  (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
+        virtual Status ResetStatistics();
+
+
     // internal
 
+        // TODO  Include.OpenNet.Filter
+        //       Deplacer la definition de BUILD_LOG_MAX_SIZE_byte dans un
+        //       fichier prive.
+
         static const unsigned int BUILD_LOG_MAX_SIZE_byte;
+
+        void AddStatistics(uint64_t aQueued, uint64_t aSubmit, uint64_t aStart, uint64_t aEnd);
 
         void * AllocateBuildLog();
 
@@ -242,13 +280,16 @@ namespace OpenNet
 
         void ReleaseCode();
 
-        char        * mBuildLog      ;
-        char        * mCode          ;
-        char        * mCodeLineBuffer;
-        unsigned int  mCodeLineCount ;
-        const char ** mCodeLines     ;
-        unsigned int  mCodeSize_byte ;
-        char          mName[64]      ;
+        char         * mBuildLog         ;
+        char         * mCode             ;
+        char         * mCodeLineBuffer   ;
+        unsigned int   mCodeLineCount    ;
+        const char  ** mCodeLines        ;
+        unsigned int   mCodeSize_byte    ;
+        char           mName[64]         ;
+        bool           mProfilingEnabled ;
+        unsigned int * mStatistics       ;
+        uint64_t       mStatisticsSums[3];
 
     };
 
