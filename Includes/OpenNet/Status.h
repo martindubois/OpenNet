@@ -54,13 +54,14 @@ namespace OpenNet
         STATUS_INTERNAL_ERROR            ,
         STATUS_INVALID_ADAPTER           ,
         STATUS_INVALID_BUFFER_COUNT      ,
+        STATUS_INVALID_MODE              ,
         STATUS_INVALID_PACKET_SIZE       ,
         STATUS_INVALID_PROCESSOR         ,
         STATUS_INVALID_REFERENCE         ,
         STATUS_IOCTL_ERROR               ,
         STATUS_NO_ADAPTER_CONNECTED      ,
-        STATUS_NO_DESTINATION_SET        ,
-        STATUS_NOT_ALLOWED_NULL_ARGUMENT , // 30
+        STATUS_NO_DESTINATION_SET        , // 30
+        STATUS_NOT_ALLOWED_NULL_ARGUMENT ,
         STATUS_OPEN_CL_ERROR             ,
         STATUS_PACKET_TOO_LARGE          ,
         STATUS_PACKET_TOO_SMALL          ,
@@ -68,9 +69,10 @@ namespace OpenNet
         STATUS_PROCESSOR_NOT_SET         ,
         STATUS_PROFILING_ALREADY_DISABLED,
         STATUS_PROFILING_ALREADY_ENABLED ,
-        STATUS_SYSTEM_ALREADY_STARTED    ,
+        STATUS_SAME_VALUE                ,
+        STATUS_SYSTEM_ALREADY_STARTED    , // 40
         STATUS_SYSTEM_NOT_STARTED        ,
-        STATUS_TOO_MANY_BUFFER           , // 40
+        STATUS_TOO_MANY_BUFFER           ,
 
         STATUS_QTY
     }

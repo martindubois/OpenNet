@@ -35,3 +35,6 @@
     {                                                                     \
         aBufferHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_COMPLETED; \
     }
+
+#define OPEN_NET_SUB_KERNEL_DECLARE                                               \
+    void SubFilter_SUB_KERNEL_ID( __global OpenNet_BufferHeader * aBufferHeader )

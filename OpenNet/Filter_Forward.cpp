@@ -24,10 +24,24 @@
 
 #define EOL "\n"
 
-static const char * CODE =
+static const char * CODE_KERNEL =
 "#include <OpenNetK/Kernel.h>"                                                EOL
                                                                               EOL
 "OPEN_NET_KERNEL_DECLARE"                                                     EOL
+"{"                                                                           EOL
+"    OPEN_NET_KERNEL_BEGIN"                                                   EOL
+                                                                              EOL
+"    if ( OPEN_NET_PACKET_STATE_RX_COMPLETED == lPacketInfo->mPacketState )"  EOL
+"    {"                                                                       EOL
+"        lPacketInfo->mPacketState = OPEN_NET_PACKET_STATE_PX_COMPLETED;"     EOL
+"        lPacketInfo->mToSendTo    = DESTINATIONS;"                           EOL
+"    }"                                                                       EOL
+                                                                              EOL
+"    OPEN_NET_KERNEL_END"                                                     EOL
+"}"                                                                           EOL;
+
+static const char * CODE_SUB_KERNEL =
+"OPEN_NET_SUB_KERNEL_DECLARE"                                                 EOL
 "{"                                                                           EOL
 "    OPEN_NET_KERNEL_BEGIN"                                                   EOL
                                                                               EOL
@@ -148,8 +162,18 @@ namespace OpenNet
 
     void Filter_Forward::GenerateCode()
     {
-        Status lStatus = SetCode(CODE, static_cast<unsigned int>(strlen(CODE)));
+        Status lStatus;
+
+        switch (GetMode())
+        {
+        case MODE_KERNEL     : lStatus = SetCode(CODE_KERNEL    , static_cast<unsigned int>(strlen(CODE_KERNEL    ))); break;
+        case MODE_SUB_KERNEL : lStatus = SetCode(CODE_SUB_KERNEL, static_cast<unsigned int>(strlen(CODE_SUB_KERNEL))); break;
+
+        default: assert(false);
+        }
+
         assert(STATUS_OK == lStatus);
+        (void)(lStatus);
 
         char lDestinations[16];
 

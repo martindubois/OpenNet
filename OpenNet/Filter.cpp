@@ -27,7 +27,13 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS[] =
+static const char * MODE_NAMES[OpenNet::Filter::MODE_QTY] =
+{
+    "KERNEL"    ,
+    "SUB_KERNEL",
+};
+
+static const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS[] =
 {
     { "EXECUTION                  ", ""  , 0 }, //  0
     { "EXECUTION - DURATION - AVG ", "us", 1 },
@@ -48,6 +54,11 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     { "QUEUE     - DURATION - LAST", "us", 0 },
     { "SUBMIT    - DURATION - LAST", "us", 0 }, // 15
 };
+
+// Static variable
+/////////////////////////////////////////////////////////////////////////////
+
+static unsigned int sSubKernelId = 0;
 
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
@@ -74,6 +85,7 @@ namespace OpenNet
         , mCodeLineCount   (    0)
         , mCodeLines       (NULL )
         , mCodeSize_byte   (    0)
+        , mMode            (MODE_KERNEL)
         , mProfilingEnabled(false)
         , mStatistics      (new unsigned int [FILTER_STATS_QTY])
     {
@@ -152,6 +164,11 @@ namespace OpenNet
         assert(0 < mCodeSize_byte);
 
         return mCodeSize_byte;
+    }
+
+    Filter::Mode Filter::GetMode() const
+    {
+        return mMode;
     }
 
     const char * Filter::GetName() const
@@ -248,6 +265,30 @@ namespace OpenNet
         return STATUS_OK;
     }
 
+    Status Filter::SetMode(Mode aMode)
+    {
+        assert(MODE_QTY > mMode);
+
+        if (MODE_QTY <= aMode)
+        {
+            return STATUS_INVALID_MODE;
+        }
+
+        if (mMode == aMode)
+        {
+            return STATUS_SAME_VALUE;
+        }
+
+        mMode = aMode;
+
+        if (MODE_SUB_KERNEL == mMode)
+        {
+            mSubKernelId = InterlockedIncrement(&sSubKernelId);
+        }
+
+        return STATUS_OK;
+    }
+
     Status Filter::SetName(const char * aName)
     {
         if (NULL == aName)
@@ -267,6 +308,8 @@ namespace OpenNet
 
     Status Filter::Display(FILE * aOut) const
     {
+        assert(MODE_QTY > mMode);
+
         if (NULL == aOut)
         {
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
@@ -279,8 +322,10 @@ namespace OpenNet
             fprintf(aOut, "  Code not set\n");
         }
 
-        fprintf(aOut, "  Code Size         = %u bytes\n", mCodeSize_byte);
-        fprintf(aOut, "  Name              = %s\n"      , mName         );
+        fprintf(aOut, "  Code Size         = %u bytes\n", mCodeSize_byte   );
+        fprintf(aOut, "  Mode              = %s\n"      , MODE_NAMES[mMode]);
+        fprintf(aOut, "  Name              = %s\n"      , mName            );
+        fprintf(aOut, "  Sub Kernel Id     = %u\n"      , mSubKernelId     );
 
         if (NULL != mCode)
         {
@@ -565,6 +610,18 @@ namespace OpenNet
 
         if (NULL != mCode)
         {
+            if (MODE_SUB_KERNEL == mMode)
+            {
+                char lSubKernelId[16];
+
+                sprintf_s(lSubKernelId, "%u", mSubKernelId);
+
+                if (1 != Edit_Replace("SUB_KERNEL_ID", lSubKernelId))
+                {
+                    return;
+                }
+            }
+
             CodeLines_Count();
 
             assert(0 < mCodeLineCount);

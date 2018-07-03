@@ -29,6 +29,15 @@ namespace OpenNet
 
     public:
 
+        typedef enum
+        {
+            MODE_KERNEL    ,
+            MODE_SUB_KERNEL,
+
+            MODE_QTY,
+        }
+        Mode;
+
         /// \cond en
         /// \brief  Constructor
         /// \endcond
@@ -105,6 +114,8 @@ namespace OpenNet
         /// \endcond
         OPEN_NET_PUBLIC unsigned int GetCodeSize() const;
 
+        OPEN_NET_PUBLIC Mode GetMode() const;
+
         /// \cond en
         /// \brief  Retrieve the instance name
         /// \return This methode returns the address of an internal buffer.
@@ -168,6 +179,8 @@ namespace OpenNet
         /// \retval STATUS_CODE_ALREADY_SET
         /// \retval STATUS_EMPTY_CODE
         OPEN_NET_PUBLIC Status SetCode(const char * aCode, unsigned int aCodeSize_byte);
+
+        OPEN_NET_PUBLIC Status SetMode(Mode aMode);
 
         /// \cond en
         /// \brief  Set the instance's name
@@ -250,7 +263,6 @@ namespace OpenNet
         virtual Status GetStatistics  (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
         virtual Status ResetStatistics();
 
-
     // internal
 
         // TODO  Include.OpenNet.Filter
@@ -286,10 +298,12 @@ namespace OpenNet
         unsigned int   mCodeLineCount    ;
         const char  ** mCodeLines        ;
         unsigned int   mCodeSize_byte    ;
+        Mode           mMode             ;
         char           mName[64]         ;
         bool           mProfilingEnabled ;
         unsigned int * mStatistics       ;
         uint64_t       mStatisticsSums[3];
+        unsigned int   mSubKernelId      ;
 
     };
 
