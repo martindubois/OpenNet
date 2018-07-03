@@ -19,6 +19,7 @@
 
 // ===== Includes ===========================================================
 #include <OpenNet/Adapter.h>
+#include <OpenNetK/Constants.h>
 
 // ===== Common =============================================================
 #include "../Common/Constants.h"
@@ -202,24 +203,22 @@ namespace OpenNet
 
         fprintf(aOut, "  Adapter Configuration :\n");
 
-        if ((PACKET_SIZE_MAX_byte >= aIn.mPacketSize_byte) && (PACKET_SIZE_MIN_byte <= aIn.mPacketSize_byte))
+        if ((OPEN_NET_BUFFER_QTY >= aIn.mBufferQty) && (0 < aIn.mBufferQty))
         {
-            fprintf(aOut, "    Packet Size = %u bytes\n", aIn.mPacketSize_byte);
+            fprintf(aOut, "    Buffer Quantity = %u\n", aIn.mBufferQty);
         }
         else
         {
-            fprintf(aOut, "    Packet Size = %u bytes - ERROR  Invalid value\n", aIn.mPacketSize_byte);
+            fprintf(aOut, "    Buffer Quantity = %u <== ERROR  Invalid value\n", aIn.mBufferQty);
         }
 
-        fprintf(aOut, "    Ethernet Address\n");
-
-        for (unsigned int i = 0; i < sizeof(aIn.mEthernetAddress) / sizeof(aIn.mEthernetAddress[0]); i++)
+        if ((PACKET_SIZE_MAX_byte >= aIn.mPacketSize_byte) && (PACKET_SIZE_MIN_byte <= aIn.mPacketSize_byte))
         {
-            if (!EthernetAddress_IsZero(aIn.mEthernetAddress[i]))
-            {
-                fprintf(aOut, "        ");
-                EthernetAddress_Display(aIn.mEthernetAddress[i], aOut);
-            }
+            fprintf(aOut, "    Packet Size     = %u bytes\n", aIn.mPacketSize_byte);
+        }
+        else
+        {
+            fprintf(aOut, "    Packet Size     = %u bytes <== ERROR  Invalid value\n", aIn.mPacketSize_byte);
         }
 
         return STATUS_OK;

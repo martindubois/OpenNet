@@ -54,11 +54,9 @@ private:
 
     void AddDestination();
 
-    void Buffer_Allocate();
-    void Buffer_Release ();
-
     void ResetInputFilter();
 
+    void SetConfig     ();
     void SetInputFilter();
     void SetProcessor  ();
 

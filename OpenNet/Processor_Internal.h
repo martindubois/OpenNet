@@ -22,6 +22,9 @@
 #include <OpenNet/Processor.h>
 #include <OpenNetK/Adapter_Types.h>
 
+// ===== OpenNet ============================================================
+#include "Filter_Data.h"
+
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
@@ -47,26 +50,17 @@ public:
     }
     ExtensionFunctions;
 
-    typedef struct
-    {
-        cl_command_queue  mCommandQueue;
-        OpenNet::Filter * mFilter      ;
-        cl_kernel         mKernel      ;
-        cl_program        mProgram     ;
-    }
-    FilterData;
-
     Processor_Internal(cl_platform_id aPlatform, cl_device_id aDevice, ExtensionFunctions * aExtensionFunctions, KmsLib::DebugLog * aDebugLog);
 
     ~Processor_Internal();
 
-    void Buffer_Allocate(unsigned int aPacketSize_byte, FilterData * aFilterData, OpenNetK::Buffer * aBuffer, BufferData * aBufferData);
+    void Buffer_Allocate(unsigned int aPacketSize_byte, Filter_Data * aFilterData, OpenNetK::Buffer * aBuffer, BufferData * aBufferData);
     void Buffer_Release (BufferData * aBufferData);
 
-    void Processing_Create (FilterData * aFilterData, OpenNet::Filter * aFilter);
-    void Processing_Queue  (FilterData * aFilterData, BufferData * aBufferData);
-    void Processing_Release(FilterData * aFilterData);
-    void Processing_Wait   (FilterData * aFilterData, BufferData * aBufferData);
+    void Processing_Create (Filter_Data * aFilterData, OpenNet::Filter * aFilter);
+    void Processing_Queue  (Filter_Data * aFilterData, BufferData * aBufferData);
+    void Processing_Release(Filter_Data * aFilterData);
+    void Processing_Wait   (Filter_Data * aFilterData, BufferData * aBufferData);
 
     // ===== OpenNet::Processor =============================================
     virtual OpenNet::Status GetInfo        (Info * aOut) const;

@@ -124,9 +124,7 @@ KMS_TEST_BEGIN(Mirror_SetupC)
 
     KMS_TEST_COMPARE(0, lSetup.Statistics_GetAndDisplay());
 
-    KmsLib::ValueVector::Constraint_UInt32 lConstraints[SetupC::STATISTICS_QTY];
-
-    KmsLib::ValueVector::Constraint_Init(lConstraints, SetupC::STATISTICS_QTY);
+    lSetup.Constraint_Init();
 
     /*
     lStatsE.mDll.mBuffer_Allocated    = BUFFER_QTY;
@@ -179,9 +177,9 @@ KMS_TEST_BEGIN(Mirror_SetupC)
     lStatsM.mDriver.mHardware_NoReset.mStats_Reset     = UTL_MASK_ABOVE;
     */
 
-    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(0, lConstraints));
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(0));
 
-    KmsLib::ValueVector::Constraint_Init(lConstraints, SetupC::STATISTICS_QTY);
+    lSetup.Constraint_Init();
 
     /*
     lStatsE.mDll.mBuffer_Allocated    = BUFFER_QTY;
@@ -230,7 +228,7 @@ KMS_TEST_BEGIN(Mirror_SetupC)
     lStatsM.mDriver.mHardware_NoReset.mStats_Get_Reset = UTL_MASK_ABOVE;
     lStatsM.mDriver.mHardware_NoReset.mStats_Reset     = UTL_MASK_ABOVE;
     */
-    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(1, lConstraints));
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(1));
 
     KMS_TEST_COMPARE(0, lSetup.Stop(OpenNet::System::STOP_FLAG_LOOPBACK));
 
@@ -238,185 +236,174 @@ KMS_TEST_BEGIN(Mirror_SetupC)
 
     KMS_TEST_COMPARE(0, lSetup.Statistics_GetAndDisplay());
 
-    KmsLib::ValueVector::Constraint_Init(lConstraints, SetupC::STATISTICS_QTY);
+    lSetup.Constraint_Init();
 
-    lConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMin = 2;
-    lConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMax = 2;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMin = 2;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMax = 2;
 
-    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMin        =   0;
-    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMax        = 320;
-    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMultipleOf =  32;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMin        =   0;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMax        = 320;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMultipleOf =  32;
 
-    lConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_QUEUE].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_QUEUE].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_WAIT].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_WAIT].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 37;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 37;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin = 0;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin = 0;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 2;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 2;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = 2;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 4;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = 2;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 4;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMin =   6;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMax = 327;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMin =   6;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMax = 327;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMax        = 320;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMultipleOf =  64;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMax        = 320;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMultipleOf =  64;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMin = 4;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMax = 7;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMin = 4;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMax = 7;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_TX_packet].mMin        =  64;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_TX_packet].mMax        = 128;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_TX_packet].mMultipleOf =  64;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_TX_packet].mMin        =  64;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_TX_packet].mMax        = 128;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_TX_packet].mMultipleOf =  64;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMin = IOCTL_CONNECT;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMax = IOCTL_STOP   ;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMin = IOCTL_CONNECT;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMax = IOCTL_STOP   ;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST_RESULT].mMax = 512;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST_RESULT].mMax = 512;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET_RESET].mMax = 0xffffffff;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 11;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 28;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 11;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 28;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 17;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 37;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 17;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 37;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin        =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax        = 128;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMultipleOf =  64;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin        =  64;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax        = 128;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMultipleOf =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin        =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax        = 448;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMultipleOf =  64;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin        =  64;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax        = 448;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMultipleOf =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 149;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =  64;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 149;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMin = 1;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMax = 1;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMin = 1;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMax = 1;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin        =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax        = 448;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMultipleOf =  64;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin        =  64;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax        = 448;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMultipleOf =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_NO_BUFFER_packet].mMax = 1;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_NO_BUFFER_packet].mMax = 1;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMin = 1;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMin = 1;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMax = 0xffffffff;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMin = 1;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMin = 1;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMax = 0xffffffff;
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(0));
 
-    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(0, lConstraints));
+    lSetup.Constraint_Init();
 
-    KmsLib::ValueVector::Constraint_Init(lConstraints, SetupC::STATISTICS_QTY);
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMin = 2;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMax = 2;
 
-    lConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMin = 2;
-    lConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMax = 2;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMin        =   0;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMax        = 576;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMultipleOf =  64;
 
-    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMin        =   0;
-    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMax        = 576;
-    lConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMultipleOf =  64;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_QUEUE].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_QUEUE].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_WAIT].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_WAIT].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin = 26;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 43;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin = 26;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 43;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 2;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 2;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = 2;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 4;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = 2;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 4;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMin =   6;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMax = 589;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMin =   6;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL].mMax = 589;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMax        = 576;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMultipleOf =  64;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMax        = 576;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMultipleOf =  64;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMin =  4;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMax = 11;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMin =  4;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATE_GET].mMax = 11;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMin = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMax = 1;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMin = 1;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STOP].mMax = 1;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMin = IOCTL_CONNECT;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMax = IOCTL_STOP   ;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMin = IOCTL_CONNECT;
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST].mMax = IOCTL_STOP   ;
+    lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST_RESULT].mMax = 512;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_LAST_RESULT].mMax = 512;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 11;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 34;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET_RESET].mMax = 0xffffffff;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 17;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 43;
 
-    lConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin        =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax        = 576;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMultipleOf =  64;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 11;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 34;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 118;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 17;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 43;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMin = 1;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMax = 1;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin        =  64;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax        = 576;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMultipleOf =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin        =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax        = 576;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMultipleOf =  64;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =  64;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 118;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_NO_BUFFER_packet].mMax = 1;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMin = 1;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET].mMax = 1;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMin = 1;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin        =  64;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax        = 576;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMultipleOf =  64;
+    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMin = 1;
 
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_NO_BUFFER_packet].mMax = 1;
-
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMin = 1;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMax = 0xffffffff;
-
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMin = 1;
-    lConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMax = 0xffffffff;
-
-    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(1, lConstraints));
+    KMS_TEST_COMPARE(0, lSetup.Statistics_Verify(1));
 }
 KMS_TEST_END

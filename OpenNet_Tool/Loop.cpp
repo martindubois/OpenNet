@@ -68,8 +68,8 @@ Loop::Loop(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int 
     Adapter_Connect();
     SetProcessor   ();
     AddDestination ();
+    SetConfig      ();
     SetInputFilter ();
-    Buffer_Allocate();
 }
 
 Loop::~Loop()
@@ -235,7 +235,6 @@ void Loop::Stop()
             "System::Stop(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
     }
 
-    Buffer_Release  ();
     ResetInputFilter();
 }
 
@@ -302,42 +301,6 @@ void Loop::AddDestination()
 }
 
 // Exception  KmsLib::Exception *  CODE_ERROR
-void Loop::Buffer_Allocate()
-{
-    assert(0 < mBufferQty);
-
-    for (unsigned int i = 0; i < 2; i++)
-    {
-        assert(NULL != mAdapters[i]);
-
-        OpenNet::Status lStatus = mAdapters[i]->Buffer_Allocate(mBufferQty);
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Adapter::Buffer_Allocate(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
-    }
-}
-
-// Exception  KmsLib::Exception *  CODE_ERROR
-void Loop::Buffer_Release()
-{
-    assert(0 < mBufferQty);
-
-    for (unsigned int i = 0; i < 2; i++)
-    {
-        assert(NULL != mAdapters[i]);
-
-        OpenNet::Status lStatus = mAdapters[i]->Buffer_Release(mBufferQty);
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Adapter::Buffer_Release(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
-    }
-}
-
-// Exception  KmsLib::Exception *  CODE_ERROR
 void Loop::ResetInputFilter()
 {
     for (unsigned int i = 0; i < 2; i++)
@@ -349,6 +312,37 @@ void Loop::ResetInputFilter()
         {
             throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
                 "Adapter::ResetInputFilter(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+        }
+    }
+}
+
+// Exception  KmsLib::Exception *  CODE_ERROR
+void Loop::SetConfig()
+{
+    assert(0 < mBufferQty);
+
+    for (unsigned int i = 0; i < 2; i++)
+    {
+        OpenNet::Adapter * lAdapter = mAdapters[i];
+
+        assert(NULL != lAdapter);
+
+        OpenNet::Adapter::Config lConfig;
+
+        OpenNet::Status lStatus = lAdapter->GetConfig(&lConfig);
+        if (OpenNet::STATUS_OK != lStatus)
+        {
+            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
+                "Adapter::GetConfig(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+        }
+
+        lConfig.mBufferQty = mBufferQty;
+
+        lAdapter->SetConfig(lConfig);
+        if (OpenNet::STATUS_OK != lStatus)
+        {
+            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
+                "Adapter::SetConfig(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
         }
     }
 }

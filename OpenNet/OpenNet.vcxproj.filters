@@ -85,6 +85,12 @@
     <ClInclude Include="EthernetAddress.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Filter_Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Filter_Data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="_DocUser\ReadMe.txt">

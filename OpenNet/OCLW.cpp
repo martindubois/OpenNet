@@ -65,6 +65,18 @@ void OCLW_WaitForEvents(cl_uint aCount, const cl_event * aEvents)
 
 // ===== cl_command_queue ===================================================
 
+void OCLW_Flush(cl_command_queue aCommandQueue)
+{
+    assert(NULL != aCommandQueue);
+
+    cl_int lStatus = clFlush(aCommandQueue);
+    if (CL_SUCCESS != lStatus)
+    {
+        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
+            "clFlush(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+    }
+}
+
 void OCLW_EnqueueNDRangeKernel(cl_command_queue aCommandQueue, cl_kernel aKernel, cl_uint aWorkDim, const size_t * aGlobalWorkOffset, const size_t * aGlobalWorkSize, const size_t * aLocalWorkSize, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent)
 {
     assert(NULL != aCommandQueue    );

@@ -44,9 +44,9 @@ KMS_TEST_BEGIN(Filter_Base)
     KMS_TEST_COMPARE(                                        0, lF0.Edit_Search     (" "));
     KMS_TEST_COMPARE(                             0, strcmp("", lF0.GetName         ()));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , lF0.SetCode         ("OpenNet_Test/Filter.cpp"));
-    KMS_TEST_COMPARE(                                       88, lF0.GetCodeLineCount());
+    KMS_TEST_COMPARE(                                       91, lF0.GetCodeLineCount());
     KMS_TEST_ASSERT (NULL                                    != lF0.GetCodeLines    ());
-    KMS_TEST_COMPARE(                                     5769, lF0.GetCodeSize     ());
+    KMS_TEST_COMPARE(                                     5871, lF0.GetCodeSize     ());
     KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET         , lF0.SetCode         (" ", 1));
     KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET         , lF0.SetCode         ("OpenNet_Test/Filter.cpp"));
     KMS_TEST_COMPARE(                                        0, lF0.Edit_Remove     (""));
@@ -54,9 +54,9 @@ KMS_TEST_BEGIN(Filter_Base)
     KMS_TEST_COMPARE(                                        0, lF0.Edit_Replace    ("A\tB", ""));
     KMS_TEST_COMPARE(                                        3, lF0.Edit_Replace    ("Found", "FOUND"));
     KMS_TEST_COMPARE(                                        5, lF0.Edit_Replace    ("FOUND", "FOUN"));
-    KMS_TEST_COMPARE(                                     5764, lF0.GetCodeSize     ());
+    KMS_TEST_COMPARE(                                     5866, lF0.GetCodeSize     ());
     KMS_TEST_COMPARE(                                        7, lF0.Edit_Replace    ("FOUN", "Found"));
-    KMS_TEST_COMPARE(                                     5771, lF0.GetCodeSize     ());
+    KMS_TEST_COMPARE(                                     5873, lF0.GetCodeSize     ());
     KMS_TEST_COMPARE(                                        0, lF0.Edit_Search     (""));
     KMS_TEST_COMPARE(                                        7, lF0.Edit_Search     ("Found"));
 

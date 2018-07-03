@@ -77,14 +77,20 @@ int SetupC::Start()
 
     for (i = 0; i < 2; i++)
     {
-        assert(NULL != mAdapters[i]);
+        OpenNet::Adapter::Config lConfig;
 
-        if (OpenNet::STATUS_OK != mAdapters[i]->SetInputFilter(mFilters + i)) { return __LINE__; }
+        if (OpenNet::STATUS_OK != mAdapters[i]->GetConfig(&lConfig)) { return __LINE__; }
+
+        lConfig.mBufferQty = mBufferQty;
+
+        if (OpenNet::STATUS_OK != mAdapters[i]->SetConfig( lConfig)) { return __LINE__; }
     }
 
     for (i = 0; i < 2; i++)
     {
-        if (OpenNet::STATUS_OK != mAdapters[i]->Buffer_Allocate(mBufferQty)) { return __LINE__; }
+        assert(NULL != mAdapters[i]);
+
+        if (OpenNet::STATUS_OK != mAdapters[i]->SetInputFilter(mFilters + i)) { return __LINE__; }
     }
 
     if (OpenNet::STATUS_OK != mSystem->Start()) { return __LINE__; }
@@ -102,13 +108,6 @@ int SetupC::Stop(unsigned int aFlags)
     if (OpenNet::STATUS_OK != mSystem->Stop(aFlags)) { return __LINE__; }
 
     unsigned int i;
-
-    for (i = 0; i < 2; i++)
-    {
-        assert(NULL != mAdapters[i]);
-
-        if (OpenNet::STATUS_OK != mAdapters[i]->Buffer_Release(mBufferQty)) { return __LINE__; }
-    }
 
     for (i = 0; i < 2; i++)
     {
@@ -172,15 +171,13 @@ int SetupC::Statistics_Reset()
     return 0;
 }
 
-// aConstraints [---;R--]
-int SetupC::Statistics_Verify(unsigned int aAdapter, const KmsLib::ValueVector::Constraint_UInt32 * aConstraints)
+int SetupC::Statistics_Verify(unsigned int aAdapter)
 {
-    assert(2    >  aAdapter    );
-    assert(NULL != aConstraints);
+    assert(2 > aAdapter);
 
     assert(NULL != mAdapters[aAdapter]);
 
-    if (0 != KmsLib::ValueVector::Constraint_Verify(mStatistics[aAdapter], STATISTICS_QTY, aConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(mAdapters[aAdapter]->GetStatisticsDescriptions())))
+    if (0 != KmsLib::ValueVector::Constraint_Verify(mStatistics[aAdapter], STATISTICS_QTY, mConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(mAdapters[aAdapter]->GetStatisticsDescriptions())))
     {
         return __LINE__;
     }

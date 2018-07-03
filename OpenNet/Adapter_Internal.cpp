@@ -100,14 +100,18 @@ Adapter_Internal::Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsL
 
     InitializeCriticalSection(&mZone0);
 
-    memset(&mConfig, 0, sizeof(mConfig));
-    memset(&mInfo  , 0, sizeof(mInfo  ));
-    memset(&mName  , 0, sizeof(mName  ));
+    memset(&mConfig      , 0, sizeof(mConfig      ));
+    memset(&mDriverConfig, 0, sizeof(mDriverConfig));
+    memset(&mInfo        , 0, sizeof(mInfo        ));
+    memset(&mName        , 0, sizeof(mName        ));
+    memset(&mStatistics  , 0, sizeof(mStatistics  ));
 
-    memset(&mStatistics , 0, sizeof(mStatistics));
+    mConfig.mBufferQty = 4;
 
-    mHandle->Control(IOCTL_CONFIG_GET, NULL, 0, &mConfig, sizeof(mConfig));
-    mHandle->Control(IOCTL_INFO_GET  , NULL, 0, &mInfo  , sizeof(mInfo  ));
+    mHandle->Control(IOCTL_CONFIG_GET, NULL, 0, &mDriverConfig, sizeof(mDriverConfig));
+    mHandle->Control(IOCTL_INFO_GET  , NULL, 0, &mInfo        , sizeof(mInfo        ));
+
+    mConfig.mPacketSize_byte = mDriverConfig.mPacketSize_byte;
 
     strncpy_s(mName, mInfo.mVersion_Hardware.mComment, sizeof(mName) - 1);
 
@@ -144,7 +148,7 @@ Adapter_Internal::~Adapter_Internal()
 
     if (0 < mBufferCount)
     {
-        Buffer_Release(mBufferCount);
+        Buffers_Release();
         assert(0 == mBufferCount);
     }
 
@@ -212,12 +216,7 @@ void Adapter_Internal::Start()
     assert(NULL                == mThread     );
     assert(0                   == mThreadId   );
 
-    if (0 >= mBufferCount)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_STATE_ERROR,
-            "No buffers", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
-    }
+    Buffers_Allocate();
 
     State_Change(STATE_INIT, STATE_START_REQUESTED);
 
@@ -250,6 +249,8 @@ void Adapter_Internal::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext
     EnterCriticalSection(&mZone0);
         Stop_Wait_Zone0(aTryToSolveHang, aContext);
     LeaveCriticalSection(&mZone0);
+
+    Buffers_Release();
 
     mStatistics[OpenNet::ADAPTER_STATS_STOP_WAIT] ++;
 }
@@ -450,12 +451,6 @@ OpenNet::Status Adapter_Internal::ResetInputFilter()
 
     assert(NULL != mProcessor);
 
-    if (0 < mBufferCount)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_BUFFER_ALLOCATED;
-    }
-
     mFilter = NULL;
 
     try
@@ -480,12 +475,6 @@ OpenNet::Status Adapter_Internal::ResetProcessor()
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_PROCESSOR_NOT_SET;
-    }
-
-    if (0 < mBufferCount)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_BUFFER_ALLOCATED;
     }
 
     if (NULL != mFilter)
@@ -518,7 +507,15 @@ OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
 
     memcpy(&mConfig, &aConfig, sizeof(mConfig));
 
-    return Control(IOCTL_CONFIG_SET, &mConfig, sizeof(mConfig), &mConfig, sizeof(mConfig));
+    mDriverConfig.mPacketSize_byte = mConfig.mPacketSize_byte;
+
+    OpenNet::Status lResult = Control(IOCTL_CONFIG_SET, &mDriverConfig, sizeof(mDriverConfig), &mDriverConfig, sizeof(mDriverConfig));
+    if (OpenNet::STATUS_OK == lResult)
+    {
+        mConfig.mPacketSize_byte = mDriverConfig.mPacketSize_byte;
+    }
+
+    return lResult;
 }
 
 OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::Filter * aFilter)
@@ -636,78 +633,6 @@ OpenNet::Status Adapter_Internal::SetProcessor(OpenNet::Processor * aProcessor)
     return OpenNet::STATUS_OK;
 }
 
-OpenNet::Status Adapter_Internal::Buffer_Allocate(unsigned int aCount)
-{
-    assert(NULL != mDebugLog);
-
-    if (0 >= aCount)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_INVALID_BUFFER_COUNT;
-    }
-
-    if (NULL == mFilter)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_FILTER_NOT_SET;
-    }
-
-    if (NULL == mProcessor)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_PROCESSOR_NOT_SET;
-    }
-
-    if (!IsConnected())
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_ADAPTER_NOT_CONNECTED;
-    }
-
-    try
-    {
-        for (unsigned int i = 0; i < aCount; i++)
-        {
-            Buffer_Allocate();
-        }
-    }
-    catch (KmsLib::Exception * eE)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        mDebugLog->Log(eE);
-        return ExceptionToStatus(eE);
-    }
-
-    return OpenNet::STATUS_OK;
-}
-
-OpenNet::Status Adapter_Internal::Buffer_Release(unsigned int aCount)
-{
-    assert(NULL != mDebugLog);
-
-    if (0 >= aCount)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_INVALID_BUFFER_COUNT;
-    }
-
-    try
-    {
-        for (unsigned int i = 0; i < aCount; i++)
-        {
-            Buffer_Release();
-        }
-    }
-    catch (KmsLib::Exception * eE)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        mDebugLog->Log(eE);
-        return ExceptionToStatus(eE);
-    }
-
-    return OpenNet::STATUS_OK;
-}
-
 OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
 {
     assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
@@ -775,6 +700,11 @@ void Adapter_Internal::Run()
 
     mStatistics[OpenNet::ADAPTER_STATS_RUN_ENTRY] ++;
 
+    if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL))
+    {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+    }
+
     try
     {
         State_Change(STATE_START_REQUESTED, STATE_STARTING);
@@ -824,6 +754,28 @@ void Adapter_Internal::Run()
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
+// Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Allocate
+void Adapter_Internal::Buffers_Allocate()
+{
+    assert(0 < mConfig.mBufferQty);
+
+    for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
+    {
+        Buffer_Allocate();
+    }
+}
+
+// Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Allocate
+void Adapter_Internal::Buffers_Release()
+{
+    assert(0 < mConfig.mBufferQty);
+
+    for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
+    {
+        Buffer_Release();
+    }
+}
+
 // Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
 //                                 See Process_Internal::Buffer_Allocate
 // Threads    Apps
@@ -847,9 +799,7 @@ void Adapter_Internal::Buffer_Allocate()
     mStatistics[OpenNet::ADAPTER_STATS_BUFFER_ALLOCATED] ++;
 }
 
-// Exception  KmsLib::Exception *  CODE_INVALID_DATA
-//                                 See KmsLib::Windows::DriverHandle::Control
-//                                 See Processor_Internal::Buffer_Release
+// Exception  KmsLib::Exception *  See Processor_Internal::Buffer_Release
 // Threads    Apps
 void Adapter_Internal::Buffer_Release()
 {

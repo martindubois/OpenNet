@@ -60,9 +60,15 @@ int SetupA::Start()
     assert(NULL != mAdapter);
     assert(NULL != mSystem );
 
-    if (OpenNet::STATUS_OK != mAdapter->SetInputFilter (&mFilter  )) { return __LINE__; }
-    if (OpenNet::STATUS_OK != mAdapter->Buffer_Allocate(mBufferQty)) { return __LINE__; }
-    if (OpenNet::STATUS_OK != mSystem ->Start          (          )) { return __LINE__; }
+    OpenNet::Adapter::Config lConfig;
+
+    if (OpenNet::STATUS_OK != mAdapter->GetConfig     (&lConfig)) { return __LINE__; }
+
+    lConfig.mBufferQty = mBufferQty;
+
+    if (OpenNet::STATUS_OK != mAdapter->SetConfig     ( lConfig)) { return __LINE__; }
+    if (OpenNet::STATUS_OK != mAdapter->SetInputFilter(&mFilter)) { return __LINE__; }
+    if (OpenNet::STATUS_OK != mSystem ->Start         (        )) { return __LINE__; }
 
     Sleep(1000);
 
@@ -74,9 +80,8 @@ int SetupA::Stop(unsigned int aFlags)
     assert(NULL != mAdapter);
     assert(NULL != mSystem );
 
-    if (OpenNet::STATUS_OK != mSystem ->Stop            (aFlags    )) { return __LINE__; }
-    if (OpenNet::STATUS_OK != mAdapter->Buffer_Release  (mBufferQty)) { return __LINE__; }
-    if (OpenNet::STATUS_OK != mAdapter->ResetInputFilter(          )) { return __LINE__; }
+    if (OpenNet::STATUS_OK != mSystem ->Stop            (aFlags)) { return __LINE__; }
+    if (OpenNet::STATUS_OK != mAdapter->ResetInputFilter(      )) { return __LINE__; }
 
     return 0;
 }
@@ -142,14 +147,11 @@ int SetupA::Statistics_Reset()
     return 0;
 }
 
-// aConstraints [---;R--]
-int SetupA::Statistics_Verify(const KmsLib::ValueVector::Constraint_UInt32 * aConstraints)
+int SetupA::Statistics_Verify()
 {
-    assert(NULL != aConstraints);
-
     assert(NULL != mAdapter);
 
-    if (0 != KmsLib::ValueVector::Constraint_Verify(mStatistics, STATISTICS_QTY, aConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(mAdapter->GetStatisticsDescriptions())))
+    if (0 != KmsLib::ValueVector::Constraint_Verify(mStatistics, STATISTICS_QTY, mConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(mAdapter->GetStatisticsDescriptions())))
     {
         return __LINE__;
     }

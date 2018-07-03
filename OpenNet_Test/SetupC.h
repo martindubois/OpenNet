@@ -15,11 +15,6 @@
 #include <OpenNet/Adapter.h>
 #include <OpenNet/Filter_Forward.h>
 #include <OpenNet/System.h>
-#include <OpenNetK/Hardware_Statistics.h>
-
-// ===== Common =============================================================
-#include "../Common/OpenNet/Adapter_Statistics.h"
-#include "../Common/OpenNetK/Adapter_Statistics.h"
 
 // ===== OpenNet_Test =======================================================
 #include "Base.h"
@@ -31,11 +26,6 @@ class SetupC : public Base
 {
 
 public:
-
-    enum
-    {
-        STATISTICS_QTY = (OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_QTY + OpenNetK::HARDWARE_STATS_QTY),
-    };
 
     SetupC(unsigned int aBufferQty);
 
@@ -50,7 +40,7 @@ public:
     int Statistics_Get          ();
     int Statistics_GetAndDisplay(unsigned int aMinLevel = 0);
     int Statistics_Reset        ();
-    int Statistics_Verify       (unsigned int aAdapter, const KmsLib::ValueVector::Constraint_UInt32 * aConstraints);
+    int Statistics_Verify       (unsigned int aAdapter);
 
     OpenNet::Adapter      * mAdapters[2];
     unsigned int            mBufferQty  ;

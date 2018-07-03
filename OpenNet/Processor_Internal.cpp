@@ -92,7 +92,7 @@ Processor_Internal::~Processor_Internal()
 // Threads  Apps
 //
 // Buffer_Allocate ==> Buffer_Release
-void Processor_Internal::Buffer_Allocate(unsigned int aPacketSize_byte, FilterData * aFilterData, OpenNetK::Buffer * aBuffer, BufferData * aBufferData)
+void Processor_Internal::Buffer_Allocate(unsigned int aPacketSize_byte, Filter_Data * aFilterData, OpenNetK::Buffer * aBuffer, BufferData * aBufferData)
 {
     assert(PACKET_SIZE_MAX_byte >= aPacketSize_byte          );
     assert(PACKET_SIZE_MIN_byte <= aPacketSize_byte          );
@@ -165,12 +165,12 @@ void Processor_Internal::Buffer_Release(BufferData * aBufferData)
 // Processing_Create ==> Processing_Release
 
 // TODO  OpenNet.Processor_Internal  Try to use one command queue by buffer
-void Processor_Internal::Processing_Create(FilterData * aFilterData, OpenNet::Filter * aFilter)
+void Processor_Internal::Processing_Create(Filter_Data * aFilterData, OpenNet::Filter * aFilter)
 {
     assert(NULL != aFilterData);
     assert(NULL != aFilter    );
 
-    memset(aFilterData, 0, sizeof(FilterData));
+    memset(aFilterData, 0, sizeof(Filter_Data));
 
     aFilterData->mFilter = aFilter;
 
@@ -221,7 +221,7 @@ void Processor_Internal::Processing_Create(FilterData * aFilterData, OpenNet::Fi
 //                                 See OCLW_EnqueueNDRangeKernel
 //                                 See OCLW_SetKernelArg
 // Thread  Worker
-void Processor_Internal::Processing_Queue(FilterData * aFilterData, BufferData * aBufferData)
+void Processor_Internal::Processing_Queue(Filter_Data * aFilterData, BufferData * aBufferData)
 {
     assert(NULL != aFilterData               );
     assert(NULL != aFilterData->mCommandQueue);
@@ -254,6 +254,8 @@ void Processor_Internal::Processing_Queue(FilterData * aFilterData, BufferData *
 
     // OCLW_EnqueueNDRangeKernel ==> OCLW_ReleaseEvent  See Processing_Wait
     OCLW_EnqueueNDRangeKernel(aFilterData->mCommandQueue, aFilterData->mKernel, 1, &lGO, &lGS, NULL, 0, NULL, &aBufferData->mEvent);
+
+    OCLW_Flush(aFilterData->mCommandQueue);
 }
 
 // aFilterData [---;RW-]
@@ -261,7 +263,7 @@ void Processor_Internal::Processing_Queue(FilterData * aFilterData, BufferData *
 // Threads  Apps
 //
 // Processing_Create ==> Processing_Release
-void Processor_Internal::Processing_Release(FilterData * aFilterData)
+void Processor_Internal::Processing_Release(Filter_Data * aFilterData)
 {
     assert(NULL != aFilterData               );
     assert(NULL != aFilterData->mCommandQueue);
@@ -283,7 +285,7 @@ void Processor_Internal::Processing_Release(FilterData * aFilterData)
 // Thread  Worker
 //
 // Processing_Queue ==> Processing_Wait
-void Processor_Internal::Processing_Wait(FilterData * aFilterData, BufferData * aBufferData)
+void Processor_Internal::Processing_Wait(Filter_Data * aFilterData, BufferData * aBufferData)
 {
     assert(NULL != aFilterData         );
     assert(NULL != aFilterData->mFilter);

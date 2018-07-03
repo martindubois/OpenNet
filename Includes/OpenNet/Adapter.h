@@ -34,7 +34,15 @@ namespace OpenNet
 
     public:
 
-        typedef OpenNetK::Adapter_Config Config;
+        typedef struct
+        {
+            unsigned int mBufferQty      ;
+            unsigned int mPacketSize_byte;
+
+            unsigned char mReserved0[1016];
+        }
+        Config;
+
         typedef OpenNetK::Adapter_Info   Info  ;
         typedef OpenNetK::Adapter_State  State ;
 
@@ -287,31 +295,6 @@ namespace OpenNet
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         /// \retval STATUS_PROCESSOR_ALREADY_SET
         virtual Status SetProcessor(Processor * aProcessor) = 0;
-
-        /// \cond en
-        /// \brief  This methode allocate buffers.
-        /// \param  aCount The number of buffer to allocate
-        /// \endcond
-        /// \cond fr
-        /// \brief Cette methode alloue des espace memoire.
-        /// \param aCount Le nombre d'espace memoire a allouer
-        /// \endcond
-        /// \retval STATUS_OK
-        /// \retval STATUS_INVALID_BUFFER_COUNT
-        /// \retval STATUS_TOO_MANY_BUFFER
-        virtual Status Buffer_Allocate(unsigned int aCount) = 0;
-
-        /// \cond en
-        /// \brief  This methode release buffers.
-        /// \param  aCount  The number of buffer to release
-        /// \endcond
-        /// \cond fr
-        /// \brief  Cette methode relache des espace memoire.
-        /// \param  aCount  Le nombre d'espace memoire a relacher
-        /// \endcond
-        /// \retval STATUS_OK
-        /// \retval STATUS_INVALID_BUFFER_COUNT
-        virtual Status Buffer_Release(unsigned int aCount) = 0;
 
         /// \cond en
         /// \brief  Display

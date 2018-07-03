@@ -17,6 +17,11 @@
 // ===== OpenNet_Test =======================================================
 #include "Base.h"
 
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define HARDWARE_BASE (OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_QTY)
+
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
@@ -43,4 +48,17 @@ int Base::Init()
     }
 
     return 0;
+}
+
+void Base::Constraint_Init()
+{
+    KmsLib::ValueVector::Constraint_Init(mConstraints, STATISTICS_QTY);
+
+    mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET_RESET].mMax = 0xffffffff;
+
+    mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
+
+    mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMax = 0xffffffff;
+
+    mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMax = 0xffffffff;
 }

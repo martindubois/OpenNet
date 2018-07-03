@@ -69,17 +69,12 @@ KMS_TEST_BEGIN(Adapter_SetupA)
 
     KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_BUFFER_COUNT, lSetup.mAdapter->Buffer_Allocate(0));
-    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_BUFFER_COUNT, lSetup.mAdapter->Buffer_Release (0));
-
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mAdapter->Display(stdout));
 
     OpenNet::Adapter::Config lC0;
 
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mAdapter->GetConfig(NULL));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , lSetup.mAdapter->GetConfig(&lC0));
-
-    KMS_TEST_ASSERT (OpenNet::EthernetAddress_IsZero(lC0.mEthernetAddress[0]));
 
     KMS_TEST_ASSERT(PACKET_SIZE_MAX_byte >= lC0.mPacketSize_byte);
     KMS_TEST_ASSERT(PACKET_SIZE_MIN_byte <= lC0.mPacketSize_byte);
@@ -107,8 +102,8 @@ KMS_TEST_BEGIN(Adapter_SetupA)
 
     unsigned int lSs0[1024];
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mAdapter->GetStatistics(NULL, NULL        , false));
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , lSetup.mAdapter->GetStatistics(lSs0, sizeof(lSs0), false));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mAdapter->GetStatistics(NULL, NULL        , false));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mAdapter->GetStatistics(lSs0, sizeof(lSs0), false));
 
     /*
     OpenNet::Adapter::Stats lSsE;

@@ -53,13 +53,16 @@ public:
     virtual OpenNet::Status Start();
     virtual OpenNet::Status Stop (unsigned int aFlags);
 
+    // ===== OpenNet::StatisticsProvider ====================================
+    virtual OpenNet::Status GetStatistics  (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
+    virtual OpenNet::Status ResetStatistics();
+
 // internal
 
     void SendLoopBackPackets(Adapter_Internal * aAdapter);
 
 private:
 
-    typedef std::vector<Adapter_Internal   *> AdapterVector  ;
     typedef std::vector<Processor_Internal *> ProcessorVector;
 
     void FindAdapters        ();
@@ -71,12 +74,10 @@ private:
     OpenNet::Status ValidateAdapter(OpenNet::Adapter * aAdapter);
 
     unsigned int                           mAdapterRunning    ;
-    AdapterVector                          mAdapters          ;
+    Adapter_Vector                         mAdapters          ;
     IoCtl_Connect_In                       mConnect           ;
     KmsLib::DebugLog                       mDebugLog          ;
     Processor_Internal::ExtensionFunctions mExtensionFunctions;
-    clEnqueueWaitSignalAMD_fn              mEnqueueWaitSignal ;
-    clEnqueueWriteSignalAMD_fn             mEnqueueWriteSignal;
     unsigned int                           mPacketSize_byte   ;
     cl_platform_id                         mPlatform          ;
     ProcessorVector                        mProcessors        ;

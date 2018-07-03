@@ -98,6 +98,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{B467
 		Common\OpenNet\Adapter_Statistics.h = Common\OpenNet\Adapter_Statistics.h
 		Common\OpenNet\EthernetAddress.h = Common\OpenNet\EthernetAddress.h
 		Common\OpenNet\Filter_Statistics.h = Common\OpenNet\Filter_Statistics.h
+		Common\OpenNet\System_Statistics.h = Common\OpenNet\System_Statistics.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{2CF49A29-C06C-4972-B8BE-262E1FE62244}"

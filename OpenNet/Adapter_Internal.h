@@ -8,6 +8,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+// ===== C++ ================================================================
+#include <vector>
+
 // ===== Windows ============================================================
 #include <Windows.h>
 
@@ -25,6 +28,7 @@
 #include "../Common/OpenNet/Adapter_Statistics.h"
 
 // ===== OpenNet ============================================================
+#include "Filter_Data.h"
 #include "Processor_Internal.h"
 
 // Class
@@ -68,9 +72,6 @@ public:
     virtual OpenNet::Status SetPacketSize   (unsigned int         aSize_byte);
     virtual OpenNet::Status SetProcessor    (OpenNet::Processor * aProcessor);
 
-    virtual OpenNet::Status Buffer_Allocate(unsigned int aCount);
-    virtual OpenNet::Status Buffer_Release (unsigned int aCount);
-
     virtual OpenNet::Status Display(FILE * aOut) const;
 
     virtual OpenNet::Status Packet_Send(const void * aData, unsigned int aSize_byte);
@@ -80,6 +81,9 @@ public:
     void Run();
 
 private:
+
+    void Buffers_Allocate();
+    void Buffers_Release ();
 
     void Buffer_Allocate();
     void Buffer_Release ();
@@ -95,20 +99,21 @@ private:
     void Stop_Request_Zone0();
     void Stop_Wait_Zone0   (TryToSolveHang aTryToSolveHang, void * aContext);
 
-    unsigned int                    mBufferCount;
+    unsigned int                    mBufferCount ;
     Processor_Internal::BufferData  mBufferData[OPEN_NET_BUFFER_QTY];
     OpenNetK::Buffer                mBuffers   [OPEN_NET_BUFFER_QTY];
-    Config                          mConfig     ;
-    KmsLib::DebugLog              * mDebugLog   ;
-    OpenNet::Filter               * mFilter     ;
-    Processor_Internal::FilterData  mFilterData ;
-    KmsLib::Windows::DriverHandle * mHandle     ;
-    Info                            mInfo       ;
-    char                            mName   [64];
-    Processor_Internal            * mProcessor  ;
+    Config                          mConfig      ;
+    KmsLib::DebugLog              * mDebugLog    ;
+    OpenNetK::Adapter_Config        mDriverConfig;
+    OpenNet::Filter               * mFilter      ;
+    Filter_Data                     mFilterData  ;
+    KmsLib::Windows::DriverHandle * mHandle      ;
+    Info                            mInfo        ;
+    char                            mName    [64];
+    Processor_Internal            * mProcessor   ;
     unsigned int                    mStatistics[OpenNet::ADAPTER_STATS_QTY];
-    HANDLE                          mThread     ;
-    DWORD                           mThreadId   ;
+    HANDLE                          mThread      ;
+    DWORD                           mThreadId    ;
 
     // ===== Zone 0 =========================================================
     // Threads  Apps
@@ -118,3 +123,5 @@ private:
     unsigned int mState;
 
 };
+
+typedef std::vector<Adapter_Internal *> Adapter_Vector;

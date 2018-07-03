@@ -340,6 +340,22 @@ OpenNet::Status System_Internal::Stop(unsigned int aFlags)
     return lResult;
 }
 
+// ===== OpenNet::StatisticsProvider ========================================
+
+OpenNet::Status System_Internal::GetStatistics(unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset)
+{
+    // TODO  OpenNet.System_Internal
+
+    return OpenNet::STATUS_OK;
+}
+
+OpenNet::Status System_Internal::ResetStatistics()
+{
+    // TODO  OpenNet.System_Internal
+
+    return OpenNet::STATUS_OK;
+}
+
 // Internal
 /////////////////////////////////////////////////////////////////////////////
 

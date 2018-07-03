@@ -10,8 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes/OpenNet ===================================================
-#include <OpenNet/OpenNet.h>
-#include <OpenNet/Status.h>
+#include <OpenNet/StatisticsProvider.h>
 
 namespace OpenNet
 {
@@ -28,7 +27,7 @@ namespace OpenNet
     /// \cond fr
     /// \brief  Cette classe definit l'interface au niveau systeme.
     /// \endcond
-    class System
+    class System : public StatisticsProvider
     {
 
     public:
