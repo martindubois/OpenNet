@@ -65,6 +65,12 @@
     <ClCompile Include="StatisticsProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Buffer_Data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Filter_Data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="System_Internal.h">
@@ -85,10 +91,22 @@
     <ClInclude Include="EthernetAddress.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Filter_Thread.h">
+    <ClInclude Include="Filter_Data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Filter_Data.h">
+    <ClInclude Include="Kernel_Functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread_Functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread_Kernel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer_Data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

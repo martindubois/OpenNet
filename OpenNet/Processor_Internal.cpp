@@ -25,6 +25,7 @@
 #include "../Common/Constants.h"
 
 // ===== OpenNet ============================================================
+#include "Buffer_Data.h"
 #include "OCLW.h"
 
 #include "Processor_Internal.h"
@@ -92,7 +93,7 @@ Processor_Internal::~Processor_Internal()
 // Threads  Apps
 //
 // Buffer_Allocate ==> Buffer_Release
-void Processor_Internal::Buffer_Allocate(unsigned int aPacketSize_byte, Filter_Data * aFilterData, OpenNetK::Buffer * aBuffer, BufferData * aBufferData)
+void Processor_Internal::Buffer_Allocate(unsigned int aPacketSize_byte, Filter_Data * aFilterData, OpenNetK::Buffer * aBuffer, Buffer_Data * aBufferData)
 {
     assert(PACKET_SIZE_MAX_byte >= aPacketSize_byte          );
     assert(PACKET_SIZE_MIN_byte <= aPacketSize_byte          );
@@ -104,8 +105,9 @@ void Processor_Internal::Buffer_Allocate(unsigned int aPacketSize_byte, Filter_D
 
     assert(NULL != mContext);
 
-    memset(aBuffer    , 0, sizeof(OpenNetK::Buffer));
-    memset(aBufferData, 0, sizeof(BufferData      ));
+    aBufferData->Reset();
+
+    memset(aBuffer, 0, sizeof(OpenNetK::Buffer));
 
     size_t lPacketQty;
 
@@ -117,7 +119,7 @@ void Processor_Internal::Buffer_Allocate(unsigned int aPacketSize_byte, Filter_D
     aBuffer->mSize_byte += aPacketSize_byte           * static_cast<unsigned int>(lPacketQty);
     aBuffer->mSize_byte += (aBuffer->mSize_byte / OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte) * aPacketSize_byte;
 
-    // OCLW_CreateBuffer ==> OCLW_ReleaseMemObject  See Buffer_Release
+    // OCLW_CreateBuffer ==> OCLW_ReleaseMemObject  See Buffer_Data::Release
     aBufferData->mMem = OCLW_CreateBuffer(mContext, CL_MEM_BUS_ADDRESSABLE_AMD, aBuffer->mSize_byte);
     assert(NULL != aBufferData->mMem);
 
@@ -126,7 +128,7 @@ void Processor_Internal::Buffer_Allocate(unsigned int aPacketSize_byte, Filter_D
     cl_int lStatus = mExtensionFunctions->mEnqueueMakeBufferResident(aFilterData->mCommandQueue, 1, &aBufferData->mMem, CL_TRUE, &lBusAddress, 0, NULL, NULL);
     if (CL_SUCCESS != lStatus)
     {
-        OCLW_ReleaseMemObject(aBufferData->mMem);
+        aBufferData->ReleaseMemObject();
 
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
@@ -134,27 +136,10 @@ void Processor_Internal::Buffer_Allocate(unsigned int aPacketSize_byte, Filter_D
     }
 
     aBufferData->mPacketQty = static_cast<unsigned int>(lPacketQty);
-    aBufferData->mSize_byte = aBuffer->mSize_byte;
 
     aBuffer->mBuffer_PA = lBusAddress.surface_bus_address;
     aBuffer->mMarker_PA = lBusAddress.marker_bus_address ;
     aBuffer->mPacketQty = static_cast<uint32_t>(lPacketQty);
-}
-
-// aBufferData [---;RW-]
-//
-// Exception  KmsLib::Exception *  CODE_INVALID_ARGUMENT
-//                                 See OCLW_ReleaseMemObject
-// Threads  Apps
-//
-// Buffer_Allocate ==> Buffer_Release
-void Processor_Internal::Buffer_Release(BufferData * aBufferData)
-{
-    assert(NULL != aBufferData      );
-    assert(NULL != aBufferData->mMem);
-
-    // OCLW_CreateBuffer ==> OCLW_ReleaseMemObject  See Buffer_Allocate
-    OCLW_ReleaseMemObject(aBufferData->mMem);
 }
 
 // aFilterData [---;-W-]
@@ -162,7 +147,7 @@ void Processor_Internal::Buffer_Release(BufferData * aBufferData)
 //
 // Threads  Apps
 //
-// Processing_Create ==> Processing_Release
+// Processing_Create ==> Filter_Data::Release
 
 // TODO  OpenNet.Processor_Internal  Try to use one command queue by buffer
 void Processor_Internal::Processing_Create(Filter_Data * aFilterData, OpenNet::Filter * aFilter)
@@ -170,11 +155,11 @@ void Processor_Internal::Processing_Create(Filter_Data * aFilterData, OpenNet::F
     assert(NULL != aFilterData);
     assert(NULL != aFilter    );
 
-    memset(aFilterData, 0, sizeof(Filter_Data));
+    aFilterData->Reset();
 
     aFilterData->mFilter = aFilter;
 
-    // OCLW_CreateProgramWithSource ==> OCLW_ReleaseProgram  See Processing_Release
+    // OCLW_CreateProgramWithSource ==> OCLW_ReleaseProgram  See Filter_Data::Release
     aFilterData->mProgram = OCLW_CreateProgramWithSource(mContext, aFilter->GetCodeLineCount(), aFilter->GetCodeLines(), NULL);
     assert(NULL != aFilterData->mProgram);
 
@@ -182,7 +167,7 @@ void Processor_Internal::Processing_Create(Filter_Data * aFilterData, OpenNet::F
     {
         OCLW_BuildProgram(aFilterData->mProgram, 1, &mDevice, "-I V:/OpenNet/Includes", NULL, NULL);
 
-        // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Processing_Release
+        // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Filter_Data::Release
         aFilterData->mKernel = OCLW_CreateKernel(aFilterData->mProgram, "Filter");
 
         const cl_queue_properties * lProperties;
@@ -196,7 +181,7 @@ void Processor_Internal::Processing_Create(Filter_Data * aFilterData, OpenNet::F
             lProperties = NULL;
         }
 
-        // OCLW_CreateCommandQueueWithProperties ==> OCLW_ReleaseCommandQueue  See Processing_Release
+        // OCLW_CreateCommandQueueWithProperties ==> OCLW_ReleaseCommandQueue  See Filter_Data::Release
         aFilterData->mCommandQueue = OCLW_CreateCommandQueueWithProperties(mContext, mDevice, lProperties);
         assert(NULL != aFilterData->mCommandQueue);
     }
@@ -221,7 +206,7 @@ void Processor_Internal::Processing_Create(Filter_Data * aFilterData, OpenNet::F
 //                                 See OCLW_EnqueueNDRangeKernel
 //                                 See OCLW_SetKernelArg
 // Thread  Worker
-void Processor_Internal::Processing_Queue(Filter_Data * aFilterData, BufferData * aBufferData)
+void Processor_Internal::Processing_Queue(Filter_Data * aFilterData, Buffer_Data * aBufferData)
 {
     assert(NULL != aFilterData               );
     assert(NULL != aFilterData->mCommandQueue);
@@ -230,21 +215,16 @@ void Processor_Internal::Processing_Queue(Filter_Data * aFilterData, BufferData 
     assert(NULL != aBufferData               );
     assert(NULL != aBufferData->mMem         );
     assert(   0 <  aBufferData->mPacketQty   );
-    assert(   0 <  aBufferData->mSize_byte   );
 
     size_t lGO = 0;
     size_t lGS = aBufferData->mPacketQty;
 
     OCLW_SetKernelArg(aFilterData->mKernel, 0, sizeof(aBufferData->mMem), &aBufferData->mMem);
 
-    aFilterData->mFilter->AddKernelArgs(aFilterData->mKernel);
-
-    aBufferData->mMarkerValue++;
-
     // Here, we don't user event between the clEnqueueWaitSignal and the
     // clEnqueueNDRangeKernel because the command queue force the execution
     // order.
-    cl_int lStatus = mExtensionFunctions->mEnqueueWaitSignal(aFilterData->mCommandQueue, aBufferData->mMem, aBufferData->mMarkerValue, 0, NULL, NULL);
+    cl_int lStatus = mExtensionFunctions->mEnqueueWaitSignal(aFilterData->mCommandQueue, aBufferData->mMem, aBufferData->GetMarkerValue(), 0, NULL, NULL);
     if (CL_SUCCESS != lStatus)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -258,61 +238,31 @@ void Processor_Internal::Processing_Queue(Filter_Data * aFilterData, BufferData 
     OCLW_Flush(aFilterData->mCommandQueue);
 }
 
-// aFilterData [---;RW-]
-//
-// Threads  Apps
-//
-// Processing_Create ==> Processing_Release
-void Processor_Internal::Processing_Release(Filter_Data * aFilterData)
-{
-    assert(NULL != aFilterData               );
-    assert(NULL != aFilterData->mCommandQueue);
-    assert(NULL != aFilterData->mKernel      );
-    assert(NULL != aFilterData->mProgram     );
-
-    // OCLW_CreateCommandQueueWithProperties ==> OCLW_ReleaseCommandQueue  See Processing_Create
-    OCLW_ReleaseCommandQueue(aFilterData->mCommandQueue);
-
-    // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Processing_Create
-    OCLW_ReleaseKernel(aFilterData->mKernel);
-
-    // OCLW_CreateProgramWithSournce ==> OCLW_ReleaseProgram  See Process_Create
-    OCLW_ReleaseProgram(aFilterData->mProgram);
-}
-
 // aBufferData [---;RW-]
 //
 // Thread  Worker
 //
 // Processing_Queue ==> Processing_Wait
-void Processor_Internal::Processing_Wait(Filter_Data * aFilterData, BufferData * aBufferData)
+void Processor_Internal::Processing_Wait(Filter_Data * aFilterData, Buffer_Data * aBufferData)
 {
     assert(NULL != aFilterData         );
     assert(NULL != aFilterData->mFilter);
     assert(NULL != aBufferData         );
     assert(NULL != aBufferData->mEvent );
 
-    OCLW_WaitForEvents(1, &aBufferData->mEvent);
+    aBufferData->WaitForEvent();
 
     if (aFilterData->mFilter->IsProfilingEnabled())
     {
-        uint64_t lQueued;
-        uint64_t lSubmit;
-        uint64_t lStart ;
-        uint64_t lEnd   ;
-
-        OCLW_GetEventProfilingInfo(aBufferData->mEvent, CL_PROFILING_COMMAND_QUEUED, sizeof(uint64_t), &lQueued);
-        OCLW_GetEventProfilingInfo(aBufferData->mEvent, CL_PROFILING_COMMAND_SUBMIT, sizeof(uint64_t), &lSubmit);
-        OCLW_GetEventProfilingInfo(aBufferData->mEvent, CL_PROFILING_COMMAND_START , sizeof(uint64_t), &lStart );
-        OCLW_GetEventProfilingInfo(aBufferData->mEvent, CL_PROFILING_COMMAND_END   , sizeof(uint64_t), &lEnd   );
+        uint64_t lQueued = aBufferData->GetEventProfilingInfo(CL_PROFILING_COMMAND_QUEUED);
+        uint64_t lSubmit = aBufferData->GetEventProfilingInfo(CL_PROFILING_COMMAND_SUBMIT);
+        uint64_t lStart  = aBufferData->GetEventProfilingInfo(CL_PROFILING_COMMAND_START );
+        uint64_t lEnd    = aBufferData->GetEventProfilingInfo(CL_PROFILING_COMMAND_END   );
 
         aFilterData->mFilter->AddStatistics(lQueued, lSubmit, lStart, lEnd);
     }
 
-    // OCLW_EnqueueNDRangeKernel ==> OCLW_ReleaseEvent  See Processing_Queue
-    OCLW_ReleaseEvent(aBufferData->mEvent);
-
-    aBufferData->mEvent = NULL;
+    aBufferData->ReleaseEvent();
 }
 
 // ===== OpenNet::Processor =================================================

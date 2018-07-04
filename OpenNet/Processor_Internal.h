@@ -25,6 +25,8 @@
 // ===== OpenNet ============================================================
 #include "Filter_Data.h"
 
+class Buffer_Data;
+
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
@@ -32,16 +34,6 @@ class Processor_Internal : public OpenNet::Processor
 {
 
 public:
-
-    typedef struct
-    {
-        cl_event     mEvent      ;
-        uint32_t     mMarkerValue;
-        cl_mem       mMem        ;
-        unsigned int mPacketQty  ;
-        unsigned int mSize_byte  ;
-    }
-    BufferData;
 
     typedef struct
     {
@@ -54,13 +46,11 @@ public:
 
     ~Processor_Internal();
 
-    void Buffer_Allocate(unsigned int aPacketSize_byte, Filter_Data * aFilterData, OpenNetK::Buffer * aBuffer, BufferData * aBufferData);
-    void Buffer_Release (BufferData * aBufferData);
+    void Buffer_Allocate(unsigned int aPacketSize_byte, Filter_Data * aFilterData, OpenNetK::Buffer * aBuffer, Buffer_Data * aBufferData);
 
-    void Processing_Create (Filter_Data * aFilterData, OpenNet::Filter * aFilter);
-    void Processing_Queue  (Filter_Data * aFilterData, BufferData * aBufferData);
-    void Processing_Release(Filter_Data * aFilterData);
-    void Processing_Wait   (Filter_Data * aFilterData, BufferData * aBufferData);
+    void Processing_Create(Filter_Data * aFilterData, OpenNet::Filter * aFilter);
+    void Processing_Queue (Filter_Data * aFilterData, Buffer_Data * aBufferData);
+    void Processing_Wait  (Filter_Data * aFilterData, Buffer_Data * aBufferData);
 
     // ===== OpenNet::Processor =============================================
     virtual OpenNet::Status GetInfo        (Info * aOut) const;

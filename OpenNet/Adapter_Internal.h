@@ -28,6 +28,7 @@
 #include "../Common/OpenNet/Adapter_Statistics.h"
 
 // ===== OpenNet ============================================================
+#include "Buffer_Data.h"
 #include "Filter_Data.h"
 #include "Processor_Internal.h"
 
@@ -100,7 +101,7 @@ private:
     void Stop_Wait_Zone0   (TryToSolveHang aTryToSolveHang, void * aContext);
 
     unsigned int                    mBufferCount ;
-    Processor_Internal::BufferData  mBufferData[OPEN_NET_BUFFER_QTY];
+    Buffer_Data                     mBufferData[OPEN_NET_BUFFER_QTY];
     OpenNetK::Buffer                mBuffers   [OPEN_NET_BUFFER_QTY];
     Config                          mConfig      ;
     KmsLib::DebugLog              * mDebugLog    ;

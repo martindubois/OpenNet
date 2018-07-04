@@ -92,8 +92,10 @@
   <ItemGroup>
     <ClCompile Include="Adapter.cpp" />
     <ClCompile Include="Adapter_Internal.cpp" />
+    <ClCompile Include="Buffer_Data.cpp" />
     <ClCompile Include="EthernetAddress.cpp" />
     <ClCompile Include="Filter.cpp" />
+    <ClCompile Include="Filter_Data.cpp" />
     <ClCompile Include="Filter_Forward.cpp" />
     <ClCompile Include="OCLW.cpp" />
     <ClCompile Include="OpenNet.cpp" />
@@ -107,12 +109,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Adapter_Internal.h" />
+    <ClInclude Include="Buffer_Data.h" />
     <ClInclude Include="EthernetAddress.h" />
     <ClInclude Include="Filter_Data.h" />
-    <ClInclude Include="Filter_Thread.h" />
+    <ClInclude Include="Thread.h" />
+    <ClInclude Include="Kernel_Functions.h" />
     <ClInclude Include="OCLW.h" />
     <ClInclude Include="Processor_Internal.h" />
     <ClInclude Include="System_Internal.h" />
+    <ClInclude Include="Thread_Functions.h" />
+    <ClInclude Include="Thread_Kernel.h" />
     <ClInclude Include="VersionInfo.h" />
   </ItemGroup>
   <ItemGroup>

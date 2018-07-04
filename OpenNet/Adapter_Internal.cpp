@@ -455,7 +455,7 @@ OpenNet::Status Adapter_Internal::ResetInputFilter()
 
     try
     {
-        mProcessor->Processing_Release(&mFilterData);
+        mFilterData.Release();
     }
     catch (KmsLib::Exception * eE)
     {
@@ -718,7 +718,7 @@ void Adapter_Internal::Run()
 
         for (i = 0; i < mBufferCount; i++)
         {
-            mBufferData[i].mMarkerValue = 0;
+            mBufferData[i].ResetMarkerValue();
 
             mProcessor->Processing_Queue(&mFilterData, mBufferData + i);
             mStatistics[OpenNet::ADAPTER_STATS_RUN_QUEUE] ++;
@@ -805,12 +805,10 @@ void Adapter_Internal::Buffer_Release()
 {
     assert(                  0 <  mBufferCount);
     assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
-    assert(NULL                != mHandle     );
-    assert(NULL                != mProcessor  );
 
     mBufferCount--;
 
-    mProcessor->Buffer_Release(mBufferData + mBufferCount);
+    mBufferData[mBufferCount].ReleaseMemObject();
 
     mStatistics[OpenNet::ADAPTER_STATS_BUFFER_RELEASED] ++;
 }

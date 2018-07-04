@@ -11,6 +11,9 @@
 // ===== OpenCL =============================================================
 #include <CL/opencl.h>
 
+// ===== Includes ===========================================================
+#include <OpenNet/Filter.h>
+
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
@@ -18,6 +21,12 @@ class Filter_Data
 {
 
 public:
+
+    Filter_Data();
+
+    void Release();
+
+    void Reset();
 
     cl_command_queue  mCommandQueue;
     OpenNet::Filter * mFilter      ;
