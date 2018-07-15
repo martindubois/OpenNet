@@ -30,6 +30,26 @@ namespace OpenNet
     public:
 
         /// \cond en
+        /// \brief  This structure contains the configuration of a Processor.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette structure contient la configuration d'un Processor.
+        /// \endcond
+        typedef struct
+        {
+            struct
+            {
+                unsigned mProfilingEnabled : 1;
+
+                unsigned mReserved0 : 31;
+            }
+            mFlags;
+
+            unsigned char mReserved0[60];
+        }
+        Config;
+
+        /// \cond en
         /// \brief  This structure contains the information about a
         ///         Processor.
         /// \endcond
@@ -111,6 +131,18 @@ namespace OpenNet
         static OPEN_NET_PUBLIC Status Display(const Info & aIn, FILE * aOut);
 
         /// \cond en
+        /// \brief  Retrieve configuration
+        /// \param  aOut [---;-W-] The configuration
+        /// \endcond
+        /// \cond fr
+        /// \brief  Obtenir la configuration
+        /// \param  aOut [---;-W-] La configuration
+        /// \endcond
+        /// \retval STATUS_OK
+        /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
+        virtual Status GetConfig(Config * aOut) const = 0;
+
+        /// \cond en
         /// \brief  Retrieve the Info
         /// \param  aOut [---;RW-] The Info instance
         /// \endcond
@@ -134,6 +166,18 @@ namespace OpenNet
         virtual const char * GetName() const = 0;
 
         /// \cond en
+        /// \brief  Modify the configuration
+        /// \param  aConfig [---;-W-] The configuration
+        /// \endcond
+        /// \cond fr
+        /// \brief  Changer la configuration
+        /// \param  aConfig [---;-W-] La configuration
+        /// \endcond
+        /// \retval STATUS_OK
+        /// \retval STATUS_INVALID_REFERENCE
+        virtual Status SetConfig(const Config & aConfig) = 0;
+
+        /// \cond en
         /// \brief  Display
         /// \param  aOut [---;RW-] The output stream
         /// \endcond
@@ -147,12 +191,6 @@ namespace OpenNet
 
     protected:
 
-        /// \cond en
-        /// \brief  Default constructor
-        /// \endcond
-        /// \cond fr
-        /// \brief  Constructeur par defaut
-        /// \endcond
         Processor();
 
     private:

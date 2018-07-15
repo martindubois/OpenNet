@@ -15,10 +15,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{6D01BCC7-C19F-4709-A2C6-39FC2CAC8392}"
 	ProjectSection(SolutionItems) = preProject
 		Includes\OpenNet\Adapter.h = Includes\OpenNet\Adapter.h
-		Includes\OpenNet\Filter.h = Includes\OpenNet\Filter.h
-		Includes\OpenNet\Filter_Forward.h = Includes\OpenNet\Filter_Forward.h
+		Includes\OpenNet\Function.h = Includes\OpenNet\Function.h
+		Includes\OpenNet\Function_Forward.h = Includes\OpenNet\Function_Forward.h
+		Includes\OpenNet\Kernel.h = Includes\OpenNet\Kernel.h
+		Includes\OpenNet\Kernel_Forward.h = Includes\OpenNet\Kernel_Forward.h
 		Includes\OpenNet\OpenNet.h = Includes\OpenNet\OpenNet.h
 		Includes\OpenNet\Processor.h = Includes\OpenNet\Processor.h
+		Includes\OpenNet\SourceCode.h = Includes\OpenNet\SourceCode.h
 		Includes\OpenNet\StatisticsProvider.h = Includes\OpenNet\StatisticsProvider.h
 		Includes\OpenNet\Status.h = Includes\OpenNet\Status.h
 		Includes\OpenNet\System.h = Includes\OpenNet\System.h
@@ -97,7 +100,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{B467
 	ProjectSection(SolutionItems) = preProject
 		Common\OpenNet\Adapter_Statistics.h = Common\OpenNet\Adapter_Statistics.h
 		Common\OpenNet\EthernetAddress.h = Common\OpenNet\EthernetAddress.h
-		Common\OpenNet\Filter_Statistics.h = Common\OpenNet\Filter_Statistics.h
+		Common\OpenNet\Kernel_Statistics.h = Common\OpenNet\Kernel_Statistics.h
+		Common\OpenNet\Processor_Statistics.h = Common\OpenNet\Processor_Statistics.h
 		Common\OpenNet\System_Statistics.h = Common\OpenNet\System_Statistics.h
 	EndProjectSection
 EndProject

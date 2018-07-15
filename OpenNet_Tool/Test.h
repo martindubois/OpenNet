@@ -15,3 +15,4 @@
 /////////////////////////////////////////////////////////////////////////////
 
 extern void Test_Loop(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int aPacketQty);
+extern void Test_Ramp(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int aPacketQty);

@@ -10,17 +10,11 @@
 #include <assert.h>
 #include <stdint.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
-
-// ===== OpenCL =============================================================
-#include <CL/opencl.h>
-
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
 
 // ===== Includes ===========================================================
-#include <OpenNet/Processor.h>
+#include <OpenNet/Function.h>
 #include <OpenNet/Status.h>
 
 // ===== Common =============================================================
@@ -31,39 +25,13 @@
 // ===== OpenNet ============================================================
 #include "EthernetAddress.h"
 #include "OCLW.h"
-#include "Processor_Internal.h"
+#include "Thread_Functions.h"
+#include "Thread_Kernel.h"
 
 #include "Adapter_Internal.h"
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
-
-// --> INIT <--+<------------------------------------------------------+
-//      |      |                                                       |
-//      |     STOPPING <--+<------+<--------+<--------------+          |
-//      |                 |       |         |               |          |
-//      |                 |       |    +--> RUNNING --+     |          |
-//      |                 |       |    |              |     |          |
-//      +--> START_REQUESTED --> STARTING ----------->+--> STOP_REQUESTED
-
-#define STATE_INIT            (0)
-#define STATE_RUNNING         (1)
-#define STATE_START_REQUESTED (2)
-#define STATE_STARTING        (3)
-#define STATE_STOP_REQUESTED  (4)
-#define STATE_STOPPING        (5)
-
-#define STATE_QTY (6)
-
-static const char * STATE_NAMES[STATE_QTY] =
-{
-    "INIT"           ,
-    "RUNNING"        ,
-    "START_REQUESTED",
-    "STARTING"       ,
-    "STOP_REQUESTED" ,
-    "STOPPING"       ,
-};
 
 static const uint8_t LOOP_BACK_PACKET[64] =
 {
@@ -74,9 +42,6 @@ static const uint8_t LOOP_BACK_PACKET[64] =
 /////////////////////////////////////////////////////////////////////////////
 
 static OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE);
-
-// ===== Entry point ========================================================
-static DWORD WINAPI Run(LPVOID aParameter);
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
@@ -89,16 +54,13 @@ static DWORD WINAPI Run(LPVOID aParameter);
 Adapter_Internal::Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog)
     : mBufferCount(0)
     , mDebugLog   (aDebugLog)
-    , mFilter     (NULL)
     , mHandle     (aHandle)
     , mProcessor  (NULL)
-    , mThread     (NULL)
-    , mState      (STATE_INIT)
+    , mProgram    (NULL)
+    , mSourceCode (NULL)
 {
     assert(NULL != aHandle  );
     assert(NULL != aDebugLog);
-
-    InitializeCriticalSection(&mZone0);
 
     memset(&mConfig      , 0, sizeof(mConfig      ));
     memset(&mDriverConfig, 0, sizeof(mDriverConfig));
@@ -111,7 +73,7 @@ Adapter_Internal::Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsL
     mHandle->Control(IOCTL_CONFIG_GET, NULL, 0, &mDriverConfig, sizeof(mDriverConfig));
     mHandle->Control(IOCTL_INFO_GET  , NULL, 0, &mInfo        , sizeof(mInfo        ));
 
-    mConfig.mPacketSize_byte = mDriverConfig.mPacketSize_byte;
+    Config_Update();
 
     strncpy_s(mName, mInfo.mVersion_Hardware.mComment, sizeof(mName) - 1);
 
@@ -130,31 +92,103 @@ Adapter_Internal::~Adapter_Internal()
 {
     assert(NULL != mHandle);
 
-    EnterCriticalSection(&mZone0);
-        switch (mState)
-        {
-        case STATE_INIT: break;
-
-        case STATE_RUNNING :
-        case STATE_STARTING:
-        case STATE_STOPPING:
-            Stop_Request_Zone0();
-            Stop_Wait_Zone0   (NULL, NULL);
-            break;
-
-        default: assert(false);
-        }
-    LeaveCriticalSection(&mZone0);
-
-    if (0 < mBufferCount)
+    try
     {
-        Buffers_Release();
-        assert(0 == mBufferCount);
+        if (NULL != mProgram)
+        {
+            OCLW_ReleaseProgram(mProgram);
+        }
+    }
+    catch (...)
+    {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
     }
 
-    DeleteCriticalSection(&mZone0);
-
     delete mHandle;
+}
+
+unsigned int Adapter_Internal::GetBufferQty() const
+{
+    assert(0                   <  mConfig.mBufferQty);
+    assert(OPEN_NET_BUFFER_QTY >= mConfig.mBufferQty);
+
+    return mConfig.mBufferQty;
+}
+
+// Thread  Apps
+unsigned int Adapter_Internal::GetPacketSize() const
+{
+    assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
+    assert(PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte);
+
+    return mConfig.mPacketSize_byte;
+}
+
+// Exception  KmsLib::Exception *  CODE_INVALID_ARGUMENT
+//                                 See KmsLib::Windows::DriverHandle::Control
+// Thread     Apps
+void Adapter_Internal::SetPacketSize(unsigned int aSize_byte)
+{
+    assert(PACKET_SIZE_MAX_byte >= aSize_byte);
+    assert(PACKET_SIZE_MIN_byte <= aSize_byte);
+
+    assert(PACKET_SIZE_MAX_byte     >= mConfig      .mPacketSize_byte);
+    assert(PACKET_SIZE_MIN_byte     <= mConfig      .mPacketSize_byte);
+    assert(mConfig.mPacketSize_byte == mDriverConfig.mPacketSize_byte);
+    assert(NULL                     != mHandle                       );
+
+    assert(NULL != mDebugLog);
+
+    if (mConfig.mPacketSize_byte != aSize_byte)
+    {
+        mDriverConfig.mPacketSize_byte = aSize_byte;
+
+        mHandle->Control(IOCTL_CONFIG_SET, &mDriverConfig, sizeof(mDriverConfig), &mDriverConfig, sizeof(mDriverConfig));
+
+        assert(PACKET_SIZE_MAX_byte >= mDriverConfig.mPacketSize_byte);
+        assert(PACKET_SIZE_MIN_byte <= mDriverConfig.mPacketSize_byte);
+
+        Config_Update();
+
+        assert(mDriverConfig.mPacketSize_byte == mConfig.mPacketSize_byte);
+
+        if (mConfig.mPacketSize_byte != aSize_byte)
+        {
+            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+            throw new KmsLib::Exception(KmsLib::Exception::CODE_INVALID_ARGUMENT,
+                "Invalid packet size", NULL, __FILE__, __FUNCTION__, __LINE__, mDriverConfig.mPacketSize_byte);
+        }
+    }
+}
+
+// aCommandQueue [---;RW-]
+// aKernel       [---;R--]
+// aBuffers      [---;RW-] The caller is responsible to release the
+//                         Buffer_Data instances added to this queue when
+//                         they are no longer needed.
+//
+// Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Allocate
+// Thread     Apps
+void Adapter_Internal::Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers)
+{
+    assert(NULL != aCommandQueue);
+    assert(NULL != aKernel      );
+    assert(NULL != aBuffers     );
+
+    assert(0 < mConfig.mBufferQty);
+
+    for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
+    {
+        aBuffers->push_back(Buffer_Allocate(aCommandQueue, aKernel));
+    }
+}
+
+// Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Release
+void Adapter_Internal::Buffers_Release()
+{
+    assert(0 < mBufferCount);
+
+    mBufferCount = 0;
 }
 
 // aConnect [---;R--]
@@ -194,7 +228,8 @@ void Adapter_Internal::Connect(IoCtl_Connect_In * aConnect)
     }
 }
 
-// Thread  Apps
+// Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
+// Threads    Apps
 void Adapter_Internal::SendLoopBackPackets()
 {
     assert(NULL != mHandle);
@@ -206,53 +241,48 @@ void Adapter_Internal::SendLoopBackPackets()
     }
 }
 
-// Exception  KmsLib::Exception *  CODE_STATE_ERROR
-//                                 CODE_THREAD_ERROR
-// Threads  Apps
+// Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
+// Threads    Apps
 void Adapter_Internal::Start()
 {
-    assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
-    assert(NULL                != mDebugLog   );
-    assert(NULL                == mThread     );
-    assert(0                   == mThreadId   );
+    assert(   0 <  mBufferCount);
+    assert(NULL != mHandle     );
 
-    Buffers_Allocate();
+    mHandle->Control(IOCTL_START, mBuffers, sizeof(OpenNetK::Buffer) * mBufferCount, NULL, 0);
+}
 
-    State_Change(STATE_INIT, STATE_START_REQUESTED);
+// Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
+// Threads    Worker
+void Adapter_Internal::Stop()
+{
+    assert(NULL != mHandle);
 
-    mThread = CreateThread(NULL, 0, ::Run, this, 0, &mThreadId);
-    if (NULL == mThread)
+    mHandle->Control(IOCTL_STOP, NULL, 0, NULL, 0);
+}
+
+// Thread  Apps
+Thread * Adapter_Internal::Thread_Prepare()
+{
+    assert(NULL != mDebugLog  );
+    assert(NULL != mSourceCode);
+    assert(NULL != mProcessor );
+    assert(NULL != mProgram   );
+
+    OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
+    if (NULL != lKernel)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_THREAD_ERROR,
-            "CreateThread( , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
+        return new Thread_Kernel(mProcessor, this, lKernel, mProgram, mDebugLog);
     }
 
-    mStatistics[OpenNet::ADAPTER_STATS_START] ++;
-}
+    OpenNet::Function * lFunction = dynamic_cast<OpenNet::Function *>(mSourceCode);
+    assert(NULL != lFunction);
 
-// Exception  KmsLib::Exception *  CODE_THREAD_ERROR
-// Threads    Apps
-void Adapter_Internal::Stop_Request()
-{
-    EnterCriticalSection(&mZone0);
-        Stop_Request_Zone0();
-    LeaveCriticalSection(&mZone0);
+    Thread_Functions * lThread = mProcessor->Thread_Get();
+    assert(NULL != lThread);
 
-    mStatistics[OpenNet::ADAPTER_STATS_STOP_REQUEST] ++;
-}
+    lThread->AddAdapter(this, *lFunction);
 
-// Exception  KmsLib::Exception *  CODE_THREAD_ERROR
-// Threads  Apps
-void Adapter_Internal::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
-{
-    EnterCriticalSection(&mZone0);
-        Stop_Wait_Zone0(aTryToSolveHang, aContext);
-    LeaveCriticalSection(&mZone0);
-
-    Buffers_Release();
-
-    mStatistics[OpenNet::ADAPTER_STATS_STOP_WAIT] ++;
+    return NULL;
 }
 
 // ===== OpenNet::Adapter ===================================================
@@ -327,14 +357,6 @@ OpenNet::Status Adapter_Internal::GetInfo(Info * aOut) const
 const char * Adapter_Internal::GetName() const
 {
     return mName;
-}
-
-unsigned int Adapter_Internal::GetPacketSize() const
-{
-    assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
-    assert(PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte);
-
-    return mConfig.mPacketSize_byte;
 }
 
 OpenNet::Status Adapter_Internal::GetState(State * aOut)
@@ -434,37 +456,56 @@ bool Adapter_Internal::IsConnected(const OpenNet::System & aSystem)
     OpenNet::Status lStatus = GetState(&lState);
     assert(OpenNet::STATUS_OK == lStatus);
 
+    OpenNet::System::Info lInfo;
+
+    lStatus = aSystem.GetInfo(&lInfo);
+    assert(OpenNet::STATUS_OK == lStatus);
+
     assert((ADAPTER_NO_UNKNOWN == lState.mAdapterNo) || (ADAPTER_NO_QTY > lState.mAdapterNo));
 
-    return ((ADAPTER_NO_UNKNOWN != lState.mAdapterNo) && (aSystem.GetSystemId() == lState.mSystemId));
+    return ((ADAPTER_NO_UNKNOWN != lState.mAdapterNo) && (lInfo.mSystemId == lState.mSystemId));
 }
 
 OpenNet::Status Adapter_Internal::ResetInputFilter()
 {
     assert(NULL != mDebugLog);
 
-    if (NULL == mFilter)
+    if (NULL == mSourceCode)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_FILTER_NOT_SET;
     }
 
-    assert(NULL != mProcessor);
-
-    mFilter = NULL;
-
-    try
-    {
-        mFilterData.Release();
-    }
-    catch (KmsLib::Exception * eE)
+    if (0 < mBufferCount)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        mDebugLog->Log(eE);
-        return ExceptionToStatus(eE);
+        return OpenNet::STATUS_ADAPTER_RUNNING;
     }
 
-    return OpenNet::STATUS_OK;
+    assert(NULL != mProcessor);
+
+    mSourceCode = NULL;
+
+    OpenNet::Status lResult = OpenNet::STATUS_OK;
+
+    if (NULL != mProgram)
+    {
+        try
+        {
+            OCLW_ReleaseProgram(mProgram);
+        }
+        catch (KmsLib::Exception * eE)
+        {
+            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+            mDebugLog->Log(eE);
+
+            lResult = ExceptionToStatus(eE);
+        }
+
+        mProgram = NULL;
+    }
+
+    return lResult;
 }
 
 OpenNet::Status Adapter_Internal::ResetProcessor()
@@ -477,7 +518,7 @@ OpenNet::Status Adapter_Internal::ResetProcessor()
         return OpenNet::STATUS_PROCESSOR_NOT_SET;
     }
 
-    if (NULL != mFilter)
+    if (NULL != mSourceCode)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_FILTER_SET;
@@ -497,12 +538,37 @@ OpenNet::Status Adapter_Internal::ResetStatistics()
 
 OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
 {
-    assert(NULL != mDebugLog);
+    assert(mDriverConfig.mPacketSize_byte == mConfig.mPacketSize_byte);
+    assert(NULL                           != mDebugLog               );
 
     if (NULL == (&aConfig))
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_INVALID_REFERENCE;
+    }
+
+    if (PACKET_SIZE_MAX_byte < aConfig.mPacketSize_byte)
+    {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_PACKET_TOO_LARGE;
+    }
+
+    if (PACKET_SIZE_MIN_byte > aConfig.mPacketSize_byte)
+    {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_PACKET_TOO_SMALL;
+    }
+
+    if (OPEN_NET_BUFFER_QTY < aConfig.mBufferQty)
+    {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_TOO_MANY_BUFFER;
+    }
+
+    if (0 >= aConfig.mBufferQty)
+    {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_NO_BUFFER;
     }
 
     memcpy(&mConfig, &aConfig, sizeof(mConfig));
@@ -512,27 +578,29 @@ OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
     OpenNet::Status lResult = Control(IOCTL_CONFIG_SET, &mDriverConfig, sizeof(mDriverConfig), &mDriverConfig, sizeof(mDriverConfig));
     if (OpenNet::STATUS_OK == lResult)
     {
-        mConfig.mPacketSize_byte = mDriverConfig.mPacketSize_byte;
+        Config_Update();
     }
 
     return lResult;
 }
 
-OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::Filter * aFilter)
+OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::SourceCode * aSourceCode)
 {
     assert(NULL != mDebugLog);
 
-    if (NULL == aFilter)
+    if (NULL == aSourceCode)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
-    if (NULL != mFilter)
+    if (NULL != mSourceCode)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_FILTER_ALREADY_SET;
     }
+
+    assert(NULL == mProgram);
 
     if (NULL == mProcessor)
     {
@@ -542,7 +610,12 @@ OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::Filter * aFilter)
 
     try
     {
-        mProcessor->Processing_Create(&mFilterData, aFilter);
+        OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(aSourceCode);
+
+        if (NULL != lKernel)
+        {
+            mProgram = mProcessor->Program_Create(lKernel);
+        }
     }
     catch (KmsLib::Exception * eE)
     {
@@ -551,58 +624,8 @@ OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::Filter * aFilter)
         return ExceptionToStatus(eE);
     }
 
-    mFilter = aFilter;
+    mSourceCode = aSourceCode;
 
-    return OpenNet::STATUS_OK;
-}
-
-OpenNet::Status Adapter_Internal::SetPacketSize(unsigned int aSize_byte)
-{
-    assert(NULL != mDebugLog);
-
-    if (PACKET_SIZE_MAX_byte < aSize_byte)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_PACKET_TOO_LARGE;
-    }
-
-    if (PACKET_SIZE_MIN_byte > aSize_byte)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_PACKET_TOO_SMALL;
-    }
-
-    Config lConfig;
-
-    OpenNet::Status lStatus = GetConfig(&lConfig);
-    if (OpenNet::STATUS_OK != lStatus)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return lStatus;
-    }
-
-    lConfig.mPacketSize_byte = aSize_byte;
-
-    lStatus = SetConfig(lConfig);
-    if (OpenNet::STATUS_OK != lStatus)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return lStatus;
-    }
-
-    lStatus = GetConfig(&lConfig);
-    if (OpenNet::STATUS_OK != lStatus)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return lStatus;
-    }
-
-    if (lConfig.mPacketSize_byte != aSize_byte)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_INVALID_PACKET_SIZE;
-    }
-    
     return OpenNet::STATUS_OK;
 }
 
@@ -637,7 +660,6 @@ OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
 {
     assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
     assert(NULL                != mDebugLog   );
-    assert(STATE_QTY           >  mState      );
 
     if (NULL == aOut)
     {
@@ -646,13 +668,11 @@ OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
     }
 
     fprintf(aOut, "Adapter :\n");
-    fprintf(aOut, "  %u Buffers\n"    , mBufferCount);
-    fprintf(aOut, "  Filter    = %s\n", ((NULL == mFilter   ) ? "Not set" : mFilter   ->GetName()));
-    fprintf(aOut, "  Name      = %s\n", mName);
-    fprintf(aOut, "  Processor = %s\n", ((NULL == mProcessor) ? "Not set" : mProcessor->GetName()));
-    fprintf(aOut, "  State     = %s\n", STATE_NAMES[mState]);
-    fprintf(aOut, "  Thread Id = %u\n", mThreadId);
-    
+    fprintf(aOut, "  %u Buffers\n"      , mBufferCount);
+    fprintf(aOut, "  Name        = %s\n", mName);
+    fprintf(aOut, "  Processor   = %s\n", ((NULL == mProcessor ) ? "Not set" : mProcessor ->GetName()));
+    fprintf(aOut, "  Source Code = %s\n", ((NULL == mSourceCode) ? "Not set" : mSourceCode->GetName()));
+
     OpenNet::Adapter::Display(mConfig, aOut);
     OpenNet::Adapter::Display(mInfo  , aOut);
 
@@ -686,101 +706,20 @@ OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int a
     return Control(IOCTL_PACKET_SEND, aData, aSize_byte, NULL, 0);
 }
 
-// Internal
-/////////////////////////////////////////////////////////////////////////////
-
-// TODO  OpenNet.Adapter_Internal
-//       Augmenter la priorite du worker thread
-
-// Thread  Worker
-void Adapter_Internal::Run()
-{
-    assert(NULL != mDebugLog);
-    assert(NULL != mHandle  );
-
-    mStatistics[OpenNet::ADAPTER_STATS_RUN_ENTRY] ++;
-
-    if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL))
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-    }
-
-    try
-    {
-        State_Change(STATE_START_REQUESTED, STATE_STARTING);
-
-        assert(                  0 <  mBufferCount);
-        assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
-        assert(NULL                != mHandle     );
-        assert(NULL                != mProcessor  );
-
-        unsigned int i;
-
-        for (i = 0; i < mBufferCount; i++)
-        {
-            mBufferData[i].ResetMarkerValue();
-
-            mProcessor->Processing_Queue(&mFilterData, mBufferData + i);
-            mStatistics[OpenNet::ADAPTER_STATS_RUN_QUEUE] ++;
-        }
-
-        mHandle->Control(IOCTL_START, mBuffers, sizeof(OpenNetK::Buffer) * mBufferCount, NULL, 0);
-
-        Run_Loop();
-
-        mHandle->Control(IOCTL_STOP, NULL, 0, NULL, 0);
-
-        Run_Wait();
-    }
-    catch (KmsLib::Exception * eE)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        mDebugLog->Log(eE);
-
-        mStatistics[OpenNet::ADAPTER_STATS_RUN_EXCEPTION] ++;
-    }
-    catch (...)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-
-        mStatistics[OpenNet::ADAPTER_STATS_RUN_UNEXPECTED_EXCEPTION] ++;
-    }
-
-    mState = STATE_STOPPING;
-
-    mStatistics[OpenNet::ADAPTER_STATS_RUN_EXIT] ++;
-}
-
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
-// Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Allocate
-void Adapter_Internal::Buffers_Allocate()
-{
-    assert(0 < mConfig.mBufferQty);
-
-    for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
-    {
-        Buffer_Allocate();
-    }
-}
-
-// Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Allocate
-void Adapter_Internal::Buffers_Release()
-{
-    assert(0 < mConfig.mBufferQty);
-
-    for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
-    {
-        Buffer_Release();
-    }
-}
-
+// aCommandQueue [---;RW-]
+// aKernel       [---;R--]
+//
 // Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
 //                                 See Process_Internal::Buffer_Allocate
 // Threads    Apps
-void Adapter_Internal::Buffer_Allocate()
+Buffer_Data * Adapter_Internal::Buffer_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel)
 {
+    assert(NULL != aCommandQueue);
+    assert(NULL != aKernel      );
+
     assert(OPEN_NET_BUFFER_QTY <= mBufferCount);
     assert(NULL                != mDebugLog   );
     assert(NULL                != mProcessor  );
@@ -792,29 +731,28 @@ void Adapter_Internal::Buffer_Allocate()
             "Too many buffer", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
     }
 
-    mProcessor->Buffer_Allocate(mConfig.mPacketSize_byte, &mFilterData, mBuffers + mBufferCount, mBufferData + mBufferCount);
+    Buffer_Data * lResult = mProcessor->Buffer_Allocate(mConfig.mPacketSize_byte, aCommandQueue, aKernel, mBuffers + mBufferCount);
 
     mBufferCount++;
 
     mStatistics[OpenNet::ADAPTER_STATS_BUFFER_ALLOCATED] ++;
+
+    return lResult;
 }
 
-// Exception  KmsLib::Exception *  See Processor_Internal::Buffer_Release
-// Threads    Apps
-void Adapter_Internal::Buffer_Release()
+void Adapter_Internal::Config_Update()
 {
-    assert(                  0 <  mBufferCount);
-    assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
+    assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte      );
+    assert(PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte      );
+    assert(PACKET_SIZE_MAX_byte >= mDriverConfig.mPacketSize_byte);
+    assert(PACKET_SIZE_MIN_byte <= mDriverConfig.mPacketSize_byte);
 
-    mBufferCount--;
-
-    mBufferData[mBufferCount].ReleaseMemObject();
-
-    mStatistics[OpenNet::ADAPTER_STATS_BUFFER_RELEASED] ++;
+    mConfig.mPacketSize_byte = mDriverConfig.mPacketSize_byte;
 }
 
-// aIn  [--O;R--]
-// aOut [--O;-W-]
+// aIn        [--O;R--]
+// aOut       [--O;-W-]
+// aInfo_byte [--O;-W-]
 //
 // Threads  Apps
 OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte)
@@ -843,223 +781,6 @@ OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, 
     return OpenNet::STATUS_OK;
 }
 
-void Adapter_Internal::Run_Iteration(unsigned int aIndex)
-{
-    assert(OPEN_NET_BUFFER_QTY > aIndex);
-
-    assert(NULL != mProcessor);
-
-    mProcessor->Processing_Wait(&mFilterData, mBufferData + aIndex);
-    mStatistics[OpenNet::ADAPTER_STATS_RUN_ITERATION_WAIT] ++;
-
-    mProcessor->Processing_Queue(&mFilterData, mBufferData + aIndex);
-    mStatistics[OpenNet::ADAPTER_STATS_RUN_ITERATION_QUEUE] ++;
-}
-
-void Adapter_Internal::Run_Loop()
-{
-    assert(                  0 <  mBufferCount);
-    assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
-    assert(NULL                != mDebugLog   );
-    assert(NULL                != mHandle     );
-
-    try
-    {
-        unsigned lIndex = 0;
-
-        State_Change(STATE_STARTING, STATE_RUNNING);
-
-        while (STATE_RUNNING == mState)
-        {
-            Run_Iteration(lIndex);
-
-            lIndex = (lIndex + 1) % mBufferCount;
-        }
-
-        State_Change(STATE_STOP_REQUESTED, STATE_STOPPING);
-
-        for (unsigned int i = 0; i < mBufferCount; i++)
-        {
-            mProcessor->Processing_Wait(&mFilterData, mBufferData + lIndex);
-
-            lIndex = (lIndex + 1) % mBufferCount;
-        }
-    }
-    catch (KmsLib::Exception * eE)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        mDebugLog->Log(eE);
-
-        mStatistics[OpenNet::ADAPTER_STATS_RUN_LOOP_EXCEPTION] ++;
-    }
-    catch (...)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-
-        mStatistics[OpenNet::ADAPTER_STATS_RUN_LOOP_UNEXPECTED_EXCEPTION] ++;
-    }
-}
-
-void Adapter_Internal::Run_Wait()
-{
-    assert(NULL != mDebugLog);
-    assert(NULL != mHandle  );
-
-    State lState;
-
-    for (unsigned int i = 0; i < 600; i++)
-    {
-        mHandle->Control(IOCTL_STATE_GET, NULL, 0, &lState, sizeof(lState));
-
-        if (0 >= lState.mBufferCount)
-        {
-            return;
-        }
-
-        Sleep(1000);
-    }
-
-    // TODO  OpenNet.Adapter_Internal.Error_Handling
-    //       This is a big program because the driver still use GPU buffer
-    //       and the application is maybe going to release them.
-
-    mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-    throw new KmsLib::Exception(KmsLib::Exception::CODE_TIMEOUT,
-        "The driver did not release the buffers in time", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
-}
-
-// Exception  KmsLib::Exception *  CODE_STATE_ERROR
-// Threads  Apps, Worker
-void Adapter_Internal::State_Change(unsigned int aFrom, unsigned int aTo)
-{
-    assert(STATE_QTY > aFrom);
-    assert(STATE_QTY < aTo  );
-
-    assert(NULL != mDebugLog);
-
-    bool lOK = false;
-
-    EnterCriticalSection(&mZone0);
-
-        assert(STATE_QTY > mState);
-
-        if (mState == aFrom)
-        {
-            lOK    = true;
-            mState = aTo ;
-        }
-
-    LeaveCriticalSection(&mZone0);
-
-    if (!lOK)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_STATE_ERROR,
-            "Invalid state transition", NULL, __FILE__, __FUNCTION__, __LINE__, aTo);
-    }
-}
-
-// Threads  Apps
-void Adapter_Internal::Stop_Request_Zone0()
-{
-    assert(NULL != mThread);
-
-    switch (mState)
-    {
-    case STATE_RUNNING :
-    case STATE_STARTING:
-        mState = STATE_STOP_REQUESTED;
-        // no break;
-
-    case STATE_STOPPING :
-        break;
-
-    default: assert(false);
-    }
-}
-
-// aTryToSolveHang [--O;--X]
-// aContext        [--O;---]
-//
-// This method release the Zone0 when it throw an exception.
-//
-// Exception  KmsLib::Exception *  CODE_THREAD_ERROR
-// Threads  Apps
-void Adapter_Internal::Stop_Wait_Zone0(TryToSolveHang aTryToSolveHang, void * aContext)
-{
-    assert(NULL != mDebugLog);
-    assert(NULL != mThread  );
-
-    switch (mState)
-    {
-    case STATE_STOP_REQUESTED:
-    case STATE_STOPPING      :
-        DWORD lRet;
-
-        if (NULL != aTryToSolveHang)
-        {
-            LeaveCriticalSection(&mZone0);
-                lRet = WaitForSingleObject(mThread, 3000);
-            EnterCriticalSection(&mZone0);
-
-            if (WAIT_OBJECT_0 == lRet) { break; }
-
-            for (unsigned int i = 0; i < 1104; i ++)
-            {
-                aTryToSolveHang(aContext, this);
-
-                LeaveCriticalSection(&mZone0);
-                    lRet = WaitForSingleObject(mThread, 500);
-                EnterCriticalSection(&mZone0);
-
-                if (WAIT_OBJECT_0 == lRet) { break; }
-            }
-        }
-        else
-        {
-            LeaveCriticalSection(&mZone0);
-               lRet = WaitForSingleObject(mThread, 600000);
-            EnterCriticalSection(&mZone0);
-        }
-
-        if (WAIT_OBJECT_0 == lRet) { break; }
-
-        // TODO  OpenNet.Adapter_Internal.ErrorHandling
-        //       This case is a big problem. Terminating the thread
-        //       interracting with the GPU may let the system in an instabla
-        //       state. Worst, in this case the drive still use the GPU
-        //       buffer.
-
-        LeaveCriticalSection(&mZone0);
-        if (!TerminateThread(mThread, __LINE__))
-        {
-            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_THREAD_ERROR,
-                "TerminateThread( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
-        }
-        EnterCriticalSection(&mZone0);
-        break;
-
-    default: assert(false);
-    }
-
-    mState = STATE_INIT;
-
-    BOOL lRetB = CloseHandle(mThread);
-
-    mThread   = NULL;
-    mThreadId = 0   ;
-
-    if (!lRetB)
-    {
-        LeaveCriticalSection(&mZone0);
-
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_THREAD_ERROR,
-            "CloseHandle(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
-    }
-}
-
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1079,18 +800,4 @@ OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE)
 
     printf("%s ==> STATUS_EXCEPTION\n", KmsLib::Exception::GetCodeName(aE->GetCode()));
     return OpenNet::STATUS_EXCEPTION;
-}
-
-// ===== Entry point ========================================================
-
-// Thread  Worker
-DWORD WINAPI Run(LPVOID aParameter)
-{
-    assert(NULL != aParameter);
-
-    Adapter_Internal * lThis = reinterpret_cast<Adapter_Internal *>(aParameter);
-
-    lThis->Run();
-
-    return 0;
 }

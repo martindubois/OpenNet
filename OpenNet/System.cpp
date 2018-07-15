@@ -31,22 +31,24 @@
 
 static const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS[] =
 {
-    VALUE_VECTOR_DESCRIPTION_RESERVED, //  0
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED, //  5
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    { "EXECUTION                  ", ""  , 0 }, //  0
+    { "EXECUTION - DURATION - AVG ", "us", 1 },
+    { "EXECUTION - DURATION - MAX ", "us", 1 },
+    { "EXECUTION - DURATION - MIN ", "us", 1 },
+    { "QUEUE     - DURATION - AVG ", "us", 1 },
+    { "QUEUE     - DURATION - MAX ", "us", 1 }, //  5
+    { "QUEUE     - DURATION - MIN ", "us", 1 },
+    { "SUBMIT    - DURATION - AVG ", "us", 1 },
+    { "SUBMIT    - DURATION - MAX ", "us", 1 },
+    { "SUBMIT    - DURATION - MIN ", "us", 1 },
+
     VALUE_VECTOR_DESCRIPTION_RESERVED, // 10
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED, // 15
+
+    { "EXECUTION - DURATION - LAST", "us", 0 },
+    { "QUEUE     - DURATION - LAST", "us", 0 },
+    { "SUBMIT    - DURATION - LAST", "us", 0 }, // 15
 };
 
 namespace OpenNet
@@ -75,6 +77,8 @@ namespace OpenNet
         return lResult;
     }
 
+    // NOT TESTED  OpenNet.System.ErrorHandling
+    //             System_Internal destructor raise an exception
     void System::Delete()
     {
         try

@@ -67,7 +67,7 @@ int SetupA::Start()
     lConfig.mBufferQty = mBufferQty;
 
     if (OpenNet::STATUS_OK != mAdapter->SetConfig     ( lConfig)) { return __LINE__; }
-    if (OpenNet::STATUS_OK != mAdapter->SetInputFilter(&mFilter)) { return __LINE__; }
+    if (OpenNet::STATUS_OK != mAdapter->SetInputFilter(&mKernel)) { return __LINE__; }
     if (OpenNet::STATUS_OK != mSystem ->Start         (        )) { return __LINE__; }
 
     Sleep(1000);

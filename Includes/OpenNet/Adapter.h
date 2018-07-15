@@ -17,8 +17,8 @@
 namespace OpenNet
 {
 
-    class Filter;
-    class System;
+    class SourceCode;
+    class System    ;
 
     // Class
     /////////////////////////////////////////////////////////////////////////
@@ -45,38 +45,6 @@ namespace OpenNet
 
         typedef OpenNetK::Adapter_Info   Info  ;
         typedef OpenNetK::Adapter_State  State ;
-
-        /// \cond en
-        /// \brief  This structure contains statistics about the Dll internal
-        ///         operation. The fields may change in future versions.
-        /// \endcond
-        /// \cond fr
-        /// \brief  Cette structure contient des statistiques au sujet du
-        ///         fonctionnement inerne de la DLL.
-        ///         Les champs peuvent changer dans les versions futures.
-        /// \endcond
-        typedef struct
-        {
-            unsigned int mBuffer_Allocated             ; //  0
-            unsigned int mBuffer_Released              ;
-            unsigned int mLoopBackPacket               ;
-            unsigned int mPacket_Send                  ;
-            unsigned int mRun_Entry                    ;
-            unsigned int mRun_Exception                ; //  5
-            unsigned int mRun_Exit                     ;
-            unsigned int mRun_Iteration_Queue          ;
-            unsigned int mRun_Iteration_Wait           ;
-            unsigned int mRun_Loop_Exception           ;
-            unsigned int mRun_Loop_UnexpectedException ; // 10
-            unsigned int mRun_Queue                    ;
-            unsigned int mRun_UnexpectedException      ;
-            unsigned int mStart                        ;
-            unsigned int mStop_Request                 ;
-            unsigned int mStop_Wait                    ; // 15
-
-            unsigned int mReserved0[112];
-        }
-        Stats_Dll;
 
         /// \cond en
         /// \brief  Display
@@ -173,16 +141,6 @@ namespace OpenNet
         virtual const char * GetName() const = 0;
 
         /// \cond en
-        /// \brief  This method returns the packet size.
-        /// \return This method returns the packet size in bytes.
-        /// \endcond
-        /// \cond fr
-        /// \brief  Cette methode retourne la taille des paquets.
-        /// \retval Cette methode retourne la taille des paquets en octets.
-        /// \endcond
-        virtual unsigned int GetPacketSize() const = 0;
-
-        /// \cond en
         /// \brief  This methode returns the state of the adapter.
         /// \param  aOut [---;-W-] The methode return the information here.
         /// \endcond
@@ -256,31 +214,17 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  This methode set the input filter.
-        /// \param  aFilter [---;RW-] The Filter instance
+        /// \param  aSourceCode [-K-;RW-] The SourceCode instance
         /// \endcond
         /// \cond fr
         /// \brief Cette methode affecte le filtre d'entre.
-        /// \param aFilter [---;RW-] L'instance de Filter
+        /// \param aSourceCode [-K-;RW-] L'instance de SourceCode
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_FILTER_ALREADY_SET
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         /// \retval STATUS_PROCESSOR_NOT_SET
-        virtual OpenNet::Status SetInputFilter(Filter * aFilter) = 0;
-
-        /// \cond en
-        /// \brief  This methode set the packet size.
-        /// \param  aSize_byte  The packet size
-        /// \endcond
-        /// \cond fr
-        /// \brief Cette methode change la taille des paquets.
-        /// \param aSize_byte  La taille des paquets
-        /// \endcond
-        /// \retval STATUS_OK
-        /// \retval STATUS_IOCTL_ERROR
-        /// \retval STATUS_PACKET_TOO_LARGE
-        /// \retval STATUS_PACKET_TOO_SMALL
-        virtual OpenNet::Status SetPacketSize(unsigned int aSize_byte) = 0;
+        virtual Status SetInputFilter(SourceCode * aSourceCode) = 0;
 
         /// \cond en
         /// \brief  This methode associate a processor to the adapter.

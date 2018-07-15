@@ -14,7 +14,7 @@
 
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/Adapter.h>
-#include <OpenNet/Filter_Forward.h>
+#include <OpenNet/Kernel_Forward.h>
 #include <OpenNet/System.h>
 
 // ===== OpenNet_Test =======================================================
@@ -57,7 +57,6 @@ KMS_TEST_BEGIN(BlackHole_SetupB)
     Utl_ValidateInit(&lStatsE, &lStatsM);
 
     lStatsE.mDll.mBuffer_Allocated = BUFFER_QTY;
-    lStatsE.mDll.mBuffer_Released  = BUFFER_QTY;
     lStatsE.mDll.mRun_Entry        = 1;
     lStatsE.mDll.mRun_Exit         = 1;
     lStatsE.mDll.mRun_Queue        = BUFFER_QTY;

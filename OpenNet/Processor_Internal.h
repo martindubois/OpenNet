@@ -18,14 +18,13 @@
 #include <KmsLib/DebugLog.h>
 
 // ===== Includes ===========================================================
-#include <OpenNet/Filter.h>
+#include <OpenNet/Kernel.h>
 #include <OpenNet/Processor.h>
 #include <OpenNetK/Adapter_Types.h>
 
-// ===== OpenNet ============================================================
-#include "Filter_Data.h"
-
-class Buffer_Data;
+class Buffer_Data     ;
+class Thread          ;
+class Thread_Functions;
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
@@ -35,29 +34,29 @@ class Processor_Internal : public OpenNet::Processor
 
 public:
 
-    typedef struct
-    {
-        clEnqueueMakeBuffersResidentAMD_fn mEnqueueMakeBufferResident;
-        clEnqueueWaitSignalAMD_fn          mEnqueueWaitSignal        ;
-    }
-    ExtensionFunctions;
-
-    Processor_Internal(cl_platform_id aPlatform, cl_device_id aDevice, ExtensionFunctions * aExtensionFunctions, KmsLib::DebugLog * aDebugLog);
+    Processor_Internal(cl_platform_id aPlatform, cl_device_id aDevice, KmsLib::DebugLog * aDebugLog);
 
     ~Processor_Internal();
 
-    void Buffer_Allocate(unsigned int aPacketSize_byte, Filter_Data * aFilterData, OpenNetK::Buffer * aBuffer, Buffer_Data * aBufferData);
+    Buffer_Data * Buffer_Allocate(unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer);
 
-    void Processing_Create(Filter_Data * aFilterData, OpenNet::Filter * aFilter);
-    void Processing_Queue (Filter_Data * aFilterData, Buffer_Data * aBufferData);
-    void Processing_Wait  (Filter_Data * aFilterData, Buffer_Data * aBufferData);
+    cl_command_queue CommandQueue_Create(bool aProfilingEnabled);
+
+    cl_program Program_Create(OpenNet::Kernel * aKernel);
+
+    Thread_Functions * Thread_Get    ();
+    Thread           * Thread_Prepare();
 
     // ===== OpenNet::Processor =============================================
-    virtual OpenNet::Status GetInfo        (Info * aOut) const;
-    virtual const char    * GetName        () const;
+    virtual OpenNet::Status GetConfig(      Config * aOut   ) const;
+    virtual OpenNet::Status GetInfo  (      Info   * aOut   ) const;
+    virtual const char    * GetName  () const;
+    virtual OpenNet::Status SetConfig(const Config & aConfig);
+    virtual OpenNet::Status Display  (      FILE   * aOut   ) const;
+
+    // ===== OpenNet::StatisticsProvider ====================================
     virtual OpenNet::Status GetStatistics  (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
     virtual OpenNet::Status ResetStatistics();
-    virtual OpenNet::Status Display        (FILE * aOut) const;
 
 private:
 
@@ -70,10 +69,11 @@ private:
 
     void GetKernelWorkGroupInfo(cl_kernel aKernel, cl_kernel_work_group_info aParam, size_t aOutSize_byte, void * aOut);
 
-    cl_context           mContext           ;
-    KmsLib::DebugLog   * mDebugLog          ;
-    cl_device_id         mDevice            ;
-    ExtensionFunctions * mExtensionFunctions;
-    Info                 mInfo              ;
+    Config             mConfig  ;
+    cl_context         mContext ;
+    KmsLib::DebugLog * mDebugLog;
+    cl_device_id       mDevice  ;
+    Info               mInfo    ;
+    Thread_Functions * mThread  ;
 
 };

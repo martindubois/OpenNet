@@ -8,6 +8,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+// ===== C++ ================================================================
+#include <vector>
+
 // ===== OpenCL =============================================================
 #include <CL/opencl.h>
 
@@ -19,25 +22,23 @@ class Buffer_Data
 
 public:
 
-    Buffer_Data();
+    Buffer_Data(cl_mem aMem, unsigned int aPacketQty);
 
-    uint64_t GetEventProfilingInfo(cl_profiling_info aParam);
-    uint32_t GetMarkerValue       ();
+    ~Buffer_Data();
 
-    void ReleaseEvent    ();
-    void ReleaseMemObject();
+    uint32_t     GetMarkerValue();
+    unsigned int GetPacketQty  () const;
 
-    void Reset           ();
     void ResetMarkerValue();
 
-    void WaitForEvent();
-
-    cl_event     mEvent    ;
-    cl_mem       mMem      ;
-    unsigned int mPacketQty;
+    cl_event mEvent;
+    cl_mem   mMem  ;
 
 private:
 
-    uint32_t mMarkerValue;
+    uint32_t     mMarkerValue;
+    unsigned int mPacketQty  ;
 
 };
+
+typedef std::vector<Buffer_Data *> Buffer_Data_Vector;

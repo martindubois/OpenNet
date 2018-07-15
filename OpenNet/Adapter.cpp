@@ -42,22 +42,24 @@ static const char * ADAPTER_TYPE_NAMES[OpenNetK::ADAPTER_TYPE_QTY] =
 const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS[] =
 {
     { "ADAPTER BUFFER_ALLOCATED             ", "", 0 }, //  0
-    { "ADAPTER BUFFER_RELEASED              ", "", 0 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
     { "ADAPTER LOOP_BACK_PACKET             ", "", 0 },
     { "ADAPTER PACKET_SEND                  ", "", 1 },
-    { "ADAPTER RUN_ENTRY                    ", "", 0 },
-    { "ADAPTER RUN_EXCEPTION                ", "", 1 }, //  5
-    { "ADAPTER RUN_EXIT                     ", "", 0 },
-    { "ADAPTER RUN_ITERATION_QUEUE          ", "", 0 },
-    { "ADAPTER RUN_ITERATION_WAIT           ", "", 0 },
-    { "ADAPTER RUN_LOOP_EXCEPTION           ", "", 0 },
-    { "ADAPTER RUN_LOOP_UNEXPECTED_EXCEPTION", "", 1 }, // 10
-    { "ADAPTER RUN_QUEUE                    ", "", 0 },
-    { "ADAPTER RUN_UNEXPECTED_EXCEPTION     ", "", 1 },
-    { "ADAPTER START                        ", "", 0 },
-    { "ADAPTER STOP_REQUEST                 ", "", 0 },
-    { "ADAPTER STOP_WAIT                    ", "", 0 }, // 15
 
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, //  5
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 10
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 15
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
@@ -184,12 +186,6 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
 
-static const char * GetIoCtlName(unsigned int aCode);
-
-static void Display(const OpenNet::Adapter::Stats_Dll    & aIn, FILE * aOut);
-
-static void DisplayStats(const char * aText, unsigned int aValue, FILE * aOut);
-
 namespace OpenNet
 {
 
@@ -201,7 +197,7 @@ namespace OpenNet
         if (NULL == (&aIn)) { return STATUS_INVALID_REFERENCE        ; }
         if (NULL ==   aOut) { return STATUS_NOT_ALLOWED_NULL_ARGUMENT; }
 
-        fprintf(aOut, "  Adapter Configuration :\n");
+        fprintf(aOut, "  Adapter::Config :\n");
 
         if ((OPEN_NET_BUFFER_QTY >= aIn.mBufferQty) && (0 < aIn.mBufferQty))
         {
@@ -229,7 +225,7 @@ namespace OpenNet
         if (NULL == (&aIn))	{ return STATUS_INVALID_REFERENCE        ; }
         if (NULL ==   aOut)	{ return STATUS_NOT_ALLOWED_NULL_ARGUMENT; }
 
-        fprintf(aOut, "  Adapter Information :\n");
+        fprintf(aOut, "  Adapter::Info :\n");
 
         if ((0 <= aIn.mAdapterType) && (OpenNetK::ADAPTER_TYPE_QTY > aIn.mAdapterType))
         {
@@ -258,15 +254,15 @@ namespace OpenNet
 
         EthernetAddress_Display(aIn.mEthernetAddress, aOut);
 
-        fprintf(aOut, "    Version - Driver :\n");
+        fprintf(aOut, "    Version - Driver   =\n");
 
         VersionInfo_Display(aIn.mVersion_Driver  , aOut);
 
-        fprintf(aOut, "    Version - Hardware :\n");
+        fprintf(aOut, "    Version - Hardware =\n");
 
         VersionInfo_Display(aIn.mVersion_Hardware, aOut);
 
-        fprintf(aOut, "    Version - ONK_Lib :\n");
+        fprintf(aOut, "    Version - ONK_Lib  =\n");
 
         VersionInfo_Display(aIn.mVersion_ONK_Lib , aOut);
 
@@ -285,7 +281,7 @@ namespace OpenNet
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
         }
 
-        fprintf(aOut, "  Adapter State :\n");
+        fprintf(aOut, "  Adapter::State :\n");
 
         if      (ADAPTER_NO_QTY     >  aIn.mAdapterNo) { fprintf(aOut, "    Adapter No  = %u\n"                       , aIn.mAdapterNo); }
         else if (ADAPTER_NO_UNKNOWN == aIn.mAdapterNo) { fprintf(aOut, "    Adapter No  = Unknown\n"                                  ); }
@@ -306,61 +302,4 @@ namespace OpenNet
     {
     }
 
-}
-
-// Static functions
-/////////////////////////////////////////////////////////////////////////////
-
-const char * GetIoCtlName(unsigned int aCode)
-{
-    switch (aCode)
-    {
-    case IOCTL_CONFIG_GET      : return "CONFIG_GET"      ;
-    case IOCTL_CONFIG_SET      : return "CONFIG_SET"      ;
-    case IOCTL_CONNECT         : return "CONNECT"         ;
-    case IOCTL_INFO_GET        : return "INFO_GET"        ;
-    case IOCTL_PACKET_SEND     : return "PACKET_SEND"     ;
-    case IOCTL_START           : return "START"           ;
-    case IOCTL_STATE_GET       : return "STATE_GET"       ;
-    case IOCTL_STATISTICS_GET  : return "STATISTICS_GET"  ;
-    case IOCTL_STATISTICS_RESET: return "STATISTICS_RESET";
-    case IOCTL_STOP            : return "STOP"            ;
-    }
-
-    return "Invalid IoCtl code";
-}
-
-void Display(const OpenNet::Adapter::Stats_Dll & aIn, FILE * aOut)
-{
-    assert(NULL != (&aIn));
-    assert(NULL !=   aOut);
-
-    fprintf(aOut, "  Dll Statistics :\n");
-    fprintf(aOut, "    Buffer - Allocated                = %u\n", aIn.mBuffer_Allocated   );
-    DisplayStats( "           - Released                 = %u\n", aIn.mBuffer_Released             , aOut);
-    DisplayStats( "    Loop Back Packet                  = %u\n", aIn.mLoopBackPacket              , aOut);
-    DisplayStats( "    Packet - Send                     = %u\n", aIn.mPacket_Send                 , aOut);
-    fprintf(aOut, "    Run - Entry                       = %u\n", aIn.mRun_Entry          );
-    DisplayStats( "        - Exception                   = %u\n", aIn.mRun_Exception               , aOut);
-    DisplayStats( "        - Exit                        = %u\n", aIn.mRun_Exit                    , aOut);
-    fprintf(aOut, "        - Iteration - Queue           = %u\n", aIn.mRun_Iteration_Queue);
-    DisplayStats( "                    - Wait            = %u\n", aIn.mRun_Iteration_Wait          , aOut);
-    fprintf(aOut, "        - Loop - Exception            = %u\n", aIn.mRun_Loop_Exception );
-    DisplayStats( "               - Unexpected Exception = %u\n", aIn.mRun_Loop_UnexpectedException, aOut);
-    DisplayStats( "        - Queue                       = %u\n", aIn.mRun_Queue                   , aOut);
-    DisplayStats( "        - Unexpected Exception        = %u\n", aIn.mRun_UnexpectedException     , aOut);
-    DisplayStats( "    Start                             = %u\n", aIn.mStart                       , aOut);
-    fprintf(aOut, "    Stop - Request                    = %u\n", aIn.mStop_Request       );
-    DisplayStats( "         - Wait                       = %u\n", aIn.mStop_Wait                   , aOut);
-}
-
-void DisplayStats(const char * aFormat, unsigned int aValue, FILE * aOut)
-{
-    assert(NULL != aFormat);
-    assert(NULL != aOut   );
-
-    if (0 < aValue)
-    {
-        fprintf(aOut, aFormat, aValue);
-    }
 }

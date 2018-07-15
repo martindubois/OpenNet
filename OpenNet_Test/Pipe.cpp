@@ -14,7 +14,7 @@
 
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/Adapter.h>
-#include <OpenNet/Filter_Forward.h>
+#include <OpenNet/Kernel_Forward.h>
 #include <OpenNet/System.h>
 
 // ===== OpenNet_Test =======================================================

@@ -10,7 +10,7 @@
 
 // ===== Includes ===========================================================
 #include <OpenNet/Adapter.h>
-#include <OpenNet/Filter_Forward.h>
+#include <OpenNet/Function_Forward.h>
 #include <OpenNet/System.h>
 
 // Class
@@ -21,10 +21,43 @@ class Loop
 
 public:
 
+    //                Ethernet   Internal
+    //
+    // CIRCLE_FULL      +---->   -----+
+    //                  | +--= 0 <--+ |
+    //                  | |         | |
+    //                  | +--> 1 ---+ |
+    //                  +----=   <----+
+    //
+    // CIRCLE_HALF
+    //                    +--= 0 <--+
+    //                    |         |
+    //                    +--> 1 ---+
+    //
+    // MIRROR_DOUBLE    +----> M
+    //                  | +--= 0
+    //                  | |
+    //                  | +--> 1
+    //                  +----= M
+    //
+    // MIRROR_SINGLE    +----> M
+    //                  | +--= 0
+    //                  | |
+    //                  | +--> 1
+    //                  +----- M
+    //
+    // MODE_EXPLOSION   +----> M -----+
+    //                  | +--= 0 <--+ |
+    //                  | |         | |
+    //                  | +--> 1 ---+ |
+    //                  +----= M <----+
     typedef enum
     {
-        MODE_DOUBLE_CIRCLE,
-        MODE_DOUBLE_MIRROR,
+        MODE_CIRCLE_FULL  ,
+        MODE_CIRCLE_HALF  ,
+        MODE_EXPLOSION    ,
+        MODE_MIRROR_DOUBLE,
+        MODE_MIRROR_SINGLE,
 
         MODE_QTY
     }
@@ -34,18 +67,21 @@ public:
 
     ~Loop();
 
-    void Display();
+    void DisplayAdapterStatistics();
+    void DisplaySpeed            (double aDuration_s);
 
-    void GetAndDisplayStatistics();
+    void GetAdapterStatistics();
 
-    void GetStatistics();
+    void GetAndDisplayKernelStatistics();
 
-    void ResetStatistics();
+    void ResetAdapterStatistics();
 
     void SendPackets();
 
     void Start();
     void Stop ();
+
+    OpenNet::Adapter * mAdapters[2];
 
 private:
 
@@ -60,14 +96,13 @@ private:
     void SetInputFilter();
     void SetProcessor  ();
 
-    OpenNet::Adapter      * mAdapters  [2]     ;
-    unsigned int            mBufferQty         ;
-    OpenNet::Filter_Forward mFilters   [2]     ;
-    Mode                    mMode              ;
-    unsigned int            mPacketQty         ;
-    unsigned int            mPacketSize_byte   ;
-    OpenNet::Processor    * mProcessor         ;
-    unsigned int            mStatistics[2][128];
-    OpenNet::System       * mSystem            ;
+    unsigned int              mBufferQty         ;
+    OpenNet::Function_Forward mFunctions [2]     ;
+    Mode                      mMode              ;
+    unsigned int              mPacketQty         ;
+    unsigned int              mPacketSize_byte   ;
+    OpenNet::Processor      * mProcessor         ;
+    unsigned int              mStatistics[2][128];
+    OpenNet::System         * mSystem            ;
 
 };

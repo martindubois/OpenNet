@@ -15,7 +15,7 @@
 
 // ===== Includes ===========================================================
 #include <OpenNet/Adapter.h>
-#include <OpenNet/Filter_Forward.h>
+#include <OpenNet/Kernel_Forward.h>
 #include <OpenNet/System.h>
 
 // ===== Common =============================================================
@@ -54,7 +54,7 @@ KMS_TEST_BEGIN(Mirror_SetupB)
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem ->Adapter_Connect(lSetup.mAdapter  ));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mAdapter->SetProcessor   (lSetup.mProcessor));
 
-    lSetup.mFilter.AddDestination(lSetup.mAdapter);
+    lSetup.mKernel.AddDestination(lSetup.mAdapter);
 
     KMS_TEST_COMPARE(0, lSetup.Statistics_Reset());
     KMS_TEST_COMPARE(0, lSetup.Start           ());
@@ -74,7 +74,6 @@ KMS_TEST_BEGIN(Mirror_SetupB)
     Utl_ValidateInit(&lStatsE, &lStatsM);
 
     lStatsE.mDll.mBuffer_Allocated = BUFFER_QTY;
-    lStatsE.mDll.mBuffer_Released  = BUFFER_QTY;
     lStatsE.mDll.mRun_Entry        = 1;
     lStatsE.mDll.mRun_Exit         = 1;
     lStatsE.mDll.mRun_Queue        = BUFFER_QTY;
@@ -108,7 +107,7 @@ KMS_TEST_BEGIN(Mirror_SetupC)
 
     KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mFilters[0].AddDestination(lSetup.mAdapters[0]));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mKernels[0].AddDestination(lSetup.mAdapters[0]));
 
     KMS_TEST_COMPARE       (0, lSetup.Statistics_Reset());
     KMS_TEST_COMPARE_RETURN(0, lSetup.Start());
@@ -238,25 +237,9 @@ KMS_TEST_BEGIN(Mirror_SetupC)
 
     lSetup.Constraint_Init();
 
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMin = 2;
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMax = 2;
-
     lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMin        =   0;
     lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMax        = 320;
     lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMultipleOf =  32;
-
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMin = 1;
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMax = 1;
-
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_QUEUE].mMax = 1;
-
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_WAIT].mMax = 1;
-
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMin = 1;
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMax = 1;
-
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMin = 1;
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMax = 1;
 
     lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1;
     lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 37;
@@ -329,25 +312,9 @@ KMS_TEST_BEGIN(Mirror_SetupC)
 
     lSetup.Constraint_Init();
 
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMin = 2;
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_BUFFER_RELEASED].mMax = 2;
-
     lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMin        =   0;
     lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMax        = 576;
     lSetup.mConstraints[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET].mMultipleOf =  64;
-
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMin = 1;
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_EXIT].mMax = 1;
-
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_QUEUE].mMax = 1;
-
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_RUN_ITERATION_WAIT].mMax = 1;
-
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMin = 1;
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_REQUEST].mMax = 1;
-
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMin = 1;
-    lSetup.mConstraints[OpenNet::ADAPTER_STATS_STOP_WAIT].mMax = 1;
 
     lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin = 26;
     lSetup.mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 43;

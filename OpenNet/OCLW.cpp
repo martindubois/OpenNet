@@ -15,6 +15,12 @@
 // ===== OpenNet ============================================================
 #include "OCLW.h"
 
+// Static variables
+/////////////////////////////////////////////////////////////////////////////
+
+clEnqueueMakeBuffersResidentAMD_fn sEnqueueMakeBufferResident = NULL;
+clEnqueueWaitSignalAMD_fn          sEnqueueWaitSignal         = NULL;
+
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
@@ -65,15 +71,20 @@ void OCLW_WaitForEvents(cl_uint aCount, const cl_event * aEvents)
 
 // ===== cl_command_queue ===================================================
 
-void OCLW_Flush(cl_command_queue aCommandQueue)
+void OCLW_EnqueueMakeBufferResident(cl_command_queue aCommandQueue, cl_uint aMemCount, cl_mem * aMems, cl_bool aBlocking, cl_bus_address_amd * aAddress, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent)
 {
     assert(NULL != aCommandQueue);
+    assert(   0 <  aMemCount    );
+    assert(NULL != aMems        );
+    assert(NULL != aAddress     );
 
-    cl_int lStatus = clFlush(aCommandQueue);
+    assert(NULL != sEnqueueMakeBufferResident);
+
+    cl_int lStatus = sEnqueueMakeBufferResident(aCommandQueue, aMemCount, aMems, aBlocking, aAddress, aEventCount, aEvents, aEvent);
     if (CL_SUCCESS != lStatus)
     {
         throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
-            "clFlush(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+            "clEnqueueMakeBufferResident( , , , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
     }
 }
 
@@ -106,6 +117,33 @@ void OCLW_EnqueueReadBuffer(cl_command_queue aCommandQueue, cl_mem aBuffer, cl_b
     {
         throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
             "clEnqueueReadBuffer( , , , , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+    }
+}
+
+void OCLW_EnqueueWaitSignal(cl_command_queue aCommandQueue, cl_mem aBuffer, int aValue, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent)
+{
+    assert(NULL != aCommandQueue);
+    assert(NULL != aBuffer      );
+
+    assert(NULL != sEnqueueWaitSignal);
+
+    cl_int lStatus = sEnqueueWaitSignal(aCommandQueue, aBuffer, aValue, aEventCount, aEvents, aEvent);
+    if (CL_SUCCESS != lStatus)
+    {
+        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
+            "clEnqueueWaitSignal( , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+    }
+}
+
+void OCLW_Flush(cl_command_queue aCommandQueue)
+{
+    assert(NULL != aCommandQueue);
+
+    cl_int lStatus = clFlush(aCommandQueue);
+    if (CL_SUCCESS != lStatus)
+    {
+        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
+            "clFlush(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
     }
 }
 
@@ -387,6 +425,23 @@ void OCLW_GetPlatformInfo(cl_platform_id aPlatform, cl_platform_info aParam, siz
             "clGetPlatformInfo repported and invalid data size", NULL, __FILE__, __FUNCTION__, __LINE__, static_cast<unsigned int>(lInfo_byte));
     }
 }
+
+// Exception  KmsLib::Exception *  See OCLW_GetExtensionFunctionAddressForPlatform
+// Threads  Apps
+void OCLW_Initialise(cl_platform_id aPlatform)
+{
+    assert(0 != aPlatform);
+
+    assert(NULL == sEnqueueMakeBufferResident);
+    assert(NULL == sEnqueueWaitSignal        );
+
+    sEnqueueMakeBufferResident = reinterpret_cast<clEnqueueMakeBuffersResidentAMD_fn>(OCLW_GetExtensionFunctionAddressForPlatform(aPlatform, "clEnqueueMakeBuffersResidentAMD"));
+    sEnqueueWaitSignal         = reinterpret_cast<clEnqueueWaitSignalAMD_fn         >(OCLW_GetExtensionFunctionAddressForPlatform(aPlatform, "clEnqueueWaitSignalAMD"         ));
+
+    assert(NULL != sEnqueueMakeBufferResident);
+    assert(NULL != sEnqueueWaitSignal        );
+}
+
 
 // ===== cl_program =========================================================
 

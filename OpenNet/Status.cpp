@@ -28,6 +28,7 @@ static const StatusInfo STATUS_INFO[] =
 
     { "ADAPTER_ALREADY_CONNECTED" , "The adapter is already connected"  },
     { "ADAPTER_NOT_CONNECTED"     , "The adapter is not connected"      },
+    { "ADAPTER_RUNNING"           , "The adapter is running"            },
     { "BUFFER_ALLOCATED"          , "At least one buffer is allocated"  },
     { "BUFFER_TOO_SMALL"          , "The buffer is too small"           },
     { "CANNOT_OPEN_INPUT_FILE"    , "Cannot open input file"            },
@@ -54,7 +55,10 @@ static const StatusInfo STATUS_INFO[] =
     { "INVALID_PROCESSOR"         , "Invalid processor"                 },
     { "INVALID_REFERENCE"         , "Invalid reference"                 },
     { "IOCTL_ERROR"               , "IoCtl error"                       },
+    { "NAME_TOO_LONG"             , "The name is too long"              },
+    { "NAME_TOO_SHORT"            , "The name it too short"             },
     { "NO_ADAPTER_CONNECTED"      , "No adapter connected"              },
+    { "NO_BUFFER"                 , "No buffer"                         },
     { "NO_DESTINATION_SET"        , "No destination set"                },
     { "NOT_ALLOWED_NULL_ARGUMENT" , "Not allowed NULL argument"         },
     { "OPEN_CL_ERROR"             , "OpenCL error"                      },
@@ -66,6 +70,7 @@ static const StatusInfo STATUS_INFO[] =
     { "PROFILING_ALREADY_ENABLED" , "The profiling is already enabled"  },
     { "SAME_VALUE"                , "Set to the same value"             },
     { "SYSTEM_ALREADY_STARTED"    , "The system is already started"     },
+    { "SYSTEM_RUNNING"            , "The system is running"             },
     { "SYSTEM_NOT_STARTED"        , "The system is not started"         },
     { "TOO_MANY_BUFFER"           , "Too many buffer allocated"         },
 };

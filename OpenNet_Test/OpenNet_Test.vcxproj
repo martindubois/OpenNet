@@ -94,8 +94,8 @@
     <ClCompile Include="Base.cpp" />
     <ClCompile Include="BlackHole.cpp" />
     <ClCompile Include="EthernetAddress.cpp" />
-    <ClCompile Include="Filter.cpp" />
-    <ClCompile Include="Filter_Forward.cpp" />
+    <ClCompile Include="Kernel.cpp" />
+    <ClCompile Include="Kernel_Forward.cpp" />
     <ClCompile Include="Loop.cpp" />
     <ClCompile Include="Mirror.cpp" />
     <ClCompile Include="OpenNet_Test.cpp" />
@@ -103,6 +103,7 @@
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="SetupA.cpp" />
     <ClCompile Include="SetupC.cpp" />
+    <ClCompile Include="SourceCode.cpp" />
     <ClCompile Include="Status.cpp" />
     <ClCompile Include="System.cpp" />
   </ItemGroup>

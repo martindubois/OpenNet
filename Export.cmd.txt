@@ -20,21 +20,25 @@ _DocUser .
 
 Includes/OpenNet
 	Adapter.h
-	EthernetAddress.h
-	Filter.h
-	Filter_Forward.h
+	Function.h
+	Function_Forward.h
+	Kernel.h
+	Kernel_Forward.h
 	OpenNet.h
 	Processor.h
+	SourceCode.h
+	StatisticsProvider.h
 	Status.h
 	System.h
-	VersionInfo.h
 
 Includes/OpenNetK
     Adapter.h
+	Adapter_Types.h
 	Adapter_WDF.h
 	Constants.h
 	Debug.h
 	Hardware.h
+	Hardware_Statistics.h
 	Hardware_WDF.h
     Interface.h
 	Kernel.h

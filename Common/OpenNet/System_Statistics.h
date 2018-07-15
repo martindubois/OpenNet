@@ -15,6 +15,8 @@ namespace OpenNet
 
     typedef enum
     {
+        SYSTEM_STATS_RESET_QTY = 1,
+
         SYSTEM_STATS_QTY = 16,
     }
     System_Statistics;

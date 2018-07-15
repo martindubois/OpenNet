@@ -25,8 +25,18 @@
 #include "Adapter_Internal.h"
 #include "OCLW.h"
 #include "Processor_Internal.h"
+#include "Thread.h"
 
 #include "System_Internal.h"
+
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+static const char * STATE_NAMES[System_Internal::STATE_QTY] =
+{
+    "IDLE"   ,
+    "RUNNING",
+};
 
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
@@ -38,23 +48,33 @@ static void SendLoopBackPackets(void * aThis, Adapter_Internal * aAdapter);
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-// Exception  KmsLib::Exception *  See FindExtension
-//                                 See FindPlatform
+// Exception  KmsLib::Exception *  See FindPlatform
 //                                 See FindProcessors
 // Threads  Apps
 System_Internal::System_Internal()
     : mDebugLog( "K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "OpenNet" )
-    , mAdapterRunning (0)
-    , mPacketSize_byte(PACKET_SIZE_MAX_byte)
-    , mPlatform       (0)
+    , mPlatform(         0)
+    , mState   (STATE_IDLE)
 {
-    memset(&mConnect           , 0, sizeof(mConnect           ));
-    memset(&mExtensionFunctions, 0, sizeof(mExtensionFunctions));
+    memset(&mConfig , 0, sizeof(mConfig ));
+    memset(&mConnect, 0, sizeof(mConnect));
+    memset(&mInfo   , 0, sizeof(mInfo   ));
+
+    mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
+
+    mInfo.mSystemId = GetCurrentProcessId();
+    assert(0 != mInfo.mSystemId);
+
+    mConnect.mSystemId = mInfo.mSystemId;
 
     FindAdapters  ();
     FindPlatform  ();
-    FindExtension ();
     FindProcessors();
+
+    if (0 != mPlatform)
+    {
+        OCLW_Initialise(mPlatform);
+    }
 
     // CreateEvent ==> CloseHandle  See the destructor
     mConnect.mEvent = reinterpret_cast<uint64_t>(CreateEvent(NULL, FALSE, TRUE, NULL));
@@ -63,9 +83,6 @@ System_Internal::System_Internal()
     // VirtualAlloc ==> VirtualAlloc  See the destructor
     mConnect.mSharedMemory = VirtualAlloc(NULL, SHARED_MEMORY_SIZE_byte, MEM_COMMIT, PAGE_READWRITE);
     assert(NULL != mConnect.mSharedMemory);
-
-    mConnect.mSystemId = GetCurrentProcessId();
-    assert(0 != mConnect.mSystemId);
 }
 
 // Threads  Apps
@@ -74,81 +91,107 @@ System_Internal::~System_Internal()
     assert(   0 != mConnect.mEvent       );
     assert(NULL != mConnect.mSharedMemory);
 
+    switch (mState)
+    {
+    case STATE_IDLE:
+        break;
+
+    case STATE_RUNNING :
+        Stop(0);
+        break;
+
+    default: assert(false);
+    }
+
+    Threads_Release();
+
     unsigned int i;
     
     for (i = 0; i < mAdapters.size(); i++)
     {
-        // new ==> delete
+        // new ==> delete  See FindAdapters
         delete mAdapters[i];
     }
 
     for (i = 0; i < mProcessors.size(); i++)
     {
-        // new ==> delete
+        // new ==> delete  See FindProcessors
         delete mProcessors[i];
     }
 
     // CreateEvent ==> CloseHandle  See the default contructor
     BOOL lRetB = CloseHandle(reinterpret_cast<HANDLE>(mConnect.mEvent));
     assert(lRetB);
+    (void)(lRetB);
 
     // VirtualAlloc ==> VirtualAlloc  See the default constructor
     void * lRetVP = VirtualAlloc(mConnect.mSharedMemory, SHARED_MEMORY_SIZE_byte, MEM_RESET, 0);
     assert(NULL == lRetVP);
+    (void)(lRetVP);
 }
 
 // ===== OpenNet::System ====================================================
 
-unsigned int System_Internal::GetSystemId() const
+OpenNet::Status System_Internal::GetConfig(Config * aOut) const
 {
-    assert(0 != mConnect.mSystemId);
+    if (NULL == aOut)
+    {
+        return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
+    }
 
-    return mConnect.mSystemId;
+    memcpy(aOut, &mConfig, sizeof(Config));
+
+    return OpenNet::STATUS_OK;
 }
 
-OpenNet::Status System_Internal::SetPacketSize(unsigned int aSize_byte)
+OpenNet::Status System_Internal::GetInfo(Info * aOut) const
 {
-    assert(PACKET_SIZE_MAX_byte >= mPacketSize_byte);
-    assert(PACKET_SIZE_MIN_byte <= mPacketSize_byte);
+    if (NULL == aOut)
+    {
+        return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
+    }
 
-    if (PACKET_SIZE_MAX_byte < aSize_byte)
+    memcpy(aOut, &mInfo, sizeof(mInfo));
+
+    return OpenNet::STATUS_OK;
+}
+
+OpenNet::Status System_Internal::SetConfig(const Config & aConfig)
+{
+    assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
+    assert(PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte);
+
+    if (NULL == (&aConfig))
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_PACKET_TOO_LARGE;
+        return OpenNet::STATUS_INVALID_REFERENCE;
     }
 
-    if (PACKET_SIZE_MIN_byte > aSize_byte)
+    OpenNet::Status lResult = Config_Validate(aConfig);
+    if (OpenNet::STATUS_OK != lResult)
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_PACKET_TOO_SMALL;
+        return lResult;
     }
 
-    mPacketSize_byte = aSize_byte;
-
-    OpenNet::Status lResult = OpenNet::STATUS_OK;
-
-    for (unsigned int i = 0; i < mAdapters.size(); i++)
+    switch (mState)
     {
-        Adapter_Internal * lAdapter = mAdapters[i];
-        assert(NULL != lAdapter);
+    case STATE_IDLE :
+        break;
 
-        if (lAdapter->IsConnected(*this))
-        {
-            lResult = lAdapter->SetPacketSize(mPacketSize_byte);
-            if (OpenNet::STATUS_OK != lResult)
-            {
-                mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-                break;
-            }
-        }
+    case STATE_RUNNING :
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_SYSTEM_RUNNING;
+
+    default: assert(false);
     }
 
-    return lResult;
+    return Config_Apply(aConfig);
 }
 
 OpenNet::Status System_Internal::Adapter_Connect(OpenNet::Adapter * aAdapter)
 {
-    OpenNet::Status lResult = ValidateAdapter(aAdapter);
+    OpenNet::Status lResult = Adapter_Validate(aAdapter);
     if (OpenNet::STATUS_OK != lResult)
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
@@ -161,6 +204,18 @@ OpenNet::Status System_Internal::Adapter_Connect(OpenNet::Adapter * aAdapter)
         return OpenNet::STATUS_ADAPTER_ALREADY_CONNECTED;
     }
 
+    switch (mState)
+    {
+    case STATE_IDLE :
+        break;
+
+    case STATE_RUNNING :
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_SYSTEM_RUNNING;
+
+    default: assert(false);
+    }
+
     try
     {
         Adapter_Internal * lAdapter = dynamic_cast<Adapter_Internal *>(aAdapter);
@@ -168,13 +223,14 @@ OpenNet::Status System_Internal::Adapter_Connect(OpenNet::Adapter * aAdapter)
 
         unsigned int lPacketSize_byte = lAdapter->GetPacketSize();
 
-        if (lPacketSize_byte < mPacketSize_byte)
+        if (lPacketSize_byte < mConfig.mPacketSize_byte)
         {
-            lResult = SetPacketSize(lPacketSize_byte);
+            SetPacketSize(lPacketSize_byte);
+            lResult = OpenNet::STATUS_OK;
         }
-        else if (lPacketSize_byte > mPacketSize_byte)
+        else if (lPacketSize_byte > mConfig.mPacketSize_byte)
         {
-            lResult = lAdapter->SetPacketSize(mPacketSize_byte);
+            lAdapter->SetPacketSize(mConfig.mPacketSize_byte);
         }
 
         if (OpenNet::STATUS_OK == lResult)
@@ -210,8 +266,7 @@ unsigned int System_Internal::Adapter_GetCount() const
 
 OpenNet::Status System_Internal::Display(FILE * aOut)
 {
-    assert(mAdapters.size() >= mAdapterRunning   );
-    assert(               0 != mConnect.mSystemId);
+    assert(0 != mConnect.mSystemId);
 
     if (NULL == aOut)
     {
@@ -220,13 +275,31 @@ OpenNet::Status System_Internal::Display(FILE * aOut)
     }
 
     fprintf(aOut, "System :\n");
-    fprintf(aOut, "  %u Adapter Running\n"    , mAdapterRunning    );
-    fprintf(aOut, "  %zu Adapters\n"          , mAdapters  .size() );
-    fprintf(aOut, "  %zu Processors\n"        , mProcessors.size() );
-    fprintf(aOut, "  System Id   = %u\n"      , mConnect.mSystemId );
-    fprintf(aOut, "  Packet Size = %u bytes\n", mPacketSize_byte   );
+    fprintf(aOut, "  %zu Adapters\n"    , mAdapters  .size() );
+    fprintf(aOut, "  %zu Processors\n"  , mProcessors.size() );
+    fprintf(aOut, "  %zu Threads\n"     , mThreads   .size() );
+    fprintf(aOut, "  State       = %s\n", STATE_NAMES[mState]);
+    fprintf(aOut, "  System Id   = %u\n", mConnect.mSystemId );
 
     return OpenNet::STATUS_OK;
+}
+
+OpenNet::Kernel * System_Internal::Kernel_Get(unsigned int aIndex)
+{
+    if (mThreads.size() <= aIndex)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return NULL;
+    }
+
+    assert(NULL != mThreads[aIndex]);
+
+    return mThreads[aIndex]->GetKernel();
+}
+
+unsigned int System_Internal::Kernel_GetCount() const
+{
+    return static_cast< unsigned int >( mThreads.size() );
 }
 
 OpenNet::Processor * System_Internal::Processor_Get(unsigned int aIndex)
@@ -246,18 +319,28 @@ unsigned int System_Internal::Processor_GetCount() const
 
 OpenNet::Status System_Internal::Start()
 {
-    if (0 < mAdapterRunning)
+    switch (mState)
     {
+    case STATE_IDLE :
+        break;
+
+    case STATE_RUNNING :
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_SYSTEM_ALREADY_STARTED;
+
+    default: assert(false);
     }
+
+    Threads_Release();
 
     OpenNet::Status lResult = OpenNet::STATUS_NO_ADAPTER_CONNECTED;
 
-    unsigned int i;
-
     try
     {
+        Thread * lThread;
+
+        unsigned int i;
+
         for (i = 0; i < mAdapters.size(); i++)
         {
             Adapter_Internal * lAdapter = mAdapters[i];
@@ -265,10 +348,40 @@ OpenNet::Status System_Internal::Start()
 
             if (lAdapter->IsConnected(*this))
             {
-                lAdapter->Start();
-                mAdapterRunning++;
+                lThread = lAdapter->Thread_Prepare();
+                if (NULL != lThread)
+                {
+                    mThreads.push_back(lThread);
+                    lResult = OpenNet::STATUS_OK;
+                }
+            }
+        }
+
+        for (i = 0; i < mProcessors.size(); i++)
+        {
+            assert(NULL != mProcessors[i]);
+
+            lThread = mProcessors[i]->Thread_Prepare();
+            if (NULL != lThread)
+            {
+                mThreads.push_back(lThread);
                 lResult = OpenNet::STATUS_OK;
             }
+        }
+
+        for (i = 0; i < mThreads.size(); i++)
+        {
+            mThreads[ i ]->Prepare();
+        }
+
+        for (i = 0; i < mThreads.size(); i++)
+        {
+            mThreads[ i ]->Start();
+        }
+
+        if (OpenNet::STATUS_OK == lResult)
+        {
+            mState = STATE_RUNNING;
         }
     }
     catch (KmsLib::Exception * eE)
@@ -287,45 +400,40 @@ OpenNet::Status System_Internal::Start()
 
 OpenNet::Status System_Internal::Stop(unsigned int aFlags)
 {
-    if (0 >= mAdapterRunning)
+    switch (mState)
     {
+    case STATE_IDLE :
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_SYSTEM_NOT_STARTED;
+
+    case STATE_RUNNING:
+        break;
+
+    default: assert(false);
     }
 
-    OpenNet::Status lResult = OpenNet::STATUS_NO_ADAPTER_CONNECTED;
+    assert(0 < mThreads.size());
+
+    mState = STATE_IDLE;
 
     try
     {
-        for (unsigned int i = 0; (i < mAdapters.size()) && (0 < mAdapterRunning); i++)
-        {
-            Adapter_Internal * lAdapter = mAdapters[i];
-            assert(NULL != lAdapter);
+        unsigned int i;
 
-            if (lAdapter->IsConnected(*this))
-            {
-                lAdapter->Stop_Request();
-            }
+        for (i = 0; i < mThreads.size(); i++)
+        {
+            mThreads[i]->Stop_Request();
         }
 
-        for (unsigned int i = 0; (i < mAdapters.size()) && (0 < mAdapterRunning); i++)
+        for (i = 0; i < mThreads.size(); i++)
         {
-            Adapter_Internal * lAdapter = mAdapters[i];
-            assert(NULL != lAdapter);
-
-            if (lAdapter->IsConnected(*this))
+            if (0 != (aFlags & STOP_FLAG_LOOPBACK))
             {
-                if (0 != (aFlags & STOP_FLAG_LOOPBACK))
-                {
-                    lAdapter->Stop_Wait(::SendLoopBackPackets, this);
-                }
-                else
-                {
-                    lAdapter->Stop_Wait(NULL, NULL);
-                }
-
-                mAdapterRunning--;
-                lResult = OpenNet::STATUS_OK;
+                mThreads[i]->Stop_Wait(::SendLoopBackPackets, this);
+            }
+            else
+            {
+                mThreads[i]->Stop_Wait(NULL, NULL);
             }
         }
     }
@@ -334,35 +442,54 @@ OpenNet::Status System_Internal::Stop(unsigned int aFlags)
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog.Log(eE);
 
-        lResult = ExceptionToStatus(eE);
+        return ExceptionToStatus(eE);
     }
 
-    return lResult;
+    return OpenNet::STATUS_OK;
 }
 
 // ===== OpenNet::StatisticsProvider ========================================
 
 OpenNet::Status System_Internal::GetStatistics(unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset)
 {
-    // TODO  OpenNet.System_Internal
+    if (NULL == aOut)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
+    }
+
+    if (0 >= aOutSize_byte)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_BUFFER_TOO_SMALL;
+    }
+
+    memset(aOut, 0, aOutSize_byte);
+
+    if (NULL != aInfo_byte)
+    {
+        (*aInfo_byte) = 0;
+    }
+
+    if (aReset)
+    {
+        return ResetStatistics();
+    }
 
     return OpenNet::STATUS_OK;
 }
 
 OpenNet::Status System_Internal::ResetStatistics()
 {
-    // TODO  OpenNet.System_Internal
-
     return OpenNet::STATUS_OK;
 }
 
 // Internal
 /////////////////////////////////////////////////////////////////////////////
 
+// aAdapter [--O;---]
 void System_Internal::SendLoopBackPackets(Adapter_Internal * aAdapter)
 {
-    assert(NULL != aAdapter);
-
     for (unsigned int i = 0; i < mAdapters.size(); i++)
     {
         Adapter_Internal * lAdapter = mAdapters[i];
@@ -406,23 +533,6 @@ void System_Internal::FindAdapters()
         assert(NULL != lAdapter);
 
         mAdapters.push_back(lAdapter);
-    }
-}
-
-// Exception  KmsLib::Exception *  See OCLW_GetExtensionFunctionAddressForPlatform
-// Threads  Apps
-void System_Internal::FindExtension()
-{
-    assert(NULL == mExtensionFunctions.mEnqueueMakeBufferResident);
-    assert(NULL == mExtensionFunctions.mEnqueueWaitSignal        );
-
-    if (0 != mPlatform)
-    {
-        mExtensionFunctions.mEnqueueMakeBufferResident = reinterpret_cast<clEnqueueMakeBuffersResidentAMD_fn>(OCLW_GetExtensionFunctionAddressForPlatform(mPlatform, "clEnqueueMakeBuffersResidentAMD"));
-        mExtensionFunctions.mEnqueueWaitSignal         = reinterpret_cast<clEnqueueWaitSignalAMD_fn         >(OCLW_GetExtensionFunctionAddressForPlatform(mPlatform, "clEnqueueWaitSignalAMD"         ));
-
-        assert(NULL != mExtensionFunctions.mEnqueueMakeBufferResident);
-        assert(NULL != mExtensionFunctions.mEnqueueWaitSignal        );
     }
 }
 
@@ -472,7 +582,7 @@ void System_Internal::FindProcessors()
                 if (IsExtensionSupported(lDevices[i]))
                 {
                     // new ==> Delete  See ~System_Internal
-                    mProcessors.push_back( new Processor_Internal(mPlatform, lDevices[i], &mExtensionFunctions, &mDebugLog) );
+                    mProcessors.push_back( new Processor_Internal(mPlatform, lDevices[i], &mDebugLog) );
                 }
             }
         }
@@ -499,10 +609,32 @@ bool System_Internal::IsExtensionSupported(cl_device_id aDevice)
     return false;
 }
 
+void System_Internal::SetPacketSize(unsigned int aSize_byte)
+{
+    assert(PACKET_SIZE_MAX_byte >= aSize_byte);
+    assert(PACKET_SIZE_MIN_byte <= aSize_byte);
+
+    assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
+    assert(PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte);
+
+    mConfig.mPacketSize_byte = aSize_byte;
+
+    for (unsigned int i = 0; i < mAdapters.size(); i++)
+    {
+        Adapter_Internal * lAdapter = mAdapters[i];
+        assert(NULL != lAdapter);
+
+        if (lAdapter->IsConnected(*this))
+        {
+            lAdapter->SetPacketSize(mConfig.mPacketSize_byte);
+        }
+    }
+}
+
 // aAdapter [---;---]
 //
 // Threads  Apps
-OpenNet::Status System_Internal::ValidateAdapter(OpenNet::Adapter * aAdapter)
+OpenNet::Status System_Internal::Adapter_Validate(OpenNet::Adapter * aAdapter)
 {
     if (NULL == aAdapter)
     {
@@ -520,6 +652,59 @@ OpenNet::Status System_Internal::ValidateAdapter(OpenNet::Adapter * aAdapter)
 
     mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
     return OpenNet::STATUS_INVALID_ADAPTER;
+}
+
+OpenNet::Status System_Internal::Config_Apply(const Config & aConfig)
+{
+    assert(NULL != (&aConfig));
+
+    if (mConfig.mPacketSize_byte != aConfig.mPacketSize_byte)
+    {
+        try
+        {
+            SetPacketSize(aConfig.mPacketSize_byte);
+        }
+        catch (KmsLib::Exception * eE)
+        {
+            mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+            mDebugLog.Log(eE);
+
+            return ExceptionToStatus(eE);
+        }
+    }
+
+    return OpenNet::STATUS_OK;
+}
+
+OpenNet::Status System_Internal::Config_Validate(const Config & aConfig)
+{
+    assert(NULL != (&aConfig));
+
+    if (PACKET_SIZE_MAX_byte < aConfig.mPacketSize_byte)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_PACKET_TOO_LARGE;
+    }
+
+    if (PACKET_SIZE_MIN_byte > aConfig.mPacketSize_byte)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_PACKET_TOO_SMALL;
+    }
+
+    return OpenNet::STATUS_OK;
+}
+
+void System_Internal::Threads_Release()
+{
+    for (unsigned int i = 0; i < mThreads.size(); i++)
+    {
+        assert(NULL != mThreads[i]);
+
+        delete mThreads[i];
+    }
+
+    mThreads.clear();
 }
 
 // Static functions

@@ -16,6 +16,7 @@ namespace OpenNet
 {
 
     class Adapter  ;
+    class Kernel   ;
     class Processor;
 
     // Class
@@ -31,6 +32,34 @@ namespace OpenNet
     {
 
     public:
+
+        /// \cond en
+        /// \brief  System configuration
+        /// \endcond
+        /// \cond fr
+        /// \brief  Configuration du system
+        /// \endcond
+        typedef struct
+        {
+            unsigned int mPacketSize_byte;
+
+            unsigned char mReserved0[60];
+        }
+        Config;
+
+        /// \cond en
+        /// \brief  System information
+        /// \endcond
+        /// \cond fr
+        /// \brief  Information au sujet du system
+        /// \endcond
+        typedef struct
+        {
+            unsigned int mSystemId;
+
+            unsigned char mReserved0[60];
+        }
+        Info;
 
         /// \cond en
         /// \brief  Use this flag when adapters are physically connected to
@@ -59,26 +88,72 @@ namespace OpenNet
         static OPEN_NET_PUBLIC System * Create();
 
         /// \cond en
-        /// \brief   Retrieve the system identifier
-        /// \return  This method return the system identifier.
+        /// \brief   This static methode display the system configuration.
+        /// \param   aConfig [---;R--] The configuration
+        /// \param   aOut    [---;RW-] The output stream
         /// \endcond
         /// \cond fr
-        /// \brief   Obtenir l'identificateur de system.
-        /// \return  Cette methode retourne l'identificateur de system.
+        /// \brief   Cette methode statique affiche la configuration d'un
+        ///          system.
+        /// \param   aConfig [---;R--] La configuration
+        /// \param   aOut    [---;RW-] Le fichier de sortie
         /// \endcond
-        virtual unsigned int GetSystemId() const = 0;
+        /// \retval  STATUS_OK
+        /// \retval  STATUS_INVALID_REFERENCE
+        /// \retval  STATUS_NOT_ALLOWER_NULL_ARGUMENT
+        static OPEN_NET_PUBLIC Status Display(const Config & aConfig, FILE * aOut);
 
         /// \cond en
-        /// \brief   Set the maximum packet size
-        /// \param   aSize_byte  The maximum packet size
+        /// \brief   This static methode display the system information.
+        /// \param   aConfig [---;R--] The configuration
+        /// \param   aOut    [---;RW-] The output stream
         /// \endcond
         /// \cond fr
-        /// \brief   Changer la taille maximal des paquets
-        /// \param   aSize_byte  La taille maximal des paquets
+        /// \brief   Cette methode statique affiche l'information au sujet
+        ///          d'un system.
+        /// \param   aConfig [---;R--] La configuration
+        /// \param   aOut    [---;RW-] Le fichier de sortie
         /// \endcond
-        /// \retval  STATUS_PACKET_TOO_LARGE
-        /// \retval  STATUS_PACKET_TOO_SMALL
-        virtual Status SetPacketSize(unsigned int aSize_byte) = 0;
+        /// \retval  STATUS_OK
+        /// \retval  STATUS_INVALID_REFERENCE
+        /// \retval  STATUS_NOT_ALLOWER_NULL_ARGUMENT
+        static OPEN_NET_PUBLIC Status Display(const Info & aInfo, FILE * aOut);
+
+        /// \cond en
+        /// \brief   Retrieve the configuration of the system
+        /// \param   aOut [---;-W-] The output space
+        /// \endcond
+        /// \cond fr
+        /// \brief   Obtenir la configuration du system
+        /// \param   aOut [---;-W-] L'espace memoire de sortie
+        /// \endcond
+        /// \retval  STATUS_OK
+        /// \retval  STATUS_NOT_ALLOWER_NULL_ARGUMENT
+        virtual Status GetConfig(Config * aOut) const = 0;
+
+        /// \cond en
+        /// \brief   Retrieve the information about the system
+        /// \param   aOut [---;-W-] The output space
+        /// \endcond
+        /// \cond fr
+        /// \brief   Obtenir l'information au sujet du system
+        /// \param   aOut [---;-W-] L'espace memoire de sortie
+        /// \endcond
+        /// \retval  STATUS_OK
+        /// \retval  STATUS_NOT_ALLOWER_NULL_ARGUMENT
+        virtual Status GetInfo(Info * aOut) const = 0;
+
+        /// \cond en
+        /// \brief   Modify the configuration of the system
+        /// \param   aConfig [---;-W-] The configuration
+        /// \endcond
+        /// \cond fr
+        /// \brief   Changer la configuration du system
+        /// \param   aConfig [---;-W-] La configuration
+        /// \endcond
+        /// \retval  STATUS_OK
+        /// \retval  STATUS_INVALID_REFERENCE
+        virtual Status SetConfig(const Config & aConfig) = 0;
 
         /// \cond en
         /// \brief   This methode delete the instance.
@@ -127,6 +202,28 @@ namespace OpenNet
         /// \endcond
         /// \retval STATUS_OK
         virtual Status Display(FILE * aOut) = 0;
+
+        /// \cond en
+        /// \brief   Retrieve a Kernel
+        /// \param   aIndex  The kernel index
+        /// \retval  NULL  Invalid index
+        /// \endcond
+        /// \cond fr
+        /// \brief   Obtenir un Kernel
+        /// \param   aIndex  L'index du Kernel
+        /// \retval  NULL  Index invalide
+        /// \endcond
+        virtual OpenNet::Kernel * Kernel_Get(unsigned int aIndex) = 0;
+
+        /// \cond en
+        /// \brief   Retrieve the number of Kernel
+        /// \return  The number of Kernel
+        /// \endcond
+        /// \cond fr
+        /// \brief   Obtenir le nombre de Kernel
+        /// \return  Le nombre de Kernel
+        /// \endcond
+        virtual unsigned int Kernel_GetCount() const = 0;
 
         /// \cond en
         /// \return  This methode return the number of processors.

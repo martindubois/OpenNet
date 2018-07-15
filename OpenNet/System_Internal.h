@@ -37,15 +37,19 @@ public:
 
     // ===== OpenNet::System ================================================
 
-    virtual unsigned int GetSystemId() const;
+    virtual OpenNet::Status   GetConfig     (OpenNet::System::Config * aOut) const;
+    virtual OpenNet::Status   GetInfo       (OpenNet::System::Info   * aOut) const;
 
-    virtual OpenNet::Status SetPacketSize(unsigned int aSize_byte);
+    virtual OpenNet::Status SetConfig(const OpenNet::System::Config & aConfig);
 
     virtual OpenNet::Status    Adapter_Connect (OpenNet::Adapter * aAdapter);
     virtual OpenNet::Adapter * Adapter_Get     (unsigned int aIndex);
     virtual unsigned int       Adapter_GetCount() const;
 
     virtual OpenNet::Status Display(FILE * aOut);
+
+    virtual OpenNet::Kernel * Kernel_Get     (unsigned int aIndex);
+    virtual unsigned int      Kernel_GetCount() const;
 
     virtual OpenNet::Processor * Processor_Get     (unsigned int aIndex);
     virtual unsigned int         Processor_GetCount() const;
@@ -59,27 +63,45 @@ public:
 
 // internal
 
+    typedef enum
+    {
+        STATE_IDLE   ,
+        STATE_RUNNING,
+
+        STATE_QTY
+    }
+    State;
+
     void SendLoopBackPackets(Adapter_Internal * aAdapter);
 
 private:
 
+    typedef std::vector<Thread             *> ThreadVector   ;
     typedef std::vector<Processor_Internal *> ProcessorVector;
 
-    void FindAdapters        ();
-    void FindExtension       ();
-    void FindPlatform        ();
-    void FindProcessors      ();
+    void FindAdapters  ();
+    void FindPlatform  ();
+    void FindProcessors();
+
     bool IsExtensionSupported(cl_device_id aDevice);
 
-    OpenNet::Status ValidateAdapter(OpenNet::Adapter * aAdapter);
+    void SetPacketSize(unsigned int aSize_byte);
 
-    unsigned int                           mAdapterRunning    ;
-    Adapter_Vector                         mAdapters          ;
-    IoCtl_Connect_In                       mConnect           ;
-    KmsLib::DebugLog                       mDebugLog          ;
-    Processor_Internal::ExtensionFunctions mExtensionFunctions;
-    unsigned int                           mPacketSize_byte   ;
-    cl_platform_id                         mPlatform          ;
-    ProcessorVector                        mProcessors        ;
+    OpenNet::Status Adapter_Validate(OpenNet::Adapter * aAdapter);
+
+    OpenNet::Status Config_Apply   (const Config & aConfig);
+    OpenNet::Status Config_Validate(const Config & aConfig);
+
+    void Threads_Release();
+
+    Adapter_Vector   mAdapters  ;
+    Config           mConfig    ;
+    IoCtl_Connect_In mConnect   ;
+    KmsLib::DebugLog mDebugLog  ;
+    Info             mInfo      ;
+    cl_platform_id   mPlatform  ;
+    ProcessorVector  mProcessors;
+    State            mState     ;
+    ThreadVector     mThreads   ;
 
 };

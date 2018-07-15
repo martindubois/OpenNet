@@ -14,7 +14,7 @@
 
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/Adapter.h>
-#include <OpenNet/Filter_Forward.h>
+#include <OpenNet/Kernel_Forward.h>
 #include <OpenNet/System.h>
 
 // ===== OpenNet_Test =======================================================
@@ -41,8 +41,8 @@ KMS_TEST_BEGIN(Loop_SetupC)
 
     KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mFilters[0].AddDestination(lSetup.mAdapters[1]));
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mFilters[1].AddDestination(lSetup.mAdapters[0]));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mKernels[0].AddDestination(lSetup.mAdapters[1]));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mKernels[1].AddDestination(lSetup.mAdapters[0]));
 
     KMS_TEST_COMPARE(0, lSetup.Statistics_Reset());
 
@@ -63,7 +63,6 @@ KMS_TEST_BEGIN(Loop_SetupC)
     Utl_ValidateInit(&lStatsE, &lStatsM);
 
     lStatsE.mDll.mBuffer_Allocated = BUFFER_QTY;
-    lStatsE.mDll.mBuffer_Released  = BUFFER_QTY;
     lStatsE.mDll.mRun_Entry        = 1;
     lStatsE.mDll.mRun_Exit         = 1;
     lStatsE.mDll.mRun_Queue        = BUFFER_QTY;

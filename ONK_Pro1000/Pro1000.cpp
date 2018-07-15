@@ -222,7 +222,7 @@ bool Pro1000::D0_Entry()
         mBAR1->mInterruptVectorAllocationMisc.mFields.mVector32Valid = true;
         mBAR1->mInterruptVectorAllocationMisc.mFields.mVector33Valid = true;
 
-        mBAR1->mInterruptTrottle[0].mFields.mInterval_us = 175;
+        mBAR1->mInterruptTrottle[0].mFields.mInterval_us = 75;
 
         Rx_Config_Zone0();
         Tx_Config_Zone0();

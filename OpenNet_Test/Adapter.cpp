@@ -63,6 +63,27 @@ KMS_TEST_BEGIN(Adapter_Base)
 }
 KMS_TEST_END
 
+KMS_TEST_BEGIN(Adapter_Display)
+{
+    OpenNet::Adapter::Config   lC ;
+    OpenNet::Adapter::Info     lI ;
+    OpenNet::Adapter::State    lSe;
+
+    memset(&lC , 0, sizeof(lC));
+    memset(&lI , 0, sizeof(lI));
+    memset(&lSe, 0, sizeof(lSe));
+
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, OpenNet::Adapter::Display(lC , stdout));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, OpenNet::Adapter::Display(lI , stdout));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, OpenNet::Adapter::Display(lSe, stdout));
+
+    printf("QUESTION  Is the output OK? (y/n)\n");
+    char lLine[1024];
+    fgets(lLine, sizeof(lLine), stdin);
+    KMS_TEST_COMPARE(0, strncmp("y", lLine, 1));
+}
+KMS_TEST_END
+
 KMS_TEST_BEGIN(Adapter_SetupA)
 {
     SetupA lSetup(0);

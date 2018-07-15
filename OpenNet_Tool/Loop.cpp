@@ -14,6 +14,7 @@
 #include <KmsLib/Exception.h>
 
 // ===== Includes ===========================================================
+#include <OpenNet/Kernel.h>
 #include <OpenNetK/Hardware_Statistics.h>
 
 // ===== Common =============================================================
@@ -65,6 +66,22 @@ Loop::Loop(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int 
             "This test need 1 processor", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
     }
 
+    OpenNet::Processor::Config lConfig;
+
+    OpenNet::Status lStatus = mProcessor->GetConfig(&lConfig);
+    assert(OpenNet::STATUS_OK == lStatus);
+
+    lConfig.mFlags.mProfilingEnabled = true;
+
+    lStatus = mProcessor->SetConfig(lConfig);
+    assert(OpenNet::STATUS_OK == lStatus);
+
+    lStatus = mFunctions[0].SetFunctionName("Function_0");
+    assert(OpenNet::STATUS_OK == lStatus);
+
+    lStatus = mFunctions[1].SetFunctionName("Function_1");
+    assert(OpenNet::STATUS_OK == lStatus);
+
     Adapter_Connect();
     SetProcessor   ();
     AddDestination ();
@@ -79,7 +96,18 @@ Loop::~Loop()
     mSystem->Delete();
 }
 
-void Loop::Display()
+void Loop::DisplayAdapterStatistics()
+{
+    for (unsigned int i = 0; i < 2; i++)
+    {
+        assert(NULL != mAdapters[i]);
+
+        OpenNet::Status lStatus = mAdapters[i]->DisplayStatistics(mStatistics[i], sizeof(mStatistics[i]), stdout, 0);
+        assert(OpenNet::STATUS_OK == lStatus);
+    }
+}
+
+void Loop::DisplaySpeed(double aDuration_s)
 {
     assert(0 < mPacketSize_byte);
 
@@ -105,11 +133,11 @@ void Loop::Display()
         lSum_packet_s[i] = lRx_packet_s[i] + lTx_packet_s[i] ;
         lTx_byte_s   [i] = lTx_packet_s[i] * mPacketSize_byte;
 
-        lRx_byte_s   [i] /= 10.0;
-        lRx_packet_s [i] /= 10.0;
-        lSum_packet_s[i] /= 10.0;
-        lTx_byte_s   [i] /= 10.0;
-        lTx_packet_s [i] /= 10.0;
+        lRx_byte_s   [i] /= aDuration_s;
+        lRx_packet_s [i] /= aDuration_s;
+        lSum_packet_s[i] /= aDuration_s;
+        lTx_byte_s   [i] /= aDuration_s;
+        lTx_packet_s [i] /= aDuration_s;
 
         lRx_KiB_s[i] = lRx_byte_s[i] / 1024;
         lRx_MiB_s[i] = lRx_KiB_s [i] / 1024;
@@ -124,54 +152,40 @@ void Loop::Display()
     printf("\t\tAdapter 0\t\t\t\t\tAdapters 1\n");
     printf("\t\tRx\t\tTx\t\tTotal\t\tRx\t\tTx\t\tTotal\n");
     printf("Packets/s\t%f\t%f\t%f\t%f\t%f\t%f\n", lRx_packet_s[0], lTx_packet_s[0], lSum_packet_s[0], lRx_packet_s[1], lTx_packet_s[1], lSum_packet_s[1]);
-    printf("B/s\t\t%f\t%f\t%f\t%f\t%f\t%f\n"    , lRx_byte_s  [0], lTx_byte_s  [0], lSum_byte_s  [0], lRx_byte_s  [1], lTx_byte_s  [1], lSum_byte_s  [1]);
-    printf("KiB/s\t\t%f\t%f\t%f\t%f\t%f\t%f\n"  , lRx_KiB_s   [0], lTx_KiB_s   [0], lSum_KiB_s   [0], lRx_KiB_s   [1], lTx_KiB_s   [1], lSum_KiB_s   [1]);
+//    printf("B/s\t\t%f\t%f\t%f\t%f\t%f\t%f\n"    , lRx_byte_s  [0], lTx_byte_s  [0], lSum_byte_s  [0], lRx_byte_s  [1], lTx_byte_s  [1], lSum_byte_s  [1]);
+//    printf("KiB/s\t\t%f\t%f\t%f\t%f\t%f\t%f\n"  , lRx_KiB_s   [0], lTx_KiB_s   [0], lSum_KiB_s   [0], lRx_KiB_s   [1], lTx_KiB_s   [1], lSum_KiB_s   [1]);
     printf("MiB/s\t\t%f\t%f\t%f\t%f\t%f\t%f\n"  , lRx_MiB_s   [0], lTx_MiB_s   [0], lSum_MiB_s   [0], lRx_MiB_s   [1], lTx_MiB_s   [1], lSum_MiB_s   [1]);
-    printf("Rx/Tx\t\t%f %%\t\t\t\t\t%f %%\n"    , (lRx_byte_s[0] * 100.0) / lTx_byte_s[0]           , (lRx_byte_s[1] * 100.0) / lTx_byte_s[1]           );
-    printf("\t\t%f %%\t\t\t\t\t%f %%\n"         , (lRx_byte_s[0] * 100.0) / lTx_byte_s[1]           , (lRx_byte_s[1] * 100.0) / lTx_byte_s[0]           );
+//    printf("Rx/Tx\t\t%f %%\t\t\t\t\t%f %%\n"    , (lRx_byte_s[0] * 100.0) / lTx_byte_s[0]           , (lRx_byte_s[1] * 100.0) / lTx_byte_s[1]           );
+//    printf("\t\t%f %%\t\t\t\t\t%f %%\n"         , (lRx_byte_s[0] * 100.0) / lTx_byte_s[1]           , (lRx_byte_s[1] * 100.0) / lTx_byte_s[0]           );
 }
 
-// Exception  KmsLib::Exception *  CODE_ERROR
-void Loop::GetAndDisplayStatistics()
-{
-    for (unsigned int i = 0; i < 2; i++)
-    {
-        unsigned int lStats[16];
-
-        OpenNet::Status lStatus = mFilters[i].GetStatistics(lStats, sizeof(lStats), NULL, true);
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Filter::GetStatistics( , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
-
-        lStatus = mFilters[i].DisplayStatistics(lStats, sizeof(lStats), stdout, 0);
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Filter::DisplayStatistics( , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
-    }
-}
-
-// Exception  KmsLib::Exception *  CODE_ERROR
-void Loop::GetStatistics()
+void Loop::GetAdapterStatistics()
 {
     for (unsigned int i = 0; i < 2; i++)
     {
         assert(NULL != mAdapters[i]);
 
         OpenNet::Status lStatus = mAdapters[i]->GetStatistics(mStatistics[i], sizeof(mStatistics[i]), NULL, true);
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Adapter::GetStats(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
+        assert(OpenNet::STATUS_OK == lStatus);
     }
 }
 
+void Loop::GetAndDisplayKernelStatistics()
+{
+    unsigned int lStats[16];
+
+    OpenNet::Kernel * lKernel = mSystem->Kernel_Get( 0 );
+    assert(NULL != lKernel);
+
+    OpenNet::Status lStatus = lKernel->GetStatistics(lStats, sizeof(lStats), NULL, true);
+    assert(OpenNet::STATUS_OK == lStatus);
+
+    lStatus = lKernel->DisplayStatistics(lStats, sizeof(lStats), stdout, 0);
+    assert(OpenNet::STATUS_OK == lStatus);
+}
+
 // Exception  KmsLib::Exception *  CODE_ERROR
-void Loop::ResetStatistics()
+void Loop::ResetAdapterStatistics()
 {
     for (unsigned int i = 0; i < 2; i++)
     {
@@ -192,9 +206,26 @@ void Loop::SendPackets()
     assert(0 < mPacketQty      );
     assert(0 < mPacketSize_byte);
 
+    unsigned int lAdapterQty;
+
+    switch (mMode)
+    {
+    case MODE_CIRCLE_FULL  :
+    case MODE_MIRROR_DOUBLE:
+        lAdapterQty = 2;
+        break;
+
+    case MODE_CIRCLE_HALF  :
+    case MODE_MIRROR_SINGLE:
+        lAdapterQty = 1;
+        break;
+
+    default: assert(false);
+    }
+
     for (unsigned int i = 0; i < mPacketQty; i++)
     {
-        for (unsigned int j = 0; j < 2; j++)
+        for (unsigned int j = 0; j < lAdapterQty; j++)
         {
             assert(NULL != mAdapters[j]);
 
@@ -216,14 +247,20 @@ void Loop::Start()
     OpenNet::Status lStatus = mSystem->Start();
     if (OpenNet::STATUS_OK != lStatus)
     {
+        OpenNet::Kernel * lKernel = mSystem->Kernel_Get(0);
+
+        if (NULL != lKernel)
+        {
+            lKernel->Display(stdout);
+        }
+
         throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
             "System::Start(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
     }
 }
 
 // Exception  KmsLib::Exception *  CODE_ERROR
-//                                 See Loop::Buffer_Release
-//                                 See Loop::ResetInputFilter
+//                                 See Loop::ResetInputKernel
 void Loop::Stop()
 {
     assert(NULL != mSystem);
@@ -278,26 +315,37 @@ void Loop::Adapter_Get()
 // Exception  KmsLib::Exception *  CODE_ERROR
 void Loop::AddDestination()
 {
-    for (unsigned int i = 0; i < 2; i++)
-    {
-        assert(NULL != mAdapters[i]);
+    assert(NULL != mAdapters[0]);
+    assert(NULL != mAdapters[1]);
 
-        OpenNet::Status lStatus;
+    OpenNet::Status lStatus;
         
-        switch (mMode)
-        {
-        case MODE_DOUBLE_CIRCLE: lStatus = mFilters[i].AddDestination(mAdapters[(i + 1) % 2]); break;
-        case MODE_DOUBLE_MIRROR: lStatus = mFilters[i].AddDestination(mAdapters[ i         ]); break;
+    switch (mMode)
+    {
+        case MODE_CIRCLE_FULL:
+            lStatus = mFunctions[0].AddDestination(mAdapters[1]); assert(OpenNet::STATUS_OK == lStatus);
+            lStatus = mFunctions[1].AddDestination(mAdapters[0]); assert(OpenNet::STATUS_OK == lStatus);
+            break;
+
+        case MODE_CIRCLE_HALF:
+            lStatus = mFunctions[1].AddDestination(mAdapters[0]); assert(OpenNet::STATUS_OK == lStatus);
+            break;
+
+        case MODE_EXPLOSION :
+            lStatus = mFunctions[0].AddDestination(mAdapters[0]); assert(OpenNet::STATUS_OK == lStatus);
+            lStatus = mFunctions[0].AddDestination(mAdapters[1]); assert(OpenNet::STATUS_OK == lStatus);
+            lStatus = mFunctions[1].AddDestination(mAdapters[0]); assert(OpenNet::STATUS_OK == lStatus);
+            lStatus = mFunctions[1].AddDestination(mAdapters[1]); assert(OpenNet::STATUS_OK == lStatus);
+            break;
+
+        case MODE_MIRROR_DOUBLE:
+        case MODE_MIRROR_SINGLE:
+            lStatus = mFunctions[0].AddDestination(mAdapters[0]); assert(OpenNet::STATUS_OK == lStatus);
+            lStatus = mFunctions[1].AddDestination(mAdapters[1]); assert(OpenNet::STATUS_OK == lStatus);
+            break;
 
         default: assert(false);
         }
-
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Filter::AddDestination(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
-    }
 }
 
 // Exception  KmsLib::Exception *  CODE_ERROR
@@ -311,7 +359,7 @@ void Loop::ResetInputFilter()
         if (OpenNet::STATUS_OK != lStatus)
         {
             throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Adapter::ResetInputFilter(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+                "Adapter::ResetInputKernel(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
         }
     }
 }
@@ -354,14 +402,7 @@ void Loop::SetInputFilter()
     {
         assert(NULL != mAdapters[i]);
 
-        OpenNet::Status lStatus = mFilters[i].EnableProfiling();
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Filter::EnableProfiling() failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
-
-        lStatus = mAdapters[i]->SetInputFilter(mFilters + i);
+        OpenNet::Status lStatus = mAdapters[i]->SetInputFilter(mFunctions + i);
         if (OpenNet::STATUS_OK != lStatus)
         {
             throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,

@@ -90,7 +90,7 @@ int SetupC::Start()
     {
         assert(NULL != mAdapters[i]);
 
-        if (OpenNet::STATUS_OK != mAdapters[i]->SetInputFilter(mFilters + i)) { return __LINE__; }
+        if (OpenNet::STATUS_OK != mAdapters[i]->SetInputFilter(mKernels + i)) { return __LINE__; }
     }
 
     if (OpenNet::STATUS_OK != mSystem->Start()) { return __LINE__; }

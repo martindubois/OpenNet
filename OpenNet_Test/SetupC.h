@@ -13,7 +13,7 @@
 
 // ===== Includes ===========================================================
 #include <OpenNet/Adapter.h>
-#include <OpenNet/Filter_Forward.h>
+#include <OpenNet/Kernel_Forward.h>
 #include <OpenNet/System.h>
 
 // ===== OpenNet_Test =======================================================
@@ -44,7 +44,7 @@ public:
 
     OpenNet::Adapter      * mAdapters[2];
     unsigned int            mBufferQty  ;
-    OpenNet::Filter_Forward mFilters [2];
+    OpenNet::Kernel_Forward mKernels [2];
     OpenNet::Processor    * mProcessor  ;
 
     unsigned int mStatistics[2][STATISTICS_QTY];
