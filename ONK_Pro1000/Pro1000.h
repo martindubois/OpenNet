@@ -38,7 +38,7 @@ public:
     virtual void         Interrupt_Process2();
     virtual void         Packet_Receive    (uint64_t aLogicalAddres, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
     virtual void         Packet_Send       (uint64_t aData, unsigned int aSize_byte, volatile long * aCounter);
-    virtual void         Packet_Send       (const void * aPacket, unsigned int aSize_byte);
+    virtual void         Packet_Send       (const void * aPacket, unsigned int aSize_byte, volatile long * aCounter, unsigned int aRepeatCount);
     virtual unsigned int Statistics_Get    (uint32_t * aOut, unsigned int aOutSize_byte, bool aReset);
     virtual void         Statistics_Reset  ();
 
@@ -46,9 +46,9 @@ private:
 
     enum
     {
-        PACKET_BUFFER_QTY =   32,
-        RX_DESCRIPTOR_QTY = 1024,
-        TX_DESCRIPTOR_QTY = 1024,
+        PACKET_BUFFER_QTY =        32,
+        RX_DESCRIPTOR_QTY = 32 * 1024,
+        TX_DESCRIPTOR_QTY = 32 * 1024,
     };
 
     void Interrupt_Disable_Zone0();

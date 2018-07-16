@@ -114,6 +114,7 @@ namespace OpenNetK
         int IoCtl_Connect         (const void           * aIn );
         int IoCtl_Info_Get        (      Adapter_Info   * aOut) const;
         int IoCtl_Packet_Send     (const void           * aIn , unsigned int aInSize_byte );
+        int IoCtl_Packet_Send_Ex  (const void           * aIn , unsigned int aInSize_byte );
         int IoCtl_Start           (const Buffer         * aIn , unsigned int aInSize_byte );
         int IoCtl_State_Get       (      Adapter_State  * aOut);
         int IoCtl_Statistics_Get  (const void           * aIn , uint32_t * aOut, unsigned int aOutSize_byte) const;
@@ -125,6 +126,8 @@ namespace OpenNetK
         KEVENT     * mEvent    ;
         Hardware   * mHardware ;
         unsigned int mSystemId ;
+
+        volatile long mPacketSend_Pending;
 
         mutable uint32_t mStatistics[32];
 

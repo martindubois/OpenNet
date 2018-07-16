@@ -87,7 +87,7 @@ TestDual::TestDual(unsigned int aBufferQty0, unsigned int aBufferQty1)
 
 TestDual::~TestDual()
 {
-    assert(NULL != mPacketGeneator);
+    assert(NULL != mPacketGenerator);
     assert(NULL != mSystem        );
 
     mPacketGenerator->Delete();
@@ -107,7 +107,7 @@ void TestDual::DisplayAdapterStatistics()
 
 void TestDual::DisplaySpeed(double aDuration_s)
 {
-    assert(0 < mPacketSize_byte);
+    assert(0 < mPacketGenerator_Config.mPacketSize_byte);
 
     double lRx_byte_s   [2];
     double lRx_KiB_s    [2];
@@ -223,7 +223,7 @@ void TestDual::Start()
     }
 
     lStatus = mPacketGenerator->Start();
-    assert(OpenNet::STATUS_OK = lStatus);
+    assert(OpenNet::STATUS_OK == lStatus);
 }
 
 // Exception  KmsLib::Exception *  See Loop::ResetInputKernel

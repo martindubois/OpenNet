@@ -17,6 +17,9 @@
 // ===== Includes ===========================================================
 #include <OpenNet/PacketGenerator.h>
 
+// ===== OpenNet ============================================================
+#include "Adapter_Internal.h"
+
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
@@ -61,7 +64,7 @@ private:
     OpenNet::Status Config_Apply   (const Config & aConfig);
     OpenNet::Status Config_Validate(const Config & aConfig);
 
-    OpenNet::Adapter * mAdapter ;
+    Adapter_Internal * mAdapter ;
     Config             mConfig  ;
     KmsLib::DebugLog   mDebugLog;
     State              mState   ;

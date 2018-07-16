@@ -9,10 +9,6 @@
 // TODO  Common.IoCtl
 //       Retirer le IOCTL_STATISTICS_RESET
 
-// TODO  Common.IoCtl
-//       Ajouter IOCTL_PACKET_SEND avec arguments (Remplacement de source,
-//       repetition...)
-
 #pragma once
 
 // Constants
@@ -38,6 +34,11 @@
 // Input   The paquet
 // Output  None
 #define IOCTL_PACKET_SEND       CTL_CODE( 0x8000, 0x830, METHOD_BUFFERED, FILE_ANY_ACCESS )
+
+// Input   IoCtl_Packet_Send_Ex_In
+//         The packet
+// Output  None
+#define IOCTL_PACKET_SEND_EX    CTL_CODE( 0x8000, 0x831, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 // Input   OpenNetK::Buffer[ 1 .. N ]
 // Output  None
@@ -71,6 +72,20 @@ typedef struct
     uint8_t  mReserved0[44];
 }
 IoCtl_Connect_In;
+
+typedef struct
+{
+    struct
+    {
+        unsigned mReserved0 : 32;
+    }
+    mFlags;
+
+    uint32_t mRepeatCount;
+
+    uint8_t mReserved0[24];
+}
+IoCtl_Packet_Send_Ex_In;
 
 typedef struct
 {

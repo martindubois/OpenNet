@@ -57,6 +57,8 @@ public:
 
     void Connect(IoCtl_Connect_In * aConnect);
 
+    void Packet_Send_Ex(const IoCtl_Packet_Send_Ex_In * aIn, unsigned int aInSize_byte);
+
     void SendLoopBackPackets();
 
     void Start();

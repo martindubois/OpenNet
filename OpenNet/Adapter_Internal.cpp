@@ -228,6 +228,15 @@ void Adapter_Internal::Connect(IoCtl_Connect_In * aConnect)
     }
 }
 
+void Adapter_Internal::Packet_Send_Ex(const IoCtl_Packet_Send_Ex_In * aIn, unsigned int aInSize_byte)
+{
+    assert(NULL                            != aIn         );
+    assert(sizeof(IoCtl_Packet_Send_Ex_In) <= aInSize_byte);
+
+    unsigned int lRet = mHandle->Control(IOCTL_PACKET_SEND_EX, aIn, aInSize_byte, NULL, 0);
+    assert(0 == lRet);
+}
+
 // Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
 // Threads    Apps
 void Adapter_Internal::SendLoopBackPackets()

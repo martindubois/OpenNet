@@ -82,6 +82,7 @@ namespace OpenNetK
         case IOCTL_CONNECT         : lInfo->mIn_MinSize_byte = sizeof(IoCtl_Connect_In  );                                                    break;
         case IOCTL_INFO_GET        :                                                       lInfo->mOut_MinSize_byte = sizeof(Adapter_Info  ); break;
         case IOCTL_PACKET_SEND     :                                                                                                          break;
+        case IOCTL_PACKET_SEND_EX  : lInfo->mIn_MinSize_byte = sizeof(IoCtl_Packet_Send_Ex_In);                                               break;
         case IOCTL_START           : lInfo->mIn_MinSize_byte = sizeof(Buffer            );                                                    break;
         case IOCTL_STATE_GET       :                                                       lInfo->mOut_MinSize_byte = sizeof(Adapter_State ); break;
         case IOCTL_STATISTICS_GET  : lInfo->mIn_MinSize_byte = sizeof(IoCtl_Stats_Get_In);                                                    break;
@@ -252,6 +253,7 @@ namespace OpenNetK
         case IOCTL_CONNECT         : lResult = IoCtl_Connect         (                                         aIn  ); break;
         case IOCTL_INFO_GET        : lResult = IoCtl_Info_Get        (reinterpret_cast<      Adapter_Info   *>(aOut)); break;
         case IOCTL_PACKET_SEND     : lResult = IoCtl_Packet_Send     (                                         aIn  , aInSize_byte ); break;
+        case IOCTL_PACKET_SEND_EX  : lResult = IoCtl_Packet_Send_Ex  (                                         aIn  , aInSize_byte ); break;
         case IOCTL_START           : lResult = IoCtl_Start           (reinterpret_cast<const Buffer         *>(aIn ), aInSize_byte ); break;
         case IOCTL_STATE_GET       : lResult = IoCtl_State_Get       (reinterpret_cast<      Adapter_State  *>(aOut)); break;
         case IOCTL_STATISTICS_GET  : lResult = IoCtl_Statistics_Get  (                                         aIn  , reinterpret_cast<uint32_t *>(aOut), aOutSize_byte); break;
@@ -632,9 +634,29 @@ namespace OpenNetK
     {
         ASSERT(NULL != mHardware);
 
-        mHardware->Packet_Send(aIn, aInSize_byte);
+        mHardware->Packet_Send(aIn, aInSize_byte, &mPacketSend_Pending);
 
         mStatistics[ADAPTER_STATS_IOCTL_PACKET_SEND] ++;
+
+        return IOCTL_RESULT_OK;
+    }
+
+    int Adapter::IoCtl_Packet_Send_Ex(const void * aIn, unsigned int aInSize_byte)
+    {
+        ASSERT(NULL                            != aIn         );
+        ASSERT(sizeof(IoCtl_Packet_Send_Ex_In) <= aInSize_byte);
+
+        const IoCtl_Packet_Send_Ex_In * lIn = reinterpret_cast<const IoCtl_Packet_Send_Ex_In *>(aIn);
+
+        if (   (               0 >= lIn->mRepeatCount )
+            || (REPEAT_COUNT_MAX <  lIn->mRepeatCount ) )
+        {
+            return IOCTL_RESULT_INVALID_PARAMETER;
+        }
+
+        mHardware->Packet_Send(lIn + 1, aInSize_byte - sizeof(IoCtl_Packet_Send_Ex_In), &mPacketSend_Pending, lIn->mRepeatCount);
+
+        mStatistics[ADAPTER_STATS_IOCTL_PACKET_SEND] += lIn->mRepeatCount;
 
         return IOCTL_RESULT_OK;
     }

@@ -122,11 +122,17 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, void * aVirtual)
         uint64_t  lLogical = aLogical;
         uint8_t * lVirtual = reinterpret_cast<uint8_t *>(aVirtual);
 
-        SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY, &mRx_Logical, reinterpret_cast<uint8_t **>(&mRx_Virtual));
-        SkipDangerousBoundary(&lLogical, &lVirtual, sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY, &mTx_Logical, reinterpret_cast<uint8_t **>(&mTx_Virtual));
+        mRx_Logical = lLogical;
+        mRx_Virtual = reinterpret_cast<Pro1000_Rx_Descriptor *>(lVirtual);
 
-        ASSERT(NULL != mRx_Virtual);
-        ASSERT(NULL != mTx_Virtual);
+        lLogical += sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY;
+        lVirtual += sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY;
+
+        mTx_Logical = lLogical;
+        mTx_Virtual = reinterpret_cast<Pro1000_Tx_Descriptor *>(lVirtual);
+
+        lLogical += sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY;
+        lVirtual += sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY;
 
         unsigned int i;
 
@@ -376,9 +382,9 @@ void Pro1000::Packet_Send(uint64_t aData, unsigned int aSize_byte, volatile long
     mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] ++;
 }
 
-void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
+void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, volatile long * aCounter, unsigned int aRepeatCount)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes )" DEBUG_EOL, aSize_byte);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes, ,  )" DEBUG_EOL, aSize_byte);
 
     ASSERT(NULL != mZone0);
 
@@ -397,7 +403,10 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte)
 
     mZone0->Unlock();
 
-    Packet_Send(lPacket_PA, aSize_byte, NULL);
+    for (unsigned int i = 0; i < aRepeatCount; i++)
+    {
+        Packet_Send(lPacket_PA, aSize_byte, aCounter);
+    }
 }
 
 unsigned int Pro1000::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)

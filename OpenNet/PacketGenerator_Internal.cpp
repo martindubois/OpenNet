@@ -21,6 +21,7 @@
 #include "../Common/Constants.h"
 
 // ===== OpenNet ============================================================
+#include "Adapter_Internal.h"
 #include "PacketGenerator_Internal.h"
 
 // Constants
@@ -40,6 +41,8 @@ static const char * STATE_NAMES[] =
 
 // Static function declaration
 /////////////////////////////////////////////////////////////////////////////
+
+static unsigned int ComputeRepeatCount(unsigned int aBandwidth_MiB_s, unsigned int aPacketSize_byte);
 
 // ===== Entry point ========================================================
 static DWORD WINAPI Run(LPVOID aParameter);
@@ -105,7 +108,12 @@ OpenNet::Status PacketGenerator_Internal::SetAdapter(OpenNet::Adapter * aAdapter
         return OpenNet::STATUS_ADAPTER_ALREADY_SET;
     }
 
-    mAdapter = aAdapter;
+    mAdapter = dynamic_cast<Adapter_Internal *>( aAdapter );
+    if (NULL == mAdapter)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_INVALID_ADAPTER;
+    }
 
     return OpenNet::STATUS_OK;
 }
@@ -296,33 +304,29 @@ unsigned int PacketGenerator_Internal::Run()
 
     mStatistics[OpenNet::PACKET_GENERATOR_STATS_RUN_ENTRY] ++;
 
-    double lTemp = mConfig.mBandwidth_MiB_s;
+    unsigned char lBuffer[sizeof(IoCtl_Packet_Send_Ex_In) + PACKET_SIZE_MAX_byte];
 
-    lTemp *=                   1024.0; // KiB / s
-    lTemp *=                   1024.0; // byte / s
-    lTemp /= mConfig.mPacketSize_byte; // packet / s
-    lTemp /=                   1000.0; // packet / ms
-    lTemp *=                     15.6; // packet / cycle
+    memset(&lBuffer, 0, sizeof(lBuffer));
 
-    unsigned int lPacketQty = static_cast<unsigned int>(lTemp + 0.5);
-    if (0 >= lPacketQty)
-    {
-        lPacketQty = 1;
-    }
+    IoCtl_Packet_Send_Ex_In * lIn = reinterpret_cast<IoCtl_Packet_Send_Ex_In *>(lBuffer);
+
+    memcpy(lIn + 1, PACKET, mConfig.mPacketSize_byte);
+
+    lIn->mRepeatCount = ComputeRepeatCount(mConfig.mBandwidth_MiB_s, mConfig.mPacketSize_byte);
 
     while (STATE_RUNNING == mState)
     {
         Sleep(10);
 
-        for (unsigned int i = 0; i < lPacketQty; i++)
-        {
-            mStatistics[OpenNet::PACKET_GENERATOR_STATS_SEND_packet] ++;
+        mStatistics[OpenNet::PACKET_GENERATOR_STATS_SEND_packet] += lIn->mRepeatCount;
 
-            OpenNet::Status lStatus = mAdapter->Packet_Send(PACKET, mConfig.mPacketSize_byte);
-            if (OpenNet::STATUS_OK != lStatus)
-            {
-                mStatistics[OpenNet::PACKET_GENERATOR_STATS_SEND_ERROR] ++;
-            }
+        try
+        {
+            mAdapter->Packet_Send_Ex(lIn, sizeof(IoCtl_Packet_Send_Ex_In) + mConfig.mPacketSize_byte);
+        }
+        catch ( ... )
+        {
+            mStatistics[OpenNet::PACKET_GENERATOR_STATS_SEND_ERROR] ++;
         }
 
         mStatistics[OpenNet::PACKET_GENERATOR_STATS_SEND_cycle] ++;
@@ -373,6 +377,30 @@ OpenNet::Status PacketGenerator_Internal::Config_Validate(const Config & aConfig
 
 // Static function declaration
 /////////////////////////////////////////////////////////////////////////////
+
+unsigned int ComputeRepeatCount(unsigned int aBandwidth_MiB_s, unsigned int aPacketSize_byte)
+{
+    assert(                   0 <  aBandwidth_MiB_s);
+    assert(                   0 <  aPacketSize_byte);
+    assert(PACKET_SIZE_MAX_byte >= aPacketSize_byte);
+
+    double lTemp = aBandwidth_MiB_s;
+
+    lTemp *=           1024.0; // KiB / s
+    lTemp *=           1024.0; // byte / s
+    lTemp /= aPacketSize_byte; // packet / s
+    lTemp /=           1000.0; // packet / ms
+    lTemp *=             15.6; // packet / cycle
+
+    unsigned int lResult = static_cast<unsigned int>(lTemp + 0.5);
+
+    if (0 >= lResult)
+    {
+        lResult = 1;
+    }
+
+    return lResult;
+}
 
 // ===== Entry point ========================================================
 DWORD WINAPI Run(LPVOID aParameter)

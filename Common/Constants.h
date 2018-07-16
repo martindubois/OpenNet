@@ -19,3 +19,6 @@
 // ===== Packet size ========================================================
 #define PACKET_SIZE_MAX_byte (16384)
 #define PACKET_SIZE_MIN_byte ( 1536)
+
+// ===== Repeat count =======================================================
+#define REPEAT_COUNT_MAX (1024)

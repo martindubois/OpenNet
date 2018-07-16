@@ -233,16 +233,20 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Add the packet to the send queue.
-        /// \param  aPacket [---;R--] The packet
-        /// \param  aSize_byte        The packet size
+        /// \param  aPacket  [---;R--] The packet
+        /// \param  aSize_byte         The packet size
+        /// \param  aCounter [-K-;RW-]
+        /// \param  aRepeatCount
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le paquet a la queue de transmission
-        /// \param  aPacket [---;R--] Le paquet
-        /// \param  aSize_byte        La taille du paquet
+        /// \param  aPacket  [---;R--] Le paquet
+        /// \param  aSize_byte         La taille du paquet
+        /// \param  aCounter [-K-;RW-]
+        /// \param  aRepeatCount
         /// \endcond
         /// \note   Thread = Queue
-        virtual void Packet_Send(const void * aPacket, unsigned int aSize_byte) = 0;
+        virtual void Packet_Send(const void * aPacket, unsigned int aSize_byte, volatile long * aCounter, unsigned int aRepeatCount = 1) = 0;
 
         /// \cond en
         /// \brief  Retrieve statistics
