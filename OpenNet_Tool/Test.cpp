@@ -13,89 +13,80 @@
 // ===== Windows ============================================================
 #include <Windows.h>
 
+// ===== Includes ===========================================================
+#include <OpenNet/PacketGenerator.h>
+
 // ===== OpenNet_Tool =======================================================
-#include "Loop.h"
-#include "PacketSender.h"
+#include "TestDual.h"
 
 #include "Test.h"
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
-// aSystem [---;RW-]
+//     Internel   Ethernet   Internal
 //
-// Exception  KmsLib::Exception *  CODE_ERROR
-//                                 CODE_NOT_FOUND
-//                                 See Loop::Display
-//                                 See Loop::GetAndDisplayAdapterStatistics
-//                                 See Loop::GetAndDisplayKernelStatistics
-//                                 See Loop::ResetAdapterStatistics
-//                                 See Loop::SendPacket
-//                                 See Loop::Start
-//                                 See Loop::Stop
-void Test_Loop(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int aPacketQty)
+// Dropped <--- 0 <------- 1 <--- Generator
+//
+void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int aBandwidth_MiB_s)
 {
     assert(0 < aBufferQty      );
     assert(0 < aPacketSize_byte);
-    assert(0 < aPacketQty      );
+    assert(0 < aBandwidth_MiB_s);
 
-    Loop lLoop(aBufferQty, aPacketSize_byte, aPacketQty, Loop::MODE_CIRCLE_HALF);
+    TestDual lTD(aBufferQty, aBufferQty);
 
-    lLoop.Start();
+    lTD.mPacketGenerator_Config.mBandwidth_MiB_s = aBandwidth_MiB_s;
+    lTD.mPacketGenerator_Config.mPacketSize_byte = aPacketSize_byte;
 
-    Sleep(2000);
+    OpenNet::Status lStatus = lTD.mPacketGenerator->SetAdapter(lTD.mAdapters[1]);
+    assert(OpenNet::STATUS_OK == lStatus);
 
-    lLoop.SendPackets();
+    lTD.Start();
 
-    Sleep(2000);
-
-    lLoop.ResetAdapterStatistics();
+    lTD.ResetAdapterStatistics();
 
     Sleep(10000);
 
-    lLoop.GetAndDisplayKernelStatistics();
-    lLoop.GetAdapterStatistics         ();
-    lLoop.DisplayAdapterStatistics     ();
-    lLoop.DisplaySpeed                 (10.0);
+    lTD.GetAdapterStatistics    ();
+    lTD.DisplayAdapterStatistics();
+    lTD.DisplaySpeed            (10.0);
 
-    lLoop.Stop();
+    lTD.Stop();
 }
 
-void Test_Ramp(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int aPacketQty)
+// Internal   Ethernet   Internal
+//
+//     +---   <-------   <--- Generator
+//     |    0          1
+//     +-->   ------->   ---> Dropped
+void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int aBandwidth_MiB_s)
 {
     assert(0 < aBufferQty);
     assert(0 < aPacketSize_byte);
-    assert(0 < aPacketQty);
+    assert(0 < aBandwidth_MiB_s);
 
-    Loop         lLoop(aBufferQty, aPacketSize_byte, 1, Loop::MODE_CIRCLE_FULL);
-    PacketSender lPacketSender0(lLoop.mAdapters[0], aPacketSize_byte, aPacketQty);
-    PacketSender lPacketSender1(lLoop.mAdapters[1], aPacketSize_byte, aPacketQty);
+    TestDual lTD(aBufferQty, 2);
 
-    lLoop         .Start();
-    lPacketSender0.Start();
-    lPacketSender1.Start();
+    lTD.mPacketGenerator_Config.mBandwidth_MiB_s = aBandwidth_MiB_s;
+    lTD.mPacketGenerator_Config.mPacketSize_byte = aPacketSize_byte;
 
-    lLoop.ResetAdapterStatistics();
+    OpenNet::Status lStatus = lTD.mPacketGenerator->SetAdapter(lTD.mAdapters[1]);
+    assert(OpenNet::STATUS_OK == lStatus);
 
-    for (unsigned int i = 0; i < 15; i++)
-    {
-        Sleep(1000);
+    lStatus = lTD.mFunctions[0].AddDestination(lTD.mAdapters[0]);
+    assert(OpenNet::STATUS_OK == lStatus);
 
-        lLoop.GetAdapterStatistics    ();
-        lLoop.DisplaySpeed            (1.0);
-    }
+    lTD.Start();
 
-    printf("\nPacketSender Stopped!\n\n");
-    lPacketSender0.Stop();
-    lPacketSender1.Stop();
+    lTD.ResetAdapterStatistics();
 
-    for (unsigned int i = 0; i < 10; i++)
-    {
-        Sleep(1000);
+    Sleep(10000);
 
-        lLoop.GetAdapterStatistics    ();
-        lLoop.DisplaySpeed            (1.0);
-    }
+    lTD.GetAdapterStatistics();
+    lTD.DisplayAdapterStatistics();
+    lTD.DisplaySpeed(10.0);
 
-    lLoop.Stop();
+    lTD.Stop();
 }
+

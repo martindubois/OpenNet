@@ -92,6 +92,12 @@
     <ClCompile Include="SourceCode_Forward.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PacketGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketGenerator_Internal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="System_Internal.h">
@@ -128,6 +134,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SourceCode_Forward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketGenerator_Internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

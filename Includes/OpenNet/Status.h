@@ -32,6 +32,7 @@ namespace OpenNet
         STATUS_OK = 0,
 
         STATUS_ADAPTER_ALREADY_CONNECTED ,
+        STATUS_ADAPTER_ALREADY_SET       ,
         STATUS_ADAPTER_NOT_CONNECTED     ,
         STATUS_ADAPTER_RUNNING           ,
         STATUS_BUFFER_ALLOCATED          , // Not used
@@ -39,8 +40,8 @@ namespace OpenNet
         STATUS_CANNOT_OPEN_INPUT_FILE    ,
         STATUS_CANNOT_READ_INPUT_FILE    ,
         STATUS_CODE_ALREADY_SET          ,
-        STATUS_CODE_NOT_SET              ,
-        STATUS_CORRUPTED_DRIVER_DATA     , // 10
+        STATUS_CODE_NOT_SET              , // 10
+        STATUS_CORRUPTED_DRIVER_DATA     ,
         STATUS_DESTINATION_ALREADY_SET   ,
         STATUS_DESTINATION_NOT_SET       ,
         STATUS_EMPTY_CODE                ,
@@ -49,34 +50,41 @@ namespace OpenNet
         STATUS_ERROR_READING_INPUT_FILE  ,
         STATUS_EXCEPTION                 ,
         STATUS_FILTER_ALREADY_SET        ,
-        STATUS_FILTER_NOT_SET            ,
-        STATUS_FILTER_SET                , // 20
+        STATUS_FILTER_NOT_SET            , // 20
+        STATUS_FILTER_SET                ,
         STATUS_INPUT_FILE_TOO_LARGE      ,
         STATUS_INTERNAL_ERROR            ,
         STATUS_INVALID_ADAPTER           ,
+        STATUS_INVALID_BANDWIDTH         ,
         STATUS_INVALID_BUFFER_COUNT      ,
         STATUS_INVALID_MODE              ,
         STATUS_INVALID_PACKET_SIZE       ,
         STATUS_INVALID_PROCESSOR         ,
-        STATUS_INVALID_REFERENCE         ,
+        STATUS_INVALID_REFERENCE         , // 30
         STATUS_IOCTL_ERROR               ,
-        STATUS_NAME_TOO_LONG             , // 30
+        STATUS_NAME_TOO_LONG             ,
         STATUS_NAME_TOO_SHORT            ,
         STATUS_NO_ADAPTER_CONNECTED      ,
         STATUS_NO_BUFFER                 ,
         STATUS_NO_DESTINATION_SET        ,
         STATUS_NOT_ALLOWED_NULL_ARGUMENT ,
         STATUS_OPEN_CL_ERROR             ,
+        STATUS_PACKET_GENERATOR_RUNNING  ,
+        STATUS_PACKET_GENERATOR_STOPPED  , // 40
         STATUS_PACKET_TOO_LARGE          ,
         STATUS_PACKET_TOO_SMALL          ,
         STATUS_PROCESSOR_ALREADY_SET     ,
-        STATUS_PROCESSOR_NOT_SET         , // 40
+        STATUS_PROCESSOR_NOT_SET         ,
         STATUS_PROFILING_ALREADY_DISABLED,
         STATUS_PROFILING_ALREADY_ENABLED ,
         STATUS_SAME_VALUE                ,
         STATUS_SYSTEM_ALREADY_STARTED    ,
         STATUS_SYSTEM_RUNNING            ,
-        STATUS_SYSTEM_NOT_STARTED        ,
+        STATUS_SYSTEM_NOT_STARTED        , // 50
+        STATUS_THREAD_CREATE_ERROR       ,
+        STATUS_THREAD_CLOSE_ERROR        ,
+        STATUS_THREAD_STOP_TIMEOUT       ,
+        STATUS_THREAD_TERMINATE_ERROR    ,
         STATUS_TOO_MANY_BUFFER           ,
 
         STATUS_QTY

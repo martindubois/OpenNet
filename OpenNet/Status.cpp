@@ -27,6 +27,7 @@ static const StatusInfo STATUS_INFO[] =
     { "OK", "Success" },
 
     { "ADAPTER_ALREADY_CONNECTED" , "The adapter is already connected"  },
+    { "ADAPTER_ALREADY_SET"       , "The adapter is already set"        },
     { "ADAPTER_NOT_CONNECTED"     , "The adapter is not connected"      },
     { "ADAPTER_RUNNING"           , "The adapter is running"            },
     { "BUFFER_ALLOCATED"          , "At least one buffer is allocated"  },
@@ -49,6 +50,7 @@ static const StatusInfo STATUS_INFO[] =
     { "INPUT_FILE_TOO_LARGE"      , "The input file is too large"       },
     { "INTERNAL_ERROR"            , "Internal error"                    },
     { "INVALID_ADAPTER"           , "Invalid adapter"                   },
+    { "INVALID_BANDWIDTH"         , "Invalid bandwidth"                 },
     { "INVALID_BUFFER_COUNT"      , "Invalid buffer count"              },
     { "INVALID_MODE"              , "Invalid mode"                      },
     { "INVALID_PACKET_SIZE"       , "Invalid packet size"               },
@@ -62,6 +64,8 @@ static const StatusInfo STATUS_INFO[] =
     { "NO_DESTINATION_SET"        , "No destination set"                },
     { "NOT_ALLOWED_NULL_ARGUMENT" , "Not allowed NULL argument"         },
     { "OPEN_CL_ERROR"             , "OpenCL error"                      },
+    { "PACKET_GENERATOR_RUNNING"  , "The packet generator is running"   },
+    { "PACKET_GENERATOR_STOPPED"  , "The packet generator is stopped"   },
     { "PACKET_TOO_LARGE"          , "The packet is too large"           },
     { "PACKET_TOO_SMALL"          , "The packet is too small"           },
     { "PROCESSOR_ALREADY_SET"     , "The processor is already set"      },
@@ -72,6 +76,10 @@ static const StatusInfo STATUS_INFO[] =
     { "SYSTEM_ALREADY_STARTED"    , "The system is already started"     },
     { "SYSTEM_RUNNING"            , "The system is running"             },
     { "SYSTEM_NOT_STARTED"        , "The system is not started"         },
+    { "THREAD_CREATE_ERROR"       , "The thread creation reported and error"   },
+    { "THREAD_CLOSE_ERROR"        , "The thread closure reported and error"    },
+    { "THREAD_STOP_TIMEOUT"       , "The thread did not stop in allowed time"  },
+    { "THREAD_TERMINATE_ERROR"    , "The thread termination reported an error" },
     { "TOO_MANY_BUFFER"           , "Too many buffer allocated"         },
 };
 

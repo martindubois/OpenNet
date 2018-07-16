@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{6D01
 		Includes\OpenNet\Kernel.h = Includes\OpenNet\Kernel.h
 		Includes\OpenNet\Kernel_Forward.h = Includes\OpenNet\Kernel_Forward.h
 		Includes\OpenNet\OpenNet.h = Includes\OpenNet\OpenNet.h
+		Includes\OpenNet\PacketGenerator.h = Includes\OpenNet\PacketGenerator.h
 		Includes\OpenNet\Processor.h = Includes\OpenNet\Processor.h
 		Includes\OpenNet\SourceCode.h = Includes\OpenNet\SourceCode.h
 		Includes\OpenNet\StatisticsProvider.h = Includes\OpenNet\StatisticsProvider.h
@@ -101,6 +102,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{B467
 		Common\OpenNet\Adapter_Statistics.h = Common\OpenNet\Adapter_Statistics.h
 		Common\OpenNet\EthernetAddress.h = Common\OpenNet\EthernetAddress.h
 		Common\OpenNet\Kernel_Statistics.h = Common\OpenNet\Kernel_Statistics.h
+		Common\OpenNet\PacketGenerator_Statistics.h = Common\OpenNet\PacketGenerator_Statistics.h
 		Common\OpenNet\Processor_Statistics.h = Common\OpenNet\Processor_Statistics.h
 		Common\OpenNet\System_Statistics.h = Common\OpenNet\System_Statistics.h
 	EndProjectSection

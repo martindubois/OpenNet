@@ -112,13 +112,13 @@ static const KmsLib::ToolBase::CommandInfo PROCESSOR_COMMANDS[] =
 	{ NULL, NULL, NULL, NULL }
 };
 
-static void Test_Loop(KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Test_Ramp(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_A(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg);
 
 static const KmsLib::ToolBase::CommandInfo TEST_COMMANDS[] =
 {
-	{ "Loop", Test_Loop, "Loop {BQ} {PS} {PQ}", NULL },
-    { "Ramp", Test_Ramp, "Ramp {BQ} {PS} {PQ}", NULL },
+	{ "A", Test_A, "Loop {BQ} {PS_byte} {BW_MiB}", NULL },
+    { "B", Test_B, "Loop {BQ} {PS_byte} {BW_MiB}", NULL },
 
 	{ NULL, NULL, NULL, NULL }
 };
@@ -883,17 +883,17 @@ void Processor_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
 	}
 }
 
-void Test_Loop(KmsLib::ToolBase * aToolBase, const char * aArg)
+void Test_A(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Test Loop %s\n", aArg);
+    printf("Test A %s\n", aArg);
 
     unsigned int lBufferQty      ;
     unsigned int lPacketSize_byte;
-    unsigned int lPacketQty      ;
+    unsigned int lBandwidth_MiB  ;
 
-    switch (sscanf_s(aArg, "%u %u %u", &lBufferQty, &lPacketSize_byte, &lPacketQty))
+    switch (sscanf_s(aArg, "%u %u %u", &lBufferQty, &lPacketSize_byte, &lBandwidth_MiB))
     {
     case EOF:
         lBufferQty = 1;
@@ -904,11 +904,11 @@ void Test_Loop(KmsLib::ToolBase * aToolBase, const char * aArg)
         // no break;
 
     case 2:
-        lPacketQty = 128;
+        lBandwidth_MiB = 50;
         // No break
 
     case 3:
-        printf("Test Loop %u %u %u\n", lBufferQty, lPacketSize_byte, lPacketQty);
+        printf("Test A %u %u %u\n", lBufferQty, lPacketSize_byte, lBandwidth_MiB);
 
         if (0 >= lBufferQty)
         {
@@ -916,15 +916,15 @@ void Test_Loop(KmsLib::ToolBase * aToolBase, const char * aArg)
             return;
         }
 
-        if (0 >= lPacketQty)
+        if (0 >= lBandwidth_MiB)
         {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid packet quantity");
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid bandwidth");
             return;
         }
 
         try
         {
-            Test_Loop(lBufferQty, lPacketSize_byte, lPacketQty);
+            Test_A(lBufferQty, lPacketSize_byte, lBandwidth_MiB);
         }
         catch (KmsLib::Exception * eE)
         {
@@ -937,17 +937,17 @@ void Test_Loop(KmsLib::ToolBase * aToolBase, const char * aArg)
     }
 }
 
-void Test_Ramp(KmsLib::ToolBase * aToolBase, const char * aArg)
+void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Test Loop %s\n", aArg);
+    printf("Test A %s\n", aArg);
 
     unsigned int lBufferQty      ;
     unsigned int lPacketSize_byte;
-    unsigned int lPacketQty      ;
+    unsigned int lBandwidth_MiB  ;
 
-    switch (sscanf_s(aArg, "%u %u %u", &lBufferQty, &lPacketSize_byte, &lPacketQty))
+    switch (sscanf_s(aArg, "%u %u %u", &lBufferQty, &lPacketSize_byte, &lBandwidth_MiB))
     {
     case EOF:
         lBufferQty = 1;
@@ -958,11 +958,11 @@ void Test_Ramp(KmsLib::ToolBase * aToolBase, const char * aArg)
         // no break;
 
     case 2:
-        lPacketQty = 10;
+        lBandwidth_MiB = 50;
         // No break
 
     case 3:
-        printf("Test Loop %u %u %u\n", lBufferQty, lPacketSize_byte, lPacketQty);
+        printf("Test A %u %u %u\n", lBufferQty, lPacketSize_byte, lBandwidth_MiB);
 
         if (0 >= lBufferQty)
         {
@@ -970,15 +970,15 @@ void Test_Ramp(KmsLib::ToolBase * aToolBase, const char * aArg)
             return;
         }
 
-        if (0 >= lPacketQty)
+        if (0 >= lBandwidth_MiB)
         {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid packet quantity");
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid bandwidth");
             return;
         }
 
         try
         {
-            Test_Ramp(lBufferQty, lPacketSize_byte, lPacketQty);
+            Test_B(lBufferQty, lPacketSize_byte, lBandwidth_MiB);
         }
         catch (KmsLib::Exception * eE)
         {

@@ -101,6 +101,8 @@
     <ClCompile Include="Kernel_Functions.cpp" />
     <ClCompile Include="OCLW.cpp" />
     <ClCompile Include="OpenNet.cpp" />
+    <ClCompile Include="PacketGenerator.cpp" />
+    <ClCompile Include="PacketGenerator_Internal.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="Processor_Internal.cpp" />
     <ClCompile Include="SourceCode.cpp" />
@@ -118,6 +120,7 @@
     <ClInclude Include="Adapter_Internal.h" />
     <ClInclude Include="Buffer_Data.h" />
     <ClInclude Include="EthernetAddress.h" />
+    <ClInclude Include="PacketGenerator_Internal.h" />
     <ClInclude Include="SourceCode_Forward.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="Kernel_Functions.h" />
