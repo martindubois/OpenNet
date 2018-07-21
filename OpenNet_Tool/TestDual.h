@@ -27,7 +27,7 @@ public:
     ~TestDual();
 
     void DisplayAdapterStatistics();
-    void DisplaySpeed            (double aDuration_s);
+    void DisplaySpeed            ();
 
     void GetAdapterStatistics();
 

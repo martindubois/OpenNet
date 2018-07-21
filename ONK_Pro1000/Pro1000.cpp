@@ -214,9 +214,9 @@ bool Pro1000::D0_Entry()
         Reset_Zone0();
 
         mBAR1->mDeviceControl.mFields.mInvertLossOfSignal   = false;
-        mBAR1->mDeviceControl.mFields.mRx_FlowControlEnable = true ;
+        // mBAR1->mDeviceControl.mFields.mRx_FlowControlEnable = true ;
         mBAR1->mDeviceControl.mFields.mSetLinkUp            = true ;
-        mBAR1->mDeviceControl.mFields.mTx_FlowControlEnable = true ;
+        // mBAR1->mDeviceControl.mFields.mTx_FlowControlEnable = true ;
 
         mBAR1->mGeneralPurposeInterruptEnable.mFields.mExtendedInterruptAutoMaskEnable = true;
 
@@ -229,6 +229,13 @@ bool Pro1000::D0_Entry()
         mBAR1->mInterruptVectorAllocationMisc.mFields.mVector33Valid = true;
 
         mBAR1->mInterruptTrottle[0].mFields.mInterval_us = 75;
+
+        // mBAR1->mFlowControlReceiveThresholdHigh.mFields.mReceiveThresholdHigh = 3000;
+
+        // mBAR1->mFlowControlReceiveThresholdLow.mFields.mReceiveThresholdLow = 2000;
+        // mBAR1->mFlowControlReceiveThresholdLow.mFields.mXOnEnable           = true;
+
+        // mBAR1->mFlowControlRefreshThreshold.mFields.mValue = 0x8000;
 
         Rx_Config_Zone0();
         Tx_Config_Zone0();
@@ -470,11 +477,15 @@ void Pro1000::Rx_Config_Zone0()
     }
 
     mBAR1->mRx_Control.mFields.mBroadcastAcceptMode         = true ; // TODO Config
+    mBAR1->mRx_Control.mFields.mDiscardPauseFrames          = true ;
     mBAR1->mRx_Control.mFields.mLongPacketEnabled           = true ;
     mBAR1->mRx_Control.mFields.mMulticastPromiscuousEnabled = true ; // TODO Config
     mBAR1->mRx_Control.mFields.mPassMacControlFrames        = false; // TODO Config
-    mBAR1->mRx_Control.mFields.mStoreBadPackets             = true ; // TODO Config
+    mBAR1->mRx_Control.mFields.mStoreBadPackets             = false; // TODO Config
+    mBAR1->mRx_Control.mFields.mStripEthernetCRC            = true ;
     mBAR1->mRx_Control.mFields.mUnicastPromiscuousEnabled   = true ; // TODO Config
+
+    mBAR1->mRx_DmaMaxOutstandingData.mFields.mValue_256_bytes = 0xfff;
 
     mBAR1->mRx_LongPacketMaximumLength.mFields.mValue_byte = mConfig.mPacketSize_byte;
 
@@ -483,10 +494,17 @@ void Pro1000::Rx_Config_Zone0()
 
     mBAR1->mRx_DescriptorRingLength0.mFields.mValue_byte = sizeof(Pro1000_Rx_Descriptor) * RX_DESCRIPTOR_QTY;
 
-    mBAR1->mRx_SplitAndReplicationControl.mFields.mHeaderSize_64bytes = 0;
+    mBAR1->mRx_PacketBufferSize.mFields.mValue_KB = 84;
+
+    mBAR1->mRx_SplitAndReplicationControl.mFields.mDescriptorType     =    0;
+    mBAR1->mRx_SplitAndReplicationControl.mFields.mDropEnabled        = true;
+    mBAR1->mRx_SplitAndReplicationControl.mFields.mHeaderSize_64bytes =    0;
     mBAR1->mRx_SplitAndReplicationControl.mFields.mPacketSize_KB      = mConfig.mPacketSize_byte / 1024;
 
-    mBAR1->mRx_DescriptorControl0.mFields.mQueueEnable = true;
+    mBAR1->mRx_DescriptorControl0.mFields.mHostThreshold      =   16;
+    mBAR1->mRx_DescriptorControl0.mFields.mPrefetchThreshold  =   16;
+    mBAR1->mRx_DescriptorControl0.mFields.mWriteBackThreshold =   16;
+    mBAR1->mRx_DescriptorControl0.mFields.mQueueEnable        = true;
 
     mBAR1->mRx_Control.mFields.mEnable = true;
 }
@@ -529,16 +547,26 @@ void Pro1000::Statistics_Update()
 
     mStatistics[OpenNetK::HARDWARE_STATS_RX_BMC_MANAGEMENT_DROPPED_packet      ] += mBAR1->mRx_BmcManagementDropper_packet     ;
     mStatistics[OpenNetK::HARDWARE_STATS_RX_CIRCUIT_BREAKER_DROPPED_packet     ] += mBAR1->mRx_CircuitBreakerDropped_packet    ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_HOST_byte                          ] += mBAR1->mRx_HostGoodLow_byte                ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_HOST_packet                        ] += mBAR1->mRx_ToHost_packet                   ;
     mStatistics[OpenNetK::HARDWARE_STATS_RX_LENGTH_ERRORS_packet               ] += mBAR1->mRx_LengthErrors_packet             ;
     mStatistics[OpenNetK::HARDWARE_STATS_RX_MANAGEMENT_DROPPED_packet          ] += mBAR1->mRx_ManagementDropped_packet        ;
     mStatistics[OpenNetK::HARDWARE_STATS_RX_MISSED_packet                      ] += mBAR1->mRx_Missed_packet                   ;
     mStatistics[OpenNetK::HARDWARE_STATS_RX_NO_BUFFER_packet                   ] += mBAR1->mRx_NoBuffer_packet                 ;
     mStatistics[OpenNetK::HARDWARE_STATS_RX_OVERSIZE_packet                    ] += mBAR1->mRx_Oversize_packet                 ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_QUEUE_DROPPED_packet               ] += mBAR1->mRx_QueueDropPacket0.mFields.mValue ;
     mStatistics[OpenNetK::HARDWARE_STATS_RX_UNDERSIZE_packet                   ] += mBAR1->mRx_Undersize_packet                ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_XOFF_packet                        ] += mBAR1->mRx_XOff_packet                     ;
+    mStatistics[OpenNetK::HARDWARE_STATS_RX_XON_packet                         ] += mBAR1->mRx_XOn_packet                      ;
+
     mStatistics[OpenNetK::HARDWARE_STATS_TX_DEFER_EVENTS                       ] += mBAR1->mTx_DeferEvents                     ;
     mStatistics[OpenNetK::HARDWARE_STATS_TX_DISCARDED_packet                   ] += mBAR1->mTx_Discarded_packet                ;
-    mStatistics[OpenNetK::HARDWARE_STATS_TX_NO_CRS_packet                      ] += mBAR1->mTx_NoCrs_packet                    ;
+    mStatistics[OpenNetK::HARDWARE_STATS_TX_HOST_byte                          ] += mBAR1->mTx_HostGoodLow_byte                ;
+    mStatistics[OpenNetK::HARDWARE_STATS_TX_HOST_packet                        ] += mBAR1->mTx_HostGood_packet                 ;
     mStatistics[OpenNetK::HARDWARE_STATS_TX_HOST_CIRCUIT_BREAKER_DROPPED_packet] += mBAR1->mTx_HostCircuitBreakerDropped_packet;
+    mStatistics[OpenNetK::HARDWARE_STATS_TX_NO_CRS_packet                      ] += mBAR1->mTx_NoCrs_packet                    ;
+    mStatistics[OpenNetK::HARDWARE_STATS_TX_XOFF_packet                        ] += mBAR1->mTx_XOff_packet                     ;
+    mStatistics[OpenNetK::HARDWARE_STATS_TX_XON_packet                         ] += mBAR1->mTx_XOn_packet                      ;
 }
 
 // Level   Thread
@@ -554,7 +582,12 @@ void Pro1000::Tx_Config_Zone0()
 
     mBAR1->mTx_DescriptorRingLength0.mFields.mValue_bytes = sizeof(Pro1000_Tx_Descriptor) * TX_DESCRIPTOR_QTY;
 
-    mBAR1->mTx_DescriptorControl0.mFields.mQueueEnable = true;
+    mBAR1->mTx_PacketBufferSize.mFields.mValue_KB = 20;
+
+    mBAR1->mTx_DescriptorControl0.mFields.mHostThreshold      =   16;
+    mBAR1->mTx_DescriptorControl0.mFields.mPrefetchThreshold  =   16;
+    mBAR1->mTx_DescriptorControl0.mFields.mWriteBackThreshold =   16;
+    mBAR1->mTx_DescriptorControl0.mFields.mQueueEnable        = true;
 
     mBAR1->mTx_Control.mFields.mEnable = true;
 }

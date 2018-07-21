@@ -10,6 +10,9 @@
 #include <assert.h>
 #include <stdint.h>
 
+// ===== Windows ============================================================
+#include <Windows.h>
+
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
 
@@ -28,6 +31,7 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
+#define ADAPTER_BASE  (OpenNet::ADAPTER_STATS_QTY)
 #define HARDWARE_BASE (OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_QTY)
 
 // Public
@@ -105,10 +109,8 @@ void TestDual::DisplayAdapterStatistics()
     }
 }
 
-void TestDual::DisplaySpeed(double aDuration_s)
+void TestDual::DisplaySpeed()
 {
-    assert(0 < mPacketGenerator_Config.mPacketSize_byte);
-
     double lRx_byte_s   [2];
     double lRx_KiB_s    [2];
     double lRx_MiB_s    [2];
@@ -124,18 +126,20 @@ void TestDual::DisplaySpeed(double aDuration_s)
 
     for (unsigned int i = 0; i < 2; i++)
     {
-        lRx_packet_s[i] = mStatistics[i][HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet];
-        lTx_packet_s[i] = mStatistics[i][HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet];
+        double lDuration_s = static_cast<double>(mStatistics[i][ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms]) / 1000.0; // ms ==> s
 
-        lRx_byte_s   [i] = lRx_packet_s[i] * mPacketGenerator_Config.mPacketSize_byte;
+        lRx_byte_s  [i] = mStatistics[i][HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte  ];
+        lRx_packet_s[i] = mStatistics[i][HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet];
+        lTx_byte_s  [i] = mStatistics[i][HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte  ];
+        lTx_packet_s[i] = mStatistics[i][HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet];
+
         lSum_packet_s[i] = lRx_packet_s[i] + lTx_packet_s[i] ;
-        lTx_byte_s   [i] = lTx_packet_s[i] * mPacketGenerator_Config.mPacketSize_byte;
 
-        lRx_byte_s   [i] /= aDuration_s;
-        lRx_packet_s [i] /= aDuration_s;
-        lSum_packet_s[i] /= aDuration_s;
-        lTx_byte_s   [i] /= aDuration_s;
-        lTx_packet_s [i] /= aDuration_s;
+        lRx_byte_s   [i] /= lDuration_s;
+        lRx_packet_s [i] /= lDuration_s;
+        lSum_packet_s[i] /= lDuration_s;
+        lTx_byte_s   [i] /= lDuration_s;
+        lTx_packet_s [i] /= lDuration_s;
 
         lRx_KiB_s[i] = lRx_byte_s[i] / 1024;
         lRx_MiB_s[i] = lRx_KiB_s [i] / 1024;
@@ -221,6 +225,8 @@ void TestDual::Start()
         throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
             "System::Start(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
     }
+
+    Sleep(100);
 
     lStatus = mPacketGenerator->Start();
     assert(OpenNet::STATUS_OK == lStatus);

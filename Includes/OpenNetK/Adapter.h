@@ -129,7 +129,8 @@ namespace OpenNetK
 
         volatile long mPacketSend_Pending;
 
-        mutable uint32_t mStatistics[32];
+        mutable uint32_t      mStatistics[32];
+        mutable LARGE_INTEGER mStatistics_Start;
 
         // ===== Zone 0 =====================================================
         SpinLock * mZone0;

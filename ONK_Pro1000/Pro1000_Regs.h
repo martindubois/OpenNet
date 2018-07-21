@@ -144,6 +144,54 @@ typedef union
 
     struct
     {
+        unsigned mReserved0 : 4;
+
+        unsigned mReceiveThresholdHigh : 12;
+
+        unsigned mReserved1 : 16;
+    }
+    mFields;
+}
+Pro1000_FlowControlReceiveThresholdHigh;
+
+typedef union
+{
+    uint32_t mValue;
+
+    struct
+    {
+        unsigned mReserved0 : 4;
+
+        unsigned mReceiveThresholdLow : 12;
+
+        unsigned mReserved1 : 15;
+
+        unsigned mXOnEnable : 1;
+    }
+    mFields;
+}
+Pro1000_FlowControlReceiveThresholdLow;
+
+typedef union
+{
+    uint32_t mValue;
+
+    struct
+    {
+        unsigned mValue : 16;
+
+        unsigned mReserved0 : 16;
+    }
+    mFields;
+}
+Pro1000_FlowControlRefreshThreshold;
+
+typedef union
+{
+    uint32_t mValue;
+
+    struct
+    {
         unsigned mNonSelectiveInterruptClearOnRead : 1;
 
         unsigned mReserved0 : 3;
@@ -452,6 +500,20 @@ typedef union
 
     struct
     {
+        unsigned mValue_256_bytes : 12;
+
+        unsigned mReserved0 : 20;
+    }
+    mFields;
+}
+Pro1000_Rx_DmaMaxOutstandingData;
+
+typedef union
+{
+    uint32_t mValue;
+
+    struct
+    {
         unsigned mValue_byte : 14;
 
         unsigned mReserved0 : 18;
@@ -725,11 +787,27 @@ typedef struct
 
     Pro1000_InterruptVectorAllocationMisc mInterruptVectorAllocationMisc; // 0x01740
 
-    uint32_t mReserved_01744[(0x02404 - 0x01744) / 4];
+    uint32_t mReserved_01744[(0x02160 - 0x01744) / 4];
+
+    Pro1000_FlowControlReceiveThresholdLow mFlowControlReceiveThresholdLow; // 0x02160 - page 488
+
+    uint32_t mReserved_02164[(0x02168 - 0x02164) / 4];
+
+    Pro1000_FlowControlReceiveThresholdHigh mFlowControlReceiveThresholdHigh; // 0x02168 - page 489
+
+    uint32_t mReserved_0216c[(0x02404 - 0x0216c) / 4];
 
     Pro1000_Rx_PacketBufferSize mRx_PacketBufferSize; // 0x02404
 
-    uint32_t mReserved_02408[(0x03004 - 0x02408) / 4];
+    uint32_t mReserved_02408[(0x02460 - 0x02408) / 4];
+
+    Pro1000_FlowControlRefreshThreshold mFlowControlRefreshThreshold; // 0x02460
+
+    uint32_t mReserved_02464[(0x02540 - 0x02464) / 4];
+
+    Pro1000_Rx_DmaMaxOutstandingData mRx_DmaMaxOutstandingData; // 0x2540 - Page 524
+
+    uint32_t mReserved_02544[(0x03004 - 0x02544) / 4];
 
     Pro1000_SwitchPacketBufferSize mSwitchPacketBufferSize; // 0x03004
 

@@ -112,6 +112,8 @@ namespace OpenNetK
         mHardware    = NULL;
         mSystemId    =    0;
         mZone0       = aZone0;
+
+        KeQuerySystemTimePrecise(&mStatistics_Start);
     }
 
     // aBuffer [-K-;RW-]
@@ -729,6 +731,12 @@ namespace OpenNetK
 
         bool lReset = lIn->mFlags.mReset;
 
+        LARGE_INTEGER lNow;
+
+        KeQuerySystemTimePrecise(&lNow);
+
+        mStatistics[ADAPTER_STATS_RUNNING_TIME_ms] = static_cast<unsigned int>((lNow.QuadPart - mStatistics_Start.QuadPart) / 10000);
+
         if (sizeof(mStatistics) <= lOutSize_byte)
         {
             memcpy(lOut, &mStatistics, sizeof(mStatistics));
@@ -749,6 +757,8 @@ namespace OpenNetK
 
         if (lReset)
         {
+            mStatistics_Start = lNow;
+
             memset(&mStatistics, 0, ADAPTER_STATS_RESET_QTY * sizeof(uint32_t));
 
             mStatistics[ADAPTER_STATS_IOCTL_STATISTICS_GET_RESET] ++;
@@ -764,6 +774,8 @@ namespace OpenNetK
     int Adapter::IoCtl_Statistics_Reset()
     {
         ASSERT(NULL != mHardware);
+
+        KeQuerySystemTimePrecise(&mStatistics_Start);
 
         memset(&mStatistics, 0, sizeof(mStatistics));
 

@@ -45,8 +45,8 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
 
     VALUE_VECTOR_DESCRIPTION_RESERVED,
 
-    { "ADAPTER LOOP_BACK_PACKET             ", "", 0 },
-    { "ADAPTER PACKET_SEND                  ", "", 1 },
+    { "ADAPTER - LOOP_BACK_PACKET             ", "", 0 },
+    { "ADAPTER - PACKET_SEND                  ", "", 1 },
 
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED, //  5
@@ -77,25 +77,25 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     VALUE_VECTOR_DESCRIPTION_RESERVED, // 30
     VALUE_VECTOR_DESCRIPTION_RESERVED,
 
-    { "ADAPTER BUFFERS_PROCESS     ", ""      , 0 },
-    { "ADAPTER BUFFER_INIT_HEADER  ", ""      , 0 },
-    { "ADAPTER BUFFER_QUEUE        ", ""      , 0 },
-    { "ADAPTER BUFFER_RECEIVE      ", ""      , 1 }, // 35
-    { "ADAPTER BUFFER_SEND         ", ""      , 1 },
-    { "ADAPTER BUFFER_SEND_PACKETS ", ""      , 1 },
-    { "ADAPTER IOCTL               ", ""      , 0 },
-    { "ADAPTER IOCTL_CONFIG_GET    ", ""      , 0 },
-    { "ADAPTER IOCTL_CONFIG_SET    ", ""      , 0 }, // 40
-    { "ADAPTER IOCTL_CONNECT       ", ""      , 0 },
-    { "ADAPTER IOCTL_INFO_GET      ", ""      , 0 },
-    { "ADAPTER IOCTL_PACKET_SEND   ", ""      , 1 },
-    { "ADAPTER IOCTL_START         ", ""      , 0 },
-    { "ADAPTER IOCTL_STATE_GET     ", ""      , 0 }, // 45
-    { "ADAPTER IOCTL_STATISTICS_GET", ""      , 0 },
-    { "ADAPTER IOCTL_STOP          ", ""      , 0 },
-    { "ADAPTER TX                  ", "packet", 1 },
+    { "ADAPTER - BUFFERS - PROCESS       ", ""      , 0 },
+    { "ADAPTER - BUFFER - INIT_HEADER    ", ""      , 0 },
+    { "ADAPTER - BUFFER - QUEUE          ", ""      , 0 },
+    { "ADAPTER - BUFFER - RECEIVE        ", ""      , 1 }, // 35
+    { "ADAPTER - BUFFER - SEND           ", ""      , 1 },
+    { "ADAPTER - BUFFER - SEND_PACKETS   ", ""      , 1 },
+    { "ADAPTER - IOCTL                   ", ""      , 0 },
+    { "ADAPTER - IOCTL - CONFIG - GET    ", ""      , 0 },
+    { "ADAPTER - IOCTL - CONFIG - SET    ", ""      , 0 }, // 40
+    { "ADAPTER - IOCTL - CONNECT         ", ""      , 0 },
+    { "ADAPTER - IOCTL - INFO_GET        ", ""      , 0 },
+    { "ADAPTER - IOCTL - PACKET_SEND     ", ""      , 1 },
+    { "ADAPTER - IOCTL - START           ", ""      , 0 },
+    { "ADAPTER - IOCTL - STATE_GET       ", ""      , 0 }, // 45
+    { "ADAPTER - IOCTL - STATISTICS - GET", ""      , 0 },
+    { "ADAPTER - IOCTL - STOP            ", ""      , 0 },
+    { "ADAPTER - RUNNING_TIME            ", "ms"    , 1 },
+    { "ADAPTER - TX                      ", "packet", 1 },
 
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED, // 50
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
@@ -107,23 +107,23 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
 
-    { "ADAPTER IOCTL_LAST                 (NR)", "", 0 }, // 60
-    { "ADAPTER IOCTL_LAST_RESULT          (NR)", "", 0 },
-    { "ADAPTER IOCTL_STATISTICS_GET_RESET (NR)", "", 0 },
-    { "ADAPTER IOCTL_STATISTICS_RESET     (NR)", "", 0 },
+    { "ADAPTER - IOCTL - LAST                     (NR)", "", 0 }, // 60
+    { "ADAPTER - IOCTL - LAST - RESULT            (NR)", "", 0 },
+    { "ADAPTER - IOCTL - STATISTICS - GET - RESET (NR)", "", 0 },
+    { "ADAPTER - IOCTL - STATISTICS - RESET       (NR)", "", 0 },
 
-    { "HARDWRE D0_ENTRY          ", ""      , 0 },
-    { "HARDWRE D0_EXIT           ", ""      , 0 }, // 65
-    { "HARDWRE INTERRUPT_DISABLE ", ""      , 0 },
-    { "HARDWRE INTERRUPT_ENABLE  ", ""      , 0 },
-    { "HARDWRE INTERRUPT_PROCESS ", ""      , 1 },
-    { "HARDWRE INTERRUPT_PROCESS2", ""      , 1 },
-    { "HARDWRE PACKET_RECEIVE    ", ""      , 1 }, // 70
-    { "HARDWRE PACKET_SEND       ", ""      , 1 },
-    { "HARDWRE RX                ", "packet", 1 },
-    { "HARDWRE SET_CONFIG        ", ""      , 0 },
-    { "HARDWRE STATISTICS_GET    ", ""      , 0 },
-    { "HARDWRE TX                ", "packet", 1 }, // 75
+    { "HARDWARE - D0 - ENTRY          ", ""      , 0 },
+    { "HARDWARE - D0 - EXIT           ", ""      , 0 }, // 65
+    { "HARDWARE - INTERRUPT - DISABLE ", ""      , 0 },
+    { "HARDWARE - INTERRUPT - ENABLE  ", ""      , 0 },
+    { "HARDWARE - INTERRUPT - PROCESS ", ""      , 1 },
+    { "HARDWARE - INTERRUPT - PROCESS2", ""      , 1 },
+    { "HARDWARE - PACKET - RECEIVE    ", ""      , 1 }, // 70
+    { "HARDWARE - PACKET - SEND       ", ""      , 1 },
+    { "HARDWARE - RX                  ", "packet", 1 },
+    { "HARDWARE - SET_CONFIG          ", ""      , 0 },
+    { "HARDWARE - STATISTICS - GET    ", ""      , 0 },
+    { "HARDWARE - TX                  ", "packet", 1 }, // 75
 
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
@@ -140,28 +140,28 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED, // 90
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED, // 95
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
 
-    { "HARDWARE RX_BMC_MANAGEMENT_DROPPED      ", "packet", 1 }, // 100
-    { "HARDWARE RX_CIRCUIT_BREAKER_DROPPED     ", "packet", 1 },
-    { "HARDWARE RX_LENGTH_ERRORS               ", "packet", 1 },
-    { "HARDWARE RX_MANAGEMENT_DROPPED          ", "packet", 1 },
-    { "HARDWARE RX_MISSED                      ", "packet", 1 },
-    { "HARDWARE RX_NO_BUFFER                   ", "packet", 0 }, // 105
-    { "HARDWARE RX_OVERSIZE                    ", "packet", 1 },
-    { "HARDWARE RX_UNDERSIZE                   ", "packet", 1 },
-    { "HARDWARE TX_DEFER_EVENTS                ", ""      , 0 },
-    { "HARDWARE TX_DISCARDED                   ", "packet", 1 },
-    { "HARDWARE TX_NO_CRS                      ", "packet", 1 }, // 110
-    { "HARDWARE TX_HOST_CIRCUIT_BREAKER_DROPPED", "packet", 1 },
+    { "HARDWARE - RX - BMC_MANAGEMENT_DROPPED       (HW)", "packet", 1 },
+    { "HARDWARE - RX - CIRCUIT_BREAKER_DROPPED      (HW)", "packet", 1 },
+    { "HARDWARE - RX - HOST                         (HW)", "byte"  , 1 },
+    { "HARDWARE - RX - HOST                         (HW)", "packet", 1 },
+    { "HARDWARE - RX - LENGTH_ERRORS                (HW)", "packet", 1 }, //  95
+    { "HARDWARE - RX - MANAGEMENT_DROPPED           (HW)", "packet", 1 },
+    { "HARDWARE - RX - MISSED                       (HW)", "packet", 1 },
+    { "HARDWARE - RX - NO_BUFFER                    (HW)", "packet", 0 },
+    { "HARDWARE - RX - OVERSIZE                     (HW)", "packet", 1 },
+    { "HARDWARE - RX - QUEUE_DROPPED                (HW)", "packet", 1 }, // 100
+    { "HARDWARE - RX - UNDERSIZE                    (HW)", "packet", 1 },
+    { "HARDWARE - RX - XOFF                         (HW)", "packet", 0 },
+    { "HARDWARE - RX - XON                          (HW)", "packet", 0 },
+    { "HARDWARE - TX - DEFER_EVENTS                 (HW)", ""      , 0 },
+    { "HARDWARE - TX - DISCARDED                    (HW)", "packet", 1 }, // 105
+    { "HARDWARE - TX - HOST                         (HW)", "byte"  , 1 },
+    { "HARDWARE - TX - HOST                         (HW)", "packet", 1 },
+    { "HARDWARE - TX - HOST_CIRCUIT_BREAKER_DROPPED (HW)", "packet", 1 },
+    { "HARDWARE - TX - NO_CRS                       (HW)", "packet", 1 },
+    { "HARDWARE - TX - XOFF                         (HW)", "packet", 0 }, // 110
+    { "HARDWARE - TX - XON                          (HW)", "packet", 0 },
 
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
@@ -177,9 +177,9 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
 
-    { "HARDWARE INTERRUPT_PROCESS_LAST_MESSAGE_ID (NR)", "", 0 }, // 125
-    { "HARDWARE STATISTICS_GET_RESET              (NR)", "", 0 },
-    { "HARDWARE STATISTICS_RESET                  (NR)", "", 0 },
+    { "HARDWARE - INTERRUPT_PROCESS_LAST_MESSAGE_ID (NR)", "", 0 }, // 125
+    { "HARDWARE - STATISTICS - GET - RESET          (NR)", "", 0 },
+    { "HARDWARE - STATISTICS - RESET                (NR)", "", 0 },
 
 };
 
