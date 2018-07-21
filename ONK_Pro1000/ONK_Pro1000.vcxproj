@@ -100,6 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="kdfile_debug" />
+    <None Include="kdfile_release" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="_DocUser\ReadMe.txt" />
