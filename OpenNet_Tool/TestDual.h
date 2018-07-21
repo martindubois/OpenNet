@@ -22,7 +22,7 @@ class TestDual
 
 public:
 
-    TestDual(unsigned int aBufferQty0, unsigned int aBufferQty1);
+    TestDual(unsigned int aBufferQty0, unsigned int aBufferQty1, bool aProfiling);
 
     ~TestDual();
 
@@ -47,6 +47,8 @@ private:
 
     void Adapter_Connect();
     void Adapter_Get    ();
+
+    void Processor_EnableProfiling();
 
     void ResetInputFilter();
 

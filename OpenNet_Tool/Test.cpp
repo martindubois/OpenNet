@@ -34,7 +34,7 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int
     assert(0 < aPacketSize_byte);
     assert(0 < aBandwidth_MiB_s);
 
-    TestDual lTD(aBufferQty, aBufferQty);
+    TestDual lTD(aBufferQty, 2, false);
 
     lTD.mPacketGenerator_Config.mBandwidth_MiB_s = aBandwidth_MiB_s;
     lTD.mPacketGenerator_Config.mPacketSize_byte = aPacketSize_byte;
@@ -44,13 +44,15 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int
 
     lTD.Start();
 
+    Sleep(100);
+
     lTD.ResetAdapterStatistics();
 
-    Sleep(10000);
+    Sleep(1000);
 
     lTD.GetAdapterStatistics    ();
     lTD.DisplayAdapterStatistics();
-    lTD.DisplaySpeed            (10.0);
+    lTD.DisplaySpeed            ();
 
     lTD.Stop();
 }
@@ -66,7 +68,7 @@ void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int
     assert(0 < aPacketSize_byte);
     assert(0 < aBandwidth_MiB_s);
 
-    TestDual lTD(aBufferQty, 2);
+    TestDual lTD(aBufferQty, aBufferQty, false);
 
     lTD.mPacketGenerator_Config.mBandwidth_MiB_s = aBandwidth_MiB_s;
     lTD.mPacketGenerator_Config.mPacketSize_byte = aPacketSize_byte;
@@ -79,13 +81,15 @@ void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int
 
     lTD.Start();
 
+    Sleep(100);
+
     lTD.ResetAdapterStatistics();
 
-    Sleep(10000);
+    Sleep(1000);
 
-    lTD.GetAdapterStatistics();
+    lTD.GetAdapterStatistics    ();
     lTD.DisplayAdapterStatistics();
-    lTD.DisplaySpeed(10.0);
+    lTD.DisplaySpeed            ();
 
     lTD.Stop();
 }

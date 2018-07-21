@@ -37,12 +37,14 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
+// aBufferQty0  Buffer quantity for adapter 0
+// aBufferQty1  Buffer quantity for adapter 1
+// aProfiling   Enable profiling at processor level
+//
 // Exception  KmsLib::Exception *  CODE_NOT_FOUND
-//                                 See Loop::Adapter_Connect
-//                                 See Loop::Set_Processor
-//                                 See Loop::AddDestination
-//                                 See Loop::SetInputFilter
-TestDual::TestDual(unsigned int aBufferQty0, unsigned int aBufferQty1)
+//                                 See TestDual::Adapter_Connect
+//                                 See TestDual::SetConfig
+TestDual::TestDual(unsigned int aBufferQty0, unsigned int aBufferQty1, bool aProfiling)
 {
     assert(0 < aBufferQty0);
     assert(0 < aBufferQty1);
@@ -68,15 +70,10 @@ TestDual::TestDual(unsigned int aBufferQty0, unsigned int aBufferQty1)
     OpenNet::Status lStatus = mPacketGenerator->GetConfig(&mPacketGenerator_Config);
     assert(OpenNet::STATUS_OK == lStatus);
 
-    OpenNet::Processor::Config lConfig;
-
-    lStatus = mProcessor->GetConfig(&lConfig);
-    assert(OpenNet::STATUS_OK == lStatus);
-
-    lConfig.mFlags.mProfilingEnabled = true;
-
-    lStatus = mProcessor->SetConfig(lConfig);
-    assert(OpenNet::STATUS_OK == lStatus);
+    if (aProfiling)
+    {
+        Processor_EnableProfiling();
+    }
 
     lStatus = mFunctions[0].SetFunctionName("Function_0");
     assert(OpenNet::STATUS_OK == lStatus);
@@ -115,8 +112,6 @@ void TestDual::DisplaySpeed()
     double lRx_KiB_s    [2];
     double lRx_MiB_s    [2];
     double lRx_packet_s [2];
-    double lSum_byte_s  [2];
-    double lSum_KiB_s   [2];
     double lSum_MiB_s   [2];
     double lSum_packet_s[2];
     double lTx_byte_s   [2];
@@ -146,19 +141,13 @@ void TestDual::DisplaySpeed()
         lTx_KiB_s[i] = lTx_byte_s[i] / 1024;
         lTx_MiB_s[i] = lTx_KiB_s [i] / 1024;
 
-        lSum_byte_s[i] = lRx_byte_s[i] + lTx_byte_s[i];
-        lSum_KiB_s [i] = lRx_KiB_s [i] + lTx_KiB_s [i];
         lSum_MiB_s [i] = lRx_MiB_s [i] + lTx_MiB_s [i];
     }
 
     printf("\t\tAdapter 0\t\t\t\t\tAdapters 1\n");
     printf("\t\tRx\t\tTx\t\tTotal\t\tRx\t\tTx\t\tTotal\n");
     printf("Packets/s\t%f\t%f\t%f\t%f\t%f\t%f\n", lRx_packet_s[0], lTx_packet_s[0], lSum_packet_s[0], lRx_packet_s[1], lTx_packet_s[1], lSum_packet_s[1]);
-//    printf("B/s\t\t%f\t%f\t%f\t%f\t%f\t%f\n"    , lRx_byte_s  [0], lTx_byte_s  [0], lSum_byte_s  [0], lRx_byte_s  [1], lTx_byte_s  [1], lSum_byte_s  [1]);
-//    printf("KiB/s\t\t%f\t%f\t%f\t%f\t%f\t%f\n"  , lRx_KiB_s   [0], lTx_KiB_s   [0], lSum_KiB_s   [0], lRx_KiB_s   [1], lTx_KiB_s   [1], lSum_KiB_s   [1]);
     printf("MiB/s\t\t%f\t%f\t%f\t%f\t%f\t%f\n"  , lRx_MiB_s   [0], lTx_MiB_s   [0], lSum_MiB_s   [0], lRx_MiB_s   [1], lTx_MiB_s   [1], lSum_MiB_s   [1]);
-//    printf("Rx/Tx\t\t%f %%\t\t\t\t\t%f %%\n"    , (lRx_byte_s[0] * 100.0) / lTx_byte_s[0]           , (lRx_byte_s[1] * 100.0) / lTx_byte_s[1]           );
-//    printf("\t\t%f %%\t\t\t\t\t%f %%\n"         , (lRx_byte_s[0] * 100.0) / lTx_byte_s[1]           , (lRx_byte_s[1] * 100.0) / lTx_byte_s[0]           );
 }
 
 void TestDual::GetAdapterStatistics()
@@ -186,7 +175,6 @@ void TestDual::GetAndDisplayKernelStatistics()
     assert(OpenNet::STATUS_OK == lStatus);
 }
 
-// Exception  KmsLib::Exception *  CODE_ERROR
 void TestDual::ResetAdapterStatistics()
 {
     for (unsigned int i = 0; i < 2; i++)
@@ -194,11 +182,7 @@ void TestDual::ResetAdapterStatistics()
         assert(NULL != mAdapters[i]);
 
         OpenNet::Status lStatus = mAdapters[i]->ResetStatistics();
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Adapter::Reset_State() failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
+        assert(OpenNet::STATUS_OK == lStatus);
     }
 }
 
@@ -232,7 +216,6 @@ void TestDual::Start()
     assert(OpenNet::STATUS_OK == lStatus);
 }
 
-// Exception  KmsLib::Exception *  See Loop::ResetInputKernel
 void TestDual::Stop()
 {
     assert(NULL != mSystem);
@@ -283,7 +266,21 @@ void TestDual::Adapter_Get()
     }
 }
 
-// Exception  KmsLib::Exception *  CODE_ERROR
+void TestDual::Processor_EnableProfiling()
+{
+    assert(NULL != mProcessor);
+
+    OpenNet::Processor::Config lConfig;
+
+    OpenNet::Status lStatus = mProcessor->GetConfig(&lConfig);
+    assert(OpenNet::STATUS_OK == lStatus);
+
+    lConfig.mFlags.mProfilingEnabled = true;
+
+    lStatus = mProcessor->SetConfig(lConfig);
+    assert(OpenNet::STATUS_OK == lStatus);
+}
+
 void TestDual::ResetInputFilter()
 {
     for (unsigned int i = 0; i < 2; i++)
@@ -291,11 +288,7 @@ void TestDual::ResetInputFilter()
         assert(NULL != mAdapters[i]);
 
         OpenNet::Status lStatus = mAdapters[i]->ResetInputFilter();
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Adapter::ResetInputKernel(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
+        assert(OpenNet::STATUS_OK == lStatus);
     }
 }
 
@@ -313,11 +306,7 @@ void TestDual::SetConfig()
         OpenNet::Adapter::Config lConfig;
 
         OpenNet::Status lStatus = lAdapter->GetConfig(&lConfig);
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Adapter::GetConfig(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
+        assert(OpenNet::STATUS_OK == lStatus);
 
         lConfig.mBufferQty = mBufferQty[i];
 
@@ -330,7 +319,6 @@ void TestDual::SetConfig()
     }
 }
 
-// Exception  KmsLib::Exception *  CODE_ERROR
 void TestDual::SetInputFilter()
 {
     for (unsigned int i = 0; i < 2; i++)
@@ -338,15 +326,10 @@ void TestDual::SetInputFilter()
         assert(NULL != mAdapters[i]);
 
         OpenNet::Status lStatus = mAdapters[i]->SetInputFilter(mFunctions + i);
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Adapter::SetInputFilter(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
+        assert(OpenNet::STATUS_OK == lStatus);
     }
 }
 
-// Exception  KmsLib::Exception *  CODE_ERROR
 void TestDual::SetProcessor()
 {
     assert(NULL != mProcessor);
@@ -356,10 +339,6 @@ void TestDual::SetProcessor()
         assert(NULL != mAdapters[i]);
 
         OpenNet::Status lStatus = mAdapters[i]->SetProcessor(mProcessor);
-        if (OpenNet::STATUS_OK != lStatus)
-        {
-            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
-                "Adapter::SetProcessor(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
-        }
+        assert(OpenNet::STATUS_OK == lStatus);
     }
 }

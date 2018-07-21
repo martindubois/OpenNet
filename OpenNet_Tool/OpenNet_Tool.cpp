@@ -941,7 +941,7 @@ void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Test A %s\n", aArg);
+    printf("Test B %s\n", aArg);
 
     unsigned int lBufferQty      ;
     unsigned int lPacketSize_byte;
@@ -962,7 +962,7 @@ void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg)
         // No break
 
     case 3:
-        printf("Test A %u %u %u\n", lBufferQty, lPacketSize_byte, lBandwidth_MiB);
+        printf("Test B %u %u %u\n", lBufferQty, lPacketSize_byte, lBandwidth_MiB);
 
         if (0 >= lBufferQty)
         {
