@@ -62,6 +62,7 @@ namespace OpenNetK
 
             OpenNet_BufferHeader * mHeader;
             volatile uint32_t    * mMarker;
+            uint32_t             * mPacketOffsets_byte;
 
             struct
             {
@@ -72,6 +73,7 @@ namespace OpenNetK
             mFlags;
 
             uint32_t      mMarkerValue;
+            unsigned int  mPacketInfoOffset_byte;
             volatile long mRx_Counter ;
             volatile long mTx_Counter ;
 
@@ -93,7 +95,7 @@ namespace OpenNetK
 
     private:
 
-        void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader, const Buffer & aBuffer);
+        void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader, const Buffer & aBuffer, uint32_t * aPacketOffsets_byte);
         void Buffer_Queue_Zone0      (const Buffer & aBuffer);
         void Buffer_Receive_Zone0    (BufferInfo * aBufferInfo);
         void Buffer_Send_Zone0       (BufferInfo * aBufferInfo);
