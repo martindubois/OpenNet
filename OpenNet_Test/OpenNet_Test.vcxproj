@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="A.cpp" />
     <ClCompile Include="Adapter.cpp" />
+    <ClCompile Include="B.cpp" />
     <ClCompile Include="Base.cpp" />
     <ClCompile Include="BlackHole.cpp" />
     <ClCompile Include="EthernetAddress.cpp" />

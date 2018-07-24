@@ -14,9 +14,9 @@
 
 // Setup-A  A computer with at least 1 adapter and 1 processor. The test
 //          program run wihtout administrator privilege.
-// Setup-A  A computer with at least 1 adapter and 1 processor. The test
+// Setup-B  A computer with at least 1 adapter and 1 processor. The test
 //          program run wihtout administrator privilege. Minimum network
-//          trafic is ent to the adapter.
+//          trafic is sent to the adapter.
 // Setup-C  A computer with at least 2 adapters and 1 processor. The test
 //          program run wihtout administrator privilege. Both adapters are
 //          connected together
@@ -34,6 +34,9 @@ extern int A_Kernel_9KB_SetupC  ();
 extern int Adapter_Base   ();
 extern int Adapter_Display();
 extern int Adapter_SetupA ();
+
+extern int B_Function_9KB_SetupC();
+extern int B_Kernel_9KB_SetupC  ();
 
 extern int BlackHole_SetupB();
 
@@ -67,6 +70,8 @@ KMS_TEST_LIST_BEGIN
     KMS_TEST_LIST_ENTRY(Adapter_Base          , "Adapter - Base"          , 0, 0)
     KMS_TEST_LIST_ENTRY(Adapter_Display       , "Adapter - Display"       , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(Adapter_SetupA        , "Adapter - Setup A"       , 2, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(B_Function_9KB_SetupC , "B - Function - 9 KB - Setup C", 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(B_Kernel_9KB_SetupC   , "B - Kernel - 9 KB - Setup C"  , 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(BlackHole_SetupB      , "BlackHole - Setup B"     , 3, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(EthernetAddress_Base  , "EthernetAddress - Base"  , 0, 0)
     KMS_TEST_LIST_ENTRY(Kernel_Base           , "Kernel - Base"           , 0, 0)
