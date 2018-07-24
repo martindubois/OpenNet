@@ -68,7 +68,7 @@ int SetupC::Init()
     return 0;
 }
 
-int SetupC::Start()
+int SetupC::Start(unsigned int aFlags)
 {
     assert(   0 <  mBufferQty);
     assert(NULL != mSystem   );
@@ -93,19 +93,19 @@ int SetupC::Start()
         if (OpenNet::STATUS_OK != mAdapters[i]->SetInputFilter(mKernels + i)) { return __LINE__; }
     }
 
-    if (OpenNet::STATUS_OK != mSystem->Start()) { return __LINE__; }
+    if (OpenNet::STATUS_OK != mSystem->Start(aFlags)) { return __LINE__; }
 
     Sleep(1000);
 
     return 0;
 }
 
-int SetupC::Stop(unsigned int aFlags)
+int SetupC::Stop()
 {
     assert(   0 <  mBufferQty);
     assert(NULL != mSystem   );
 
-    if (OpenNet::STATUS_OK != mSystem->Stop(aFlags)) { return __LINE__; }
+    if (OpenNet::STATUS_OK != mSystem->Stop()) { return __LINE__; }
 
     unsigned int i;
 

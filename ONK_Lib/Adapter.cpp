@@ -149,11 +149,6 @@ namespace OpenNetK
 
             switch (lPacketInfo[i].mPacketState) // Reading Direct GMA buffer !!!
             {
-            case OPEN_NET_PACKET_STATE_RX_COMPLETED:
-            case OPEN_NET_PACKET_STATE_RX_RUNNING  :
-                // TODO  ONK_Lib.Adapter.PartialBuffer  Add statistics
-                break;
-
             case OPEN_NET_PACKET_STATE_PX_COMPLETED:
                 lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_TX_RUNNING; // Writing Direct GMA buffer !
                 // no break;
@@ -274,11 +269,6 @@ namespace OpenNetK
 
         default: ASSERT(false);
         }
-
-        mStatistics[ADAPTER_STATS_IOCTL]++;
-
-        mStatistics[ADAPTER_STATS_IOCTL_LAST       ] = aCode  ;
-        mStatistics[ADAPTER_STATS_IOCTL_LAST_RESULT] = lResult;
 
         return lResult;
     }
@@ -465,6 +455,8 @@ namespace OpenNetK
         ASSERT(NULL != aBufferInfo         );
         ASSERT(NULL != aBufferInfo->mHeader);
 
+        ASSERT(OPEN_NET_BUFFER_STATE_PX_COMPLETED == aBufferInfo->mHeader->mBufferState); // Reading DirectGMA buffer !!!
+
         if (NULL == mAdapters)
         {
             // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_COMPLETED ==> STOPPED" DEBUG_EOL, mAdapterNo, aBufferInfo);
@@ -479,7 +471,7 @@ namespace OpenNetK
             // gates.
 
             // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_COMPLETED ==> TX_PROGRAMMING" DEBUG_EOL, mAdapterNo, aBufferInfo);
-            aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_PROGRAMMING;
+            aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_PROGRAMMING; // Writing DirectGMA buffer !
 
             Buffer_Send_Zone0(aBufferInfo);
 

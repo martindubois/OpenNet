@@ -9,8 +9,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== Includes/OpenNet ===================================================
-#include <OpenNet/StatisticsProvider.h>
+// ===== Includes ===========================================================
+#include <OpenNet/OpenNet.h>
+#include <OpenNet/Status.h>
 
 namespace OpenNet
 {
@@ -28,7 +29,7 @@ namespace OpenNet
     /// \cond fr
     /// \brief  Cette classe definit l'interface au niveau systeme.
     /// \endcond
-    class System : public StatisticsProvider
+    class System
     {
 
     public:
@@ -72,7 +73,7 @@ namespace OpenNet
         ///         envoyer des paquets pour debloquer d'eventuelles
         ///         operations de reception.
         /// \endcond
-        static OPEN_NET_PUBLIC const unsigned int STOP_FLAG_LOOPBACK;
+        static OPEN_NET_PUBLIC const unsigned int START_FLAG_LOOPBACK;
 
         /// \cond en
         /// \brief   This static methode create an instance of the System
@@ -105,14 +106,14 @@ namespace OpenNet
 
         /// \cond en
         /// \brief   This static methode display the system information.
-        /// \param   aConfig [---;R--] The configuration
-        /// \param   aOut    [---;RW-] The output stream
+        /// \param   aInfo [---;R--] The information
+        /// \param   aOut  [---;RW-] The output stream
         /// \endcond
         /// \cond fr
         /// \brief   Cette methode statique affiche l'information au sujet
         ///          d'un system.
-        /// \param   aConfig [---;R--] La configuration
-        /// \param   aOut    [---;RW-] Le fichier de sortie
+        /// \param   aInfo [---;R--] L'information
+        /// \param   aOut  [---;RW-] Le fichier de sortie
         /// \endcond
         /// \retval  STATUS_OK
         /// \retval  STATUS_INVALID_REFERENCE
@@ -245,23 +246,23 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Start
+        /// \param  aFlags  START_FLAG_LOOPBACK
         /// \endcond
         /// \cond fr
         /// \brief  Demarrer
+        /// \param  aFlags  START_FLAG_LOOPBACK
         /// \endcond
         /// \retval STATUS_OK
-        virtual Status Start() = 0;
+        virtual Status Start(unsigned int aFlags) = 0;
 
         /// \cond en
         /// \brief  Stop
-        /// \param  aFlags  STOP_FLAG_LOOPBACK
         /// \endcond
         /// \cond fr
         /// \brief  Arreter
-        /// \param  aFlags  STOP_FLAG_LOOPBACK
         /// \endcond
         /// \retval STATUS_OK
-        virtual Status Stop(unsigned int aFlags) = 0;
+        virtual Status Stop() = 0;
 
     protected:
 

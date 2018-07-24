@@ -25,7 +25,7 @@ namespace OpenNetK
         ADAPTER_STATS_BUFFER_RECEIVE       =  3,
         ADAPTER_STATS_BUFFER_SEND          =  4,
         ADAPTER_STATS_BUFFER_SEND_PACKETS  =  5,
-        ADAPTER_STATS_IOCTL                =  6,
+
         ADAPTER_STATS_IOCTL_CONFIG_GET     =  7,
         ADAPTER_STATS_IOCTL_CONFIG_SET     =  8,
         ADAPTER_STATS_IOCTL_CONNECT        =  9,
@@ -40,8 +40,6 @@ namespace OpenNetK
 
         ADAPTER_STATS_RESET_QTY = 18,
 
-        ADAPTER_STATS_IOCTL_LAST                 = 28,
-        ADAPTER_STATS_IOCTL_LAST_RESULT          = 29,
         ADAPTER_STATS_IOCTL_STATISTICS_GET_RESET = 30,
         ADAPTER_STATS_IOCTL_STATISTICS_RESET     = 31,
 

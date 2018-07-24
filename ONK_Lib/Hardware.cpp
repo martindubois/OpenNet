@@ -128,6 +128,8 @@ namespace OpenNetK
         mStatistics[HARDWARE_STATS_INTERRUPT_ENABLE] ++;
     }
 
+    // CRITICAL PATH
+
     // NOT TESTED  ONK_Lib.Hardware
     //             The Interrupt_Process is only there to fill the virtual
     //             table entry when the driver does not need interrupt.
@@ -143,6 +145,7 @@ namespace OpenNetK
         return false;
     }
 
+    // CRITICAL PATH
     void Hardware::Interrupt_Process2()
     {
         ASSERT(NULL != mAdapter);
@@ -177,8 +180,6 @@ namespace OpenNetK
         if (aReset)
         {
             memset(&mStatistics, 0, sizeof(uint32_t) * HARDWARE_STATS_RESET_QTY);
-
-            mStatistics[HARDWARE_STATS_STATISTICS_GET_RESET] ++;
         }
 
         mStatistics[HARDWARE_STATS_STATISTICS_GET] ++;
@@ -189,8 +190,6 @@ namespace OpenNetK
     void Hardware::Statistics_Reset()
     {
         memset(&mStatistics, 0, sizeof(uint32_t) * HARDWARE_STATS_RESET_QTY);
-
-        mStatistics[HARDWARE_STATS_STATISTICS_RESET] ++;
     }
 
     // Internal

@@ -61,7 +61,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OpenNet.lib;KmsLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>TestLib.lib;OpenNet.lib;KmsLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);../Import/Libraries/Debug_64_DLL</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -82,7 +82,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OpenNet.lib;KmsLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>TestLib.lib;OpenNet.lib;KmsLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);../Import/Libraries/Release_64_DLL</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -90,13 +90,13 @@
     <ResourceCompile Include="..\Common\Version.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="A.cpp" />
     <ClCompile Include="Adapter.cpp" />
     <ClCompile Include="Base.cpp" />
     <ClCompile Include="BlackHole.cpp" />
     <ClCompile Include="EthernetAddress.cpp" />
     <ClCompile Include="Kernel.cpp" />
     <ClCompile Include="Kernel_Forward.cpp" />
-    <ClCompile Include="Loop.cpp" />
     <ClCompile Include="Mirror.cpp" />
     <ClCompile Include="OpenNet_Test.cpp" />
     <ClCompile Include="Pipe.cpp" />

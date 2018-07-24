@@ -41,12 +41,12 @@ static const char * ADAPTER_TYPE_NAMES[OpenNetK::ADAPTER_TYPE_QTY] =
 
 const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS[] =
 {
-    { "ADAPTER BUFFER_ALLOCATED             ", "", 0 }, //  0
+    { "OpenNet::Adapter - BUFFER_ALLOCATED         ", "", 0 }, //  0
 
     VALUE_VECTOR_DESCRIPTION_RESERVED,
 
-    { "ADAPTER - LOOP_BACK_PACKET             ", "", 0 },
-    { "ADAPTER - PACKET_SEND                  ", "", 1 },
+    { "OpenNet::Adapter - LOOP_BACK_PACKET         ", "", 0 },
+    { "OpenNet::Adapter - PACKET_SEND              ", "", 1 },
 
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED, //  5
@@ -77,24 +77,26 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     VALUE_VECTOR_DESCRIPTION_RESERVED, // 30
     VALUE_VECTOR_DESCRIPTION_RESERVED,
 
-    { "ADAPTER - BUFFERS - PROCESS       ", ""      , 0 },
-    { "ADAPTER - BUFFER - INIT_HEADER    ", ""      , 0 },
-    { "ADAPTER - BUFFER - QUEUE          ", ""      , 0 },
-    { "ADAPTER - BUFFER - RECEIVE        ", ""      , 1 }, // 35
-    { "ADAPTER - BUFFER - SEND           ", ""      , 1 },
-    { "ADAPTER - BUFFER - SEND_PACKETS   ", ""      , 1 },
-    { "ADAPTER - IOCTL                   ", ""      , 0 },
-    { "ADAPTER - IOCTL - CONFIG - GET    ", ""      , 0 },
-    { "ADAPTER - IOCTL - CONFIG - SET    ", ""      , 0 }, // 40
-    { "ADAPTER - IOCTL - CONNECT         ", ""      , 0 },
-    { "ADAPTER - IOCTL - INFO_GET        ", ""      , 0 },
-    { "ADAPTER - IOCTL - PACKET_SEND     ", ""      , 1 },
-    { "ADAPTER - IOCTL - START           ", ""      , 0 },
-    { "ADAPTER - IOCTL - STATE_GET       ", ""      , 0 }, // 45
-    { "ADAPTER - IOCTL - STATISTICS - GET", ""      , 0 },
-    { "ADAPTER - IOCTL - STOP            ", ""      , 0 },
-    { "ADAPTER - RUNNING_TIME            ", "ms"    , 1 },
-    { "ADAPTER - TX                      ", "packet", 1 },
+    { "OpenNetK::Adapter - BUFFERS - PROCESS       ", ""      , 0 },
+    { "OpenNetK::Adapter - BUFFER - INIT_HEADER    ", ""      , 0 },
+    { "OpenNetK::Adapter - BUFFER - QUEUE          ", ""      , 0 },
+    { "OpenNetK::Adapter - BUFFER - RECEIVE        ", ""      , 1 }, // 35
+    { "OpenNetK::Adapter - BUFFER - SEND           ", ""      , 1 },
+    { "OpenNetK::Adapter - BUFFER - SEND_PACKETS   ", ""      , 1 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
+    { "OpenNetK::Adapter - IOCTL - CONFIG - GET    ", ""      , 0 },
+    { "OpenNetK::Adapter - IOCTL - CONFIG - SET    ", ""      , 0 }, // 40
+    { "OpenNetK::Adapter - IOCTL - CONNECT         ", ""      , 0 },
+    { "OpenNetK::Adapter - IOCTL - INFO_GET        ", ""      , 0 },
+    { "OpenNetK::Adapter - IOCTL - PACKET_SEND     ", ""      , 1 },
+    { "OpenNetK::Adapter - IOCTL - START           ", ""      , 0 },
+    { "OpenNetK::Adapter - IOCTL - STATE_GET       ", ""      , 0 }, // 45
+    { "OpenNetK::Adapter - IOCTL - STATISTICS - GET", ""      , 0 },
+    { "OpenNetK::Adapter - IOCTL - STOP            ", ""      , 0 },
+    { "OpenNetK::Adapter - RUNNING_TIME            ", "ms"    , 1 },
+    { "OpenNetK::Adapter - TX                      ", "packet", 1 },
 
     VALUE_VECTOR_DESCRIPTION_RESERVED, // 50
     VALUE_VECTOR_DESCRIPTION_RESERVED,
@@ -106,24 +108,24 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 60
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
 
-    { "ADAPTER - IOCTL - LAST                     (NR)", "", 0 }, // 60
-    { "ADAPTER - IOCTL - LAST - RESULT            (NR)", "", 0 },
-    { "ADAPTER - IOCTL - STATISTICS - GET - RESET (NR)", "", 0 },
-    { "ADAPTER - IOCTL - STATISTICS - RESET       (NR)", "", 0 },
+    { "OpenNetK::Adapter - IOCTL - STATISTICS - GET - RESET (NR)", "", 0 },
+    { "OpenNetK::Adapter - IOCTL - STATISTICS - RESET       (NR)", "", 0 },
 
-    { "HARDWARE - D0 - ENTRY          ", ""      , 0 },
-    { "HARDWARE - D0 - EXIT           ", ""      , 0 }, // 65
-    { "HARDWARE - INTERRUPT - DISABLE ", ""      , 0 },
-    { "HARDWARE - INTERRUPT - ENABLE  ", ""      , 0 },
-    { "HARDWARE - INTERRUPT - PROCESS ", ""      , 1 },
-    { "HARDWARE - INTERRUPT - PROCESS2", ""      , 1 },
-    { "HARDWARE - PACKET - RECEIVE    ", ""      , 1 }, // 70
-    { "HARDWARE - PACKET - SEND       ", ""      , 1 },
-    { "HARDWARE - RX                  ", "packet", 1 },
-    { "HARDWARE - SET_CONFIG          ", ""      , 0 },
-    { "HARDWARE - STATISTICS - GET    ", ""      , 0 },
-    { "HARDWARE - TX                  ", "packet", 1 }, // 75
+    { "OpenNetK::Hardware - D0 - ENTRY             ", ""      , 0 },
+    { "OpenNetK::Hardware - D0 - EXIT              ", ""      , 0 }, // 65
+    { "OpenNetK::Hardware - INTERRUPT - DISABLE    ", ""      , 0 },
+    { "OpenNetK::Hardware - INTERRUPT - ENABLE     ", ""      , 0 },
+    { "OpenNetK::Hardware - INTERRUPT - PROCESS    ", ""      , 1 },
+    { "OpenNetK::Hardware - INTERRUPT - PROCESS2   ", ""      , 1 },
+    { "OpenNetK::Hardware - PACKET - RECEIVE       ", ""      , 1 }, // 70
+    { "OpenNetK::Hardware - PACKET - SEND          ", ""      , 1 },
+    { "OpenNetK::Hardware - RX                     ", "packet", 1 },
+    { "OpenNetK::Hardware - SET_CONFIG             ", ""      , 0 },
+    { "OpenNetK::Hardware - STATISTICS - GET       ", ""      , 0 },
+    { "OpenNetK::Hardware - TX                     ", "packet", 1 }, // 75
 
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
@@ -141,27 +143,27 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED, // 90
 
-    { "HARDWARE - RX - BMC_MANAGEMENT_DROPPED       (HW)", "packet", 1 },
-    { "HARDWARE - RX - CIRCUIT_BREAKER_DROPPED      (HW)", "packet", 1 },
-    { "HARDWARE - RX - HOST                         (HW)", "byte"  , 1 },
-    { "HARDWARE - RX - HOST                         (HW)", "packet", 1 },
-    { "HARDWARE - RX - LENGTH_ERRORS                (HW)", "packet", 1 }, //  95
-    { "HARDWARE - RX - MANAGEMENT_DROPPED           (HW)", "packet", 1 },
-    { "HARDWARE - RX - MISSED                       (HW)", "packet", 1 },
-    { "HARDWARE - RX - NO_BUFFER                    (HW)", "packet", 0 },
-    { "HARDWARE - RX - OVERSIZE                     (HW)", "packet", 1 },
-    { "HARDWARE - RX - QUEUE_DROPPED                (HW)", "packet", 1 }, // 100
-    { "HARDWARE - RX - UNDERSIZE                    (HW)", "packet", 1 },
-    { "HARDWARE - RX - XOFF                         (HW)", "packet", 0 },
-    { "HARDWARE - RX - XON                          (HW)", "packet", 0 },
-    { "HARDWARE - TX - DEFER_EVENTS                 (HW)", ""      , 0 },
-    { "HARDWARE - TX - DISCARDED                    (HW)", "packet", 1 }, // 105
-    { "HARDWARE - TX - HOST                         (HW)", "byte"  , 1 },
-    { "HARDWARE - TX - HOST                         (HW)", "packet", 1 },
-    { "HARDWARE - TX - HOST_CIRCUIT_BREAKER_DROPPED (HW)", "packet", 1 },
-    { "HARDWARE - TX - NO_CRS                       (HW)", "packet", 1 },
-    { "HARDWARE - TX - XOFF                         (HW)", "packet", 0 }, // 110
-    { "HARDWARE - TX - XON                          (HW)", "packet", 0 },
+    { "Hardware - RX - BMC_MANAGEMENT_DROPPED      ", "packet", 1 },
+    { "Hardware - RX - CIRCUIT_BREAKER_DROPPED     ", "packet", 1 },
+    { "Hardware - RX - HOST                        ", "byte"  , 1 },
+    { "Hardware - RX - HOST                        ", "packet", 1 },
+    { "Hardware - RX - LENGTH_ERRORS               ", "packet", 1 }, //  95
+    { "Hardware - RX - MANAGEMENT_DROPPED          ", "packet", 1 },
+    { "Hardware - RX - MISSED                      ", "packet", 1 },
+    { "Hardware - RX - NO_BUFFER                   ", "packet", 0 },
+    { "Hardware - RX - OVERSIZE                    ", "packet", 1 },
+    { "Hardware - RX - QUEUE_DROPPED               ", "packet", 1 }, // 100
+    { "Hardware - RX - UNDERSIZE                   ", "packet", 1 },
+    { "Hardware - RX - XOFF                        ", "packet", 0 },
+    { "Hardware - RX - XON                         ", "packet", 0 },
+    { "Hardware - TX - DEFER_EVENTS                ", ""      , 0 },
+    { "Hardware - TX - DISCARDED                   ", "packet", 1 }, // 105
+    { "Hardware - TX - HOST                        ", "byte"  , 1 },
+    { "Hardware - TX - HOST                        ", "packet", 1 },
+    { "Hardware - TX - HOST_CIRCUIT_BREAKER_DROPPED", "packet", 1 },
+    { "Hardware - TX - NO_CRS                      ", "packet", 1 },
+    { "Hardware - TX - XOFF                        ", "packet", 0 }, // 110
+    { "Hardware - TX - XON                         ", "packet", 0 },
 
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
@@ -178,9 +180,9 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     VALUE_VECTOR_DESCRIPTION_RESERVED,
 
     { "HARDWARE - INTERRUPT_PROCESS_LAST_MESSAGE_ID (NR)", "", 0 }, // 125
-    { "HARDWARE - STATISTICS - GET - RESET          (NR)", "", 0 },
-    { "HARDWARE - STATISTICS - RESET                (NR)", "", 0 },
 
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
 };
 
 // Static function declarations

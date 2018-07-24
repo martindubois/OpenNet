@@ -32,8 +32,8 @@ public:
     ~SetupA();
 
     int Init ();
-    int Start();
-    int Stop (unsigned int aFlags);
+    int Start(unsigned int aFlags);
+    int Stop ();
 
     int Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aCount);
 

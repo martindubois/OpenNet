@@ -277,19 +277,22 @@ Thread * Adapter_Internal::Thread_Prepare()
     assert(NULL != mProcessor );
     assert(NULL != mProgram   );
 
-    OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
-    if (NULL != lKernel)
+    if (NULL != mSourceCode)
     {
-        return new Thread_Kernel(mProcessor, this, lKernel, mProgram, mDebugLog);
+        OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
+        if (NULL != lKernel)
+        {
+            return new Thread_Kernel(mProcessor, this, lKernel, mProgram, mDebugLog);
+        }
+
+        OpenNet::Function * lFunction = dynamic_cast<OpenNet::Function *>(mSourceCode);
+        assert(NULL != lFunction);
+
+        Thread_Functions * lThread = mProcessor->Thread_Get();
+        assert(NULL != lThread);
+
+        lThread->AddAdapter(this, *lFunction);
     }
-
-    OpenNet::Function * lFunction = dynamic_cast<OpenNet::Function *>(mSourceCode);
-    assert(NULL != lFunction);
-
-    Thread_Functions * lThread = mProcessor->Thread_Get();
-    assert(NULL != lThread);
-
-    lThread->AddAdapter(this, *lFunction);
 
     return NULL;
 }

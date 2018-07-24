@@ -61,7 +61,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OpenNet.lib;KmsLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>TestLib.lib;OpenNet.lib;KmsLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);../Import/Libraries/Debug_64_DLL</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -82,7 +82,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OpenNet.lib;KmsLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>TestLib.lib;OpenNet.lib;KmsLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);../Import/Libraries/Release_64_DLL</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -90,7 +90,6 @@
     <ResourceCompile Include="..\Common\Version.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TestDual.cpp" />
     <ClCompile Include="OpenNet_Tool.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
@@ -98,7 +97,6 @@
     <Text Include="_DocUser\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TestDual.h" />
     <ClInclude Include="Test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

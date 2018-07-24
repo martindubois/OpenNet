@@ -40,11 +40,11 @@ KMS_TEST_BEGIN(BlackHole_SetupB)
 
     KMS_TEST_COMPARE(0, lSetup.Statistics_Reset());
 
-    KMS_TEST_COMPARE(0, lSetup.Start());
+    KMS_TEST_COMPARE(0, lSetup.Start(0));
 
     Sleep(2000);
 
-    KMS_TEST_COMPARE(0, lSetup.Stop(0));
+    KMS_TEST_COMPARE(0, lSetup.Stop());
 
     Sleep(2000);
 

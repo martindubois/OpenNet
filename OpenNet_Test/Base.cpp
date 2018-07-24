@@ -57,8 +57,4 @@ void Base::Constraint_Init()
     mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET_RESET].mMax = 0xffffffff;
 
     mConstraints[OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
-
-    mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_GET_RESET].mMax = 0xffffffff;
-
-    mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_STATISTICS_RESET].mMax = 0xffffffff;
 }

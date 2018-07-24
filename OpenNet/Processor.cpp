@@ -71,7 +71,7 @@ namespace OpenNet
     // Protected
     /////////////////////////////////////////////////////////////////////////
 
-    Processor::Processor() : StatisticsProvider(NULL, 0)
+    Processor::Processor()
     {
     }
 

@@ -26,38 +26,13 @@
 #include "Adapter_Internal.h"
 #include "System_Internal.h"
 
-// Constants
-////////////////////////////////////////////////////////////////////////////
-
-static const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS[] =
-{
-    { "EXECUTION                  ", ""  , 0 }, //  0
-    { "EXECUTION - DURATION - AVG ", "us", 1 },
-    { "EXECUTION - DURATION - MAX ", "us", 1 },
-    { "EXECUTION - DURATION - MIN ", "us", 1 },
-    { "QUEUE     - DURATION - AVG ", "us", 1 },
-    { "QUEUE     - DURATION - MAX ", "us", 1 }, //  5
-    { "QUEUE     - DURATION - MIN ", "us", 1 },
-    { "SUBMIT    - DURATION - AVG ", "us", 1 },
-    { "SUBMIT    - DURATION - MAX ", "us", 1 },
-    { "SUBMIT    - DURATION - MIN ", "us", 1 },
-
-    VALUE_VECTOR_DESCRIPTION_RESERVED, // 10
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-
-    { "EXECUTION - DURATION - LAST", "us", 0 },
-    { "QUEUE     - DURATION - LAST", "us", 0 },
-    { "SUBMIT    - DURATION - LAST", "us", 0 }, // 15
-};
-
 namespace OpenNet
 {
 
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    const unsigned int System::STOP_FLAG_LOOPBACK = 0x00000001;
+    const unsigned int System::START_FLAG_LOOPBACK = 0x00000001;
 
     // NOT TESTED  OpenNet.System.ErrorHandling
     //             System_Internal contructor raise an exception
@@ -93,7 +68,7 @@ namespace OpenNet
     // Protected
     /////////////////////////////////////////////////////////////////////////
 
-    System::System() : StatisticsProvider(STATISTICS_DESCRIPTIONS, SYSTEM_STATS_QTY)
+    System::System()
     {
     }
 

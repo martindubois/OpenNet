@@ -27,22 +27,18 @@ KMS_TEST_BEGIN(System_Base)
 
     OpenNet::System::Config   lC0;
     OpenNet::System::Config * lCNP = NULL;
-    unsigned int              lInfo_byte;
-    unsigned int              lS0[16];
 
     memset(&lC0, 0, sizeof(lC0));
 
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mSystem->GetConfig      (NULL ));
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mSystem->GetInfo        (NULL ));
-    KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mSystem->GetStatistics  (NULL, 0, NULL, false));
-    KMS_TEST_COMPARE(OpenNet::STATUS_BUFFER_TOO_SMALL         , lSetup.mSystem->GetStatistics  (lS0 , 0, NULL, false));
     KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE        , lSetup.mSystem->SetConfig      (*lCNP));
     KMS_TEST_COMPARE(OpenNet::STATUS_PACKET_TOO_SMALL         , lSetup.mSystem->SetConfig      (lC0  ));
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mSystem->Adapter_Connect(NULL ));
     KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_ADAPTER          , lSetup.mSystem->Adapter_Connect(reinterpret_cast<OpenNet::Adapter *>(1)));
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mSystem->Display        (NULL));
-    KMS_TEST_COMPARE(OpenNet::STATUS_NO_ADAPTER_CONNECTED     , lSetup.mSystem->Start          ());
-    KMS_TEST_COMPARE(OpenNet::STATUS_SYSTEM_NOT_STARTED       , lSetup.mSystem->Stop           (0));
+    KMS_TEST_COMPARE(OpenNet::STATUS_NO_ADAPTER_CONNECTED     , lSetup.mSystem->Start          (0));
+    KMS_TEST_COMPARE(OpenNet::STATUS_SYSTEM_NOT_STARTED       , lSetup.mSystem->Stop           ());
 
     KMS_TEST_ASSERT(NULL == lSetup.mSystem->Kernel_Get(0));
 
@@ -60,9 +56,6 @@ KMS_TEST_BEGIN(System_Base)
 
     KMS_TEST_ASSERT(0 < lI0.mSystemId);
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem->GetStatistics(lS0, sizeof(lS0), NULL       , false));
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem->GetStatistics(lS0, sizeof(lS0), &lInfo_byte, false));
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem->GetStatistics(lS0, sizeof(lS0), NULL       , true ));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem->SetConfig    (lC0));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem->Display      (stdout));
 

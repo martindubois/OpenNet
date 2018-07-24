@@ -998,7 +998,7 @@ void Stop(KmsLib::ToolBase * aToolBase, const char * aArg)
     printf("Stop %s\n", aArg);
     printf("Stop\n");
 
-    OpenNet::Status lStatus = sSystem->Stop(0);
+    OpenNet::Status lStatus = sSystem->Stop();
     if (OpenNet::STATUS_OK != lStatus)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System::Stop failed");
@@ -1016,7 +1016,7 @@ void Start(KmsLib::ToolBase * aToolBase, const char * aArg)
     printf("Start %s\n", aArg);
     printf("Start\n");
 
-    OpenNet::Status lStatus = sSystem->Start();
+    OpenNet::Status lStatus = sSystem->Start(0);
     if (OpenNet::STATUS_OK != lStatus)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System::Start failed");

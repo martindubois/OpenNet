@@ -56,8 +56,6 @@ namespace OpenNetK
         HARDWARE_STATS_RESET_QTY = 48,
 
         HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID = 61,
-        HARDWARE_STATS_STATISTICS_GET_RESET              = 62,
-        HARDWARE_STATS_STATISTICS_RESET                  = 63,
 
         HARDWARE_STATS_QTY = 64,
     }

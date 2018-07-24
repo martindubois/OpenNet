@@ -52,7 +52,7 @@ static void SendLoopBackPackets(void * aThis, Adapter_Internal * aAdapter);
 //                                 See FindProcessors
 // Threads  Apps
 System_Internal::System_Internal()
-    : mDebugLog( "K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "OpenNet" )
+    : mDebugLog( "K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "System" )
     , mPlatform(         0)
     , mState   (STATE_IDLE)
 {
@@ -97,7 +97,7 @@ System_Internal::~System_Internal()
         break;
 
     case STATE_RUNNING :
-        Stop(0);
+        Stop();
         break;
 
     default: assert(false);
@@ -317,7 +317,7 @@ unsigned int System_Internal::Processor_GetCount() const
     return static_cast<unsigned int>(mProcessors.size());
 }
 
-OpenNet::Status System_Internal::Start()
+OpenNet::Status System_Internal::Start(unsigned int aFlags)
 {
     switch (mState)
     {
@@ -330,6 +330,8 @@ OpenNet::Status System_Internal::Start()
 
     default: assert(false);
     }
+
+    mStartFlags = 0;
 
     Threads_Release();
 
@@ -369,6 +371,8 @@ OpenNet::Status System_Internal::Start()
             }
         }
 
+        mStartFlags = aFlags;
+
         for (i = 0; i < mThreads.size(); i++)
         {
             mThreads[ i ]->Prepare();
@@ -391,14 +395,14 @@ OpenNet::Status System_Internal::Start()
 
         lResult = ExceptionToStatus(eE);
 
-        OpenNet::Status lStatus = Stop(0);
+        OpenNet::Status lStatus = Stop();
         assert(OpenNet::STATUS_OK == lStatus);
     }
 
     return lResult;
 }
 
-OpenNet::Status System_Internal::Stop(unsigned int aFlags)
+OpenNet::Status System_Internal::Stop()
 {
     switch (mState)
     {
@@ -427,7 +431,7 @@ OpenNet::Status System_Internal::Stop(unsigned int aFlags)
 
         for (i = 0; i < mThreads.size(); i++)
         {
-            if (0 != (aFlags & STOP_FLAG_LOOPBACK))
+            if (0 != (mStartFlags & START_FLAG_LOOPBACK))
             {
                 mThreads[i]->Stop_Wait(::SendLoopBackPackets, this);
             }

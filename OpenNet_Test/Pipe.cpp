@@ -42,12 +42,12 @@ KMS_TEST_BEGIN(Pipe_SetupC)
     KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
     KMS_TEST_COMPARE(0, lSetup.Statistics_Reset());
-    KMS_TEST_COMPARE(0, lSetup.Start           ());
+    KMS_TEST_COMPARE(0, lSetup.Start           (OpenNet::System::START_FLAG_LOOPBACK));
     KMS_TEST_COMPARE(0, lSetup.Packet_Send     (PACKET, sizeof(PACKET), PACKET_QTY));
 
     Sleep(2000);
 
     KMS_TEST_COMPARE(0, lSetup.Statistics_GetAndDisplay());
-    KMS_TEST_COMPARE(0, lSetup.Stop                    (OpenNet::System::STOP_FLAG_LOOPBACK));
+    KMS_TEST_COMPARE(0, lSetup.Stop                    ());
 }
 KMS_TEST_END

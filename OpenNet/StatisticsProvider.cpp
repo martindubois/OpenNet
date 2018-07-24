@@ -27,6 +27,11 @@ namespace OpenNet
         return mStatisticsDescriptions;
     }
 
+    unsigned int StatisticsProvider::GetStatisticsQty() const
+    {
+        return mStatisticsQty;
+    }
+
     Status StatisticsProvider::DisplayStatistics(const unsigned int * aIn, unsigned int aInSize_byte, FILE * aOut, unsigned int aMinLevel)
     {
         if (NULL == aIn)

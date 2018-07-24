@@ -54,8 +54,8 @@ public:
     virtual OpenNet::Processor * Processor_Get     (unsigned int aIndex);
     virtual unsigned int         Processor_GetCount() const;
 
-    virtual OpenNet::Status Start();
-    virtual OpenNet::Status Stop (unsigned int aFlags);
+    virtual OpenNet::Status Start(unsigned int aFlags);
+    virtual OpenNet::Status Stop ();
 
     // ===== OpenNet::StatisticsProvider ====================================
     virtual OpenNet::Status GetStatistics  (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
@@ -101,6 +101,7 @@ private:
     Info             mInfo      ;
     cl_platform_id   mPlatform  ;
     ProcessorVector  mProcessors;
+    unsigned int     mStartFlags;
     State            mState     ;
     ThreadVector     mThreads   ;
 
