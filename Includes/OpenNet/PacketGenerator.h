@@ -40,10 +40,11 @@ namespace OpenNet
         /// \endcond
         typedef struct
         {
-            unsigned int mBandwidth_MiB_s;
+            double mBandwidth_MiB_s;
+
             unsigned int mPacketSize_byte;
 
-            unsigned char mReserved0[56];
+            unsigned char mReserved0[52];
         }
         Config;
 

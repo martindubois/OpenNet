@@ -479,6 +479,8 @@ namespace OpenNetK
 
             // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_PROGRAMMING ==> TX_RUNNING" DEBUG_EOL, mAdapterNo, aBufferInfo);
             aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_RUNNING; // Writing Direct GMA buffer !
+
+            Buffer_TxRunning_Zone0(aBufferInfo);
         }
     }
 

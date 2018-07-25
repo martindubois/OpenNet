@@ -151,8 +151,6 @@ namespace OpenNetK
         ASSERT(NULL != mAdapter);
 
         mAdapter->Buffers_Process();
-
-        mStatistics[HARDWARE_STATS_INTERRUPT_PROCESS2] ++;
     }
 
     unsigned int Hardware::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)

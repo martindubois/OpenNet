@@ -42,7 +42,7 @@ static const char * STATE_NAMES[] =
 // Static function declaration
 /////////////////////////////////////////////////////////////////////////////
 
-static unsigned int ComputeRepeatCount(unsigned int aBandwidth_MiB_s, unsigned int aPacketSize_byte);
+static unsigned int ComputeRepeatCount(double aBandwidth_MiB_s, unsigned int aPacketSize_byte);
 
 // ===== Entry point ========================================================
 static DWORD WINAPI Run(LPVOID aParameter);
@@ -55,8 +55,8 @@ PacketGenerator_Internal::PacketGenerator_Internal() : mAdapter(NULL), mDebugLog
     memset(&mConfig    , 0, sizeof(mConfig    ));
     memset(&mStatistics, 0, sizeof(mStatistics));
 
-    mConfig.mBandwidth_MiB_s =   50;
-    mConfig.mPacketSize_byte = 1024;
+    mConfig.mBandwidth_MiB_s =   50.0;
+    mConfig.mPacketSize_byte = 1024  ;
 }
 
 // ===== OpenNet::PacketGenerator ===========================================
@@ -298,8 +298,8 @@ OpenNet::Status PacketGenerator_Internal::ResetStatistics()
 unsigned int PacketGenerator_Internal::Run()
 {
     assert(NULL                 != mAdapter                );
-    assert(                   0 <  mConfig.mBandwidth_MiB_s);
-    assert(                   0 <  mConfig.mPacketSize_byte);
+    assert(                 0.0 <  mConfig.mBandwidth_MiB_s);
+    assert(                 0   <  mConfig.mPacketSize_byte);
     assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
 
     mStatistics[OpenNet::PACKET_GENERATOR_STATS_RUN_ENTRY] ++;
@@ -354,7 +354,7 @@ OpenNet::Status PacketGenerator_Internal::Config_Validate(const Config & aConfig
 {
     assert(NULL != (&aConfig));
 
-    if (0 >= aConfig.mBandwidth_MiB_s)
+    if (0.0 >= aConfig.mBandwidth_MiB_s)
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_INVALID_BANDWIDTH;
@@ -378,10 +378,10 @@ OpenNet::Status PacketGenerator_Internal::Config_Validate(const Config & aConfig
 // Static function declaration
 /////////////////////////////////////////////////////////////////////////////
 
-unsigned int ComputeRepeatCount(unsigned int aBandwidth_MiB_s, unsigned int aPacketSize_byte)
+unsigned int ComputeRepeatCount(double aBandwidth_MiB_s, unsigned int aPacketSize_byte)
 {
-    assert(                   0 <  aBandwidth_MiB_s);
-    assert(                   0 <  aPacketSize_byte);
+    assert(                 0.0 <  aBandwidth_MiB_s);
+    assert(                 0   <  aPacketSize_byte);
     assert(PACKET_SIZE_MAX_byte >= aPacketSize_byte);
 
     double lTemp = aBandwidth_MiB_s;

@@ -273,9 +273,6 @@ KMS_TEST_BEGIN(Mirror_SetupC)
     lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 11;
     lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 28;
 
-    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 17;
-    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 37;
-
     lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin        =  64;
     lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax        = 128;
     lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMultipleOf =  64;
@@ -327,9 +324,6 @@ KMS_TEST_BEGIN(Mirror_SetupC)
 
     lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 11;
     lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 34;
-
-    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 17;
-    lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 43;
 
     lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin        =  64;
     lSetup.mConstraints[HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax        = 576;

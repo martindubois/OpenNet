@@ -51,8 +51,6 @@ KMS_TEST_BEGIN(B_Function_9KB_SetupC)
     lTD.GetAdapterStatistics();
     lTD.DisplaySpeed        ();
 
-    lTD.Stop();
-
     lTD.Adapter_InitialiseConstraints();
 
     lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 12237; // 1248 = 11.4 %
@@ -75,9 +73,6 @@ KMS_TEST_BEGIN(B_Function_9KB_SetupC)
 
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 13356; // 2437 = 22.3 %
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 10919;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 12238; // 1319 = 12.1 %
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 10919;
 
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 9600;
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin = 9600;
@@ -128,9 +123,6 @@ KMS_TEST_BEGIN(B_Function_9KB_SetupC)
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 13371; // 1981 = 17.4 %
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 11390;
 
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 12323; // 1967 = 19 %
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 10356;
-
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 9600; // 15 = 0.16 %
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin = 9585;
 
@@ -156,6 +148,8 @@ KMS_TEST_BEGIN(B_Function_9KB_SetupC)
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin = 9578;
 
     KMS_TEST_COMPARE(0, lTD.Adapter_VerifyStatistics(1));
+
+    lTD.Stop();
 }
 KMS_TEST_END
 
@@ -182,8 +176,6 @@ KMS_TEST_BEGIN(B_Kernel_9KB_SetupC)
     lTD.GetAdapterStatistics();
     lTD.DisplaySpeed        ();
 
-    lTD.Stop();
-
     lTD.Adapter_InitialiseConstraints();
 
     lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 12231;
@@ -206,9 +198,6 @@ KMS_TEST_BEGIN(B_Kernel_9KB_SetupC)
 
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 13356;
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 12176;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 12232;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 10994;
 
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 9600;
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin = 9536;
@@ -259,9 +248,6 @@ KMS_TEST_BEGIN(B_Kernel_9KB_SetupC)
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 13370;
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 13356;
 
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMax = 12351;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS2].mMin = 11011;
-
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 9600;
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin = 9536;
 
@@ -287,5 +273,7 @@ KMS_TEST_BEGIN(B_Kernel_9KB_SetupC)
     lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin = 9560;
 
     KMS_TEST_COMPARE(0, lTD.Adapter_VerifyStatistics(1));
+
+    lTD.Stop();
 }
 KMS_TEST_END

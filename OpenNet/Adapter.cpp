@@ -119,7 +119,9 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     { "OpenNetK::Hardware - INTERRUPT - DISABLE    ", ""      , 0 },
     { "OpenNetK::Hardware - INTERRUPT - ENABLE     ", ""      , 0 },
     { "OpenNetK::Hardware - INTERRUPT - PROCESS    ", ""      , 1 },
-    { "OpenNetK::Hardware - INTERRUPT - PROCESS2   ", ""      , 1 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
     { "OpenNetK::Hardware - PACKET - RECEIVE       ", ""      , 1 }, // 70
     { "OpenNetK::Hardware - PACKET - SEND          ", ""      , 1 },
     { "OpenNetK::Hardware - RX                     ", "packet", 1 },
