@@ -41,10 +41,43 @@ namespace TestLib
             STATS_QTY     = 128,
         };
 
-        TestDual(unsigned int aBufferQty0, unsigned int aBufferQty1, bool aProfiling);
+        typedef enum
+        {
+            MODE_FUNCTION,
+            MODE_KERNEL  ,
+
+            MODE_QTY
+        }
+        Mode;
+
+        TestDual(Mode aMode, bool aProfiling);
 
         ~TestDual();
 
+        //     Internel   Ethernet   Internal
+        //
+        // Dropped <--- 0 <------- 1 <--- Generator
+
+        unsigned int A       (unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
+        unsigned int A_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte);
+        unsigned int A_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
+
+        // Internal   Ethernet   Internal
+        //
+        //     +---   <-------   <--- Generator
+        //     |    0          1
+        //     +-->   ------->   ---> Dropped
+
+        unsigned int B       (unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
+        unsigned int B_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte);
+        unsigned int B_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
+
+        // TODO  TestLib.TestDual
+        //       Mettre privee ce qui peut l'etre
+
+        double       Adapter_GetBandwidth         () const;
+        unsigned int Adapter_GetDroppedPacketCount() const;
+        double       Adapter_GetPacketThroughput  () const;
         void         Adapter_InitialiseConstraints();
         void         Adapter_SetInputFunctions    ();
         void         Adapter_SetInputFunction     (unsigned int aAdapter);
@@ -74,6 +107,13 @@ namespace TestLib
 
     private:
 
+        unsigned int A_Init(unsigned int aBufferQty);
+
+        unsigned int B_Init(unsigned int aBufferQty);
+
+        unsigned int Init  ();
+        unsigned int Uninit();
+
         void Adapter_Connect();
         void Adapter_Get    ();
 
@@ -84,8 +124,12 @@ namespace TestLib
         void SetConfig   ();
         void SetProcessor();
 
+        double               mBandwidth_MiB_s   ;
         unsigned int         mBufferQty [ADAPTER_QTY];
+        Mode                 mMode              ;
+        double               mPacketThroughput  ;
         OpenNet::Processor * mProcessor         ;
+        bool                 mProfiling         ;
         unsigned int         mStatistics[ADAPTER_QTY][STATS_QTY];
         OpenNet::System    * mSystem            ;
 

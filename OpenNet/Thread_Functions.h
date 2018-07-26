@@ -47,7 +47,7 @@ private:
 
     enum
     {
-        EVENT_QTY = 2,
+        EVENT_QTY = 3,
     };
 
     cl_event         mEvents[EVENT_QTY];

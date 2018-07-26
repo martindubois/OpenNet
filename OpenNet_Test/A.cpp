@@ -3,10 +3,6 @@
 // Product  OpenNet
 // File     OpenNet_Test/A.cpp
 
-//     Internel   Ethernet   Internal
-//
-// Dropped <--- 0 <------- 1 <--- Generator
-
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -28,236 +24,103 @@
 
 KMS_TEST_BEGIN(A_Function_9KB_SetupC)
 {
-    TestLib::TestDual lTD(8, 2, false);
+    TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
-    lTD.mPacketGenerator_Config.mBandwidth_MiB_s =  120.0;
-    lTD.mPacketGenerator_Config.mPacketSize_byte = 9000  ;
+    KMS_TEST_COMPARE_RETURN(0, lTD.A(2, 9000, 120.0));
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lTD.mPacketGenerator->SetAdapter(lTD.mAdapters[1]));
+    lTD.DisplaySpeed();
 
-    lTD.Adapter_SetInputFunction(0);
-    lTD.Start                   ();
+    KMS_TEST_ASSERT(119.0 < lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(119.1 > lTD.Adapter_GetBandwidth());
 
-    Sleep(100);
+    KMS_TEST_ASSERT(13860.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(13862.0 >= lTD.Adapter_GetPacketThroughput());
+}
+KMS_TEST_END
 
-    lTD.ResetAdapterStatistics();
+// TODO  OpenNet_Test.A
+//       Ajouter un test a 1000 B - Function et Kernel
 
-    Sleep(1000);
+KMS_TEST_BEGIN(A_Function_500B_SetupC)
+{
+    TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
-    lTD.GetAdapterStatistics();
-    lTD.DisplaySpeed        ();
+    KMS_TEST_COMPARE_RETURN(0, lTD.A_Search(32, 500));
+    KMS_TEST_COMPARE_RETURN(0, lTD.A_Verify(32, 500, lTD.mPacketGenerator_Config.mBandwidth_MiB_s))
 
-    lTD.Adapter_InitialiseConstraints();
+    lTD.DisplaySpeed();
 
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 12674; // 88 = 0.7 %
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin = 12586;
+    KMS_TEST_ASSERT(35.9 < lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(44.0 > lTD.Adapter_GetBandwidth());
 
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 217;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin = 217;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 217;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = 217;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 217;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = 217;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1002; // 1 = 0 %
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1001;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 13363; // 778 = 6.18 %
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 12585;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 13888;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin = 13888;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 13889; // 19 = 0.14 %
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin = 13870;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 120 * 1024 * 1024; // 1 MiB = 0.84 %
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin = 119 * 1024 * 1024;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 13888; // 18 = 0.13 %
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin = 13870;
-
-    KMS_TEST_COMPARE(0, lTD.Adapter_VerifyStatistics(0));
-
-    lTD.Stop();
+    KMS_TEST_ASSERT(74852.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(91419.0 >= lTD.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END
 
 KMS_TEST_BEGIN(A_Function_64B_SetupC)
 {
-    TestLib::TestDual lTD(16, 2, false);
+    TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
-    lTD.mPacketGenerator_Config.mBandwidth_MiB_s =  2.5;
-    lTD.mPacketGenerator_Config.mPacketSize_byte = 64  ;
+    KMS_TEST_COMPARE_RETURN(0, lTD.A_Search(32, 64));
+    KMS_TEST_COMPARE_RETURN(0, lTD.A_Verify(32, 64, lTD.mPacketGenerator_Config.mBandwidth_MiB_s));
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lTD.mPacketGenerator->SetAdapter(lTD.mAdapters[1]));
+    lTD.DisplaySpeed();
 
-    lTD.Adapter_SetInputFunction(0);
-    lTD.Start                   ();
+    KMS_TEST_ASSERT(4.8 < lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(5.8 > lTD.Adapter_GetBandwidth());
 
-    Sleep(100);
-
-    lTD.ResetAdapterStatistics();
-
-    Sleep(1000);
-
-    lTD.GetAdapterStatistics();
-    lTD.DisplaySpeed        ();
-
-    lTD.Adapter_InitialiseConstraints();
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 895;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin = 142;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 718;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin = 695;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 718;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = 695;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 718;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = 695;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1003;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1001;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 2686;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 2538;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 46464;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin = 44480;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 46008;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin = 44732;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 3 * 1024 * 1024;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin = 2 * 1024 * 1024;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 46008;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin = 45369;
-
-    KMS_TEST_COMPARE(0, lTD.Adapter_VerifyStatistics(0));
-
-    lTD.Stop();
+    KMS_TEST_ASSERT(74821.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(89141.0 >= lTD.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END
 
 KMS_TEST_BEGIN(A_Kernel_9KB_SetupC)
 {
-    TestLib::TestDual lTD(8, 2, false);
+    TestLib::TestDual lTD(TestLib::TestDual::MODE_KERNEL, false);
 
-    lTD.mPacketGenerator_Config.mBandwidth_MiB_s =  120.0;
-    lTD.mPacketGenerator_Config.mPacketSize_byte = 9000  ;
+    KMS_TEST_COMPARE_RETURN(0, lTD.A(2, 9000, 120.0));
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lTD.mPacketGenerator->SetAdapter(lTD.mAdapters[1]));
+    lTD.DisplaySpeed();
 
-    lTD.Adapter_SetInputKernel(0);
-    lTD.Start                 ();
+    KMS_TEST_ASSERT(119.0 < lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(119.1 > lTD.Adapter_GetBandwidth());
 
-    Sleep(100);
+    KMS_TEST_ASSERT(13860.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(13875.0 >= lTD.Adapter_GetPacketThroughput());
+}
+KMS_TEST_END
 
-    lTD.ResetAdapterStatistics();
+KMS_TEST_BEGIN(A_Kernel_500B_SetupC)
+{
+    TestLib::TestDual lTD(TestLib::TestDual::MODE_KERNEL, false);
 
-    Sleep(1000);
+    KMS_TEST_COMPARE_RETURN(0, lTD.A_Search(32, 500));
+    KMS_TEST_COMPARE_RETURN(0, lTD.A_Verify(32, 500, lTD.mPacketGenerator_Config.mBandwidth_MiB_s));
 
-    lTD.GetAdapterStatistics();
-    lTD.DisplaySpeed        ();
+    lTD.DisplaySpeed();
 
-    lTD.Adapter_InitialiseConstraints();
+    KMS_TEST_ASSERT(22.2 < lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(32.7 > lTD.Adapter_GetBandwidth());
 
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 12663; // 81 = 0.64 %
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin = 12582;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 217;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin = 217;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 217;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = 217;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 217;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = 217;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1001;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1001;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 13350; // 5 = 0 %
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 13345;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 13888;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin = 13888;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 13875; // 1 = 0 %
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin = 13874;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 120 * 1024 * 1024; // 1 MiB = 0.84 %
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin = 119 * 1024 * 1024;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 13875; // 1 = 0 %
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin = 13874;
-
-    KMS_TEST_COMPARE(0, lTD.Adapter_VerifyStatistics(0));
-
-    lTD.Stop();
+    KMS_TEST_ASSERT(46375.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(68008.0 >= lTD.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END
 
 KMS_TEST_BEGIN(A_Kernel_64B_SetupC)
 {
-    TestLib::TestDual lTD(16, 2, false);
+    TestLib::TestDual lTD(TestLib::TestDual::MODE_KERNEL, false);
 
-    lTD.mPacketGenerator_Config.mBandwidth_MiB_s =  1.4;
-    lTD.mPacketGenerator_Config.mPacketSize_byte = 64  ;
+    KMS_TEST_COMPARE_RETURN(0, lTD.A_Search(32, 64));
+    KMS_TEST_COMPARE_RETURN(0, lTD.A_Verify(32, 64, lTD.mPacketGenerator_Config.mBandwidth_MiB_s))
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lTD.mPacketGenerator->SetAdapter(lTD.mAdapters[1]));
-
-    lTD.Adapter_SetInputKernel(0);
-    lTD.Start();
-
-    Sleep(100);
-
-    lTD.ResetAdapterStatistics();
-
-    Sleep(1000);
-
-    lTD.GetAdapterStatistics();
     lTD.DisplaySpeed();
 
-    lTD.Adapter_InitialiseConstraints();
+    KMS_TEST_ASSERT(2.7 < lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(3.4 > lTD.Adapter_GetBandwidth());
 
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 460;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin = 260;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 468;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin = 464;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 468;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = 464;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 468;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = 464;
-
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1001;
-    lTD.mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1001;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 1760;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin = 1726;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 29760;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin = 29652;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 29716;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin = 29716;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 2 * 1024 * 1024;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin = 1 * 1024 * 1024;
-
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 29716;
-    lTD.mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin = 29714;
-
-    KMS_TEST_COMPARE(0, lTD.Adapter_VerifyStatistics(0));
-
-    lTD.Stop();
+    KMS_TEST_ASSERT(41922.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(52348.0 >= lTD.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END

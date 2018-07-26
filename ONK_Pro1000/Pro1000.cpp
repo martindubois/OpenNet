@@ -286,6 +286,7 @@ void Pro1000::Interrupt_Enable()
     mZone0->Unlock();
 }
 
+// CRITICAL PATH
 bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing)
 {
     ASSERT(NULL != aNeedMoreProcessing);
@@ -306,6 +307,7 @@ bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcess
     return true;
 }
 
+// CRITICAL PATH
 void Pro1000::Interrupt_Process2()
 {
     // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
@@ -322,6 +324,7 @@ void Pro1000::Interrupt_Process2()
     Hardware::Interrupt_Process2();
 }
 
+// CRITICAL PATH
 void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
 {
     // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , ,  )" DEBUG_EOL);
@@ -340,7 +343,7 @@ void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, v
         mRx_Counter   [mRx_In] = aCounter   ;
         mRx_PacketInfo[mRx_In] = aPacketInfo;
 
-        mRx_PacketInfo[mRx_In]->mPacketState = OPEN_NET_PACKET_STATE_RX_RUNNING;
+        mRx_PacketInfo[mRx_In]->mPacketState = OPEN_NET_PACKET_STATE_RX_RUNNING; // Writing DirectGMA buffer !
 
         memset((Pro1000_Rx_Descriptor *)(mRx_Virtual) + mRx_In, 0, sizeof(Pro1000_Rx_Descriptor)); // volatile_cast
 
@@ -357,6 +360,7 @@ void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, v
     mStatistics[OpenNetK::HARDWARE_STATS_PACKET_RECEIVE] ++;
 }
 
+// CRITICAL PATH
 void Pro1000::Packet_Send(uint64_t aData, unsigned int aSize_byte, volatile long * aCounter)
 {
     // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u,  )" DEBUG_EOL, aSize_byte);
@@ -402,7 +406,7 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, volatil
         ASSERT(PACKET_BUFFER_QTY >  mTx_PacketBuffer_In                          );
         ASSERT(NULL              != mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In]);
 
-        memcpy((void *)(mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In]), aPacket, aSize_byte); // volatile_cast
+        memcpy(mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In], aPacket, aSize_byte);
 
         lPacket_PA = mTx_PacketBuffer_Logical[mTx_PacketBuffer_In];
 
@@ -509,6 +513,8 @@ void Pro1000::Rx_Config_Zone0()
     mBAR1->mRx_Control.mFields.mEnable = true;
 }
 
+// CRITICAL PATH
+//
 // Level   SoftInt
 // Thread  SoftInt
 void Pro1000::Rx_Process_Zone0()
@@ -526,10 +532,10 @@ void Pro1000::Rx_Process_Zone0()
 
         ASSERT(NULL                             != mRx_Counter   [mRx_Out]              );
         ASSERT(NULL                             != mRx_PacketInfo[mRx_Out]              );
-        ASSERT(OPEN_NET_PACKET_STATE_RX_RUNNING == mRx_PacketInfo[mRx_Out]->mPacketState);
+        ASSERT(OPEN_NET_PACKET_STATE_RX_RUNNING == mRx_PacketInfo[mRx_Out]->mPacketState); // Reading DirectGMA buffer !!!
 
-        mRx_PacketInfo[mRx_Out]->mPacketSize_byte = mRx_Virtual[mRx_Out].mSize_byte;
-        mRx_PacketInfo[mRx_Out]->mPacketState     = OPEN_NET_PACKET_STATE_RX_COMPLETED;
+        mRx_PacketInfo[mRx_Out]->mPacketSize_byte = mRx_Virtual[mRx_Out].mSize_byte   ; // Writing DirectGMA buffer !
+        mRx_PacketInfo[mRx_Out]->mPacketState     = OPEN_NET_PACKET_STATE_RX_COMPLETED; // Writing DirectGMA buffer !
 
         InterlockedDecrement(mRx_Counter[mRx_Out]);
 
@@ -592,6 +598,8 @@ void Pro1000::Tx_Config_Zone0()
     mBAR1->mTx_Control.mFields.mEnable = true;
 }
 
+// CRITICAL PATH
+//
 // Level   SoftInt
 // Thread  SoftInt
 void Pro1000::Tx_Process_Zone0()

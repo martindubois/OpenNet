@@ -229,6 +229,8 @@ void Thread::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
 // Internal
 /////////////////////////////////////////////////////////////////////////////
 
+// CRITICAL PATH
+//
 // Thread  Worker
 void Thread::Run()
 {
@@ -285,6 +287,8 @@ void Thread::Run()
 //                       processing. This event must be passed to
 //                       Processing_Wait.
 //
+// CRITICAL PATH
+//
 // Processing_Queue ==> Processing_Wait
 void Thread::Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalSize, cl_event * aEvent)
 {
@@ -303,6 +307,8 @@ void Thread::Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalS
 }
 
 // aEvent [D--;RW-] The cl_event Processing_Queue created
+//
+// CRITICAL PATH
 //
 // Processing_Queue ==> Processing_Wait
 void Thread::Processing_Wait(cl_event aEvent)
@@ -327,6 +333,8 @@ void Thread::Processing_Wait(cl_event aEvent)
 }
 
 // aIndex  The index passed to Processing_Queue and Processing_Wait
+//
+// CRITICAL PATH
 void Thread::Run_Iteration(unsigned int aIndex)
 {
     Processing_Wait (aIndex);
@@ -406,7 +414,7 @@ void Thread::Run_Wait()
     assert(   0 <  mAdapters.size());
     assert(NULL != mDebugLog       );
 
-    for (unsigned int i = 0; i < 600; i++)
+    for (unsigned int i = 0; i < 3000; i++)
     {
         unsigned int lBufferCount = 0;
 
@@ -426,7 +434,7 @@ void Thread::Run_Wait()
             return;
         }
 
-        Sleep(1000);
+        Sleep(100);
     }
 
     // TODO  OpenNet.Adapter_Internal.Error_Handling
@@ -476,22 +484,22 @@ void Thread::Stop_Wait_Zone0(TryToSolveHang aTryToSolveHang, void * aContext)
 
         if (NULL != aTryToSolveHang)
         {
-            lRet = Wait_Zone0(3000);
+            lRet = Wait_Zone0(1000);
 
             if (WAIT_OBJECT_0 == lRet) { break; }
 
-            for (unsigned int i = 0; i < 1104; i ++)
+            for (unsigned int i = 0; i < 2990; i ++)
             {
                 aTryToSolveHang(aContext, ( 1 == mAdapters.size() ) ? mAdapters[ 0 ] : NULL);
 
-                lRet = Wait_Zone0(500);
+                lRet = Wait_Zone0(100);
 
                 if (WAIT_OBJECT_0 == lRet) { break; }
             }
         }
         else
         {
-            lRet = Wait_Zone0(600000);
+            lRet = Wait_Zone0(300000);
         }
 
         if (WAIT_OBJECT_0 == lRet) { break; }
@@ -550,6 +558,8 @@ unsigned int Thread::Wait_Zone0(unsigned int aTimeout_ms)
 // aParam
 //
 // Return  This method return the retrieved information
+//
+// CRITICAL PATH
 //
 // Exception  KmsLib::Exception *  See OCLW_GetEventProfilingInfo
 // Thread     Worker

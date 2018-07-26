@@ -9,6 +9,10 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-#define OPEN_NET_BUFFER_QTY (16)
+// TODO  OpenNetK.Constants
+//       Deplacer OPEN_NET_BUFFER_QTY dans Common/OpenNetK/Constants et
+//       renommer BUFFER_QTY
+
+#define OPEN_NET_BUFFER_QTY (32)
 
 #define OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte (64 * 1024)
