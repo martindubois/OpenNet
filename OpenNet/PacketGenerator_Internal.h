@@ -64,6 +64,11 @@ private:
     OpenNet::Status Config_Apply   (const Config & aConfig);
     OpenNet::Status Config_Validate(const Config & aConfig);
 
+    double                    ComputePeriod     () const;
+    unsigned int              ComputeRepeatCount(const LARGE_INTEGER & aBefore, const LARGE_INTEGER & aNow, double aPeriod);
+    IoCtl_Packet_Send_Ex_In * PreparePacket(void * aBuffer);
+    void                      SendPackets  (const IoCtl_Packet_Send_Ex_In * aIn);
+
     Adapter_Internal * mAdapter ;
     Config             mConfig  ;
     KmsLib::DebugLog   mDebugLog;
