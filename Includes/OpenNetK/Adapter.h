@@ -56,6 +56,19 @@ namespace OpenNetK
 
     // Internal
 
+        // TODO  OpenNetK.Adapter
+        //       Definit la structure BufferInfo dans un fichier prive. En
+        //       faire une classe.
+
+        /// \cond en
+        /// \brief  DirectGMA Buffer information. This structur is not
+        ///         documented and may change or disapear in futur version.
+        /// \endcond
+        /// \cond fr
+        /// \brief  L'information au sujet d'un espace memoire DirectGMA.
+        ///         Cette structure n'est pas documente. Elle peut changer
+        ///         ou disparaitre dans une version future.
+        /// \endcond
         typedef struct
         {
             Buffer mBuffer;
@@ -128,8 +141,6 @@ namespace OpenNetK
         KEVENT     * mEvent    ;
         Hardware   * mHardware ;
         unsigned int mSystemId ;
-
-        volatile long mPacketSend_Pending;
 
         mutable uint32_t      mStatistics[32];
         mutable LARGE_INTEGER mStatistics_Start;

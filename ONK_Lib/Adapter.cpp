@@ -123,7 +123,7 @@ namespace OpenNetK
 
     // aBuffer [-K-;RW-]
     //
-    // CRITICAL PATH
+    // CRITICAL PATH - Buffer
     //
     // Level   SoftInt
     // Thread  SoftInt
@@ -143,35 +143,49 @@ namespace OpenNetK
 
         OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<OpenNet_PacketInfo *>(lBase + aBufferInfo->mPacketInfoOffset_byte);
 
-        for (unsigned int i = 0; i < aBufferInfo->mBuffer.mPacketQty; i++)
-        {
-            ASSERT(0 < aBufferInfo->mPacketOffsets_byte[i]);
+        mHardware->Lock();
 
-            switch (lPacketInfo[i].mPacketState) // Reading Direct GMA buffer !!!
+            unsigned int lPacketQty = 0;
+
+            for (unsigned int i = 0; i < aBufferInfo->mBuffer.mPacketQty; i++)
             {
-            case OPEN_NET_PACKET_STATE_PX_COMPLETED:
-                lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_TX_RUNNING; // Writing Direct GMA buffer !
-                // no break;
+                ASSERT(0 < aBufferInfo->mPacketOffsets_byte[i]);
 
-            case OPEN_NET_PACKET_STATE_TX_RUNNING:
-                if (0 != (lPacketInfo[i].mToSendTo & lAdapterBit))
+                switch (lPacketInfo[i].mPacketState) // Reading DirectGMA buffer !!!
                 {
-                    mHardware->Packet_Send(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPacketOffsets_byte[i], lPacketInfo[i].mPacketSize_byte, &aBufferInfo->mTx_Counter); // Reading Direct GMA buffer !!!
-                    mStatistics[ADAPTER_STATS_TX_packet]++;
-                }
-                break;
+                case OPEN_NET_PACKET_STATE_PX_COMPLETED:
+                    lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_TX_RUNNING; // Writing DirectGMA buffer !
+                    // no break;
 
-            default: ASSERT(false);
+                case OPEN_NET_PACKET_STATE_TX_RUNNING:
+                    if (0 != (lPacketInfo[i].mToSendTo & lAdapterBit)) // Reading DirectGMA buffer !
+                    {
+                        lPacketQty++;
+                        mHardware->Packet_Send_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPacketOffsets_byte[i], lPacketInfo[i].mPacketSize_byte, &aBufferInfo->mTx_Counter); // Reading DirectGMA buffer !!!
+                    }
+                    break;
+
+                default: ASSERT(false);
+                }
             }
-        }
+
+        mHardware->Unlock_AfterSend(&aBufferInfo->mTx_Counter, lPacketQty);
 
         mStatistics[ADAPTER_STATS_BUFFER_SEND_PACKETS]++;
+        mStatistics[ADAPTER_STATS_TX_packet          ]+= lPacketQty;
     }
 
     // CRITICAL PATH
     //
     // Level    SoftInt
     // Threads  Queue or SoftInt
+
+    // TODO  OpenNetK.Adapter.TxOrder
+    //       Les paquets doivent etre transmis dans l'ordre de reception.
+
+    // ISSUE  2018-07-25_21h17_MD
+    //        Il y a une condition de course qui cause un probleme a la
+    //        machine a etat des Buffers.
     void Adapter::Buffers_Process()
     {
         ASSERT(NULL != mZone0);
@@ -184,7 +198,7 @@ namespace OpenNetK
             {
                 ASSERT(NULL != mBuffers[i].mHeader);
 
-                switch (mBuffers[i].mHeader->mBufferState) // Reading Direct GMA buffer !!!
+                switch (mBuffers[i].mHeader->mBufferState) // Reading DirectGMA buffer !!!
                 {
                 case OPEN_NET_BUFFER_STATE_PX_COMPLETED  : Buffer_PxCompleted_Zone0(mBuffers + i); break;
                 case OPEN_NET_BUFFER_STATE_PX_RUNNING    : Buffer_PxRunning_Zone0  (mBuffers + i); break;
@@ -299,20 +313,20 @@ namespace OpenNetK
 
         unsigned int lPacketOffset_byte = sizeof(OpenNet_BufferHeader) + (sizeof(OpenNet_PacketInfo) * lPacketQty);
 
-        memset(aHeader, 0, lPacketOffset_byte);  // Writing Direct GMA buffer !
+        memset(aHeader, 0, lPacketOffset_byte);  // Writing DirectGMA buffer !
 
-        aHeader->mBufferState           = OPEN_NET_BUFFER_STATE_TX_RUNNING; // Writing Direct GMA buffer !
-        aHeader->mPacketInfoOffset_byte = sizeof(OpenNet_BufferHeader); // Writing Direct GMA buffer !
-        aHeader->mPacketQty             = lPacketQty; // Writing Direct GMA buffer !
-        aHeader->mPacketSize_byte       = lPacketSize_byte; // Writing Direct GMA buffer !
+        aHeader->mBufferState           = OPEN_NET_BUFFER_STATE_TX_RUNNING; // Writing DirectGMA buffer !
+        aHeader->mPacketInfoOffset_byte = sizeof(OpenNet_BufferHeader); // Writing DirectGMA buffer !
+        aHeader->mPacketQty             = lPacketQty; // Writing DirectGMA buffer !
+        aHeader->mPacketSize_byte       = lPacketSize_byte; // Writing DirectGMA buffer !
 
         for (unsigned int i = 0; i < lPacketQty; i++)
         {
-            lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_TX_RUNNING;  // Writing Direct GMA buffer !
+            lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_TX_RUNNING;  // Writing DirectGMA buffer !
 
             SkipDangerousBoundary(aBuffer.mBuffer_PA, &lPacketOffset_byte, lPacketSize_byte, aPacketOffsets_byte + i);
 
-            lPacketInfo[i].mPacketOffset_byte = aPacketOffsets_byte[i]; // Writing Direct GMA buffer !
+            lPacketInfo[i].mPacketOffset_byte = aPacketOffsets_byte[i]; // Writing DirectGMA buffer !
         }
 
         mStatistics[ADAPTER_STATS_BUFFER_INIT_HEADER] ++;
@@ -358,7 +372,7 @@ namespace OpenNetK
 
     // aBuffer [-K-;R--]
     //
-    // CRITICAL PATH
+    // CRITICAL PATH - Buffer
     //
     // Level    SoftInt
     // Threads  Queue or SoftInt
@@ -379,12 +393,16 @@ namespace OpenNetK
 
         mZone0->Unlock();
 
-            for (unsigned int i = 0; i < aBufferInfo->mBuffer.mPacketQty; i++)
-            {
-                ASSERT(0 < aBufferInfo->mPacketOffsets_byte[i]);
+            mHardware->Lock();
 
-                mHardware->Packet_Receive(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPacketOffsets_byte[i], lPacketInfo + i, &aBufferInfo->mRx_Counter);
-            }
+                for (unsigned int i = 0; i < aBufferInfo->mBuffer.mPacketQty; i++)
+                {
+                    ASSERT(0 < aBufferInfo->mPacketOffsets_byte[i]);
+
+                    mHardware->Packet_Receive_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPacketOffsets_byte[i], lPacketInfo + i, &aBufferInfo->mRx_Counter);
+                }
+
+            mHardware->Unlock_AfterReceive(&aBufferInfo->mRx_Counter, aBufferInfo->mBuffer.mPacketQty);
 
         mZone0->Lock();
 
@@ -393,7 +411,7 @@ namespace OpenNetK
 
     // aBuffer [-K-;R--]
     //
-    // CRITICAL PATH
+    // CRITICAL PATH - Buffer
     //
     // Level   SoftInt
     // Thread  SoftInt
@@ -419,7 +437,7 @@ namespace OpenNetK
         mStatistics[ADAPTER_STATS_BUFFER_SEND] ++;
     }
 
-    // CRITICAL PATH
+    // CRITICAL PATH - Buffer
     void Adapter::Buffer_WriteMarker_Zone0(BufferInfo * aBufferInfo)
     {
         ASSERT(NULL != aBufferInfo         );
@@ -445,7 +463,7 @@ namespace OpenNetK
     // ===== Buffer_State ===================================================
     // aBufferInfo [---;RW-]
     //
-    // CRITICAL PATH
+    // CRITICAL PATH - Buffer
     //
     // Level   SoftInt
     // Thread  SoftInt
@@ -475,10 +493,10 @@ namespace OpenNetK
 
             Buffer_Send_Zone0(aBufferInfo);
 
-            ASSERT(OPEN_NET_BUFFER_STATE_TX_PROGRAMMING == aBufferInfo->mHeader->mBufferState); // Reading Direct GMA buffer !!!
+            ASSERT(OPEN_NET_BUFFER_STATE_TX_PROGRAMMING == aBufferInfo->mHeader->mBufferState); // Reading DirectGMA buffer !!!
 
             // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_PROGRAMMING ==> TX_RUNNING" DEBUG_EOL, mAdapterNo, aBufferInfo);
-            aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_RUNNING; // Writing Direct GMA buffer !
+            aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_TX_RUNNING; // Writing DirectGMA buffer !
 
             Buffer_TxRunning_Zone0(aBufferInfo);
         }
@@ -494,7 +512,7 @@ namespace OpenNetK
         if (aBufferInfo->mFlags.mStopRequested)
         {
             DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_RUNNING ==> STOPPED" DEBUG_EOL, mAdapterNo, aBufferInfo);
-            aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED; // Writing Direct GMA buffer !
+            aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED; // Writing DirectGMA buffer !
         }
     }
 
@@ -507,7 +525,7 @@ namespace OpenNetK
         if (0 == aBufferInfo->mRx_Counter)
         {
             DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p RX_RUNNING ==> PX_RUNNING" DEBUG_EOL, mAdapterNo, aBufferInfo);
-            aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_RUNNING;  // Writing Direct GMA buffer !
+            aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_RUNNING;  // Writing DirectGMA buffer !
             Buffer_WriteMarker_Zone0(aBufferInfo);
         }
     }
@@ -534,14 +552,14 @@ namespace OpenNetK
     {
         ASSERT(NULL                             != aBufferInfo                       );
         ASSERT(NULL                             != aBufferInfo->mHeader              );
-        ASSERT(OPEN_NET_BUFFER_STATE_TX_RUNNING == aBufferInfo->mHeader->mBufferState); // Reading Direct GMA buffer !!!!
+        ASSERT(OPEN_NET_BUFFER_STATE_TX_RUNNING == aBufferInfo->mHeader->mBufferState); // Reading DirectGMA buffer !!!!
 
         if (0 == aBufferInfo->mTx_Counter)
         {
             if (aBufferInfo->mFlags.mStopRequested)
             {
                 DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_RUNNING ==> STOPPED" DEBUG_EOL, mAdapterNo, aBufferInfo);
-                aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED; // Writing Direct GMA buffer !
+                aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED; // Writing DirectGMA buffer !
 
                 Buffer_WriteMarker_Zone0(aBufferInfo);
             }
@@ -551,14 +569,14 @@ namespace OpenNetK
                 // release the gate to avoid deadlock with the Hardware's
                 // gates.
                 DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_RUNNING ==> RX_PROGRAMMING" DEBUG_EOL, mAdapterNo, aBufferInfo);
-                aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RX_PROGRAMMING; // Writing Direct GMA buffer !
+                aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RX_PROGRAMMING; // Writing DirectGMA buffer !
 
                 Buffer_Receive_Zone0(aBufferInfo);
 
-                ASSERT(OPEN_NET_BUFFER_STATE_RX_PROGRAMMING == aBufferInfo->mHeader->mBufferState); // Reading Direct GMA buffer !!!
+                ASSERT(OPEN_NET_BUFFER_STATE_RX_PROGRAMMING == aBufferInfo->mHeader->mBufferState); // Reading DirectGMA buffer !!!
 
                 DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p RX_PROGRAMMING ==> RX_RUNNING" DEBUG_EOL, mAdapterNo, aBufferInfo);
-                aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RX_RUNNING; // Writing Direct GMA buffer !
+                aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RX_RUNNING; // Writing DirectGMA buffer !
             }
         }
     }
@@ -653,7 +671,7 @@ namespace OpenNetK
     {
         ASSERT(NULL != mHardware);
 
-        mHardware->Packet_Send(aIn, aInSize_byte, &mPacketSend_Pending);
+        mHardware->Packet_Send(aIn, aInSize_byte);
 
         mStatistics[ADAPTER_STATS_IOCTL_PACKET_SEND] ++;
 
@@ -673,7 +691,7 @@ namespace OpenNetK
             return IOCTL_RESULT_INVALID_PARAMETER;
         }
 
-        mHardware->Packet_Send(lIn + 1, aInSize_byte - sizeof(IoCtl_Packet_Send_Ex_In), &mPacketSend_Pending, lIn->mRepeatCount);
+        mHardware->Packet_Send(lIn + 1, aInSize_byte - sizeof(IoCtl_Packet_Send_Ex_In), lIn->mRepeatCount);
 
         mStatistics[ADAPTER_STATS_IOCTL_PACKET_SEND] += lIn->mRepeatCount;
 

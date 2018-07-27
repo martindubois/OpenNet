@@ -202,6 +202,14 @@ namespace OpenNetK
         /// \endcond
         virtual void Interrupt_Process2();
 
+        void Lock();
+
+        void Unlock();
+
+        virtual void Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacketQty);
+
+        virtual void Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty);
+
         /// \cond en
         /// \brief  Add the buffer to the receiving queue.
         /// \param  aLogicalAddress       The data
@@ -215,44 +223,42 @@ namespace OpenNetK
         /// \param  aCounter    [-K-;RW-] Le compteur d'operation
         /// \retval false  Erreur
         /// \endcond
-        virtual void Packet_Receive(uint64_t aLogicalAddress, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter) = 0;
+        virtual void Packet_Receive_NoLock(uint64_t aLogicalAddress, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter) = 0;
 
         /// \cond en
         /// \brief  Add the packet to the send queue.
         /// \param  aLogicalAddress    The data
         /// \param  aSize_byte         The data size
-        /// \param  aCounter [-K-;RW-] The operation counter
+        /// \param  aCounter [-KO;RW-] The operation counter
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le paquet a la queue de transmission
         /// \param  aLogicalAddress    Les donnees
         /// \param  aSize_byte         La taille des donnees
-        /// \param  aCounter [-K-;RW-] Le compteur d'operation
+        /// \param  aCounter [-KO;RW-] Le compteur d'operation
         /// \endcond
-        virtual void Packet_Send(uint64_t aLogicalAddress, unsigned int aSize_byte, volatile long * aCounter) = 0;
+        virtual void Packet_Send_NoLock(uint64_t aLogicalAddress, unsigned int aSize_byte, volatile long * aCounter = NULL) = 0;
 
         /// \cond en
         /// \brief  Add the packet to the send queue.
         /// \param  aPacket  [---;R--] The packet
         /// \param  aSize_byte         The packet size
-        /// \param  aCounter [-K-;RW-]
         /// \param  aRepeatCount
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le paquet a la queue de transmission
         /// \param  aPacket  [---;R--] Le paquet
         /// \param  aSize_byte         La taille du paquet
-        /// \param  aCounter [-K-;RW-]
         /// \param  aRepeatCount
         /// \endcond
         /// \note   Thread = Queue
-        virtual void Packet_Send(const void * aPacket, unsigned int aSize_byte, volatile long * aCounter, unsigned int aRepeatCount = 1) = 0;
+        virtual void Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1) = 0;
 
         /// \cond en
         /// \brief  Retrieve statistics
         /// \param  aOut [---;-W-] The output buffer
         /// \param  aOutSize_byte  The output buffer size
-        /// \param  aReset         Reset the statitics after getting them?
+        /// \param  aReset         Reset the statitics after getting them
         /// \return This method returns the size of statistics writen into
         ///         the output buffer.
         /// \endcond
@@ -261,7 +267,7 @@ namespace OpenNetK
         /// \param  aOut [---;-W-] L'espace de memoire de sortie
         /// \param  aOutSize_byte  La taille de l'espace memoire de sortie
         /// \param  aReset         Remettre les statistiques a zero apres les
-        ///                        avoir obtenus?
+        ///                        avoir obtenus
         /// \return Cette methode retourne la taille des statistiques ecrites
         ///         dans l'espace de memoire de sortie.
         /// \endcond

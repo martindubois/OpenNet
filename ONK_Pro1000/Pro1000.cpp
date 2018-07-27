@@ -228,7 +228,7 @@ bool Pro1000::D0_Entry()
         mBAR1->mInterruptVectorAllocationMisc.mFields.mVector32Valid = true;
         mBAR1->mInterruptVectorAllocationMisc.mFields.mVector33Valid = true;
 
-        mBAR1->mInterruptTrottle[0].mFields.mInterval_us = 75;
+        mBAR1->mInterruptTrottle[0].mFields.mInterval_us = 100;
 
         // mBAR1->mFlowControlReceiveThresholdHigh.mFields.mReceiveThresholdHigh = 3000;
 
@@ -295,7 +295,7 @@ bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcess
 
     (void)(aMessageId);
 
-    uint32_t lValue = mBAR1->mInterruptCauseRead.mValue;
+    uint32_t lValue = mBAR1->mInterruptCauseRead.mValue; // Reading hardware !!!
     (void)(lValue);
 
     (*aNeedMoreProcessing) = true;
@@ -324,85 +324,103 @@ void Pro1000::Interrupt_Process2()
     Hardware::Interrupt_Process2();
 }
 
-// CRITICAL PATH
-void Pro1000::Packet_Receive(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
+// CRITICAL PATH - Buffer
+void Pro1000::Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacketQty)
+{
+    ASSERT(NULL != aCounter  );
+    ASSERT(0    <  aPacketQty);
+
+    ASSERT(NULL              != mBAR1 );
+    ASSERT(RX_DESCRIPTOR_QTY >  mRx_In);
+
+    Hardware::Unlock_AfterReceive(aCounter, aPacketQty);
+
+    Pro1000_Rx_DescriptorTail lReg;
+
+    lReg.mValue         =      0;
+    lReg.mFields.mValue = mRx_In;
+
+    mBAR1->mRx_DescriptorTail0.mFields.mValue = lReg.mValue; // Writing hardware !
+
+    mStatistics[OpenNetK::HARDWARE_STATS_PACKET_RECEIVE] += aPacketQty;
+}
+
+// CRITICAL PATH - Buffer
+void Pro1000::Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty)
+{
+    ASSERT(NULL != aCounter  );
+    ASSERT(0    <  aPacketQty);
+
+    ASSERT(NULL              != mBAR1 );
+    ASSERT(RX_DESCRIPTOR_QTY >  mTx_In);
+
+    Hardware::Unlock_AfterSend(aCounter, aPacketQty);
+
+    Pro1000_Tx_DescriptorTail lReg;
+
+    lReg.mValue         =      0;
+    lReg.mFields.mValue = mTx_In;
+
+    mBAR1->mTx_DescriptorTail0.mFields.mValue = lReg.mValue; // Writing hardware !
+
+    mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
+
+}
+
+// CRITICAL PATH - Packet
+void Pro1000::Packet_Receive_NoLock(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
 {
     // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , ,  )" DEBUG_EOL);
 
     ASSERT(NULL != aPacketInfo);
     ASSERT(NULL != aCounter   );
 
-    ASSERT(NULL != mBAR1      );
-    ASSERT(NULL != mRx_Virtual);
-    ASSERT(NULL != mZone0     );
+    ASSERT(RX_DESCRIPTOR_QTY >  mRx_In     );
+    ASSERT(NULL              != mRx_Virtual);
 
-    mZone0->Lock();
+    mRx_Counter   [mRx_In] = aCounter   ;
+    mRx_PacketInfo[mRx_In] = aPacketInfo;
 
-        ASSERT(RX_DESCRIPTOR_QTY >  mRx_In     );
+    mRx_PacketInfo[mRx_In]->mPacketState = OPEN_NET_PACKET_STATE_RX_RUNNING; // Writing DirectGMA buffer !
 
-        mRx_Counter   [mRx_In] = aCounter   ;
-        mRx_PacketInfo[mRx_In] = aPacketInfo;
+    memset((Pro1000_Rx_Descriptor *)(mRx_Virtual) + mRx_In, 0, sizeof(Pro1000_Rx_Descriptor)); // volatile_cast
 
-        mRx_PacketInfo[mRx_In]->mPacketState = OPEN_NET_PACKET_STATE_RX_RUNNING; // Writing DirectGMA buffer !
+    mRx_Virtual[mRx_In].mLogicalAddress = aData;
 
-        memset((Pro1000_Rx_Descriptor *)(mRx_Virtual) + mRx_In, 0, sizeof(Pro1000_Rx_Descriptor)); // volatile_cast
+    mRx_In = (mRx_In + 1) % RX_DESCRIPTOR_QTY;
+}
 
-        mRx_Virtual[mRx_In].mLogicalAddress = aData;
+// CRITICAL PATH - Packet
+void Pro1000::Packet_Send_NoLock(uint64_t aData, unsigned int aSize_byte, volatile long * aCounter)
+{
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u,  )" DEBUG_EOL, aSize_byte);
 
-        InterlockedIncrement(mRx_Counter[mRx_In]);
+    ASSERT(TX_DESCRIPTOR_QTY >  mTx_In     );
+    ASSERT(NULL              != mTx_Virtual);
 
-        mRx_In = (mRx_In + 1) % RX_DESCRIPTOR_QTY;
+    mTx_Counter[mTx_In] = aCounter;
 
-        mBAR1->mRx_DescriptorTail0.mFields.mValue = mRx_In;
+    mTx_Virtual[mTx_In].mFields.mDescriptorDone = false     ;
+    mTx_Virtual[mTx_In].mFields.mSize_byte      = aSize_byte;
+    mTx_Virtual[mTx_In].mLogicalAddress         = aData     ;
 
-    mZone0->Unlock();
-
-    mStatistics[OpenNetK::HARDWARE_STATS_PACKET_RECEIVE] ++;
+    mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
 }
 
 // CRITICAL PATH
-void Pro1000::Packet_Send(uint64_t aData, unsigned int aSize_byte, volatile long * aCounter)
+void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u,  )" DEBUG_EOL, aSize_byte);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes,  )" DEBUG_EOL, aSize_byte);
 
     ASSERT(NULL != mBAR1      );
     ASSERT(NULL != mTx_Virtual);
     ASSERT(NULL != mZone0     );
 
-    mZone0->Lock();
-
-        ASSERT(TX_DESCRIPTOR_QTY >  mTx_In     );
-
-        mTx_Counter[mTx_In] = aCounter;
-
-        mTx_Virtual[mTx_In].mFields.mDescriptorDone = false     ;
-        mTx_Virtual[mTx_In].mFields.mSize_byte      = aSize_byte;
-        mTx_Virtual[mTx_In].mLogicalAddress         = aData     ;
-
-        if (NULL != mTx_Counter[mTx_In])
-        {
-            InterlockedIncrement(mTx_Counter[mTx_In]);
-        }
-
-        mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
-
-        mBAR1->mTx_DescriptorTail0.mFields.mValue = mTx_In;
-
-    mZone0->Unlock();
-
-    mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] ++;
-}
-
-void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, volatile long * aCounter, unsigned int aRepeatCount)
-{
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes, ,  )" DEBUG_EOL, aSize_byte);
-
-    ASSERT(NULL != mZone0);
-
     uint64_t lPacket_PA;
 
-    mZone0->Lock();
+    Lock();
 
+        ASSERT(TX_DESCRIPTOR_QTY >  mTx_In                                       );
         ASSERT(PACKET_BUFFER_QTY >  mTx_PacketBuffer_In                          );
         ASSERT(NULL              != mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In]);
 
@@ -412,12 +430,12 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, volatil
 
         mTx_PacketBuffer_In = ( mTx_PacketBuffer_In + 1 ) % PACKET_BUFFER_QTY;
 
-    mZone0->Unlock();
+        for (unsigned int i = 0; i < aRepeatCount; i++)
+        {
+            Packet_Send_NoLock(lPacket_PA, aSize_byte, NULL);
+        }
 
-    for (unsigned int i = 0; i < aRepeatCount; i++)
-    {
-        Packet_Send(lPacket_PA, aSize_byte, aCounter);
-    }
+    Unlock_AfterSend(NULL, aRepeatCount);
 }
 
 unsigned int Pro1000::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)

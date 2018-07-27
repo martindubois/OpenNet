@@ -22,6 +22,7 @@
 #include <OpenNetK/Constants.h>
 #include <OpenNetK/Hardware_Statistics.h>
 #include <OpenNetK/Interface.h>
+#include <OpenNetK/SpinLock.h>
 
 #include <OpenNetK/Hardware.h>
 
@@ -151,6 +152,45 @@ namespace OpenNetK
         ASSERT(NULL != mAdapter);
 
         mAdapter->Buffers_Process();
+    }
+
+    // CRITICAL PATH - Buffer
+    void Hardware::Lock()
+    {
+        ASSERT(NULL != mZone0);
+
+        mZone0->Lock();
+    }
+
+    // CRITICAL PATH - Buffer
+    void Hardware::Unlock()
+    {
+        ASSERT(NULL != mZone0);
+
+        mZone0->Unlock();
+    }
+
+    void Hardware::Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacketQty)
+    {
+        ASSERT(NULL != aCounter );
+        ASSERT(0    < aPacketQty);
+
+        InterlockedAdd(aCounter, aPacketQty);
+
+        Unlock();
+    }
+
+    // CRITICAL PATH - Buffer
+    void Hardware::Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty)
+    {
+        ASSERT(0 < aPacketQty);
+
+        if (NULL != aCounter)
+        {
+            InterlockedAdd(aCounter, aPacketQty);
+        }
+
+        Unlock();
     }
 
     unsigned int Hardware::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)

@@ -36,9 +36,11 @@ public:
     virtual void         Interrupt_Enable  ();
     virtual bool         Interrupt_Process (unsigned int aMessageId, bool * aNeedMoreProcessing);
     virtual void         Interrupt_Process2();
-    virtual void         Packet_Receive    (uint64_t aLogicalAddres, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
-    virtual void         Packet_Send       (uint64_t aData, unsigned int aSize_byte, volatile long * aCounter);
-    virtual void         Packet_Send       (const void * aPacket, unsigned int aSize_byte, volatile long * aCounter, unsigned int aRepeatCount);
+    virtual void         Unlock_AfterReceive  (volatile long * aCounter, unsigned int aPacketQty);
+    virtual void         Unlock_AfterSend     (volatile long * aCounter, unsigned int aPacketQty);
+    virtual void         Packet_Receive_NoLock(uint64_t aLogicalAddres, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
+    virtual void         Packet_Send_NoLock   (uint64_t aData, unsigned int aSize_byte, volatile long * aCounter = NULL);
+    virtual void         Packet_Send       (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);
     virtual unsigned int Statistics_Get    (uint32_t * aOut, unsigned int aOutSize_byte, bool aReset);
     virtual void         Statistics_Reset  ();
 
