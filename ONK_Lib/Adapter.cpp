@@ -182,10 +182,6 @@ namespace OpenNetK
 
     // TODO  OpenNetK.Adapter.TxOrder
     //       Les paquets doivent etre transmis dans l'ordre de reception.
-
-    // ISSUE  2018-07-25_21h17_MD
-    //        Il y a une condition de course qui cause un probleme a la
-    //        machine a etat des Buffers.
     void Adapter::Buffers_Process()
     {
         ASSERT(NULL != mZone0);
@@ -432,7 +428,7 @@ namespace OpenNetK
                 }
             }
 
-        mZone0->Unlock();
+        mZone0->Lock();
 
         mStatistics[ADAPTER_STATS_BUFFER_SEND] ++;
     }
