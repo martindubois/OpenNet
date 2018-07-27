@@ -183,9 +183,7 @@ namespace OpenNetK
     // CRITICAL PATH - Buffer
     void Hardware::Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty)
     {
-        ASSERT(0 < aPacketQty);
-
-        if (NULL != aCounter)
+        if ((0 < aPacketQty) && (NULL != aCounter))
         {
             InterlockedAdd(aCounter, aPacketQty);
         }

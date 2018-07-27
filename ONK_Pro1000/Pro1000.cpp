@@ -348,23 +348,22 @@ void Pro1000::Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacket
 // CRITICAL PATH - Buffer
 void Pro1000::Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty)
 {
-    ASSERT(NULL != aCounter  );
-    ASSERT(0    <  aPacketQty);
-
     ASSERT(NULL              != mBAR1 );
     ASSERT(RX_DESCRIPTOR_QTY >  mTx_In);
 
     Hardware::Unlock_AfterSend(aCounter, aPacketQty);
 
-    Pro1000_Tx_DescriptorTail lReg;
+    if (0 < aPacketQty)
+    {
+        Pro1000_Tx_DescriptorTail lReg;
 
-    lReg.mValue         =      0;
-    lReg.mFields.mValue = mTx_In;
+        lReg.mValue         =      0;
+        lReg.mFields.mValue = mTx_In;
 
-    mBAR1->mTx_DescriptorTail0.mFields.mValue = lReg.mValue; // Writing hardware !
+        mBAR1->mTx_DescriptorTail0.mFields.mValue = lReg.mValue; // Writing hardware !
 
-    mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
-
+        mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
+    }
 }
 
 // CRITICAL PATH - Packet
