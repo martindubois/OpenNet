@@ -41,6 +41,10 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte)
 
 void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
 {
+    assert(0   < aBufferQty      );
+    assert(0   < aPacketSize_byte);
+    assert(0.0 < aBandwidth_MiB_s);
+
     TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
     lTD.A(aBufferQty, aPacketSize_byte, aBandwidth_MiB_s);
@@ -48,11 +52,25 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
     lTD.DisplaySpeed();
 }
 
-void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, unsigned int aBandwidth_MiB_s)
+void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte)
 {
-    assert(0 < aBufferQty);
+    assert(0 < aBufferQty      );
     assert(0 < aPacketSize_byte);
-    assert(0 < aBandwidth_MiB_s);
+
+    TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
+
+    lTD.B_Search(aBufferQty, aPacketSize_byte);
+
+    lTD.B_Verify(aBufferQty, aPacketSize_byte, lTD.mPacketGenerator_Config.mBandwidth_MiB_s);
+
+    lTD.DisplaySpeed();
+}
+
+void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+{
+    assert(0   < aBufferQty      );
+    assert(0   < aPacketSize_byte);
+    assert(0.0 < aBandwidth_MiB_s);
 
     TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 

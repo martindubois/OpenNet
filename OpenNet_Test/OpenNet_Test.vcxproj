@@ -100,7 +100,6 @@
     <ClCompile Include="Kernel_Forward.cpp" />
     <ClCompile Include="Mirror.cpp" />
     <ClCompile Include="OpenNet_Test.cpp" />
-    <ClCompile Include="Pipe.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="SetupA.cpp" />
     <ClCompile Include="SetupC.cpp" />

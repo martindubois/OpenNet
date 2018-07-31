@@ -52,7 +52,7 @@ KMS_TEST_BEGIN(A_Function_500B_SetupC)
     KMS_TEST_ASSERT(114.7 < lTD.Adapter_GetBandwidth());
     KMS_TEST_ASSERT(114.8 > lTD.Adapter_GetBandwidth());
 
-    KMS_TEST_ASSERT(238698 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(238665.0 <= lTD.Adapter_GetPacketThroughput());
     KMS_TEST_ASSERT(238699.0 >= lTD.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END
@@ -100,7 +100,7 @@ KMS_TEST_BEGIN(A_Kernel_500B_SetupC)
     KMS_TEST_ASSERT(114.7 < lTD.Adapter_GetBandwidth());
     KMS_TEST_ASSERT(114.8 > lTD.Adapter_GetBandwidth());
 
-    KMS_TEST_ASSERT(238697.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(238695.0 <= lTD.Adapter_GetPacketThroughput());
     KMS_TEST_ASSERT(238723.0 >= lTD.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END

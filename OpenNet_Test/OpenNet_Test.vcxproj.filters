@@ -44,9 +44,6 @@
     <ClCompile Include="EthernetAddress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Pipe.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SetupC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
