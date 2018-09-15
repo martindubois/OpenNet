@@ -3,6 +3,11 @@
 // Product  OpenNet
 // File     ONK_Lib/Adapter.cpp
 
+// ISSUE  2018-07-32_17h47_MD
+//        Lors des test B, il arrive que l'etat des paquets n'est pas celle
+//        attendu. Dans ces cas, nous attendons RX_RUNNING et l'etat est
+//        TX_RUNNING.
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -21,6 +26,7 @@
 #include <OpenNetK/Constants.h>
 #include <OpenNetK/Debug.h>
 #include <OpenNetK/Hardware.h>
+#include <OpenNetK/Packet.h>
 #include <OpenNetK/SpinLock.h>
 
 #include <OpenNetK/Adapter.h>
@@ -36,6 +42,8 @@
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
+
+#define PACKET_STATE_TX_RUNNING   (4)
 
 #define TAG 'LKNO'
 
@@ -127,11 +135,18 @@ namespace OpenNetK
     //
     // Level   SoftInt
     // Thread  SoftInt
+
+    // TODO  OpenNetK.Adapter
+    //       Utiliser une cache pour l'etat des paquet. Ne modifier le buffer
+    //       DirectGMA que lorsque la partie OpenCL a besoin de connaitre
+    //       l'etat du paquet. Ne lire l'etat du paquet que lorsque la partie
+    //       OpenCL peut l'avoir modifie. Aussi utiliser la cache pour le
+    //       champ de bits.
     void Adapter::Buffer_SendPackets(BufferInfo * aBufferInfo)
     {
         ASSERT(NULL != aBufferInfo                                 );
         ASSERT(   0 <  aBufferInfo->mPacketInfoOffset_byte         );
-        ASSERT(NULL != aBufferInfo->mPacketOffsets_byte            );
+        ASSERT(NULL != aBufferInfo->mPackets                       );
         ASSERT(   0 <  aBufferInfo->mBuffer.mPacketQty             );
         ASSERT(NULL != aBufferInfo->mHeader                        );
 
@@ -149,19 +164,26 @@ namespace OpenNetK
 
             for (unsigned int i = 0; i < aBufferInfo->mBuffer.mPacketQty; i++)
             {
-                ASSERT(0 < aBufferInfo->mPacketOffsets_byte[i]);
+                ASSERT(0 < aBufferInfo->mPackets[i].mOffset_byte);
 
-                switch (lPacketInfo[i].mPacketState) // Reading DirectGMA buffer !!!
+                switch (aBufferInfo->mPackets[i].mState)
                 {
-                case OPEN_NET_PACKET_STATE_PX_COMPLETED:
-                    lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_TX_RUNNING; // Writing DirectGMA buffer !
+                case OPEN_NET_PACKET_STATE_RX_COMPLETED:
+                    // TODO  ONK_Lib.Adapter  Use burst
+                    // TODO  ONK_Lib.Adapter  Also cache mPacketSize_byte (and use burst too)
+                    aBufferInfo->mPackets[i].mSendTo = lPacketInfo[i].mSendTo; // Reading DirectGMA buffer !!!
+
+                    // TODO  OpenNetK.Adapter.PartialBuffer
+                    ASSERT(0 != (OPEN_NET_PACKET_PROCESSED & aBufferInfo->mPackets[i].mSendTo));
+
+                    aBufferInfo->mPackets[i].mState = PACKET_STATE_TX_RUNNING;
                     // no break;
 
-                case OPEN_NET_PACKET_STATE_TX_RUNNING:
-                    if (0 != (lPacketInfo[i].mToSendTo & lAdapterBit)) // Reading DirectGMA buffer !
+                case PACKET_STATE_TX_RUNNING:
+                    if (0 != (aBufferInfo->mPackets[i].mSendTo & lAdapterBit))
                     {
                         lPacketQty++;
-                        mHardware->Packet_Send_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPacketOffsets_byte[i], lPacketInfo[i].mPacketSize_byte, &aBufferInfo->mTx_Counter); // Reading DirectGMA buffer !!!
+                        mHardware->Packet_Send_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].mOffset_byte, lPacketInfo[i].mPacketSize_byte, &aBufferInfo->mTx_Counter); // Reading DirectGMA buffer !!!
                     }
                     break;
 
@@ -288,15 +310,16 @@ namespace OpenNetK
 
     // aHeader [---;-W-]
     // aBuffer [---;R--]
-    // aPacketOffsets_byte [---;-W-]
+    // aPackets [---;-W-]
     //
     // Levels   SoftInt or Thread
     // Threads  Queue
-    void Adapter::Buffer_InitHeader_Zone0(OpenNet_BufferHeader * aHeader, const Buffer & aBuffer, uint32_t * aPacketOffsets_byte)
+    void Adapter::Buffer_InitHeader_Zone0(OpenNet_BufferHeader * aHeader, const Buffer & aBuffer, Packet * aPackets)
     {
         ASSERT(NULL !=   aHeader           );
         ASSERT(NULL != (&aBuffer)          );
         ASSERT(   0 <    aBuffer.mPacketQty);
+        ASSERT(NULL !=   aPackets          );
 
         ASSERT(NULL != mHardware);
 
@@ -318,11 +341,13 @@ namespace OpenNetK
 
         for (unsigned int i = 0; i < lPacketQty; i++)
         {
-            lPacketInfo[i].mPacketState = OPEN_NET_PACKET_STATE_TX_RUNNING;  // Writing DirectGMA buffer !
+            aPackets[i].mSendTo = OPEN_NET_PACKET_PROCESSED;
+            aPackets[i].mState = PACKET_STATE_TX_RUNNING;
 
-            SkipDangerousBoundary(aBuffer.mBuffer_PA, &lPacketOffset_byte, lPacketSize_byte, aPacketOffsets_byte + i);
+            SkipDangerousBoundary(aBuffer.mBuffer_PA, &lPacketOffset_byte, lPacketSize_byte, &aPackets[i].mOffset_byte);
 
-            lPacketInfo[i].mPacketOffset_byte = aPacketOffsets_byte[i]; // Writing DirectGMA buffer !
+            lPacketInfo[i].mPacketOffset_byte = aPackets[i].mOffset_byte; // Writing DirectGMA buffer !
+            lPacketInfo[i].mSendTo            = OPEN_NET_PACKET_PROCESSED;  // Writing DirectGMA buffer !
         }
 
         mStatistics[ADAPTER_STATS_BUFFER_INIT_HEADER] ++;
@@ -343,7 +368,7 @@ namespace OpenNetK
 
         mBuffers[mBufferCount].mBuffer = aBuffer;
         mBuffers[mBufferCount].mPacketInfoOffset_byte = sizeof(OpenNet_BufferHeader);
-        mBuffers[mBufferCount].mPacketOffsets_byte    = reinterpret_cast<uint32_t *>(ExAllocatePoolWithTag(NonPagedPool, sizeof(uint32_t) * aBuffer.mPacketQty, TAG));
+        mBuffers[mBufferCount].mPackets               = reinterpret_cast<Packet *>(ExAllocatePoolWithTag(NonPagedPool, sizeof(Packet) * aBuffer.mPacketQty, TAG));
 
         PHYSICAL_ADDRESS lPA;
 
@@ -359,7 +384,7 @@ namespace OpenNetK
         mBuffers[mBufferCount].mMarker = reinterpret_cast<uint32_t *>(MmMapIoSpace(lPA, PAGE_SIZE, MmNonCached));
         ASSERT(NULL != mBuffers[mBufferCount].mMarker);
 
-        Buffer_InitHeader_Zone0(mBuffers[mBufferCount].mHeader, aBuffer, mBuffers[mBufferCount].mPacketOffsets_byte);
+        Buffer_InitHeader_Zone0(mBuffers[mBufferCount].mHeader, aBuffer, mBuffers[mBufferCount].mPackets);
         
         mBufferCount++;
 
@@ -376,7 +401,7 @@ namespace OpenNetK
     {
         ASSERT(NULL != aBufferInfo                                 );
         ASSERT(   0 <  aBufferInfo->mPacketInfoOffset_byte         );
-        ASSERT(NULL != aBufferInfo->mPacketOffsets_byte            );
+        ASSERT(NULL != aBufferInfo->mPackets                       );
         ASSERT(NULL != aBufferInfo->mBuffer.mPacketQty             );
         ASSERT(NULL != aBufferInfo->mHeader                        );
 
@@ -393,9 +418,9 @@ namespace OpenNetK
 
                 for (unsigned int i = 0; i < aBufferInfo->mBuffer.mPacketQty; i++)
                 {
-                    ASSERT(0 < aBufferInfo->mPacketOffsets_byte[i]);
+                    ASSERT(0 < aBufferInfo->mPackets[i].mOffset_byte);
 
-                    mHardware->Packet_Receive_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPacketOffsets_byte[i], lPacketInfo + i, &aBufferInfo->mRx_Counter);
+                    mHardware->Packet_Receive_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].mOffset_byte, aBufferInfo->mPackets + i, lPacketInfo + i, &aBufferInfo->mRx_Counter);
                 }
 
             mHardware->Unlock_AfterReceive(&aBufferInfo->mRx_Counter, aBufferInfo->mBuffer.mPacketQty);
@@ -512,6 +537,10 @@ namespace OpenNetK
         }
     }
 
+    // TODO  OpenNetK.Adapter
+    //       Ajouter la possibilite de remplacer le traitement OpenCL par un
+    //       "Forward" fixe. Cela implique l'allocation de buffer dans la
+    //       memoire de l'ordinateur par le pilote lui meme.
     void Adapter::Buffer_RxRunning_Zone0(BufferInfo * aBufferInfo)
     {
         ASSERT(NULL                             != aBufferInfo                       );
@@ -538,9 +567,9 @@ namespace OpenNetK
 
             mBufferCount--;
 
-            ASSERT(NULL != mBuffers[mBufferCount].mPacketOffsets_byte);
+            ASSERT(NULL != mBuffers[mBufferCount].mPackets);
 
-            ExFreePoolWithTag(mBuffers[mBufferCount].mPacketOffsets_byte, TAG);
+            ExFreePoolWithTag(mBuffers[mBufferCount].mPackets, TAG);
         }
     }
 

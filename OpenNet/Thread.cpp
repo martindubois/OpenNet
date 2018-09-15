@@ -139,7 +139,7 @@ void Thread::SetProgram(cl_program aProgram)
 void Thread::Prepare()
 {
     assert(   0 <  mAdapters.size());
-    assert(   0 <  mBuffers .size());
+    assert(   0 == mBuffers .size());
     assert(NULL == mCommandQueue   );
     assert(NULL != mKernel         );
     assert(NULL != mProcessor      );
@@ -287,7 +287,7 @@ void Thread::Run()
 //                       processing. This event must be passed to
 //                       Processing_Wait.
 //
-// CRITICAL PATH
+// CRITICAL PATH - Buffer
 //
 // Processing_Queue ==> Processing_Wait
 void Thread::Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalSize, cl_event * aEvent)
@@ -308,7 +308,7 @@ void Thread::Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalS
 
 // aEvent [D--;RW-] The cl_event Processing_Queue created
 //
-// CRITICAL PATH
+// CRITICAL PATH - Buffer
 //
 // Processing_Queue ==> Processing_Wait
 void Thread::Processing_Wait(cl_event aEvent)
@@ -334,7 +334,7 @@ void Thread::Processing_Wait(cl_event aEvent)
 
 // aIndex  The index passed to Processing_Queue and Processing_Wait
 //
-// CRITICAL PATH
+// CRITICAL PATH - Buffer
 void Thread::Run_Iteration(unsigned int aIndex)
 {
     Processing_Wait (aIndex);
@@ -349,7 +349,7 @@ void Thread::Run_Iteration(unsigned int aIndex)
 void Thread::State_Change(State aFrom, State aTo)
 {
     assert(STATE_QTY > aFrom);
-    assert(STATE_QTY < aTo  );
+    assert(STATE_QTY > aTo  );
 
     assert(NULL != mDebugLog);
 
@@ -559,7 +559,7 @@ unsigned int Thread::Wait_Zone0(unsigned int aTimeout_ms)
 //
 // Return  This method return the retrieved information
 //
-// CRITICAL PATH
+// CRITICAL PATH - Buffer
 //
 // Exception  KmsLib::Exception *  See OCLW_GetEventProfilingInfo
 // Thread     Worker

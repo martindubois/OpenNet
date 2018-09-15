@@ -5,7 +5,7 @@ Fichier  _DocDev/Procedures/Build_fr.txt
 
 Developpeur        __________________________________________________________
 
-Date et heure      20______ - ______ - ______ ,               ______ : ______
+Date et heure      20 ______ - ______ - ______                ______ : ______
 
 Version            _____ . _____ . _____ . _____ - __________________________
 
@@ -22,16 +22,12 @@ Version            _____ . _____ . _____ . _____ - __________________________
       Version Number"
     - Fermer la solution
 
-[ ] Executer Build.cmd
-
+[ ] Executer "RunDoxygen.cmd"
+[ ] Executer "Build.cmd"
 [ ] Commetre les fichiers modifiers
-
-[ ] Ajouter un tag
-
+[ ] Ajouter le tag {Major}.{Minor}.{Build}_{Type}
 [ ] Pousser les sourses sur le serveur
 
-Heure                                                          _____ : ______
-
-Duree                                           ______ heures, ______ minutes
+Heure et duree      _____ : ______            ______ heures et ______ minutes
 
 Signature          __________________________________________________________

@@ -36,15 +36,14 @@
 
 // ===== Packet state / Etat d'un paquet ====================================
 
-// --> INVALID --> TX_RUNNING <------------------------ PX_COMPLETED <--+
-//                  |                                                   |
-//                  +-------------> RX_RUNNING --> RX_COMPLETED --------+
-#define OPEN_NET_PACKET_STATE_INVALID      (0)
+// --> TX_RUNNING <------- PX_COMPLETED <--+
+//      |                                  |
+//      +--> RX_RUNNING --> RX_COMPLETED --+
 #define OPEN_NET_PACKET_STATE_PX_COMPLETED (1)
 #define OPEN_NET_PACKET_STATE_RX_COMPLETED (2)
 #define OPEN_NET_PACKET_STATE_RX_RUNNING   (3)
-#define OPEN_NET_PACKET_STATE_TX_RUNNING   (4)
-#define OPEN_NET_PACKET_STATE_QTY          (5)
+
+#define OPEN_NET_PACKET_PROCESSED (0x80000000)
 
 // Data type / Type de donnees
 /////////////////////////////////////////////////////////////////////////////
@@ -77,15 +76,16 @@ OpenNet_BufferHeader;
 /// \endcond
 typedef struct
 {
-    volatile uint32_t mToSendTo;
+    volatile uint32_t mSendTo;
 
     uint8_t mReserved0[4];
 
     uint32_t mPacketOffset_byte;
 
-    volatile uint32_t mPacketState    ;
+    uint8_t mReserved1[4];
+
     volatile uint32_t mPacketSize_byte;
 
-    uint8_t mReserved1[12];
+    uint8_t mReserved2[12];
 }
 OpenNet_PacketInfo;

@@ -69,6 +69,9 @@ Adapter_Internal::Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsL
     memset(&mStatistics  , 0, sizeof(mStatistics  ));
 
     mConfig.mBufferQty = 4;
+	mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
+
+	mDriverConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
 
     mHandle->Control(IOCTL_CONFIG_GET, NULL, 0, &mDriverConfig, sizeof(mDriverConfig));
     mHandle->Control(IOCTL_INFO_GET  , NULL, 0, &mInfo        , sizeof(mInfo        ));
@@ -273,16 +276,16 @@ void Adapter_Internal::Stop()
 Thread * Adapter_Internal::Thread_Prepare()
 {
     assert(NULL != mDebugLog  );
-    assert(NULL != mSourceCode);
     assert(NULL != mProcessor );
-    assert(NULL != mProgram   );
 
     if (NULL != mSourceCode)
     {
-        OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
+		OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
         if (NULL != lKernel)
         {
-            return new Thread_Kernel(mProcessor, this, lKernel, mProgram, mDebugLog);
+			assert(NULL != mProgram);
+
+			return new Thread_Kernel(mProcessor, this, lKernel, mProgram, mDebugLog);
         }
 
         OpenNet::Function * lFunction = dynamic_cast<OpenNet::Function *>(mSourceCode);
@@ -732,7 +735,7 @@ Buffer_Data * Adapter_Internal::Buffer_Allocate(cl_command_queue aCommandQueue, 
     assert(NULL != aCommandQueue);
     assert(NULL != aKernel      );
 
-    assert(OPEN_NET_BUFFER_QTY <= mBufferCount);
+    assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
     assert(NULL                != mDebugLog   );
     assert(NULL                != mProcessor  );
 

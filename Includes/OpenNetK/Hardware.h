@@ -12,6 +12,7 @@
 // ===== Includes ===========================================================
 #include <OpenNetK/Adapter_Types.h>
 #include <OpenNetK/Interface.h>
+#include <OpenNetK/Packet.h>
 #include <OpenNetK/Types.h>
 
 namespace OpenNetK
@@ -213,17 +214,19 @@ namespace OpenNetK
         /// \cond en
         /// \brief  Add the buffer to the receiving queue.
         /// \param  aLogicalAddress       The data
+        /// \param  aPacketData [-K-;RW-] The Packet
         /// \param  aPacketInfo [-K-;-W-] The OpenNet_PacketInfo
         /// \param  aCounter    [-K-;RW-] The operation counter
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le buffer a la queue de reception
         /// \param  aLogicalAddress       Les donnees
+        /// \param  aPacketData [-K-;RW-] Le Packet
         /// \param  aPacketInfo [-K-;-W-] Le OpenNet_PacketInfo
         /// \param  aCounter    [-K-;RW-] Le compteur d'operation
         /// \retval false  Erreur
         /// \endcond
-        virtual void Packet_Receive_NoLock(uint64_t aLogicalAddress, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter) = 0;
+        virtual void Packet_Receive_NoLock(uint64_t aLogicalAddress, Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter) = 0;
 
         /// \cond en
         /// \brief  Add the packet to the send queue.
@@ -243,13 +246,13 @@ namespace OpenNetK
         /// \brief  Add the packet to the send queue.
         /// \param  aPacket  [---;R--] The packet
         /// \param  aSize_byte         The packet size
-        /// \param  aRepeatCount
+        /// \param  aRepeatCount       The repeat count
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le paquet a la queue de transmission
         /// \param  aPacket  [---;R--] Le paquet
         /// \param  aSize_byte         La taille du paquet
-        /// \param  aRepeatCount
+        /// \param  aRepeatCount       Le nombre de repetition
         /// \endcond
         /// \note   Thread = Queue
         virtual void Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1) = 0;

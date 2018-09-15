@@ -1,13 +1,14 @@
 
-# Author / Auteur    KMS - Martin Dubois, ing.
-# Product / Produit  OpenNet
-# File / Fichier     Export.cmd.txt
+# Author   KMS - Martin Dubois, ing.
+# Product  OpenNet
+# File     Export.cmd.txt
 
 . Binaries
 . Drivers
 . Drivers\Debug_64
 . Drivers\Release_64
 . Includes
+. Libraries
 . Tests
 
 .
@@ -25,6 +26,7 @@ Includes/OpenNet
 	Kernel.h
 	Kernel_Forward.h
 	OpenNet.h
+	PacketGenerator.h
 	Processor.h
 	SourceCode.h
 	StatisticsProvider.h
@@ -42,6 +44,7 @@ Includes/OpenNetK
 	Hardware_WDF.h
     Interface.h
 	Kernel.h
+	Packet.h
 	SpinLock.h
 	Spinlock_WDF.h
 	StdInt.h
@@ -59,9 +62,17 @@ OpenNet/_DocUser OpenNet
 OpenNet_Tool/_DocUser OpenNet_Tool
 	ReadMe.txt
 
+Scripts .
+	Package.cmd
+	Package_SDK.txt
+	Package_SDK_DDK.txt
+
 x64/Debug Binaries/Debug_64
     OpenNet.dll
     OpenNet_Tool.exe
+
+x64/Debug Libraries/Debug_64
+    ONK_Lib.lib
 
 x64/Debug Tests/Debug_64
     ONK_Test.exe
@@ -80,6 +91,9 @@ x64/Debug/ONK_Pro1000 Drivers/Debug_64/ONK_Pro1000
 x64/Release Binaries/Release_64
     OpenNet.dll
     OpenNet_Tool.exe
+
+x64/Release Libraries/Release_64
+    ONK_Lib.lib
 
 x64/Release Tests/Release_64
     ONK_Test.exe

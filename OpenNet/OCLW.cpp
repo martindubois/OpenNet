@@ -18,8 +18,8 @@
 // Static variables
 /////////////////////////////////////////////////////////////////////////////
 
-clEnqueueMakeBuffersResidentAMD_fn sEnqueueMakeBufferResident = NULL;
-clEnqueueWaitSignalAMD_fn          sEnqueueWaitSignal         = NULL;
+static clEnqueueMakeBuffersResidentAMD_fn sEnqueueMakeBufferResident = NULL;
+static clEnqueueWaitSignalAMD_fn          sEnqueueWaitSignal         = NULL;
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
@@ -207,7 +207,6 @@ cl_program OCLW_CreateProgramWithSource(cl_context aContext, cl_uint aLineCount,
     assert(NULL != aContext    );
     assert(   0 <  aLineCount  );
     assert(NULL != aLines      );
-    assert(NULL != aLineLengths);
 
     cl_int lStatus;
 
@@ -431,9 +430,6 @@ void OCLW_GetPlatformInfo(cl_platform_id aPlatform, cl_platform_info aParam, siz
 void OCLW_Initialise(cl_platform_id aPlatform)
 {
     assert(0 != aPlatform);
-
-    assert(NULL == sEnqueueMakeBufferResident);
-    assert(NULL == sEnqueueWaitSignal        );
 
     sEnqueueMakeBufferResident = reinterpret_cast<clEnqueueMakeBuffersResidentAMD_fn>(OCLW_GetExtensionFunctionAddressForPlatform(aPlatform, "clEnqueueMakeBuffersResidentAMD"));
     sEnqueueWaitSignal         = reinterpret_cast<clEnqueueWaitSignalAMD_fn         >(OCLW_GetExtensionFunctionAddressForPlatform(aPlatform, "clEnqueueWaitSignalAMD"         ));

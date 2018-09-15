@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC
 		Includes\OpenNetK\Hardware_WDF.h = Includes\OpenNetK\Hardware_WDF.h
 		Includes\OpenNetK\Interface.h = Includes\OpenNetK\Interface.h
 		Includes\OpenNetK\Kernel.h = Includes\OpenNetK\Kernel.h
+		Includes\OpenNetK\Packet.h = Includes\OpenNetK\Packet.h
 		Includes\OpenNetK\SpinLock.h = Includes\OpenNetK\SpinLock.h
 		Includes\OpenNetK\SpinLock_WDF.h = Includes\OpenNetK\SpinLock_WDF.h
 		Includes\OpenNetK\StdInt.h = Includes\OpenNetK\StdInt.h
@@ -85,6 +86,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Procedures", "Procedures", "{F6D48D20-B04B-47E1-AB5E-C84AF52E70C4}"
 	ProjectSection(SolutionItems) = preProject
 		_DocDev\Procedures\Build_fr.txt = _DocDev\Procedures\Build_fr.txt
+		_DocDev\Procedures\Test.txt = _DocDev\Procedures\Test.txt
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_NDIS", "ONK_NDIS\ONK_NDIS.vcxproj", "{0FEE010C-5B77-415F-A3D1-02B52DD2C4C6}"
@@ -98,6 +100,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Pro1000", "ONK_Pro1000\
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocUser", "_DocUser", "{5714C93D-2416-4B15-9AA1-490A1D131BFE}"
+	ProjectSection(SolutionItems) = preProject
+		_DocUser\ReadMe.txt = _DocUser\ReadMe.txt
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{B4675DF3-6BF9-483B-AB9F-11FAF0BFC219}"
 	ProjectSection(SolutionItems) = preProject
@@ -117,6 +122,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestLib", "TestLib", "{F717FA89-DD40-4CFC-BDA0-FE69C6D37B01}"
 	ProjectSection(SolutionItems) = preProject
 		Common\TestLib\TestDual.h = Common\TestLib\TestDual.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{DDC857B0-A3ED-4E00-9A0F-5AAAB745368D}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\Package.cmd = Scripts\Package.cmd
+		Scripts\Package_SDK.txt = Scripts\Package_SDK.txt
+		Scripts\Package_SDK_DDK.txt = Scripts\Package_SDK_DDK.txt
 	EndProjectSection
 EndProject
 Global

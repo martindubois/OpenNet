@@ -4,9 +4,6 @@
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Adapter.h
 
-// TODO  Includes.OpenNet.Adapter
-//       Definir la structure BufferInfo dans un fichier prive.
-
 #pragma once
 
 // Includes
@@ -16,6 +13,8 @@
 #include <OpenNetK/Adapter_Types.h>
 #include <OpenNetK/Constants.h>
 #include <OpenNetK/Types.h>
+
+class Packet;
 
 namespace OpenNetK
 {
@@ -35,7 +34,7 @@ namespace OpenNetK
     /// \cond fr
     /// \brief  Cette classe maintien les information concernant un
     ///         adaptateur sur le reseau interne OpenNet.
-    /// \note   Classe noyau - Pas de constructer, pas de destructor, pas de
+    /// \note   Classe noyau - Pas de constructeur, pas de destructor, pas de
     ///         method virtuel
     /// \endcond
     class Adapter
@@ -44,14 +43,14 @@ namespace OpenNetK
     public:
 
         /// \cond en
-        /// \brief  Connect the hardware
-        /// \param  aHardware [-K-;RW-] The new comment
+        /// \brief  Connect the Hardware instance
+        /// \param  aHardware [-K-;RW-] The Hardware instance
         /// \endcond
         /// \cond fr
-        /// \brief  Connecter le materiel
-        /// \param  aHardware [-K-;RW-] Le materiel
+        /// \brief  Connecter l'instance de la classe Hardware
+        /// \param  aHardware [-K-;RW-] L'instance de la classe Hardware
         /// \endcond
-        /// \note   Level = thread, Thread = Init
+        /// \note   Level = Thread, Thread = Init
         void SetHardware(Hardware * aHardware);
 
     // Internal
@@ -75,7 +74,7 @@ namespace OpenNetK
 
             OpenNet_BufferHeader * mHeader;
             volatile uint32_t    * mMarker;
-            uint32_t             * mPacketOffsets_byte;
+            Packet               * mPackets;
 
             struct
             {
@@ -108,7 +107,7 @@ namespace OpenNetK
 
     private:
 
-        void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader, const Buffer & aBuffer, uint32_t * aPacketOffsets_byte);
+        void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader, const Buffer & aBuffer, Packet * aPackets);
         void Buffer_Queue_Zone0      (const Buffer & aBuffer);
         void Buffer_Receive_Zone0    (BufferInfo * aBufferInfo);
         void Buffer_Send_Zone0       (BufferInfo * aBufferInfo);

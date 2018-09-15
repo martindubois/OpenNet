@@ -34,10 +34,20 @@ namespace OpenNet
 
     public:
 
+        /// \cond en
+        /// \brief  The configuration
+        /// \endcond
+        /// \cond fr
+        /// \brief  La configuration
+        /// \endcond
         typedef struct
         {
             unsigned int mBufferQty      ;
             unsigned int mPacketSize_byte;
+
+            // TODO  OpenNet.Adapter
+            //       Ajouter un "Buffer Factor" pour allouer un multiple du
+            //       multiple prefere du Kernel.
 
             unsigned char mReserved0[1016];
         }
@@ -178,6 +188,9 @@ namespace OpenNet
         /// \retval false
         /// \retval true
         virtual bool IsConnected(const System & aSystem) = 0;
+
+        // TODO  OpenNet.Adapter
+        //       Ajouter ResetConfig
 
         /// \cond en
         /// \brief  This methode reset the input filter.

@@ -1,0 +1,24 @@
+
+Author   KMS - Martin Dubois, ing.
+Product  OpenNet
+File     _DocDev/Procedures/Test.txt
+
+Name                _________________________________________________________
+
+Data and time       20 ______ - ______ - ______               ______ : ______
+
+Version             ______ . ______ . ______ . ______ - _____________________
+
+Debug  Release
+[ ]     [ ] Tool Terminal
+                ONK_Test.exe group 1
+                OpenNet_Test.exe group 2
+[ ]     [ ] Connect a cable between the two adapters
+[ ]     [ ] Tool Terminal
+                OpenNet_Test.exe group 4
+        [ ] Tool Terminal
+                OpenNet_Test.exe group 5
+
+Time and duration   ______ : ______            _____ hours and ______ minutes
+
+Signature           _________________________________________________________

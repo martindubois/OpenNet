@@ -61,15 +61,15 @@ KMS_TEST_BEGIN(A_Function_64B_SetupC)
 {
     TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
-    KMS_TEST_COMPARE_RETURN(0, lTD.A_Verify(28, 64, 28.0));
+    KMS_TEST_COMPARE_RETURN(0, lTD.A_Verify(52, 64, 72.0));
 
     lTD.DisplaySpeed();
 
-    KMS_TEST_ASSERT(29.4 < lTD.Adapter_GetBandwidth());
-    KMS_TEST_ASSERT(29.8 > lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(66.4 < lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(66.5 > lTD.Adapter_GetBandwidth());
 
-    KMS_TEST_ASSERT(454042.0 <= lTD.Adapter_GetPacketThroughput());
-    KMS_TEST_ASSERT(459009.0 >= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(1025020.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(1025023.0 >= lTD.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END
 
@@ -109,14 +109,14 @@ KMS_TEST_BEGIN(A_Kernel_64B_SetupC)
 {
     TestLib::TestDual lTD(TestLib::TestDual::MODE_KERNEL, false);
 
-    KMS_TEST_COMPARE_RETURN(0, lTD.A_Verify(28, 64, 20.0))
+    KMS_TEST_COMPARE_RETURN(0, lTD.A_Verify(24, 64, 35.0))
 
     lTD.DisplaySpeed();
 
-    KMS_TEST_ASSERT(19.3 < lTD.Adapter_GetBandwidth());
-    KMS_TEST_ASSERT(19.5 > lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(28.8 < lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(37.2 > lTD.Adapter_GetBandwidth());
 
-    KMS_TEST_ASSERT(298346.0 <= lTD.Adapter_GetPacketThroughput());
-    KMS_TEST_ASSERT(299907.0 >= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(444343.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(572098.0 >= lTD.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END

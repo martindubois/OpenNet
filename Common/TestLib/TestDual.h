@@ -57,6 +57,13 @@ namespace TestLib
         //     Internel   Ethernet   Internal
         //
         // Dropped <--- 0 <------- 1 <--- Generator
+        //
+        //                  Send
+        //                  0   1   Read    Write   Total
+        // Ethernet             1                   1
+        // PCIe                     1       1       2
+        // Memory - GPU                     1       1
+        // Memory - Main            1               1
 
         unsigned int A       (unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
         unsigned int A_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte);
@@ -67,6 +74,13 @@ namespace TestLib
         //     +---   <-------   <--- Generator
         //     |    0          1
         //     +-->   ------->   ---> Dropped
+        //
+        //                  Send
+        //                  0   1   Read    Write   Total
+        // Ethernet         1   1                   2
+        // PCIe                     2       2       4
+        // Memory - GPU             1       2       3
+        // Memory - Main            1               1
 
         unsigned int B       (unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
         unsigned int B_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte);

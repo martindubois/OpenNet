@@ -732,7 +732,6 @@ OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE)
 void SendLoopBackPackets(void * aThis, Adapter_Internal * aAdapter)
 {
     assert(NULL != aThis   );
-    assert(NULL != aAdapter);
 
     System_Internal * lThis = reinterpret_cast<System_Internal *>(aThis);
 

@@ -93,6 +93,7 @@ void Thread_Functions::Prepare()
 
 // ===== Thread =============================================================
 
+// CRITICAL PATH - Buffer
 void Thread_Functions::Processing_Queue(unsigned int aIndex)
 {
     assert(EVENT_QTY > aIndex);
@@ -108,6 +109,8 @@ void Thread_Functions::Processing_Queue(unsigned int aIndex)
     Thread::Processing_Queue(&lGS, &lLS, mEvents + aIndex);
 }
 
+// CRITICAL_PATH
+//
 // Thread  Worker
 //
 // Processing_Queue ==> Processing_Wait
@@ -122,6 +125,7 @@ void Thread_Functions::Processing_Wait(unsigned int aIndex)
     mEvents[aIndex] = NULL;
 }
 
+// CRITICAL PATH
 void Thread_Functions::Run_Loop()
 {
     assert(NULL != mDebugLog);

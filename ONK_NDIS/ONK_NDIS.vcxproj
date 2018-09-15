@@ -63,9 +63,10 @@
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
       <AdditionalIncludeDirectories>../Includes;C:\Program Files (x86)\Windows Kits\10\Include\10.0.17134.0\km\netadaptercx\1.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Inf>
-      <TimeStamp>0.0.2.0</TimeStamp>
+      <TimeStamp>0.0.3.0</TimeStamp>
     </Inf>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -75,7 +76,7 @@
       <AdditionalIncludeDirectories>../Includes;C:\Program Files (x86)\Windows Kits\10\Include\10.0.17134.0\km\netadaptercx\1.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Inf>
-      <TimeStamp>0.0.2.0</TimeStamp>
+      <TimeStamp>0.0.3.0</TimeStamp>
     </Inf>
   </ItemDefinitionGroup>
   <ItemGroup>

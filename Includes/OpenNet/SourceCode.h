@@ -82,12 +82,10 @@ namespace OpenNet
         /// \cond en
         /// \brief  Appen code
         /// \param  aCode [---;R--] The code
-        /// \param  aCodeSize_byte  La taille du code
         /// \endcond
         /// \cond fr
         /// \brief  Ajouter du code
         /// \param  aCode [---;R--] Le code
-        /// \param  aCodeSize_byte  La taille du code
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_CODE_ALREADY_SET

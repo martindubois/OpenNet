@@ -68,10 +68,10 @@ extern int System_SetupA ();
 
 KMS_TEST_LIST_BEGIN
     KMS_TEST_LIST_ENTRY(A_Function_9KB_SetupC , "A - Function - 9 KB - Setup C" , 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(A_Function_500B_SetupC, "A - Function - 500 B - Setup C", 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(A_Function_500B_SetupC, "A - Function - 500 B - Setup C - Release", 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(A_Function_64B_SetupC , "A - Function - 64 B - Setup C - Release", 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(A_Kernel_9KB_SetupC   , "A - Kernel - 9 KB - Setup C"   , 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(A_Kernel_500B_SetupC  , "A - Kernel - 500 B - Setup C"  , 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(A_Kernel_500B_SetupC  , "A - Kernel - 500 B - Setup C - Release"  , 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(A_Kernel_64B_SetupC   , "A - Kernel - 64 B - Setup C - Release"  , 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(Adapter_Base          , "Adapter - Base"                , 0, 0)
     KMS_TEST_LIST_ENTRY(Adapter_Display       , "Adapter - Display"             , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)

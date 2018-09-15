@@ -367,10 +367,11 @@ void Pro1000::Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty
 }
 
 // CRITICAL PATH - Packet
-void Pro1000::Packet_Receive_NoLock(uint64_t aData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
+void Pro1000::Packet_Receive_NoLock(uint64_t aData, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , ,  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , , ,  )" DEBUG_EOL);
 
+    ASSERT(NULL != aPacketData);
     ASSERT(NULL != aPacketInfo);
     ASSERT(NULL != aCounter   );
 
@@ -378,9 +379,10 @@ void Pro1000::Packet_Receive_NoLock(uint64_t aData, OpenNet_PacketInfo * aPacket
     ASSERT(NULL              != mRx_Virtual);
 
     mRx_Counter   [mRx_In] = aCounter   ;
+    mRx_PacketData[mRx_In] = aPacketData;
     mRx_PacketInfo[mRx_In] = aPacketInfo;
 
-    mRx_PacketInfo[mRx_In]->mPacketState = OPEN_NET_PACKET_STATE_RX_RUNNING; // Writing DirectGMA buffer !
+    mRx_PacketData[mRx_In]->mState = OPEN_NET_PACKET_STATE_RX_RUNNING; // Writing DirectGMA buffer !
 
     memset((Pro1000_Rx_Descriptor *)(mRx_Virtual) + mRx_In, 0, sizeof(Pro1000_Rx_Descriptor)); // volatile_cast
 
@@ -548,11 +550,13 @@ void Pro1000::Rx_Process_Zone0()
         }
 
         ASSERT(NULL                             != mRx_Counter   [mRx_Out]              );
+        ASSERT(NULL                             != mRx_PacketData[mRx_Out]              );
+        ASSERT(OPEN_NET_PACKET_STATE_RX_RUNNING == mRx_PacketData[mRx_Out]->mState      );
         ASSERT(NULL                             != mRx_PacketInfo[mRx_Out]              );
-        ASSERT(OPEN_NET_PACKET_STATE_RX_RUNNING == mRx_PacketInfo[mRx_Out]->mPacketState); // Reading DirectGMA buffer !!!
 
+        mRx_PacketData[mRx_Out]->mState           = OPEN_NET_PACKET_STATE_RX_COMPLETED;
         mRx_PacketInfo[mRx_Out]->mPacketSize_byte = mRx_Virtual[mRx_Out].mSize_byte   ; // Writing DirectGMA buffer !
-        mRx_PacketInfo[mRx_Out]->mPacketState     = OPEN_NET_PACKET_STATE_RX_COMPLETED; // Writing DirectGMA buffer !
+        mRx_PacketInfo[mRx_Out]->mSendTo          =                                  0; // Writing DirectGMA buffer !
 
         InterlockedDecrement(mRx_Counter[mRx_Out]);
 

@@ -29,10 +29,9 @@ static const char * CODE =
 "{"                                                                           EOL
 "    OPEN_NET_FUNCTION_BEGIN"                                                 EOL
                                                                               EOL
-"    if ( OPEN_NET_PACKET_STATE_RX_COMPLETED == lPacketInfo->mPacketState )"  EOL
+"    if ( 0 == lPacketInfo->mSendTo )"                                        EOL
 "    {"                                                                       EOL
-"        lPacketInfo->mPacketState = OPEN_NET_PACKET_STATE_PX_COMPLETED;"     EOL
-"        lPacketInfo->mToSendTo    = DESTINATIONS;"                           EOL
+"        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED | DESTINATIONS;"    EOL
 "    }"                                                                       EOL
                                                                               EOL
 "    OPEN_NET_FUNCTION_END"                                                   EOL
@@ -47,8 +46,6 @@ namespace OpenNet
     Function_Forward::Function_Forward() : mDestinations(0)
     {
         SetFunctionName("Function_Forward");
-
-        GenerateCode();
     }
 
     Status Function_Forward::AddDestination(Adapter * aAdapter)
@@ -82,7 +79,7 @@ namespace OpenNet
         if (STATUS_OK == lResult)
         {
             lResult = ResetCode();
-            assert(STATUS_OK == lResult);
+            assert((STATUS_OK == lResult) || (STATUS_CODE_NOT_SET == lResult));
 
             GenerateCode();
         }

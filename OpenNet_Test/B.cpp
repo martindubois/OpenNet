@@ -30,10 +30,10 @@ KMS_TEST_BEGIN(B_Function_9KB_SetupC)
 
     lTD.DisplaySpeed();
 
-    KMS_TEST_ASSERT(83.0 < lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(81.8 < lTD.Adapter_GetBandwidth());
     KMS_TEST_ASSERT(83.1 > lTD.Adapter_GetBandwidth());
 
-    KMS_TEST_ASSERT(9667.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(9536.0 <= lTD.Adapter_GetPacketThroughput());
     KMS_TEST_ASSERT(9671.0 >= lTD.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END
@@ -46,10 +46,10 @@ KMS_TEST_BEGIN(B_Kernel_9KB_SetupC)
 
     lTD.DisplaySpeed();
 
-    KMS_TEST_ASSERT(83.0 < lTD.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(81.8 < lTD.Adapter_GetBandwidth());
     KMS_TEST_ASSERT(83.1 > lTD.Adapter_GetBandwidth());
 
-    KMS_TEST_ASSERT(9667.0 <= lTD.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(9533.0 <= lTD.Adapter_GetPacketThroughput());
     KMS_TEST_ASSERT(9671.0 >= lTD.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END
