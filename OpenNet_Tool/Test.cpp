@@ -32,9 +32,9 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte)
 
     TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
-    lTD.A_Search(aBufferQty, aPacketSize_byte);
+    lTD.A_Search(aBufferQty, aPacketSize_byte, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
 
-    lTD.A_Verify(aBufferQty, aPacketSize_byte, lTD.mPacketGenerator_Config.mBandwidth_MiB_s);
+    lTD.A_Verify(aBufferQty, aPacketSize_byte, lTD.mPacketGenerator_Config.mBandwidth_MiB_s, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
 
     lTD.DisplaySpeed();
 }
@@ -47,7 +47,7 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
 
     TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
-    lTD.A(aBufferQty, aPacketSize_byte, aBandwidth_MiB_s);
+    lTD.A(aBufferQty, aPacketSize_byte, aBandwidth_MiB_s, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
 
     lTD.DisplaySpeed();
 }
@@ -59,9 +59,9 @@ void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte)
 
     TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
-    lTD.B_Search(aBufferQty, aPacketSize_byte);
+    lTD.B_Search(aBufferQty, aPacketSize_byte, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
 
-    lTD.B_Verify(aBufferQty, aPacketSize_byte, lTD.mPacketGenerator_Config.mBandwidth_MiB_s);
+    lTD.B_Verify(aBufferQty, aPacketSize_byte, lTD.mPacketGenerator_Config.mBandwidth_MiB_s, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
 
     lTD.DisplaySpeed();
 }
@@ -74,7 +74,7 @@ void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
 
     TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
-    lTD.B(aBufferQty, aPacketSize_byte, aBandwidth_MiB_s);
+    lTD.B(aBufferQty, aPacketSize_byte, aBandwidth_MiB_s, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
 
     lTD.DisplaySpeed();
 }

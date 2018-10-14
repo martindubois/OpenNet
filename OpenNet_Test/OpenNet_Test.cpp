@@ -17,9 +17,12 @@
 // Setup-B  A computer with at least 1 adapter and 1 processor. The test
 //          program run wihtout administrator privilege. Minimum network
 //          trafic is sent to the adapter.
-// Setup-C  A computer with at least 2 adapters and 1 processor. The test
-//          program run wihtout administrator privilege. Both adapters are
-//          connected together
+// Setup-C  A computer with at least 1 dual ports adapters and 1 processor.
+//          The test program run wihtout administrator privilege. Both ports
+//          of all cards are connected together
+// Setup-D  A computer with at least 2 dual ports adapters and 1 processor.
+///         The test program run without administrator privilege. Ports of
+//          each card are connected to ports of other card.
 KMS_TEST_GROUP_LIST_BEGIN
     KMS_TEST_GROUP_LIST_ENTRY("Base"   )
     KMS_TEST_GROUP_LIST_ENTRY("Display")
@@ -27,11 +30,13 @@ KMS_TEST_GROUP_LIST_BEGIN
     KMS_TEST_GROUP_LIST_ENTRY("Setup-B")
     KMS_TEST_GROUP_LIST_ENTRY("Setup-C")
     KMS_TEST_GROUP_LIST_ENTRY("Setup-C_Release")
+    KMS_TEST_GROUP_LIST_ENTRY("Setup-D_Release")
 KMS_TEST_GROUP_LIST_END
 
 extern int A_Function_9KB_SetupC ();
 extern int A_Function_500B_SetupC();
 extern int A_Function_64B_SetupC ();
+extern int A_Function_64B_SetupD ();
 extern int A_Kernel_9KB_SetupC   ();
 extern int A_Kernel_500B_SetupC  ();
 extern int A_Kernel_64B_SetupC   ();
@@ -70,6 +75,7 @@ KMS_TEST_LIST_BEGIN
     KMS_TEST_LIST_ENTRY(A_Function_9KB_SetupC , "A - Function - 9 KB - Setup C" , 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(A_Function_500B_SetupC, "A - Function - 500 B - Setup C - Release", 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(A_Function_64B_SetupC , "A - Function - 64 B - Setup C - Release", 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(A_Function_64B_SetupD , "A - Function - 64 B - Setup D - Release" , 6, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(A_Kernel_9KB_SetupC   , "A - Kernel - 9 KB - Setup C"   , 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(A_Kernel_500B_SetupC  , "A - Kernel - 500 B - Setup C - Release"  , 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(A_Kernel_64B_SetupC   , "A - Kernel - 64 B - Setup C - Release"  , 5, KMS_TEST_FLAG_INTERACTION_NEEDED)

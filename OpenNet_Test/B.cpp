@@ -26,7 +26,7 @@ KMS_TEST_BEGIN(B_Function_9KB_SetupC)
 {
     TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
-    KMS_TEST_COMPARE_RETURN(0, lTD.B(3, 9000, 120.0));
+    KMS_TEST_COMPARE_RETURN(0, lTD.B(3, 9000, 120.0, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME));
 
     lTD.DisplaySpeed();
 
@@ -42,7 +42,7 @@ KMS_TEST_BEGIN(B_Kernel_9KB_SetupC)
 {
     TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
 
-    KMS_TEST_COMPARE_RETURN(0, lTD.B(3, 9000, 120.0));
+    KMS_TEST_COMPARE_RETURN(0, lTD.B(3, 9000, 120.0, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME));
 
     lTD.DisplaySpeed();
 

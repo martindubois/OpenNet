@@ -51,9 +51,9 @@ namespace TestLib
         }
     }
 
-    unsigned int TestDual::A(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+    unsigned int TestDual::A(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect)
     {
-        A_Init(aBufferQty);
+        A_Init(aBufferQty, aSelect);
 
         mPacketGenerator_Config.mBandwidth_MiB_s = aBandwidth_MiB_s;
         mPacketGenerator_Config.mPacketSize_byte = aPacketSize_byte;
@@ -88,13 +88,13 @@ namespace TestLib
         mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 12674;
         mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =    53;
 
-        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 16098;
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 22300;
         mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =    78;
 
-        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 16098;
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 22300;
         mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =    78;
 
-        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 16098;
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 22300;
         mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =    78;
 
         mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1162;
@@ -103,16 +103,16 @@ namespace TestLib
         mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 13363;
         mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =   153;
 
-        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 1030976;
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 1430000;
         mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =    4992;
 
-        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 1030144;
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 1430000;
         mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =    4992;
 
         mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 121 * 1024 * 1024;
         mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin =   1 * 1024 * 1024;
 
-        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 1030144;
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 1430000;
         mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =   13870;
 
         unsigned int lResult = Adapter_VerifyStatistics(0);
@@ -123,7 +123,7 @@ namespace TestLib
         return lResult;
     }
 
-    unsigned int TestDual::A_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte)
+    unsigned int TestDual::A_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte, AdapterSelect aSelect)
     {
         assert(0 < aBufferQty      );
         assert(0 < aPacketSize_byte);
@@ -138,7 +138,7 @@ namespace TestLib
 
             printf("Search  %f MiB/s\n", lCenter_MiB_s);
 
-            if (0 >= A(aBufferQty, aPacketSize_byte, lCenter_MiB_s))
+            if (0 >= A(aBufferQty, aPacketSize_byte, lCenter_MiB_s, aSelect))
             {
                 lMin_MiB_s = lCenter_MiB_s;
             }
@@ -151,7 +151,7 @@ namespace TestLib
         return 0;
     }
 
-    unsigned int TestDual::A_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+    unsigned int TestDual::A_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect)
     {
         double lBandwidth_MiB_s = aBandwidth_MiB_s;
 
@@ -159,7 +159,7 @@ namespace TestLib
         {
             printf("Verify  %f MiB/s\n", lBandwidth_MiB_s);
 
-            if (0 < A(aBufferQty, aPacketSize_byte, lBandwidth_MiB_s))
+            if (0 < A(aBufferQty, aPacketSize_byte, lBandwidth_MiB_s, aSelect))
             {
                 lBandwidth_MiB_s -= 0.1;
                 i = 0;
@@ -169,9 +169,9 @@ namespace TestLib
         return 0;
     }
 
-    unsigned int TestDual::B(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+    unsigned int TestDual::B(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect)
     {
-        B_Init(aBufferQty);
+        B_Init(aBufferQty, aSelect);
 
         mPacketGenerator_Config.mBandwidth_MiB_s = aBandwidth_MiB_s;
         mPacketGenerator_Config.mPacketSize_byte = aPacketSize_byte;
@@ -311,7 +311,7 @@ namespace TestLib
         return lResult;
     }
 
-    unsigned int TestDual::B_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte)
+    unsigned int TestDual::B_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte, AdapterSelect aSelect)
     {
         assert(0 < aBufferQty      );
         assert(0 < aPacketSize_byte);
@@ -326,7 +326,7 @@ namespace TestLib
 
             printf("Search  %f MiB/s\n", lCenter_MiB_s);
 
-            if (0 >= B(aBufferQty, aPacketSize_byte, lCenter_MiB_s))
+            if (0 >= B(aBufferQty, aPacketSize_byte, lCenter_MiB_s, aSelect))
             {
                 lMin_MiB_s = lCenter_MiB_s;
             }
@@ -339,7 +339,7 @@ namespace TestLib
         return 0;
     }
 
-    unsigned int TestDual::B_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+    unsigned int TestDual::B_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect)
     {
         double lBandwidth_MiB_s = aBandwidth_MiB_s;
 
@@ -347,7 +347,7 @@ namespace TestLib
         {
             printf("Verify  %f MiB/s\n", lBandwidth_MiB_s);
 
-            if (0 < B(aBufferQty, aPacketSize_byte, lBandwidth_MiB_s))
+            if (0 < B(aBufferQty, aPacketSize_byte, lBandwidth_MiB_s, aSelect))
             {
                 lBandwidth_MiB_s -= 0.1;
                 i = 0;
@@ -572,23 +572,23 @@ namespace TestLib
     // Private
     /////////////////////////////////////////////////////////////////////////
 
-    unsigned int TestDual::A_Init(unsigned int aBufferQty)
+    unsigned int TestDual::A_Init(unsigned int aBufferQty, AdapterSelect aSelect)
     {
         mBufferQty[0] = aBufferQty;
         mBufferQty[1] =          2;
 
-        return Init();
+        return Init(aSelect);
     }
 
-    unsigned int TestDual::B_Init(unsigned int aBufferQty)
+    unsigned int TestDual::B_Init(unsigned int aBufferQty, AdapterSelect aSelect)
     {
         mBufferQty[0] = aBufferQty;
         mBufferQty[1] = aBufferQty;
 
-        return Init();
+        return Init(aSelect);
     }
 
-    unsigned int TestDual::Init()
+    unsigned int TestDual::Init(AdapterSelect aSelect)
     {
         mPacketGenerator = OpenNet::PacketGenerator::Create();
         assert(NULL != mPacketGenerator);
@@ -596,7 +596,7 @@ namespace TestLib
         mSystem = OpenNet::System::Create();
         assert(NULL != mSystem);
 
-        Adapter_Get();
+        Adapter_Get(aSelect);
 
         mProcessor = mSystem->Processor_Get(0);
         if (NULL == mProcessor)
@@ -664,18 +664,53 @@ namespace TestLib
         }
     }
 
+    // aOrder [--O;R--]
+    //
     // Exception  KmsLib::Exception *  CODE_NOT_FOUND
-    void TestDual::Adapter_Get()
+    void TestDual::Adapter_Get(AdapterSelect aSelect)
     {
         assert(NULL != mSystem);
 
-        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
+        OpenNet::Adapter::Info lInfo[2];
+
+        mAdapters[0] = mSystem->Adapter_Get(0);
+        if (NULL == mAdapters[0])
         {
-            mAdapters[i] = mSystem->Adapter_Get(i);
+            throw new KmsLib::Exception(KmsLib::Exception::CODE_NOT_FOUND,
+                "First adapter not found", NULL, __FILE__, __FUNCTION__, __LINE__, aSelect);
+        }
+
+        OpenNet::Status lStatus = mAdapters[0]->GetInfo(lInfo + 0);
+        if (OpenNet::STATUS_OK != lStatus)
+        {
+            throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
+                "Adapter::GetInfo(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+        }
+
+        bool lFound = false;
+
+        for (unsigned int i = 1; ! lFound; i++)
+        {
+            mAdapters[1] = mSystem->Adapter_Get(i);
             if (NULL == mAdapters[i])
             {
                 throw new KmsLib::Exception(KmsLib::Exception::CODE_NOT_FOUND,
-                    "This test need 2 adapters", NULL, __FILE__, __FUNCTION__, __LINE__, i);
+                    "Second adapter not found", NULL, __FILE__, __FUNCTION__, __LINE__, i);
+            }
+
+            lStatus = mAdapters[1]->GetInfo(lInfo + 1);
+            if (OpenNet::STATUS_OK != lStatus)
+            {
+                throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
+                    "Adapter::GetInfo(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+            }
+
+            switch (aSelect)
+            {
+            case ADAPTER_SELECT_CARD_DIFF: lFound = (0 != memcmp(lInfo[0].mEthernetAddress.mAddress, lInfo[1].mEthernetAddress.mAddress, 5)); break;
+            case ADAPTER_SELECT_CARD_SAME: lFound = (0 == memcmp(lInfo[0].mEthernetAddress.mAddress, lInfo[1].mEthernetAddress.mAddress, 5)); break;
+
+            default: assert(false);
             }
         }
     }

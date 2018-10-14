@@ -43,6 +43,15 @@ namespace TestLib
 
         typedef enum
         {
+            ADAPTER_SELECT_CARD_DIFF,
+            ADAPTER_SELECT_CARD_SAME,
+
+            ADAPTER_SELECT_QTY
+        }
+        AdapterSelect;
+
+        typedef enum
+        {
             MODE_FUNCTION,
             MODE_KERNEL  ,
 
@@ -65,9 +74,9 @@ namespace TestLib
         // Memory - GPU                     1       1
         // Memory - Main            1               1
 
-        unsigned int A       (unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
-        unsigned int A_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte);
-        unsigned int A_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
+        unsigned int A       (unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect);
+        unsigned int A_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte,                          AdapterSelect aSelect);
+        unsigned int A_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect);
 
         // Internal   Ethernet   Internal
         //
@@ -82,9 +91,9 @@ namespace TestLib
         // Memory - GPU             1       2       3
         // Memory - Main            1               1
 
-        unsigned int B       (unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
-        unsigned int B_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte);
-        unsigned int B_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
+        unsigned int B       (unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect);
+        unsigned int B_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte,                          AdapterSelect aSelect);
+        unsigned int B_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect);
 
         // TODO  TestLib.TestDual
         //       Mettre privee ce qui peut l'etre
@@ -121,15 +130,15 @@ namespace TestLib
 
     private:
 
-        unsigned int A_Init(unsigned int aBufferQty);
+        unsigned int A_Init(unsigned int aBufferQty, AdapterSelect aSelect);
 
-        unsigned int B_Init(unsigned int aBufferQty);
+        unsigned int B_Init(unsigned int aBufferQty, AdapterSelect aSelect);
 
-        unsigned int Init  ();
+        unsigned int Init  (AdapterSelect aSelect);
         unsigned int Uninit();
 
         void Adapter_Connect();
-        void Adapter_Get    ();
+        void Adapter_Get    (AdapterSelect aSelect);
 
         void Processor_EnableProfiling();
 

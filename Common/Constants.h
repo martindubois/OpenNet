@@ -21,4 +21,12 @@
 #define PACKET_SIZE_MIN_byte ( 1536)
 
 // ===== Repeat count =======================================================
-#define REPEAT_COUNT_MAX (2048)
+// Setting the repeat count too small make impossible for the PacketGenerator
+// to send packet as fast it could. At 3072, the PacketGenerator can fill a
+// 1 Gb/s link even with 64 bytes packets.
+#define REPEAT_COUNT_MAX (3072)
+
+// TODO  ONK_X.TxOverflowDetection
+//       A network adapter's device driver simply ignore transmit request
+//       when the tx queue or ring is full. It then increment a statistic
+//       counter.
