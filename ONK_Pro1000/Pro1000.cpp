@@ -555,7 +555,7 @@ void Pro1000::Rx_Process_Zone0()
         ASSERT(NULL                             != mRx_PacketInfo[mRx_Out]              );
 
         mRx_PacketData[mRx_Out]->mState           = OPEN_NET_PACKET_STATE_RX_COMPLETED;
-        mRx_PacketInfo[mRx_Out]->mPacketSize_byte = mRx_Virtual[mRx_Out].mSize_byte   ; // Writing DirectGMA buffer !
+        mRx_PacketInfo[mRx_Out]->mSize_byte       = mRx_Virtual[mRx_Out].mSize_byte   ; // Writing DirectGMA buffer !
         mRx_PacketInfo[mRx_Out]->mSendTo          =                                  0; // Writing DirectGMA buffer !
 
         InterlockedDecrement(mRx_Counter[mRx_Out]);

@@ -95,34 +95,33 @@ namespace TestLib
         unsigned int B_Search(unsigned int aBufferQty, unsigned int aPacketSize_byte,                          AdapterSelect aSelect);
         unsigned int B_Verify(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect);
 
+        //     Internal   Ethernet   Internal
+        //
+        // Dropped <-a-
+        //              0 <------- 1 <-- Generator
+        //         +-b-
+        //         |
+        //         +-->
+        //
+        // a) No error
+        // b) Error
+        unsigned int C(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect);
+
         // TODO  TestLib.TestDual
         //       Mettre privee ce qui peut l'etre
 
         double       Adapter_GetBandwidth         () const;
-        unsigned int Adapter_GetDroppedPacketCount() const;
         double       Adapter_GetPacketThroughput  () const;
-        void         Adapter_InitialiseConstraints();
-        void         Adapter_SetInputFunctions    ();
-        void         Adapter_SetInputFunction     (unsigned int aAdapter);
-        void         Adapter_SetInputKernels      ();
-        void         Adapter_SetInputKernel       (unsigned int aAdapter);
-        unsigned int Adapter_VerifyStatistics     (unsigned int aAdapter);
 
-        void DisplayAdapterStatistics();
         void DisplaySpeed            ();
-
-        void GetAdapterStatistics();
-
-        void GetAndDisplayKernelStatistics();
-
-        void ResetAdapterStatistics();
 
         void Start();
         void Stop ();
 
         OpenNet::Adapter               * mAdapters [ADAPTER_QTY];
-        OpenNet::Function_Forward        mFunctions[ADAPTER_QTY];
-        OpenNet::Kernel_Forward          mKernels  [ADAPTER_QTY];
+        OpenNet::Function_Forward        mForwardFs[ADAPTER_QTY];
+        OpenNet::Kernel_Forward          mForwardKs[ADAPTER_QTY];
+        OpenNet::Kernel                  mKernel                ;
         OpenNet::PacketGenerator       * mPacketGenerator       ;
         OpenNet::PacketGenerator::Config mPacketGenerator_Config;
 
@@ -134,13 +133,26 @@ namespace TestLib
 
         unsigned int B_Init(unsigned int aBufferQty, AdapterSelect aSelect);
 
+        unsigned int C_Init(unsigned int aBufferQty, AdapterSelect aSelect);
+
         unsigned int Init  (AdapterSelect aSelect);
         unsigned int Uninit();
 
         void Adapter_Connect();
         void Adapter_Get    (AdapterSelect aSelect);
+        void         Adapter_InitialiseConstraints();
+        void         Adapter_SetInputFunctions    ();
+        void         Adapter_SetInputFunction     (unsigned int aAdapter);
+        void         Adapter_SetInputKernels      ();
+        void         Adapter_SetInputKernel       (unsigned int aAdapter);
+        void         Adapter_SetInputKernel_C     (unsigned int aAdapter);
+        unsigned int Adapter_VerifyStatistics     (unsigned int aAdapter);
+
+        void GetAdapterStatistics();
 
         void Processor_EnableProfiling();
+
+        void ResetAdapterStatistics();
 
         void ResetInputFilter();
 

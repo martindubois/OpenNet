@@ -170,7 +170,7 @@ namespace OpenNetK
                 {
                 case OPEN_NET_PACKET_STATE_RX_COMPLETED:
                     // TODO  ONK_Lib.Adapter  Use burst
-                    // TODO  ONK_Lib.Adapter  Also cache mPacketSize_byte (and use burst too)
+                    // TODO  ONK_Lib.Adapter  Also cache mSize_byte (and use burst too)
                     aBufferInfo->mPackets[i].mSendTo = lPacketInfo[i].mSendTo; // Reading DirectGMA buffer !!!
 
                     // TODO  OpenNetK.Adapter.PartialBuffer
@@ -183,7 +183,7 @@ namespace OpenNetK
                     if (0 != (aBufferInfo->mPackets[i].mSendTo & lAdapterBit))
                     {
                         lPacketQty++;
-                        mHardware->Packet_Send_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].mOffset_byte, lPacketInfo[i].mPacketSize_byte, &aBufferInfo->mTx_Counter); // Reading DirectGMA buffer !!!
+                        mHardware->Packet_Send_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].mOffset_byte, lPacketInfo[i].mSize_byte, &aBufferInfo->mTx_Counter); // Reading DirectGMA buffer !!!
                     }
                     break;
 
@@ -346,7 +346,7 @@ namespace OpenNetK
 
             SkipDangerousBoundary(aBuffer.mBuffer_PA, &lPacketOffset_byte, lPacketSize_byte, &aPackets[i].mOffset_byte);
 
-            lPacketInfo[i].mPacketOffset_byte = aPackets[i].mOffset_byte; // Writing DirectGMA buffer !
+            lPacketInfo[i].mOffset_byte       = aPackets[i].mOffset_byte; // Writing DirectGMA buffer !
             lPacketInfo[i].mSendTo            = OPEN_NET_PACKET_PROCESSED;  // Writing DirectGMA buffer !
         }
 

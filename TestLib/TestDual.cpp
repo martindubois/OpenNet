@@ -27,6 +27,60 @@
 
 #include "../Common/TestLib/TestDual.h"
 
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define EOL "\n"
+
+static const char * CODE =
+"#include <OpenNetK/Kernel.h>"                                                EOL
+                                                                              EOL
+"OPEN_NET_KERNEL_DECLARE"                                                     EOL
+"{"                                                                           EOL
+"    OPEN_NET_KERNEL_BEGIN"                                                   EOL
+                                                                              EOL
+"        __global unsigned char * lData   = lBase + lPacketInfo->mOffset_byte;" EOL
+"        unsigned int             lResult = OPEN_NET_PACKET_PROCESSED;"       EOL
+"        unsigned int             i;"                                         EOL
+                                                                              EOL
+"        for ( i = 0; i < 6; i ++)"                                           EOL
+"        {"                                                                   EOL
+"            if ( 0xff != lData[ i ] )"                                       EOL
+"            {"                                                               EOL
+"                lResult |= 1;"                                               EOL
+"            }"                                                               EOL
+"        }"                                                                   EOL
+                                                                              EOL
+"        for ( i = 6; i < 12; i ++)"                                          EOL
+"        {"                                                                   EOL
+"            if ( 0x00 != lData[ i ] )"                                       EOL
+"            {"                                                               EOL
+"                lResult |= 1;"                                               EOL
+"            }"                                                               EOL
+"        }"                                                                   EOL
+                                                                              EOL
+"        for ( i = 12; i < 14; i ++)"                                         EOL
+"        {"                                                                   EOL
+"            if ( 0x88 != lData[ i ] )"                                       EOL
+"            {"                                                               EOL
+"                lResult |= 1;"                                               EOL
+"            }"                                                               EOL
+"        }"                                                                   EOL
+                                                                              EOL
+"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                    EOL
+"        {"                                                                   EOL
+"            if ( 0x00 != lData[ i ] )"                                       EOL
+"            {"                                                               EOL
+"                lResult |= 1;"                                               EOL
+"            }"                                                               EOL
+"        }"                                                                   EOL
+                                                                              EOL
+"        lPacketInfo->mSendTo = lResult;"                                     EOL
+                                                                              EOL
+"    OPEN_NET_KERNEL_END"                                                     EOL
+"}"                                                                           EOL;
+
+
 namespace TestLib
 {
 
@@ -41,6 +95,8 @@ namespace TestLib
             mAdapters [i] = NULL;
             mBufferQty[i] =    8;
         }
+
+        mKernel.SetCode(CODE, static_cast<unsigned int>(strlen(CODE)));
     }
 
     TestDual::~TestDual()
@@ -182,14 +238,14 @@ namespace TestLib
         switch (mMode)
         {
         case MODE_FUNCTION:
-            lStatus = mFunctions[0].AddDestination(mAdapters[0]);
+            lStatus = mForwardFs[0].AddDestination(mAdapters[0]);
             assert(OpenNet::STATUS_OK == lStatus);
 
             Adapter_SetInputFunctions();
             break;
 
         case MODE_KERNEL:
-            lStatus = mKernels[0].AddDestination(mAdapters[0]);
+            lStatus = mForwardKs[0].AddDestination(mAdapters[0]);
             assert(OpenNet::STATUS_OK == lStatus);
 
             Adapter_SetInputKernels();
@@ -357,89 +413,80 @@ namespace TestLib
         return 0;
     }
 
+    unsigned int TestDual::C(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s, AdapterSelect aSelect)
+    {
+        A_Init(aBufferQty, aSelect);
+
+        mPacketGenerator_Config.mBandwidth_MiB_s = aBandwidth_MiB_s;
+        mPacketGenerator_Config.mPacketSize_byte = aPacketSize_byte;
+
+        OpenNet::Status lStatus = mPacketGenerator->SetAdapter(mAdapters[1]);
+        if (OpenNet::STATUS_OK != lStatus)
+        {
+            printf(__FUNCTION__ " - PacketGenerator::SetAdapter(  ) returned %u\n", lStatus);
+            return __LINE__;
+        }
+
+        Adapter_SetInputKernel_C(0);
+
+        Start();
+
+        Sleep(100);
+
+        ResetAdapterStatistics();
+
+        Sleep(1000);
+
+        GetAdapterStatistics();
+
+        Adapter_InitialiseConstraints();
+
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 9840;
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin = 9800;
+
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 3740;
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =  217;
+
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 3740;
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =  217;
+
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 3740;
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =  217;
+
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1010;
+        mConstraints[TestLib::TestDual::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1000;
+
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10100;
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  9940;
+
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 23900;
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin = 13800;
+
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 23900;
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin = 13800;
+
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin = 1 * 1024 * 1024;
+
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 23900;
+        mConstraints[TestLib::TestDual::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin = 13800;
+
+        unsigned int lResult = Adapter_VerifyStatistics(0);
+
+        Stop();
+        Uninit();
+
+        return lResult;
+    }
+
     double TestDual::Adapter_GetBandwidth() const
     {
         return mBandwidth_MiB_s;
     }
 
-    unsigned int TestDual::Adapter_GetDroppedPacketCount() const
-    {
-        return mStatistics[0][HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_QUEUE_DROPPED_packet];
-    }
-
     double TestDual::Adapter_GetPacketThroughput() const
     {
         return mPacketThroughput;
-    }
-
-    void TestDual::Adapter_InitialiseConstraints()
-    {
-        KmsLib::ValueVector::Constraint_Init(mConstraints, STATS_QTY);
-
-        mConstraints[ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
-    }
-
-    void TestDual::Adapter_SetInputFunctions()
-    {
-        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
-        {
-            assert(NULL != mAdapters[i]);
-
-            OpenNet::Status lStatus = mAdapters[i]->SetInputFilter(mFunctions + i);
-            assert(OpenNet::STATUS_OK == lStatus);
-        }
-    }
-
-    void TestDual::Adapter_SetInputFunction(unsigned int aAdapter)
-    {
-        assert(ADAPTER_QTY > aAdapter);
-
-        assert(NULL != mAdapters[aAdapter]);
-
-        OpenNet::Status lStatus = mAdapters[aAdapter]->SetInputFilter(mFunctions + aAdapter);
-        assert(OpenNet::STATUS_OK == lStatus);
-    }
-
-    void TestDual::Adapter_SetInputKernels()
-    {
-        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
-        {
-            assert(NULL != mAdapters[i]);
-
-            OpenNet::Status lStatus = mAdapters[i]->SetInputFilter(mKernels + i);
-            assert(OpenNet::STATUS_OK == lStatus);
-        }
-    }
-
-    void TestDual::Adapter_SetInputKernel(unsigned int aAdapter)
-    {
-        assert(ADAPTER_QTY > aAdapter);
-
-        assert(NULL != mAdapters[aAdapter]);
-
-        OpenNet::Status lStatus = mAdapters[aAdapter]->SetInputFilter(mKernels + aAdapter);
-        assert(OpenNet::STATUS_OK == lStatus);
-    }
-
-    unsigned int TestDual::Adapter_VerifyStatistics(unsigned int aAdapter)
-    {
-        assert(ADAPTER_QTY > aAdapter);
-
-        OpenNet::Adapter * lAdapter = mAdapters[aAdapter];
-        assert(NULL != lAdapter);
-
-        return KmsLib::ValueVector::Constraint_Verify(mStatistics[aAdapter], lAdapter->GetStatisticsQty(), mConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>( lAdapter->GetStatisticsDescriptions()));
-    }
-
-    void TestDual::DisplayAdapterStatistics()
-    {
-        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
-        {
-            assert(NULL != mAdapters[i]);
-
-            OpenNet::Status lStatus = mAdapters[i]->DisplayStatistics(mStatistics[i], sizeof(mStatistics[i]), stdout, 0);
-            assert(OpenNet::STATUS_OK == lStatus);
-        }
     }
 
     void TestDual::DisplaySpeed()
@@ -487,42 +534,6 @@ namespace TestLib
 
         mBandwidth_MiB_s  = lRx_MiB_s   [0];
         mPacketThroughput = lRx_packet_s[0];
-    }
-
-    void TestDual::GetAdapterStatistics()
-    {
-        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
-        {
-            assert(NULL != mAdapters[i]);
-
-            OpenNet::Status lStatus = mAdapters[i]->GetStatistics(mStatistics[i], sizeof(mStatistics[i]), NULL, true);
-            assert(OpenNet::STATUS_OK == lStatus);
-        }
-    }
-
-    void TestDual::GetAndDisplayKernelStatistics()
-    {
-        unsigned int lStats[16];
-
-        OpenNet::Kernel * lKernel = mSystem->Kernel_Get( 0 );
-        assert(NULL != lKernel);
-
-        OpenNet::Status lStatus = lKernel->GetStatistics(lStats, sizeof(lStats), NULL, true);
-        assert(OpenNet::STATUS_OK == lStatus);
-
-        lStatus = lKernel->DisplayStatistics(lStats, sizeof(lStats), stdout, 0);
-        assert(OpenNet::STATUS_OK == lStatus);
-    }
-
-    void TestDual::ResetAdapterStatistics()
-    {
-        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
-        {
-            assert(NULL != mAdapters[i]);
-
-            OpenNet::Status lStatus = mAdapters[i]->ResetStatistics();
-            assert(OpenNet::STATUS_OK == lStatus);
-        }
     }
 
     // TODO TestLib.DualTest
@@ -613,10 +624,10 @@ namespace TestLib
             Processor_EnableProfiling();
         }
 
-        lStatus = mFunctions[0].SetFunctionName("Function_0");
+        lStatus = mForwardFs[0].SetFunctionName("Function_0");
         assert(OpenNet::STATUS_OK == lStatus);
 
-        lStatus = mFunctions[1].SetFunctionName("Function_1");
+        lStatus = mForwardFs[1].SetFunctionName("Function_1");
         assert(OpenNet::STATUS_OK == lStatus);
 
         Adapter_Connect();
@@ -715,6 +726,86 @@ namespace TestLib
         }
     }
 
+    void TestDual::Adapter_InitialiseConstraints()
+    {
+        KmsLib::ValueVector::Constraint_Init(mConstraints, STATS_QTY);
+
+        mConstraints[ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
+    }
+
+    void TestDual::Adapter_SetInputFunctions()
+    {
+        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
+        {
+            assert(NULL != mAdapters[i]);
+
+            OpenNet::Status lStatus = mAdapters[i]->SetInputFilter(mForwardFs + i);
+            assert(OpenNet::STATUS_OK == lStatus);
+        }
+    }
+
+    void TestDual::Adapter_SetInputFunction(unsigned int aAdapter)
+    {
+        assert(ADAPTER_QTY > aAdapter);
+
+        assert(NULL != mAdapters[aAdapter]);
+
+        OpenNet::Status lStatus = mAdapters[aAdapter]->SetInputFilter(mForwardFs + aAdapter);
+        assert(OpenNet::STATUS_OK == lStatus);
+    }
+
+    void TestDual::Adapter_SetInputKernels()
+    {
+        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
+        {
+            assert(NULL != mAdapters[i]);
+
+            OpenNet::Status lStatus = mAdapters[i]->SetInputFilter(mForwardKs + i);
+            assert(OpenNet::STATUS_OK == lStatus);
+        }
+    }
+
+    void TestDual::Adapter_SetInputKernel(unsigned int aAdapter)
+    {
+        assert(ADAPTER_QTY > aAdapter);
+
+        assert(NULL != mAdapters[aAdapter]);
+
+        OpenNet::Status lStatus = mAdapters[aAdapter]->SetInputFilter(mForwardKs + aAdapter);
+        assert(OpenNet::STATUS_OK == lStatus);
+    }
+
+    void TestDual::Adapter_SetInputKernel_C(unsigned int aAdapter)
+    {
+        assert(ADAPTER_QTY > aAdapter);
+
+        assert(NULL != mAdapters[aAdapter]);
+
+        OpenNet::Status lStatus = mAdapters[aAdapter]->SetInputFilter(&mKernel);
+        assert(OpenNet::STATUS_OK == lStatus);
+    }
+
+    unsigned int TestDual::Adapter_VerifyStatistics(unsigned int aAdapter)
+    {
+        assert(ADAPTER_QTY > aAdapter);
+
+        OpenNet::Adapter * lAdapter = mAdapters[aAdapter];
+        assert(NULL != lAdapter);
+
+        return KmsLib::ValueVector::Constraint_Verify(mStatistics[aAdapter], lAdapter->GetStatisticsQty(), mConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(lAdapter->GetStatisticsDescriptions()));
+    }
+
+    void TestDual::GetAdapterStatistics()
+    {
+        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
+        {
+            assert(NULL != mAdapters[i]);
+
+            OpenNet::Status lStatus = mAdapters[i]->GetStatistics(mStatistics[i], sizeof(mStatistics[i]), NULL, true);
+            assert(OpenNet::STATUS_OK == lStatus);
+        }
+    }
+
     void TestDual::Processor_EnableProfiling()
     {
         assert(NULL != mProcessor);
@@ -728,6 +819,17 @@ namespace TestLib
 
         lStatus = mProcessor->SetConfig(lConfig);
         assert(OpenNet::STATUS_OK == lStatus);
+    }
+
+    void TestDual::ResetAdapterStatistics()
+    {
+        for (unsigned int i = 0; i < ADAPTER_QTY; i++)
+        {
+            assert(NULL != mAdapters[i]);
+
+            OpenNet::Status lStatus = mAdapters[i]->ResetStatistics();
+            assert(OpenNet::STATUS_OK == lStatus);
+        }
     }
 
     void TestDual::ResetInputFilter()

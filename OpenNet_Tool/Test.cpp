@@ -78,3 +78,16 @@ void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
 
     lTD.DisplaySpeed();
 }
+
+void Test_C(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+{
+    assert(0   < aBufferQty      );
+    assert(0   < aPacketSize_byte);
+    assert(0.0 < aBandwidth_MiB_s);
+
+    TestLib::TestDual lTD(TestLib::TestDual::MODE_KERNEL, false);
+
+    lTD.C(aBufferQty, aPacketSize_byte, aBandwidth_MiB_s, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
+
+    lTD.DisplaySpeed();
+}

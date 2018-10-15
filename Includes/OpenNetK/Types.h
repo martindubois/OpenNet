@@ -80,11 +80,11 @@ typedef struct
 
     uint8_t mReserved0[4];
 
-    uint32_t mPacketOffset_byte;
+    uint32_t mOffset_byte;
 
     uint8_t mReserved1[4];
 
-    volatile uint32_t mPacketSize_byte;
+    volatile uint32_t mSize_byte;
 
     uint8_t mReserved2[12];
 }
