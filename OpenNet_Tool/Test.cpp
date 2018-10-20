@@ -17,7 +17,7 @@
 #include <OpenNet/PacketGenerator.h>
 
 // ===== Common =============================================================
-#include "../Common/TestLib/TestDual.h"
+#include "../Common/TestLib/Tester.h"
 
 // ===== OpenNet_Tool =======================================================
 #include "Test.h"
@@ -30,13 +30,16 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte)
     assert(0 < aBufferQty      );
     assert(0 < aPacketSize_byte);
 
-    TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
+    TestLib::Tester::A_Describe();
 
-    lTD.A_Search(aBufferQty, aPacketSize_byte, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
+    TestLib::Tester lT(TestLib::Tester::MODE_FUNCTION, false);
 
-    lTD.A_Verify(aBufferQty, aPacketSize_byte, lTD.mPacketGenerator_Config.mBandwidth_MiB_s, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
+    lT.SetPacketSize(aPacketSize_byte);
 
-    lTD.DisplaySpeed();
+    lT.A_Search(aBufferQty);
+    lT.A_Verify(aBufferQty);
+
+    lT.DisplaySpeed();
 }
 
 void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
@@ -45,11 +48,16 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
     assert(0   < aPacketSize_byte);
     assert(0.0 < aBandwidth_MiB_s);
 
-    TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
+    TestLib::Tester::A_Describe();
 
-    lTD.A(aBufferQty, aPacketSize_byte, aBandwidth_MiB_s, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
+    TestLib::Tester lT(TestLib::Tester::MODE_FUNCTION, false);
 
-    lTD.DisplaySpeed();
+    lT.SetBandwidth (aBandwidth_MiB_s);
+    lT.SetPacketSize(aPacketSize_byte);
+
+    lT.A(aBufferQty);
+
+    lT.DisplaySpeed();
 }
 
 void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte)
@@ -57,13 +65,16 @@ void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte)
     assert(0 < aBufferQty      );
     assert(0 < aPacketSize_byte);
 
-    TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
+    TestLib::Tester::B_Describe();
 
-    lTD.B_Search(aBufferQty, aPacketSize_byte, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
+    TestLib::Tester lT(TestLib::Tester::MODE_FUNCTION, false);
 
-    lTD.B_Verify(aBufferQty, aPacketSize_byte, lTD.mPacketGenerator_Config.mBandwidth_MiB_s, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
+    lT.SetPacketSize(aPacketSize_byte);
 
-    lTD.DisplaySpeed();
+    lT.B_Search(aBufferQty);
+    lT.B_Verify(aBufferQty);
+
+    lT.DisplaySpeed();
 }
 
 void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
@@ -72,11 +83,16 @@ void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
     assert(0   < aPacketSize_byte);
     assert(0.0 < aBandwidth_MiB_s);
 
-    TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
+    TestLib::Tester::B_Describe();
 
-    lTD.B(aBufferQty, aPacketSize_byte, aBandwidth_MiB_s, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
+    TestLib::Tester lT(TestLib::Tester::MODE_FUNCTION, false);
 
-    lTD.DisplaySpeed();
+    lT.SetBandwidth (aBandwidth_MiB_s);
+    lT.SetPacketSize(aPacketSize_byte);
+
+    lT.B(aBufferQty);
+
+    lT.DisplaySpeed();
 }
 
 void Test_C(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
@@ -85,9 +101,49 @@ void Test_C(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
     assert(0   < aPacketSize_byte);
     assert(0.0 < aBandwidth_MiB_s);
 
-    TestLib::TestDual lTD(TestLib::TestDual::MODE_KERNEL, false);
+    TestLib::Tester::C_Describe();
 
-    lTD.C(aBufferQty, aPacketSize_byte, aBandwidth_MiB_s, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME);
+    TestLib::Tester lT(TestLib::Tester::MODE_KERNEL, false);
 
-    lTD.DisplaySpeed();
+    lT.SetBandwidth (aBandwidth_MiB_s);
+    lT.SetPacketSize(aPacketSize_byte);
+
+    lT.C(aBufferQty);
+
+    lT.DisplaySpeed();
+}
+
+void Test_D(unsigned int aBufferQty, unsigned int aPacketSize_byte)
+{
+    assert(0 < aBufferQty      );
+    assert(0 < aPacketSize_byte);
+
+    TestLib::Tester::D_Describe();
+
+    TestLib::Tester lT(TestLib::Tester::MODE_KERNEL, false);
+
+    lT.SetPacketSize(aPacketSize_byte);
+
+    lT.D_Search(aBufferQty);
+    lT.D_Verify(aBufferQty);
+
+    lT.DisplaySpeed();
+}
+
+void Test_D(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+{
+    assert(0 < aBufferQty);
+    assert(0 < aPacketSize_byte);
+    assert(0.0 < aBandwidth_MiB_s);
+
+    TestLib::Tester::D_Describe();
+
+    TestLib::Tester lT(TestLib::Tester::MODE_KERNEL, false);
+
+    lT.SetBandwidth(aBandwidth_MiB_s);
+    lT.SetPacketSize(aPacketSize_byte);
+
+    lT.D(aBufferQty);
+
+    lT.DisplaySpeed();
 }

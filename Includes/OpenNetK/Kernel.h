@@ -29,9 +29,12 @@
     {                                                                                                                                 \
         __global unsigned char      * lBase       = (__global unsigned char      *)( aBufferHeader );                                 \
         __global OpenNet_PacketInfo * lPacketInfo = (__global OpenNet_PacketInfo *)( lBase + aBufferHeader->mPacketInfoOffset_byte ); \
-        lPacketInfo += get_local_id( 0 );
+        lPacketInfo += get_local_id( 0 );                                                                                             \
+        if (0 == lPacketInfo->mSendTo)                                                                                                \
+        {
 
 #define OPEN_NET_FUNCTION_END                                                 \
+        }                                                                     \
         if ( 0 == get_local_id( 0 ) )                                         \
         {                                                                     \
             aBufferHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_COMPLETED; \
@@ -44,9 +47,12 @@
 #define OPEN_NET_KERNEL_BEGIN                                                                                                     \
     __global unsigned char      * lBase       = (__global unsigned char      *)( aBufferHeader );                                 \
     __global OpenNet_PacketInfo * lPacketInfo = (__global OpenNet_PacketInfo *)( lBase + aBufferHeader->mPacketInfoOffset_byte ); \
-    lPacketInfo += get_global_id( 0 );
+    lPacketInfo += get_global_id( 0 );                                                                                            \
+    if (0 == lPacketInfo->mSendTo)                                                                                                \
+    {
 
 #define OPEN_NET_KERNEL_END                                               \
+    }                                                                     \
     if ( 0 == get_global_id( 0 ) )                                        \
     {                                                                     \
         aBufferHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_COMPLETED; \

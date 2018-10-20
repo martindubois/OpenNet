@@ -34,10 +34,7 @@ static const char * CODE =
 "{"                                                                           EOL
 "    OPEN_NET_KERNEL_BEGIN"                                                   EOL
                                                                               EOL
-"    if ( 0 == lPacketInfo->mSendTo )"                                        EOL
-"    {"                                                                       EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED | DESTINATIONS;"    EOL
-"    }"                                                                       EOL
                                                                               EOL
 "    OPEN_NET_KERNEL_END"                                                     EOL
 "}"                                                                           EOL;

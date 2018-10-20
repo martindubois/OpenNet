@@ -17,39 +17,49 @@
 
 // ===== Common =============================================================
 #include "../Common/OpenNetK/Adapter_Statistics.h"
-#include "../Common/TestLib/TestDual.h"
+#include "../Common/TestLib/Tester.h"
 
 // Tests
 /////////////////////////////////////////////////////////////////////////////
 
 KMS_TEST_BEGIN(B_Function_9KB_SetupC)
 {
-    TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
+    TestLib::Tester::B_Describe();
 
-    KMS_TEST_COMPARE_RETURN(0, lTD.B(3, 9000, 120.0, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME));
+    TestLib::Tester lT(TestLib::Tester::MODE_FUNCTION, false);
 
-    lTD.DisplaySpeed();
+    lT.SetBandwidth ( 120.0);
+    lT.SetPacketSize(9000  );
 
-    KMS_TEST_ASSERT(81.8 < lTD.Adapter_GetBandwidth());
-    KMS_TEST_ASSERT(83.1 > lTD.Adapter_GetBandwidth());
+    KMS_TEST_COMPARE_RETURN(0, lT.B(3));
 
-    KMS_TEST_ASSERT(9536.0 <= lTD.Adapter_GetPacketThroughput());
-    KMS_TEST_ASSERT(9671.0 >= lTD.Adapter_GetPacketThroughput());
+    lT.DisplaySpeed();
+
+    KMS_TEST_ASSERT(81.8 < lT.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(83.1 > lT.Adapter_GetBandwidth());
+
+    KMS_TEST_ASSERT(9536.0 <= lT.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(9671.0 >= lT.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END
 
 KMS_TEST_BEGIN(B_Kernel_9KB_SetupC)
 {
-    TestLib::TestDual lTD(TestLib::TestDual::MODE_FUNCTION, false);
+    TestLib::Tester::B_Describe();
 
-    KMS_TEST_COMPARE_RETURN(0, lTD.B(3, 9000, 120.0, TestLib::TestDual::ADAPTER_SELECT_CARD_SAME));
+    TestLib::Tester lT(TestLib::Tester::MODE_FUNCTION, false);
 
-    lTD.DisplaySpeed();
+    lT.SetBandwidth ( 120.0);
+    lT.SetPacketSize(9000  );
 
-    KMS_TEST_ASSERT(81.8 < lTD.Adapter_GetBandwidth());
-    KMS_TEST_ASSERT(83.1 > lTD.Adapter_GetBandwidth());
+    KMS_TEST_COMPARE_RETURN(0, lT.B(3));
 
-    KMS_TEST_ASSERT(9533.0 <= lTD.Adapter_GetPacketThroughput());
-    KMS_TEST_ASSERT(9671.0 >= lTD.Adapter_GetPacketThroughput());
+    lT.DisplaySpeed();
+
+    KMS_TEST_ASSERT(81.8 < lT.Adapter_GetBandwidth());
+    KMS_TEST_ASSERT(83.1 > lT.Adapter_GetBandwidth());
+
+    KMS_TEST_ASSERT(9533.0 <= lT.Adapter_GetPacketThroughput());
+    KMS_TEST_ASSERT(9671.0 >= lT.Adapter_GetPacketThroughput());
 }
 KMS_TEST_END

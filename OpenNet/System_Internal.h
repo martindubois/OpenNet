@@ -44,6 +44,7 @@ public:
 
     virtual OpenNet::Status    Adapter_Connect (OpenNet::Adapter * aAdapter);
     virtual OpenNet::Adapter * Adapter_Get     (unsigned int aIndex);
+    virtual OpenNet::Adapter * Adapter_Get     (const unsigned char * aAddress, const unsigned char * aMask, const unsigned char * aMaskDiff);
     virtual unsigned int       Adapter_GetCount() const;
 
     virtual OpenNet::Status Display(FILE * aOut);

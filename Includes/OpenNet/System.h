@@ -185,13 +185,35 @@ namespace OpenNet
 
         /// \cond en
         /// \param   aIndex  The index of the adapter to get
-        /// \return  This methode return the adapter.
+        /// \retval  NULL    Not found
+        /// \retval  Other   The address of the Adapter instance
         /// \endcond
         /// \cond fr
         /// \param   aIndex  L'index de l'adaptateur a retourner
-        /// \return  Cette methode retourne l'adaptateurs.
+        /// \retval  NULL    Introuvable
+        /// \retval  Other   L'adresse de l'instance d'Adapter
         /// \endcond
         virtual Adapter * Adapter_Get( unsigned int aIndex ) = 0;
+
+        /// \cond en
+        /// \param   aAddress   The Ethernet address to look for
+        /// \param   aMask      The bit set to 1 indicate the bit that must
+        ///                     match the address.
+        /// \param   aMaskDiff  The bit set to 1 indicate the part of address
+        ///                     that must be different.
+        /// \retval  NULL       Not found
+        /// \retval  Other      The address of the Adapter instance
+        /// \endcond
+        /// \cond fr
+        /// \param   aAddress   L'adresse Ethernet a rechercher
+        /// \param   aMask      Les bit a 1 correspondre au bit qui doivent
+        ///                     correspondres a l'adresse.
+        /// \param   aMaskDiff  Les bits a 1 indiquent la partie de l'adresse
+        ///                     qui doit etre differente
+        /// \retval  NULL       Introuvable
+        /// \retval  Other      L'adresse de l'instance d'Adapter
+        /// \endcond
+        virtual Adapter * Adapter_Get(const unsigned char * aAddress, const unsigned char * aMask, const unsigned char * aMaskDiff) = 0;
 
         /// \cond en
         /// \brief  Display

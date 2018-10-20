@@ -88,6 +88,7 @@ protected:
     Buffer_Data_Vector   mBuffers     ;
     cl_command_queue     mCommandQueue;
     KmsLib::DebugLog   * mDebugLog    ;
+    OpenNet::Kernel    * mKernel      ;
     cl_kernel            mKernel_CL   ;
     Processor_Internal * mProcessor   ;
 
@@ -105,7 +106,6 @@ private:
 
     unsigned int Wait_Zone0(unsigned int aTimeout_ms);
 
-    OpenNet::Kernel * mKernel  ;
     cl_program        mProgram ;
     HANDLE            mThread  ;
     DWORD             mThreadId;

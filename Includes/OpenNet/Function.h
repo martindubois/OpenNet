@@ -60,8 +60,8 @@ namespace OpenNet
         virtual Status SetFunctionName(const char * aFunctionName);
 
         // ===== SourceCode =================================================
-        virtual        ~Function();
-        virtual Status Display  (FILE * aOut) const;
+        OPEN_NET_PUBLIC virtual        ~Function();
+        OPEN_NET_PUBLIC virtual Status Display  (FILE * aOut) const;
 
     private:
 

@@ -259,6 +259,57 @@ OpenNet::Adapter * System_Internal::Adapter_Get(unsigned int aIndex)
     return mAdapters[aIndex];
 }
 
+OpenNet::Adapter * System_Internal::Adapter_Get(const unsigned char * aAddress, const unsigned char * aMask, const unsigned char * aMaskDiff)
+{
+    if ((NULL == aAddress) || (NULL == aMask) || (NULL == aMaskDiff))
+    {
+        return NULL;
+    }
+
+    OpenNet::Adapter * lResult = NULL;
+
+    for (unsigned int i = 0; i < mAdapters.size(); i++)
+    {
+        bool                   lDiffNeeded = false;
+        bool                   lDiffOk     = false;
+        OpenNet::Adapter::Info lInfo              ;
+
+        lResult = mAdapters[i];
+        assert(NULL != lResult);
+
+        OpenNet::Status lStatus = mAdapters[i]->GetInfo(&lInfo);
+        if (OpenNet::STATUS_OK == lStatus)
+        {
+            for (unsigned int j = 0; j < 6; j++)
+            {
+                if ((aAddress[j] & aMask[j]) != (lInfo.mEthernetAddress.mAddress[j] & aMask[j]))
+                {
+                    lResult = NULL;
+                    break;
+                }
+
+                if (0 != aMaskDiff[j])
+                {
+                    lDiffNeeded = true;
+                    if ((aAddress[j] & aMaskDiff[j]) != (lInfo.mEthernetAddress.mAddress[j] & aMaskDiff[j]))
+                    {
+                        lDiffOk = true;
+                    }
+                }
+            }
+
+            if ((NULL != lResult) && ((!lDiffNeeded) || lDiffOk))
+            {
+                break;
+            }
+        }
+
+        lResult = NULL;
+    }
+
+    return lResult;
+}
+
 unsigned int System_Internal::Adapter_GetCount() const
 {
     return static_cast<unsigned int>(mAdapters.size());
