@@ -16,23 +16,20 @@
 // ===== Includes ===========================================================
 #include <OpenNet/PacketGenerator.h>
 
-// ===== Common =============================================================
-#include "../Common/TestLib/Tester.h"
-
 // ===== OpenNet_Tool =======================================================
 #include "Test.h"
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
-void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte)
+void Test_A(TestLib::Tester::Mode aMode, unsigned int aBufferQty, unsigned int aPacketSize_byte)
 {
     assert(0 < aBufferQty      );
     assert(0 < aPacketSize_byte);
 
     TestLib::Tester::A_Describe();
 
-    TestLib::Tester lT(TestLib::Tester::MODE_FUNCTION, false);
+    TestLib::Tester lT(aMode, false);
 
     lT.SetPacketSize(aPacketSize_byte);
 
@@ -42,7 +39,7 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte)
     lT.DisplaySpeed();
 }
 
-void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+void Test_A(TestLib::Tester::Mode aMode, unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
 {
     assert(0   < aBufferQty      );
     assert(0   < aPacketSize_byte);
@@ -50,7 +47,7 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
 
     TestLib::Tester::A_Describe();
 
-    TestLib::Tester lT(TestLib::Tester::MODE_FUNCTION, false);
+    TestLib::Tester lT(aMode, false);
 
     lT.SetBandwidth (aBandwidth_MiB_s);
     lT.SetPacketSize(aPacketSize_byte);
@@ -60,14 +57,14 @@ void Test_A(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
     lT.DisplaySpeed();
 }
 
-void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte)
+void Test_B(TestLib::Tester::Mode aMode, unsigned int aBufferQty, unsigned int aPacketSize_byte)
 {
     assert(0 < aBufferQty      );
     assert(0 < aPacketSize_byte);
 
     TestLib::Tester::B_Describe();
 
-    TestLib::Tester lT(TestLib::Tester::MODE_FUNCTION, false);
+    TestLib::Tester lT(aMode, false);
 
     lT.SetPacketSize(aPacketSize_byte);
 
@@ -77,7 +74,7 @@ void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte)
     lT.DisplaySpeed();
 }
 
-void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+void Test_B(TestLib::Tester::Mode aMode, unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
 {
     assert(0   < aBufferQty      );
     assert(0   < aPacketSize_byte);
@@ -85,7 +82,7 @@ void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
 
     TestLib::Tester::B_Describe();
 
-    TestLib::Tester lT(TestLib::Tester::MODE_FUNCTION, false);
+    TestLib::Tester lT(aMode, false);
 
     lT.SetBandwidth (aBandwidth_MiB_s);
     lT.SetPacketSize(aPacketSize_byte);
@@ -95,7 +92,7 @@ void Test_B(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
     lT.DisplaySpeed();
 }
 
-void Test_C(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+void Test_C(TestLib::Tester::Mode aMode, unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
 {
     assert(0   < aBufferQty      );
     assert(0   < aPacketSize_byte);
@@ -103,7 +100,7 @@ void Test_C(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
 
     TestLib::Tester::C_Describe();
 
-    TestLib::Tester lT(TestLib::Tester::MODE_KERNEL, false);
+    TestLib::Tester lT(aMode, false);
 
     lT.SetBandwidth (aBandwidth_MiB_s);
     lT.SetPacketSize(aPacketSize_byte);
@@ -113,14 +110,14 @@ void Test_C(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
     lT.DisplaySpeed();
 }
 
-void Test_D(unsigned int aBufferQty, unsigned int aPacketSize_byte)
+void Test_D(TestLib::Tester::Mode aMode, unsigned int aBufferQty, unsigned int aPacketSize_byte)
 {
     assert(0 < aBufferQty      );
     assert(0 < aPacketSize_byte);
 
     TestLib::Tester::D_Describe();
 
-    TestLib::Tester lT(TestLib::Tester::MODE_KERNEL, false);
+    TestLib::Tester lT(aMode, false);
 
     lT.SetPacketSize(aPacketSize_byte);
 
@@ -130,7 +127,7 @@ void Test_D(unsigned int aBufferQty, unsigned int aPacketSize_byte)
     lT.DisplaySpeed();
 }
 
-void Test_D(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
+void Test_D(TestLib::Tester::Mode aMode, unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s)
 {
     assert(0 < aBufferQty);
     assert(0 < aPacketSize_byte);
@@ -138,9 +135,9 @@ void Test_D(unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBand
 
     TestLib::Tester::D_Describe();
 
-    TestLib::Tester lT(TestLib::Tester::MODE_KERNEL, false);
+    TestLib::Tester lT(aMode, false);
 
-    lT.SetBandwidth(aBandwidth_MiB_s);
+    lT.SetBandwidth (aBandwidth_MiB_s);
     lT.SetPacketSize(aPacketSize_byte);
 
     lT.D(aBufferQty);

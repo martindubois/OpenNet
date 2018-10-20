@@ -771,34 +771,34 @@ namespace TestLib
         Adapter_InitialiseConstraints();
 
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  9800;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1640;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 4620;
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =  216;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 22100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =   216;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 4620;
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =  216;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 22100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =   216;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 4620;
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =  216;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 22100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =   216;
 
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1010;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1000;
 
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10100;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  9910;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  7490;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 296000;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =  13800;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 1420000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =   13800;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 296000;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =  13800;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 1420000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =   13800;
 
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 121 * 1024 * 1024;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin = 1 * 1024 * 1024;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 296000;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =  13800;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 1420000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =   13800;
 
         lResult = Adapter_VerifyStatistics(0);
 
@@ -849,68 +849,68 @@ namespace TestLib
         Adapter_InitialiseConstraints();
 
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10300;
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1890;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =    64;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 10400;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 25400;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =   110;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 10400;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 25400;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =   110;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 11400;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 27100;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =   220;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1040;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1170;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1000;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10200;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  4420;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 11500;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =   158;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 654000;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =   7040;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 1620000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =    7040;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 663000;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =   7010;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 1620000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =    7010;
 
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 121 * 1024 * 1024;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin =   1 * 1024 * 1024;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 983000;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =   7010;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 1620000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =    7010;
 
         lResult = Adapter_VerifyStatistics(0);
 
         Adapter_InitialiseConstraints();
 
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10300;
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1890;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =    64;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 10400;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 25400;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =   110;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 10400;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 25400;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =   110;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 11400;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 27100;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =   220;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1040;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1170;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1000;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10200;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  4420;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 11500;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =   158;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 654000;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =   7040;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 1620000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =    7040;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 663000;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =   7010;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 1620000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =    7010;
 
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 121 * 1024 * 1024;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin =   1 * 1024 * 1024;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 983000;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =   7010;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 1620000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =    7010;
 
         lResult += Adapter_VerifyStatistics(1);
 
@@ -1444,11 +1444,11 @@ namespace TestLib
 
                 switch (mCodes[i])
                 {
-                case CODE_FORWARD       : Adapter_SetProcessing(lA, lF, (0 == i) ? FUNCTION_FORWARD_0        : FUNCTION_FORWARD_1       , (0 == i) ? "Forward0"        : "Forward1"      , mNos[lOther]); break;
-                case CODE_NONE          :                                                                                                                                                                 break;
-                case CODE_NOTHING       : Adapter_SetProcessing(lA, lF, (0 == i) ? FUNCTION_NOTHING_0        : FUNCTION_NOTHING_1       , (0 == i) ? "Nothing0"        : "Nothing1"      , NULL        ); break;
-                case CODE_REPLY         : Adapter_SetProcessing(lA, lF, (0 == i) ? FUNCTION_FORWARD_0        : FUNCTION_FORWARD_1       , (0 == i) ? "Forward0"        : "Forward1"      , lIndex      ); break;
-                case CODE_REPLY_ON_ERROR: Adapter_SetProcessing(lA, lF, (0 == i) ? FUNCTION_REPLY_ON_ERROR_0 : FUNCTION_REPLY_ON_ERROR_1, (0 == i) ? "ForwardOnError0" : "ForwardOnError", lIndex      ); break;
+                case CODE_FORWARD       : Adapter_SetProcessing(lA, lF, (0 == i) ? FUNCTION_FORWARD_0        : FUNCTION_FORWARD_1       , (0 == i) ? "Forward0"      : "Forward1"    , mNos[lOther]); break;
+                case CODE_NONE          :                                                                                                                                                             break;
+                case CODE_NOTHING       : Adapter_SetProcessing(lA, lF, (0 == i) ? FUNCTION_NOTHING_0        : FUNCTION_NOTHING_1       , (0 == i) ? "Nothing0"      : "Nothing1"    , NULL        ); break;
+                case CODE_REPLY         : Adapter_SetProcessing(lA, lF, (0 == i) ? FUNCTION_FORWARD_0        : FUNCTION_FORWARD_1       , (0 == i) ? "Forward0"      : "Forward1"    , lIndex      ); break;
+                case CODE_REPLY_ON_ERROR: Adapter_SetProcessing(lA, lF, (0 == i) ? FUNCTION_REPLY_ON_ERROR_0 : FUNCTION_REPLY_ON_ERROR_1, (0 == i) ? "ReplyOnError0" : "ReplyOnError", lIndex      ); break;
 
                 default: assert(false);
                 }

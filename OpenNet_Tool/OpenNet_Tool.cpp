@@ -27,6 +27,7 @@
 
 // ===== Common =============================================================
 #include "../Common/Version.h"
+#include "../Common/TestLib/Tester.h"
 
 // ===== OpenNet_Tool =======================================================
 #include "Test.h"
@@ -118,12 +119,16 @@ static void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Test_C(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Test_D(KmsLib::ToolBase * aToolBase, const char * aArg);
 
+static void Test_Mode(KmsLib::ToolBase * aToolBase, const char * aArg);
+
 static const KmsLib::ToolBase::CommandInfo TEST_COMMANDS[] =
 {
 	{ "A", Test_A, "Loop {BQ} {PS_byte} [BW_MiB/s]", NULL },
     { "B", Test_B, "Loop {BQ} {PS_byte} [BW_MiB/s]", NULL },
     { "C", Test_C, "Loop {BQ} {PS_byte} {BW_MiB/s}", NULL },
     { "D", Test_D, "Loop {BQ} {PS_byte} [BW_MiB/s]", NULL },
+
+    { "Mode", Test_Mode, "Mode {Function|Kernel}", NULL },
 
 	{ NULL, NULL, NULL, NULL }
 };
@@ -164,6 +169,8 @@ static OpenNet::Kernel    * sKernel    = NULL;
 static KernelMap            sKernels;
 static OpenNet::Processor * sProcessor = NULL;
 static OpenNet::System    * sSystem;
+
+static TestLib::Tester::Mode sTest_Mode = TestLib::Tester::MODE_FUNCTION;
 
 // Entry point
 /////////////////////////////////////////////////////////////////////////////
@@ -919,7 +926,7 @@ void Test_A(KmsLib::ToolBase * aToolBase, const char * aArg)
 
         try
         {
-            Test_A(lBufferQty, lPacketSize_byte);
+            Test_A(sTest_Mode, lBufferQty, lPacketSize_byte);
         }
         catch (KmsLib::Exception * eE)
         {
@@ -944,7 +951,7 @@ void Test_A(KmsLib::ToolBase * aToolBase, const char * aArg)
 
         try
         {
-            Test_A(lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
+            Test_A(sTest_Mode, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
         }
         catch (KmsLib::Exception * eE)
         {
@@ -988,7 +995,7 @@ void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg)
 
         try
         {
-            Test_B(lBufferQty, lPacketSize_byte);
+            Test_B(sTest_Mode, lBufferQty, lPacketSize_byte);
         }
         catch (KmsLib::Exception * eE)
         {
@@ -1013,7 +1020,7 @@ void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg)
 
         try
         {
-            Test_B(lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
+            Test_B(sTest_Mode, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
         }
         catch (KmsLib::Exception * eE)
         {
@@ -1067,7 +1074,7 @@ void Test_C(KmsLib::ToolBase * aToolBase, const char * aArg)
 
         try
         {
-            Test_C(lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
+            Test_C(sTest_Mode, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
         }
         catch (KmsLib::Exception * eE)
         {
@@ -1111,7 +1118,7 @@ void Test_D(KmsLib::ToolBase * aToolBase, const char * aArg)
 
         try
         {
-            Test_D(lBufferQty, lPacketSize_byte);
+            Test_D(sTest_Mode, lBufferQty, lPacketSize_byte);
         }
         catch (KmsLib::Exception * eE)
         {
@@ -1136,7 +1143,7 @@ void Test_D(KmsLib::ToolBase * aToolBase, const char * aArg)
 
         try
         {
-            Test_D(lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
+            Test_D(sTest_Mode, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
         }
         catch (KmsLib::Exception * eE)
         {
@@ -1145,6 +1152,34 @@ void Test_D(KmsLib::ToolBase * aToolBase, const char * aArg)
         break;
 
     default:
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
+    }
+}
+
+void Test_Mode(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test Mode %s\n", aArg);
+
+    if (0 == _strnicmp("Function", aArg, 8))
+    {
+        printf("Test Mode Function\n");
+
+        sTest_Mode = TestLib::Tester::MODE_FUNCTION;
+
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Test Mode set to Function");
+    }
+    else if (0 == _strnicmp("Kernel", aArg, 6))
+    {
+        printf("Test Mode Kernel\n");
+
+        sTest_Mode = TestLib::Tester::MODE_KERNEL;
+
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Test Mode set to Kernel");
+    }
+    else
+    {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
     }
 }
