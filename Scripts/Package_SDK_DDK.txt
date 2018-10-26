@@ -5,8 +5,10 @@
 
 ADD Binaries/Debug_64/OpenNet.dll
 ADD Binaries/Debug_64/OpenNet_Tool.exe
+ADD Binaries/Debug_64/Radar.exe
 ADD Binaries/Release_64/OpenNet.dll
 ADD Binaries/Release_64/OpenNet_Tool.exe
+ADD Binaries/Release_64/Radar.exe
 ADD DoxyFile_en.txt
 ADD DoxyFile_Fr.txt
 ADD Drivers/Debug_64/ONK_NDIS/ONK_NDIS.cat
@@ -55,3 +57,14 @@ ADD OpenNet/ReadMe.txt
 ADD OpenNet_Tool/ReadMe.txt
 ADD RunDoxygen.cmd
 ADD ReadMe.txt
+ADD Samples/Radar/Main.cpp
+ADD Samples/Radar/Radar.vcxproj
+ADD Samples/Radar/Radar.vcxproj.filers
+ADD Samples/Radar/Radar_Controller.cpp
+ADD Samples/Radar/Radar_Controller.h
+ADD Samples/Radar/Radar_Kernel.cpp
+ADD Samples/Radar/Radar_Kernel.h
+ADD Samples/Radar/Radar_Types.h
+ADD Samples/Radar/Radar_View.cpp
+ADD Samples/Radar/Radar_View.h
+ADD Samples/Radar/Radar_View.resx

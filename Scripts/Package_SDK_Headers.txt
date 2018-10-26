@@ -1,0 +1,24 @@
+
+# Author   KMS - Martin Dubois, ing.
+# Product  OpenNet
+# File     Scripts/Package_SDK_Headers.txt
+
+ADD DoxyFile_en.txt
+ADD DoxyFile_Fr.txt
+ADD Includes/OpenNet/Adapter.h
+ADD Includes/OpenNet/Function.h
+ADD Includes/OpenNet/Function_Forward.h
+ADD Includes/OpenNet/Kernel.h
+ADD Includes/OpenNet/Kernel_Forward.h
+ADD Includes/OpenNet/OpenNet.h
+ADD Includes/OpenNet/PacketGenerator.h
+ADD Includes/OpenNet/Processor.h
+ADD Includes/OpenNet/SourceCode.h
+ADD Includes/OpenNet/StatisticsProvider.h
+ADD Includes/OpenNet/Status.h
+ADD Includes/OpenNet/System.h
+ADD Includes/OpenNetK/Kernel.h
+ADD Includes/OpenNetK/Types.h
+ADD OpenNet/ReadMe.txt
+ADD RunDoxygen.cmd
+ADD ReadMe.txt

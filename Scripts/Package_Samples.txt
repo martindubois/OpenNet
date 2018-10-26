@@ -1,0 +1,16 @@
+
+# Author   KMS - Martin Dubois, ing.
+# Product  OpenNet
+# File     Scripts/Package_Samples.txt
+
+ADD Samples/Radar/Main.cpp
+ADD Samples/Radar/Radar.vcxproj
+ADD Samples/Radar/Radar.vcxproj.filers
+ADD Samples/Radar/Radar_Controller.cpp
+ADD Samples/Radar/Radar_Controller.h
+ADD Samples/Radar/Radar_Kernel.cpp
+ADD Samples/Radar/Radar_Kernel.h
+ADD Samples/Radar/Radar_Types.h
+ADD Samples/Radar/Radar_View.cpp
+ADD Samples/Radar/Radar_View.h
+ADD Samples/Radar/Radar_View.resx
