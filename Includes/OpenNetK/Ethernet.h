@@ -3,15 +3,6 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Ethernet.h
-///
-/// \cond    en
-/// This file defines constant and functions used to manipulate Ethernet
-/// packets.
-/// \endcond
-/// \cond    fr
-/// Ce fichier defini une constante et des fonction utilise pour manipuler des
-/// paquets Ethernet.
-/// \endcond
 
 #pragma once
 

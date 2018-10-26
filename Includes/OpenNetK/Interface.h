@@ -3,8 +3,6 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Interface.h
-///
-/// This file define the GUID used to identify the device driver interface.
 
 #pragma once
 

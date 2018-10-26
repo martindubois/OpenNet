@@ -3,13 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/Kernel.h
-///
-/// \cond en
-/// This file declare the Kernel class
-/// \endcond
-/// \cond fr
-/// Ce fichier declare la classe Kernel
-/// \endcond
+/// \brief   OpenNet::Kernel
 
 #pragma once
 

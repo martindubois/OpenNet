@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Hardware.h
+/// \brief   OpenNetK::Hardware
 
 #pragma once
 

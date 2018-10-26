@@ -3,9 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Types.h
-///
-/// This file defines the data type used by the device driver and the OpenCL
-/// code.
+/// \brief   OpenNet_BufferHeader, OpenNet_PacketInfo
 
 // TODO  OpenNetK/Types.h  Use enum for OPEN_NET_BUFFER_STATE_... and
 //                         OPEN_NET_PACKET_STATE

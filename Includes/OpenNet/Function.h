@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/Function.h
+/// \brief   OpenNet::Function
 
 #pragma once
 

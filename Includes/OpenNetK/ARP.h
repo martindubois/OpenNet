@@ -3,14 +3,6 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/ARP.h
-///
-/// \cond    en
-/// This file defines constant and functions used to manipulate ARP packets.
-/// \endcond
-/// \cond    fr
-/// Ce fichier defini une constante et des fonction utilise pour manipuler des
-/// paquets ARP.
-/// \endcond
 
 #pragma once
 

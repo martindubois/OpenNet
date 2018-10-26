@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/PacketGenerator.h
+/// \brief   OpenNet::PacketGenerator
 
 #pragma once
 

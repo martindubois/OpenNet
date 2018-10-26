@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/System.h
+/// \brief   OpenNet::System
 
 #pragma once
 

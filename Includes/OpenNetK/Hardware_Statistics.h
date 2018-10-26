@@ -4,9 +4,6 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Hardware_Statistics.h
-///
-/// This file define the index of statistics counters for the
-/// OpenNetK::Hardware class.
 
 #pragma once
 

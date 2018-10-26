@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/Kernel_Forward.h
+/// \brief   OpenNet::Kernel_Forward
 
 #pragma once
 

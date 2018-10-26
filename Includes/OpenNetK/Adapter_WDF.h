@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Adapter_WDF.h
+/// \brief   OpenNetK::Adapter_WDF
 
 #pragma once
 

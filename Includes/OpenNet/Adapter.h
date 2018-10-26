@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/Adapter.h
+/// \brief   OpenNet::Adapter
 
 #pragma once
 
@@ -47,7 +48,7 @@ namespace OpenNet
 
             // TODO  OpenNet.Adapter
             //       Ajouter un "Buffer Factor" pour allouer un multiple du
-            //       multiple prefere du Kernel.
+            //       multiple prefere du Kernel (division ou multiplication).
 
             unsigned char mReserved0[1016];
         }

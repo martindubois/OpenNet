@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/Function_Forward.h
+/// \brief   OpenNet::Function_Forward
 
 #pragma once
 

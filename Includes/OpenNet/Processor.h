@@ -3,13 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/Processor.h
-///
-/// \cond en
-/// This file declare the Processor class.
-/// \endcond
-/// \cond fr
-/// Ce fichier declare la classe Processor.
-/// \endcond
+/// \brief   OpenNet::Processor
 
 #pragma once
 

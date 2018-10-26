@@ -1,7 +1,9 @@
 
-// Author   KMS - Martin Dubois, ing.
 // Product  OpenNet
-// File     Includes/OpenNetK/Packet.h
+
+/// \author  KMS - Martin Dubois, ing.
+/// \file    Includes/OpenNetK/Packet.h
+/// \brief   OpenNetK::Packet
 
 #pragma once
 

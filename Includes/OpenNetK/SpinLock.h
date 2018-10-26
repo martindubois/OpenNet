@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/SpinLock.h
+/// \brief   OpenNetK::SpinLock
 
 #pragma once
 

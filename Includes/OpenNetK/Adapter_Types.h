@@ -3,6 +3,9 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Adapter_Types.h
+/// \brief   OpenNetK::Adapter_Config, OpenNetK::Adapter_Info,
+///          OpenNetK::Adapter_State, OpenNetK::Buffer,
+///          OpenNetK::EthernetAddress, OpenNetK::VersionInfo
 
 #pragma once
 

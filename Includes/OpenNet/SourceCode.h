@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/SourceCode.h
+/// \brief   OpenNet::SourceCode
 
 #pragma once
 

@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Adapter.h
+/// \brief   OpenNetK::Adapter
 
 #pragma once
 

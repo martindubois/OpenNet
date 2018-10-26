@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/StatisticsProvider.h
+/// \brief   OpenNet::StatisticsProvider
 
 #pragma once
 

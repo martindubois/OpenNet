@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/Hardware_WDF.h
+/// \brief   OpenNetK::Hardware_WDF
 
 #pragma once
 

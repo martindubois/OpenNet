@@ -3,6 +3,7 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/SpinLock_WDF.h
+/// \brief   OpenNetK::SpinLock_WDF
 
 #pragma once
 

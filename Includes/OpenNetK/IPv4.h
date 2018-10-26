@@ -3,14 +3,6 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNetK/IPv4.h
-///
-/// \cond    en
-/// This file defines constant and functions used to manipulate IPv4 packets.
-/// \endcond
-/// \cond    fr
-/// Ce fichier defini une constante et des fonction utilise pour manipuler des
-/// paquets IPv4.
-/// \endcond
 
 #pragma once
 
