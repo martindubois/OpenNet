@@ -3,6 +3,13 @@
 
 /// \author  KMS - Martin Dubois, ing.
 /// \file    Includes/OpenNet/Processor.h
+///
+/// \cond en
+/// This file declare the Processor class.
+/// \endcond
+/// \cond fr
+/// Ce fichier declare la classe Processor.
+/// \endcond
 
 #pragma once
 
@@ -142,6 +149,26 @@ namespace OpenNet
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
         virtual Status GetConfig(Config * aOut) const = 0;
+
+        /// \cond en
+        /// \brief   Retrieve the OpenCL context
+        /// \return  This method returns a valid cl_context
+        /// \endcond
+        /// \cond fr
+        /// \brief   Obtenir le contexte OpenCL
+        /// \return  Cette methode retourne un valeur cl_context valide
+        /// \endcond
+        virtual void * GetContext() = 0;
+
+        /// \cond en
+        /// \brief   Retrieve the OpenCL device id
+        /// \return  This method returns a valid cl_device_id
+        /// \endcond
+        /// \cond fr
+        /// \brief   Obtenir l'indentificateur de device OpenCL
+        /// \return  Cette methode retourne un valeur cl_device_id valide
+        /// \endcond
+        virtual void * GetDeviceId() = 0;
 
         /// \cond en
         /// \brief  Retrieve the Info

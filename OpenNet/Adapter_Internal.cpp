@@ -276,11 +276,12 @@ void Adapter_Internal::Stop()
 Thread * Adapter_Internal::Thread_Prepare()
 {
     assert(NULL != mDebugLog  );
-    assert(NULL != mProcessor );
 
     if (NULL != mSourceCode)
     {
-		OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
+        assert(NULL != mProcessor);
+
+        OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
         if (NULL != lKernel)
         {
 			assert(NULL != mProgram);

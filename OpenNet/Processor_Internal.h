@@ -49,6 +49,8 @@ public:
 
     // ===== OpenNet::Processor =============================================
     virtual OpenNet::Status GetConfig(      Config * aOut   ) const;
+    virtual void          * GetContext();
+    virtual void          * GetDeviceId();
     virtual OpenNet::Status GetInfo  (      Info   * aOut   ) const;
     virtual const char    * GetName  () const;
     virtual OpenNet::Status SetConfig(const Config & aConfig);

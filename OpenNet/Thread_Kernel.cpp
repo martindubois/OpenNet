@@ -61,6 +61,8 @@ void Thread_Kernel::Processing_Queue(unsigned int aIndex)
 
     OCLW_SetKernelArg(mKernel_CL, 0, sizeof(lBuffer->mMem), &lBuffer->mMem);
 
+    mKernel->SetUserKernelArgs(mKernel_CL);
+
     // Here, we don't user event between the clEnqueueWaitSignal and the
     // clEnqueueNDRangeKernel because the command queue force the execution
     // order.

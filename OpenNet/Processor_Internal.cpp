@@ -219,6 +219,20 @@ OpenNet::Status Processor_Internal::GetConfig(Config * aOut) const
     return OpenNet::STATUS_OK;
 }
 
+void * Processor_Internal::GetContext()
+{
+    assert(NULL != mContext);
+
+    return mContext;
+}
+
+void * Processor_Internal::GetDeviceId()
+{
+    assert(NULL != mDevice);
+
+    return mDevice;
+}
+
 OpenNet::Status Processor_Internal::GetInfo(Info * aOut) const
 {
     assert(NULL != mDebugLog);

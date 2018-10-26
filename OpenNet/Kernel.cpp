@@ -59,6 +59,7 @@ namespace OpenNet
         , mCodeLineBuffer  (NULL )
         , mCodeLineCount   (    0)
         , mCodeLines       (NULL )
+        , mCommandQueue    (NULL )
         , mProfilingEnabled(false)
         , mStatistics      (new unsigned int [KERNEL_STATS_QTY])
     {
@@ -113,6 +114,11 @@ namespace OpenNet
         }
 
         return mCodeLines;
+    }
+
+    void * Kernel::GetCommandQueue()
+    {
+        return mCommandQueue;
     }
 
     bool Kernel::IsProfilingEnabled() const
@@ -275,6 +281,22 @@ namespace OpenNet
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
+    void Kernel::ResetCommandQueue()
+    {
+        assert(NULL != mCommandQueue);
+
+        mCommandQueue = NULL;
+    }
+
+    void Kernel::SetCommandQueue(void * aCommandQueue)
+    {
+        assert(NULL != aCommandQueue);
+
+        assert(NULL == mCommandQueue);
+
+        mCommandQueue = aCommandQueue;
+    }
+
     // aQueued
     // aSubmit
     // aStart
@@ -323,6 +345,16 @@ namespace OpenNet
         assert(NULL != mBuildLog);
 
         return mBuildLog;
+    }
+
+    // Protected
+    /////////////////////////////////////////////////////////////////////////
+
+    Status Kernel::SetUserKernelArgs(void * aKernel)
+    {
+        assert(NULL != aKernel);
+
+        return STATUS_OK;
     }
 
     // Private

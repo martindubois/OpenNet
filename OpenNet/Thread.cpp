@@ -148,6 +148,8 @@ void Thread::Prepare()
     mCommandQueue = mProcessor->CommandQueue_Create(mKernel->IsProfilingEnabled());
     assert(NULL != mCommandQueue);
 
+    mKernel->SetCommandQueue(mCommandQueue);
+
     // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Release
     mKernel_CL = OCLW_CreateKernel(mProgram, "Filter");
     assert(NULL != mKernel_CL);
@@ -384,6 +386,8 @@ void Thread::Release()
 
     if (NULL != mCommandQueue)
     {
+        mKernel->ResetCommandQueue();
+
         try
         {
             OCLW_ReleaseCommandQueue(mCommandQueue);
