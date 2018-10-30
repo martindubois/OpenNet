@@ -118,15 +118,19 @@ static void Test_A(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Test_C(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Test_D(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_E(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_F(KmsLib::ToolBase * aToolBase, const char * aArg);
 
 static void Test_Mode(KmsLib::ToolBase * aToolBase, const char * aArg);
 
 static const KmsLib::ToolBase::CommandInfo TEST_COMMANDS[] =
 {
-	{ "A", Test_A, "Loop {BQ} {PS_byte} [BW_MiB/s]", NULL },
-    { "B", Test_B, "Loop {BQ} {PS_byte} [BW_MiB/s]", NULL },
-    { "C", Test_C, "Loop {BQ} {PS_byte} {BW_MiB/s}", NULL },
-    { "D", Test_D, "Loop {BQ} {PS_byte} [BW_MiB/s]", NULL },
+	{ "A", Test_A, "A {BQ} {PS_byte} [BW_MiB/s]", NULL },
+    { "B", Test_B, "B {BQ} {PS_byte} [BW_MiB/s]", NULL },
+    { "C", Test_C, "C {BQ} {PS_byte} [BW_MiB/s]", NULL },
+    { "D", Test_D, "D {BQ} {PS_byte} [BW_MiB/s]", NULL },
+    { "E", Test_E, "E {BQ} {PS_byte} [BW_MiB/s]", NULL },
+    { "F", Test_F, "F {BQ} {PS_byte} [BW_MiB/s]", NULL },
 
     { "Mode", Test_Mode, "Mode {Function|Kernel}", NULL },
 
@@ -158,6 +162,8 @@ static const KmsLib::ToolBase::CommandInfo COMMANDS[] =
 static void ReportStatus(OpenNet::Status aStatus, const char * aMsgOK);
 
 static void System_Connect();
+
+static void Test(char aTest, KmsLib::ToolBase * aToolBase, const char * aArg);
 
 // Global variable
 /////////////////////////////////////////////////////////////////////////////
@@ -899,261 +905,42 @@ void Test_A(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Test A %s\n", aArg);
-
-    double       lBandwidth_MiB_s;
-    unsigned int lBufferQty      ;
-    unsigned int lPacketSize_byte;
-
-    switch (sscanf_s(aArg, "%u %u %lf", &lBufferQty, &lPacketSize_byte, &lBandwidth_MiB_s))
-    {
-    case EOF:
-        lBufferQty = 1;
-        // no break;
-
-    case 1:
-        lPacketSize_byte = 1024;
-        // no break;
-
-    case 2:
-        printf("Test A %u %u\n", lBufferQty, lPacketSize_byte);
-
-        if ((0 >= lBufferQty) || (OPEN_NET_BUFFER_QTY < lBufferQty))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid buffer quantity");
-            return;
-        }
-
-        try
-        {
-            Test_A(sTest_Mode, lBufferQty, lPacketSize_byte);
-        }
-        catch (KmsLib::Exception * eE)
-        {
-            eE->Write(stdout);
-        }
-        break;
-
-    case 3:
-        printf("Test A %u %u %f\n", lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
-
-        if ((0 >= lBufferQty) || (OPEN_NET_BUFFER_QTY < lBufferQty))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid buffer quantity");
-            return;
-        }
-
-        if ((0.0 >= lBandwidth_MiB_s) || (120.0 < lBandwidth_MiB_s))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid bandwidth");
-            return;
-        }
-
-        try
-        {
-            Test_A(sTest_Mode, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
-        }
-        catch (KmsLib::Exception * eE)
-        {
-            eE->Write(stdout);
-        }
-        break;
-
-    default:
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
-    }
+    Test('A', aToolBase, aArg);
 }
 
 void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Test B %s\n", aArg);
-
-    double       lBandwidth_MiB_s;
-    unsigned int lBufferQty      ;
-    unsigned int lPacketSize_byte;
-
-    switch (sscanf_s(aArg, "%u %u %lf", &lBufferQty, &lPacketSize_byte, &lBandwidth_MiB_s))
-    {
-    case EOF:
-        lBufferQty = 1;
-        // no break;
-
-    case 1:
-        lPacketSize_byte = 1024;
-        // no break;
-
-    case 2:
-        printf("Test B %u %u\n", lBufferQty, lPacketSize_byte);
-
-        if ((0 >= lBufferQty) || (OPEN_NET_BUFFER_QTY < lBufferQty))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid buffer quantity");
-            return;
-        }
-
-        try
-        {
-            Test_B(sTest_Mode, lBufferQty, lPacketSize_byte);
-        }
-        catch (KmsLib::Exception * eE)
-        {
-            eE->Write(stdout);
-        }
-        break;
-
-    case 3:
-        printf("Test B %u %u %f\n", lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
-
-        if ((0 >= lBufferQty) || (OPEN_NET_BUFFER_QTY < lBufferQty))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid buffer quantity");
-            return;
-        }
-
-        if ((0.0 >= lBandwidth_MiB_s) || (120.0 < lBandwidth_MiB_s))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid bandwidth");
-            return;
-        }
-
-        try
-        {
-            Test_B(sTest_Mode, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
-        }
-        catch (KmsLib::Exception * eE)
-        {
-            eE->Write(stdout);
-        }
-        break;
-
-    default:
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
-    }
+    Test('B', aToolBase, aArg);
 }
 
 void Test_C(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Test C %s\n", aArg);
-
-    double       lBandwidth_MiB_s;
-    unsigned int lBufferQty;
-    unsigned int lPacketSize_byte;
-
-    switch (sscanf_s(aArg, "%u %u %lf", &lBufferQty, &lPacketSize_byte, &lBandwidth_MiB_s))
-    {
-    case EOF:
-        lBufferQty = 1;
-        // no break;
-
-    case 1:
-        lPacketSize_byte = 1024;
-        // no break;
-
-    case 2:
-        lBandwidth_MiB_s = 120.0;
-        // no break;
-
-    case 3:
-        printf("Test C %u %u %f\n", lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
-
-        if ((0 >= lBufferQty) || (OPEN_NET_BUFFER_QTY < lBufferQty))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid buffer quantity");
-            return;
-        }
-
-        if ((0.0 >= lBandwidth_MiB_s) || (120.0 < lBandwidth_MiB_s))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid bandwidth");
-            return;
-        }
-
-        try
-        {
-            Test_C(sTest_Mode, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
-        }
-        catch (KmsLib::Exception * eE)
-        {
-            eE->Write(stdout);
-        }
-        break;
-
-    default:
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
-    }
+    Test('C', aToolBase, aArg);
 }
 
 void Test_D(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Test D %s\n", aArg);
+    Test('D', aToolBase, aArg);
+}
 
-    double       lBandwidth_MiB_s;
-    unsigned int lBufferQty;
-    unsigned int lPacketSize_byte;
+void Test_E(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
 
-    switch (sscanf_s(aArg, "%u %u %lf", &lBufferQty, &lPacketSize_byte, &lBandwidth_MiB_s))
-    {
-    case EOF:
-        lBufferQty = 1;
-        // no break;
+    Test('E', aToolBase, aArg);
+}
 
-    case 1:
-        lPacketSize_byte = 1024;
-        // no break;
+void Test_F(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
 
-    case 2:
-        printf("Test D %u %u\n", lBufferQty, lPacketSize_byte);
-
-        if ((0 >= lBufferQty) || (OPEN_NET_BUFFER_QTY < lBufferQty))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid buffer quantity");
-            return;
-        }
-
-        try
-        {
-            Test_D(sTest_Mode, lBufferQty, lPacketSize_byte);
-        }
-        catch (KmsLib::Exception * eE)
-        {
-            eE->Write(stdout);
-        }
-        break;
-
-    case 3:
-        printf("Test D %u %u %f\n", lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
-
-        if ((0 >= lBufferQty) || (OPEN_NET_BUFFER_QTY < lBufferQty))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid buffer quantity");
-            return;
-        }
-
-        if ((0.0 >= lBandwidth_MiB_s) || (120.0 < lBandwidth_MiB_s))
-        {
-            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid bandwidth");
-            return;
-        }
-
-        try
-        {
-            Test_D(sTest_Mode, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
-        }
-        catch (KmsLib::Exception * eE)
-        {
-            eE->Write(stdout);
-        }
-        break;
-
-    default:
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
-    }
+    Test('F', aToolBase, aArg);
 }
 
 void Test_Mode(KmsLib::ToolBase * aToolBase, const char * aArg)
@@ -1245,5 +1032,74 @@ void System_Connect()
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_FATAL_ERROR, "OpenNet::System::Create() failed");
         exit(__LINE__);
+    }
+}
+
+void Test(char aTest, KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test %c %s\n", aTest, aArg);
+
+    double       lBandwidth_MiB_s;
+    unsigned int lBufferQty;
+    unsigned int lPacketSize_byte;
+
+    switch (sscanf_s(aArg, "%u %u %lf", &lBufferQty, &lPacketSize_byte, &lBandwidth_MiB_s))
+    {
+    case EOF:
+        lBufferQty = 1;
+        // no break;
+
+    case 1:
+        lPacketSize_byte = 1024;
+        // no break;
+
+    case 2:
+        printf("Test %c %u %u\n", aTest, lBufferQty, lPacketSize_byte);
+
+        if ((0 >= lBufferQty) || (OPEN_NET_BUFFER_QTY < lBufferQty))
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid buffer quantity");
+            return;
+        }
+
+        try
+        {
+            Test(aTest, sTest_Mode, lBufferQty, lPacketSize_byte);
+        }
+        catch (KmsLib::Exception * eE)
+        {
+            eE->Write(stdout);
+        }
+        break;
+
+    case 3:
+        printf("Test %c %u %u %f\n", aTest, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
+
+        if ((0 >= lBufferQty) || (OPEN_NET_BUFFER_QTY < lBufferQty))
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid buffer quantity");
+            return;
+        }
+
+        if ((0.0 >= lBandwidth_MiB_s) || (120.0 < lBandwidth_MiB_s))
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid bandwidth");
+            return;
+        }
+
+        try
+        {
+            Test(aTest, sTest_Mode, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
+        }
+        catch (KmsLib::Exception * eE)
+        {
+            eE->Write(stdout);
+        }
+        break;
+
+    default:
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
     }
 }

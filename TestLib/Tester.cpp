@@ -94,35 +94,38 @@ static const char * FUNCTION_REPLY_ON_ERROR_0 =
 "        unsigned int             lResult = OPEN_NET_PACKET_PROCESSED;"         EOL
 "        unsigned int             i;"                                           EOL
                                                                                 EOL
-"        for ( i = 0; i < 6; i ++)"                                             EOL
+"        for ( unsigned int j = 0; j < 10; j ++ )"                              EOL
 "        {"                                                                     EOL
-"            if ( 0xff != lData[ i ] )"                                         EOL
+"            for ( i = 0; i < 6; i ++)"                                         EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0xff != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
-"        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 6; i < 12; i ++)"                                            EOL
-"        {"                                                                     EOL
-"            if ( 0x00 != lData[ i ] )"                                         EOL
+"            for ( i = 6; i < 12; i ++)"                                        EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0x00 != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
-"        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 12; i < 14; i ++)"                                           EOL
-"        {"                                                                     EOL
-"            if ( 0x88 != lData[ i ] )"                                         EOL
+"            for ( i = 12; i < 14; i ++)"                                       EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0x88 != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
-"        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                      EOL
-"        {"                                                                     EOL
-"            if ( 0x00 != lData[ i ] )"                                         EOL
+"            for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                  EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0x00 != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
 "        }"                                                                     EOL
                                                                                 EOL
@@ -142,35 +145,38 @@ static const char * FUNCTION_REPLY_ON_ERROR_1 =
 "        unsigned int             lResult = OPEN_NET_PACKET_PROCESSED;"         EOL
 "        unsigned int             i;"                                           EOL
                                                                                 EOL
-"        for ( i = 0; i < 6; i ++)"                                             EOL
+"        for ( unsigned int j = 0; j < 10; j ++ )"                              EOL
 "        {"                                                                     EOL
-"            if ( 0xff != lData[ i ] )"                                         EOL
+"            for ( i = 0; i < 6; i ++)"                                         EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0xff != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
-"        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 6; i < 12; i ++)"                                            EOL
-"        {"                                                                     EOL
-"            if ( 0x00 != lData[ i ] )"                                         EOL
+"            for ( i = 6; i < 12; i ++)"                                        EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0x00 != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
-"        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 12; i < 14; i ++)"                                           EOL
-"        {"                                                                     EOL
-"            if ( 0x88 != lData[ i ] )"                                         EOL
+"            for ( i = 12; i < 14; i ++)"                                       EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0x88 != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
-"        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                      EOL
-"        {"                                                                     EOL
-"            if ( 0x00 != lData[ i ] )"                                         EOL
+"            for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                  EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0x00 != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
 "        }"                                                                     EOL
                                                                                 EOL
@@ -226,35 +232,38 @@ static const char * KERNEL_REPLY_ON_ERROR =
 "        unsigned int             lResult = OPEN_NET_PACKET_PROCESSED;"         EOL
 "        unsigned int             i;"                                           EOL
                                                                                 EOL
-"        for ( i = 0; i < 6; i ++)"                                             EOL
+"        for ( unsigned int j = 0; j < 10; j ++ )"                              EOL
 "        {"                                                                     EOL
-"            if ( 0xff != lData[ i ] )"                                         EOL
+"            for ( i = 0; i < 6; i ++)"                                         EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0xff != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
-"        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 6; i < 12; i ++)"                                            EOL
-"        {"                                                                     EOL
-"            if ( 0x00 != lData[ i ] )"                                         EOL
+"            for ( i = 6; i < 12; i ++)"                                        EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0x00 != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
-"        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 12; i < 14; i ++)"                                           EOL
-"        {"                                                                     EOL
-"            if ( 0x88 != lData[ i ] )"                                         EOL
+"            for ( i = 12; i < 14; i ++)"                                       EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0x88 != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
-"        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                      EOL
-"        {"                                                                     EOL
-"            if ( 0x00 != lData[ i ] )"                                         EOL
+"            for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                  EOL
 "            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
+"                if ( 0x00 != lData[ i ] )"                                     EOL
+"                {"                                                             EOL
+"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
+"                }"                                                             EOL
 "            }"                                                                 EOL
 "        }"                                                                     EOL
                                                                                 EOL
@@ -278,6 +287,21 @@ namespace TestLib
     // Public
     /////////////////////////////////////////////////////////////////////////
 
+    void Tester::Describe(char aTest)
+    {
+        switch (aTest)
+        {
+        case 'A': A_Describe(); break;
+        case 'B': B_Describe(); break;
+        case 'C': C_Describe(); break;
+        case 'D': D_Describe(); break;
+        case 'E': E_Describe(); break;
+        case 'F': F_Describe(); break;
+
+        default: assert(false);
+        }
+    }
+
     void Tester::A_Describe()
     {
         DisplayConnections_1_Card();
@@ -287,6 +311,8 @@ namespace TestLib
             "    Internel   Ethernet   Internal\n"
             "\n"
             "Dropped <--- 0 <------- 1 <--- Generator\n"
+            "\n"
+            "Packets     x1    +    x1 = x2\n"
             "\n"
             "===== Bandwidth ==============================\n"
             "                 Send\n"
@@ -309,6 +335,8 @@ namespace TestLib
             "    +---   <-------   <--- Generator\n"
             "    |    0          1\n"
             "    +-->   ------->   ---> Dropped\n"
+            "\n"
+            "Packets x2    +    x1 = x3\n"
             "\n"
             "===== Bandwidth ==============================\n"
             "                 Send\n"
@@ -337,6 +365,8 @@ namespace TestLib
             "a) No error\n"
             "b) Error\n"
             "\n"
+            "Packets    x1    +    x1 = x2\n"
+            "\n"
             "===== Bandwidth ==============================\n"
             "                 Send\n"
             "                 1   Read    Write   Total\n"
@@ -358,6 +388,8 @@ namespace TestLib
             "Dropped <--- 0 <------- 2 <-- Generator\n"
             "Dropped <--- 1 <------- 3 <-- Generator\n"
             "\n"
+            "Packets     x2    +    x2 = x4\n"
+            "\n"
             "===== Bandwidth ==============================\n"
             "                 Send\n"
             "                 2   3   Read    Write   Total\n"
@@ -365,6 +397,54 @@ namespace TestLib
             "PCIe                      x2      x2      x4\n"
             "Memory - GPU                      x2      x2\n"
             "Memory - Main             x2              x2\n"
+            "==============================================\n");
+    }
+
+    void Tester::E_Describe()
+    {
+        DisplayConnections_2_Cards();
+
+        printf(
+            "===== Sequence ===============================\n"
+            "Internel   Ethernet   Internal\n"
+            "\n"
+            "    +---   <-------   <--- Generator\n"
+            "    |    0          1\n"
+            "    +-->   ------->   ---> Dropped\n"
+            "\n"
+            "Packets x2    +    x1 = x3\n"
+            "\n"
+            "===== Bandwidth ==============================\n"
+            "                 Send\n"
+            "                 0   1   Read    Write   Total\n"
+            "Ethernet         x1  x1                   x2\n"
+            "PCIe                      x2      x2      x4\n"
+            "Memory - GPU              x1      x2      x3\n"
+            "Memory - Main             x1              x1\n"
+            "==============================================\n");
+    }
+
+    void Tester::F_Describe()
+    {
+        DisplayConnections_2_Cards();
+
+        printf(
+            "===== Sequence ===============================\n"
+            "Internel   Ethernet   Internal\n"
+            "\n"
+            "    +--- 0 <------- 2 <--- Generator\n"
+            "    |\n"
+            "    +--> 1 -------> 3  ---> Dropped\n"
+            "\n"
+            "Packets x2    +    x1 = x3\n"
+            "\n"
+            "===== Bandwidth ==============================\n"
+            "                 Send\n"
+            "                 1   2   Read    Write   Total\n"
+            "Ethernet         x1  x1                   x2\n"
+            "PCIe                      x2      x2      x4\n"
+            "Memory - GPU              x1      x2      x3\n"
+            "Memory - Main             x1              x1\n"
             "==============================================\n");
     }
 
@@ -505,53 +585,6 @@ namespace TestLib
         return lResult;
     }
 
-    unsigned int Tester::A_Search(unsigned int aBufferQty)
-    {
-        assert(0 < aBufferQty);
-
-        double lMin_MiB_s = BANDWIDTH_MIN_MiB_s;
-        double lMax_MiB_s = BANDWIDTH_MAX_MiB_s;
-        double lCenter_MiB_s;
-
-        while ((lMin_MiB_s + 0.1) < lMax_MiB_s)
-        {
-            lCenter_MiB_s = (lMax_MiB_s + lMin_MiB_s) / 2.0;
-
-            printf("Search  %f MiB/s\n", lCenter_MiB_s);
-
-            SetBandwidth(lCenter_MiB_s);
-
-            if (0 >= A(aBufferQty))
-            {
-                lMin_MiB_s = lCenter_MiB_s;
-            }
-            else
-            {
-                lMax_MiB_s = lCenter_MiB_s;
-            }
-        }
-
-        return 0;
-    }
-
-    unsigned int Tester::A_Verify(unsigned int aBufferQty)
-    {
-        assert(0 < aBufferQty);
-
-        for (unsigned int i = 0; i < 5; i++)
-        {
-            printf("Verify  %f MiB/s\n", mGeneratorConfig.mBandwidth_MiB_s);
-
-            if (0 < A(aBufferQty))
-            {
-                mGeneratorConfig.mBandwidth_MiB_s -= 0.1;
-                i = 0;
-            }
-        }
-
-        return 0;
-    }
-
     unsigned int Tester::B(unsigned int aBufferQty)
     {
         assert(0 < aBufferQty);
@@ -590,46 +623,46 @@ namespace TestLib
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1075;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 5260;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 9830;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =  149;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 5260;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 9830;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =  149;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 10400;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 18700;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =   158;
 
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1010;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1000;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_TX_packet].mMax = 337000;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_TX_packet].mMax = 629000;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_TX_packet].mMin =   9530;
 
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10100;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  4210;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 337000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 629000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =   9530;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax = 337000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax = 629000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin =   9530;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 336000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 630000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =   9530;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax = 337000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax = 639000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin =   9530;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 85 * 1024 * 1024;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin = 15 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin =  15 * 1024 * 1024;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 666000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 998000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =   9530;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMax = 85 * 1024 * 1024;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMin = 15 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMin =  15 * 1024 * 1024;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMax = 337000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMax = 630000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin =   9530;
 
         lResult = Adapter_VerifyStatistics(0);
@@ -637,18 +670,18 @@ namespace TestLib
         Adapter_InitialiseConstraints();
 
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1840;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1680;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 5190;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 9300;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =  149;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 5190;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 9300;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =  149;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 10400;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 18700;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =   158;
 
-        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMax = 666000;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMax = 995000;
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMin =  14000;
 
         mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1010;
@@ -657,28 +690,28 @@ namespace TestLib
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10100;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  4210;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 332000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 595000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =   9530;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax = 666000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax = 995000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin =  14000;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 333000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 594000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =   9530;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax = 666000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax = 975000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin =   9530;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 85 * 1024 * 1024;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin = 15 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin =  15 * 1024 * 1024;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 337000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 630000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =   9530;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMax = 85 * 1024 * 1024;
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMin = 15 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMin =  15 * 1024 * 1024;
 
-        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMax = 666000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMax = 998000;
         mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin =   9530;
 
         lResult += Adapter_VerifyStatistics(1);
@@ -687,53 +720,6 @@ namespace TestLib
         Uninit();
 
         return lResult;
-    }
-
-    unsigned int Tester::B_Search(unsigned int aBufferQty)
-    {
-        assert(0 < aBufferQty);
-
-        double lMin_MiB_s = BANDWIDTH_MIN_MiB_s;
-        double lMax_MiB_s = BANDWIDTH_MAX_MiB_s;
-        double lCenter_MiB_s;
-
-        while ((lMin_MiB_s + 0.1) < lMax_MiB_s)
-        {
-            lCenter_MiB_s = (lMax_MiB_s + lMin_MiB_s) / 2.0;
-
-            printf("Search  %f MiB/s\n", lCenter_MiB_s);
-
-            SetBandwidth(lCenter_MiB_s);
-
-            if (0 >= B(aBufferQty))
-            {
-                lMin_MiB_s = lCenter_MiB_s;
-            }
-            else
-            {
-                lMax_MiB_s = lCenter_MiB_s;
-            }
-        }
-
-        return 0;
-    }
-
-    unsigned int Tester::B_Verify(unsigned int aBufferQty)
-    {
-        assert(0 < aBufferQty);
-
-        for (unsigned int i = 0; i < 5; i++)
-        {
-            printf("Verify  %f MiB/s\n", mGeneratorConfig.mBandwidth_MiB_s);
-
-            if (0 < B(aBufferQty))
-            {
-                mGeneratorConfig.mBandwidth_MiB_s -= 0.1;
-                i = 0;
-            }
-        }
-
-        return 0;
     }
 
     unsigned int Tester::C(unsigned int aBufferQty)
@@ -920,51 +906,245 @@ namespace TestLib
         return lResult;
     }
 
-    unsigned int Tester::D_Search(unsigned int aBufferQty)
+    unsigned int Tester::E(unsigned int aBufferQty)
     {
         assert(0 < aBufferQty);
 
-        double lMin_MiB_s = BANDWIDTH_MIN_MiB_s;
-        double lMax_MiB_s = BANDWIDTH_MAX_MiB_s;
-        double lCenter_MiB_s;
+        mAdapterCount0  =            2;
+        mCodes[0]       = CODE_REPLY  ;
+        mCodes[1]       = CODE_NOTHING;
+        mGeneratorCount =            1;
 
-        while ((lMin_MiB_s + 0.1) < lMax_MiB_s)
+        unsigned int lResult = E_Init(aBufferQty);
+        if (0 != lResult)
         {
-            lCenter_MiB_s = (lMax_MiB_s + lMin_MiB_s) / 2.0;
-
-            printf("Search  %f MiB/s\n", lCenter_MiB_s);
-
-            SetBandwidth(lCenter_MiB_s);
-
-            if (0 >= D(aBufferQty))
-            {
-                lMin_MiB_s = lCenter_MiB_s;
-            }
-            else
-            {
-                lMax_MiB_s = lCenter_MiB_s;
-            }
+            return lResult;
         }
 
-        return 0;
+        assert(NULL != mAdapters  [1]);
+        assert(NULL != mGenerators[0]);
+
+        OpenNet::Status lStatus = mGenerators[0]->SetAdapter(mAdapters[1]);
+        assert(OpenNet::STATUS_OK == lStatus);
+
+        Adapters_SetProcessing();
+
+        Start();
+
+        Sleep(100);
+
+        ResetAdapterStatistics();
+
+        Sleep(1000);
+
+        GetAdapterStatistics();
+
+        Adapter_InitialiseConstraints();
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =   926;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 10700;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =   149;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 10700;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =   149;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 19400;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =   158;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1010;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1000;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_TX_packet].mMax = 683000;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_TX_packet].mMin =   9530;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10100;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  4210;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 683000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =   9530;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax = 683000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin =   9530;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 683000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =   9530;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax = 683000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin =   9530;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin =  15 * 1024 * 1024;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 1220000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =    9530;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMin =  15 * 1024 * 1024;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMax = 683000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin =   9530;
+
+        lResult = Adapter_VerifyStatistics(0);
+
+        Adapter_InitialiseConstraints();
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1680;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 10700;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =   149;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 10700;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =   149;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 19400;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =   158;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMax = 1250000;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_PACKET_SEND].mMin =   14000;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1010;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1000;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10100;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  4210;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 619000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =   9530;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax = 1250000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin =   14000;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 683000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =   9530;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax = 1180000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin =    9530;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin =  15 * 1024 * 1024;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 643000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =   9530;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMin =  15 * 1024 * 1024;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMax = 1220000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin =    9530;
+
+        lResult += Adapter_VerifyStatistics(1);
+
+        Stop  ();
+        Uninit();
+
+        return lResult;
     }
 
-    unsigned int Tester::D_Verify(unsigned int aBufferQty)
+    unsigned int Tester::F(unsigned int aBufferQty)
     {
         assert(0 < aBufferQty);
 
-        for (unsigned int i = 0; i < 5; i++)
-        {
-            printf("Verify  %f MiB/s\n", mGeneratorConfig.mBandwidth_MiB_s);
+        mAdapterCount0  =            2;
+        mCodes[0]       = CODE_FORWARD;
+        mCodes[1]       = CODE_NOTHING;
+        mGeneratorCount =            1;
 
-            if (0 < D(aBufferQty))
-            {
-                mGeneratorConfig.mBandwidth_MiB_s -= 0.1;
-                i = 0;
-            }
+        unsigned int lResult = F_Init(aBufferQty);
+        if (0 != lResult)
+        {
+            return lResult;
         }
 
-        return 0;
+        assert(NULL != mAdapters  [2]);
+        assert(NULL != mGenerators[0]);
+
+        OpenNet::Status lStatus = mGenerators[0]->SetAdapter(mAdapters[2]);
+        assert(OpenNet::STATUS_OK == lStatus);
+
+        Adapters_SetProcessing();
+
+        Start();
+
+        Sleep(100);
+
+        ResetAdapterStatistics();
+
+        Sleep(1000);
+
+        GetAdapterStatistics();
+
+        Adapter_InitialiseConstraints();
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1010;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = 12100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =    25;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = 12100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =    25;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 12100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =    25;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1010;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1000;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10100;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  1160;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = 771000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =  13800;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = 771000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =  13800;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin =  15 * 1024 * 1024;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 771000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =  13800;
+
+        lResult = Adapter_VerifyStatistics(0);
+
+        Adapter_InitialiseConstraints();
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  8370;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = 12100;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =   217;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1010;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1000;
+
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_TX_packet].mMax = 771000;
+        mConstraints[TestLib::Tester::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_TX_packet].mMin =  13800;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10100;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  8650;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax = 771000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin =  13800;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax = 771000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin =  13800;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMax = 121 * 1024 * 1024;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMin =  15 * 1024 * 1024;
+
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMax = 771000;
+        mConstraints[TestLib::Tester::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin =  13800;
+
+        lResult += Adapter_VerifyStatistics(1);
+
+        Stop  ();
+        Uninit();
+
+        return lResult;
     }
 
     double Tester::Adapter_GetBandwidth() const
@@ -1022,6 +1202,35 @@ namespace TestLib
 
         mBandwidth_MiB_s  = lRx_MiB_s   [0];
         mPacketThroughput = lRx_packet_s[0];
+    }
+
+    unsigned int Tester::Search(char aTest, unsigned int aBufferQty)
+    {
+        assert(0 < aBufferQty);
+
+        double lMin_MiB_s = BANDWIDTH_MIN_MiB_s;
+        double lMax_MiB_s = BANDWIDTH_MAX_MiB_s;
+        double lCenter_MiB_s;
+
+        while ((lMin_MiB_s + 0.1) < lMax_MiB_s)
+        {
+            lCenter_MiB_s = (lMax_MiB_s + lMin_MiB_s) / 2.0;
+
+            printf("Search  %f MiB/s\n", lCenter_MiB_s);
+
+            SetBandwidth(lCenter_MiB_s);
+
+            if (0 >= Test(aTest, aBufferQty))
+            {
+                lMin_MiB_s = lCenter_MiB_s;
+            }
+            else
+            {
+                lMax_MiB_s = lCenter_MiB_s;
+            }
+        }
+
+        return 0;
     }
 
     // TODO TestLib.DualTest
@@ -1084,6 +1293,43 @@ namespace TestLib
         }
 
         ResetInputFilter();
+    }
+
+    unsigned int Tester::Test(char aTest, unsigned int aBufferQty)
+    {
+        unsigned int lResult;
+
+        switch (aTest)
+        {
+        case 'A': lResult = A(aBufferQty); break;
+        case 'B': lResult = B(aBufferQty); break;
+        case 'C': lResult = C(aBufferQty); break;
+        case 'D': lResult = D(aBufferQty); break;
+        case 'E': lResult = E(aBufferQty); break;
+        case 'F': lResult = F(aBufferQty); break;
+
+        default: assert(false);
+        }
+
+        return lResult;
+    }
+
+    unsigned int Tester::Verify(char aTest, unsigned int aBufferQty)
+    {
+        assert(0 < aBufferQty);
+
+        for (unsigned int i = 0; i < 5; i++)
+        {
+            printf("Verify  %f MiB/s\n", mGeneratorConfig.mBandwidth_MiB_s);
+
+            if (0 < Test(aTest, aBufferQty))
+            {
+                mGeneratorConfig.mBandwidth_MiB_s -= 0.1;
+                i = 0;
+            }
+        }
+
+        return 0;
     }
 
     // Private
@@ -1149,6 +1395,42 @@ namespace TestLib
     {
         assert(0 < aBufferQty);
 
+        mBufferQty[0] = aBufferQty;
+        mBufferQty[1] = aBufferQty;
+
+        unsigned int lResult = Init0();
+        if (0 == lResult)
+        {
+            lResult = Init_4_SameCard();
+            if (0 == lResult)
+            {
+                lResult = Init1();
+            }
+        }
+
+        return lResult;
+    }
+
+    unsigned int Tester::E_Init(unsigned int aBufferQty)
+    {
+        mBufferQty[0] = aBufferQty;
+        mBufferQty[1] = aBufferQty;
+
+        unsigned int lResult = Init0();
+        if (0 == lResult)
+        {
+            lResult = Init_2_SamePort();
+            if (0 == lResult)
+            {
+                lResult = Init1();
+            }
+        }
+
+        return lResult;
+    }
+
+    unsigned int Tester::F_Init(unsigned int aBufferQty)
+    {
         mBufferQty[0] = aBufferQty;
         mBufferQty[1] = aBufferQty;
 

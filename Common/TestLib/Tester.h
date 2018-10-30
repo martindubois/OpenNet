@@ -63,10 +63,14 @@ namespace TestLib
         }
         Mode;
 
+        static void Describe(char aTest);
+
         static void A_Describe();
         static void B_Describe();
         static void C_Describe();
         static void D_Describe();
+        static void E_Describe();
+        static void F_Describe();
 
         Tester(Mode aMode, bool aProfiling);
 
@@ -77,27 +81,26 @@ namespace TestLib
         void SetMode      (Mode         aMode           );
         void SetPacketSize(unsigned int aPacketSize_byte);
 
-        unsigned int A       (unsigned int aBufferQty);
-        unsigned int A_Search(unsigned int aBufferQty);
-        unsigned int A_Verify(unsigned int aBufferQty);
-
-        unsigned int B       (unsigned int aBufferQty);
-        unsigned int B_Search(unsigned int aBufferQty);
-        unsigned int B_Verify(unsigned int aBufferQty);
-
+        unsigned int A(unsigned int aBufferQty);
+        unsigned int B(unsigned int aBufferQty);
         unsigned int C(unsigned int aBufferQty);
-
-        unsigned int D       (unsigned int aBufferQty);
-        unsigned int D_Search(unsigned int aBufferQty);
-        unsigned int D_Verify(unsigned int aBufferQty);
+        unsigned int D(unsigned int aBufferQty);
+        unsigned int E(unsigned int aBufferQty);
+        unsigned int F(unsigned int aBufferQty);
 
         double       Adapter_GetBandwidth         () const;
         double       Adapter_GetPacketThroughput  () const;
 
         void DisplaySpeed            ();
 
+        unsigned int Search(char aTest, unsigned int aBufferQty);
+
         void Start();
         void Stop ();
+
+        unsigned int Test(char aTest, unsigned int aBufferQty);
+
+        unsigned int Verify(char aTest, unsigned int aBufferQty);
 
     private:
 
@@ -105,6 +108,8 @@ namespace TestLib
         unsigned int B_Init(unsigned int aBufferQty);
         unsigned int C_Init(unsigned int aBufferQty);
         unsigned int D_Init(unsigned int aBufferQty);
+        unsigned int E_Init(unsigned int aBufferQty);
+        unsigned int F_Init(unsigned int aBufferQty);
 
         unsigned int Init0 ();
         unsigned int Init1 ();
