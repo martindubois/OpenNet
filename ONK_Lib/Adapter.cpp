@@ -3,11 +3,6 @@
 // Product  OpenNet
 // File     ONK_Lib/Adapter.cpp
 
-// ISSUE  2018-07-32_17h47_MD
-//        Lors des test B, il arrive que l'etat des paquets n'est pas celle
-//        attendu. Dans ces cas, nous attendons RX_RUNNING et l'etat est
-//        TX_RUNNING.
-
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -135,13 +130,6 @@ namespace OpenNetK
     //
     // Level   SoftInt
     // Thread  SoftInt
-
-    // TODO  OpenNetK.Adapter
-    //       Utiliser une cache pour l'etat des paquet. Ne modifier le buffer
-    //       DirectGMA que lorsque la partie OpenCL a besoin de connaitre
-    //       l'etat du paquet. Ne lire l'etat du paquet que lorsque la partie
-    //       OpenCL peut l'avoir modifie. Aussi utiliser la cache pour le
-    //       champ de bits.
     void Adapter::Buffer_SendPackets(BufferInfo * aBufferInfo)
     {
         ASSERT(NULL != aBufferInfo                                 );
@@ -169,11 +157,16 @@ namespace OpenNetK
                 switch (aBufferInfo->mPackets[i].mState)
                 {
                 case OPEN_NET_PACKET_STATE_RX_COMPLETED:
-                    // TODO  ONK_Lib.Adapter  Use burst
-                    // TODO  ONK_Lib.Adapter  Also cache mSize_byte (and use burst too)
+                    // TODO  ONK_Lib.Adapter
+                    //       Normal (Performance) - Use burst
+
+                    // TODO  ONK_Lib.Adapter
+                    //       Normal (Performance) - Also cache mSize_byte
+                    //       (and use burst too)
                     aBufferInfo->mPackets[i].mSendTo = lPacketInfo[i].mSendTo; // Reading DirectGMA buffer !!!
 
                     // TODO  OpenNetK.Adapter.PartialBuffer
+                    //       Low (Feature)
                     ASSERT(0 != (OPEN_NET_PACKET_PROCESSED & aBufferInfo->mPackets[i].mSendTo));
 
                     aBufferInfo->mPackets[i].mState = PACKET_STATE_TX_RUNNING;
@@ -203,7 +196,8 @@ namespace OpenNetK
     // Threads  Queue or SoftInt
 
     // TODO  OpenNetK.Adapter.TxOrder
-    //       Les paquets doivent etre transmis dans l'ordre de reception.
+    //       High - Les paquets doivent etre transmis dans l'ordre de
+    //       reception.
     void Adapter::Buffers_Process()
     {
         ASSERT(NULL != mZone0);
@@ -230,10 +224,12 @@ namespace OpenNetK
                     // The buffer is clearly corrupted! We don't write to it
                     // and if possible we simply forget about it.
 
-                    // TODO  ONK_Lib.Adapter  Add statistic counter
+                    // TODO  ONK_Lib.Adapter.ErrorHandling
+                    //       High - Add statistic counter
                     if (i == (mBufferCount - 1))
                     {
-                        // TODO  ONK_Lib.Adapter  Add statistic counter
+                        // TODO  ONK_Lib.Adapter.ErrorHandling
+                        //       High - Add statistic counter
                         DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %u Corrupted ==> Released" DEBUG_EOL, mAdapterNo, i);
                         mBufferCount--;
                     }
@@ -538,9 +534,10 @@ namespace OpenNetK
     }
 
     // TODO  OpenNetK.Adapter
-    //       Ajouter la possibilite de remplacer le traitement OpenCL par un
-    //       "Forward" fixe. Cela implique l'allocation de buffer dans la
-    //       memoire de l'ordinateur par le pilote lui meme.
+    //       Low (Feature) - Ajouter la possibilite de remplacer le
+    //       traitement OpenCL par un "Forward" fixe. Cela implique
+    //       l'allocation de buffer dans la memoire de l'ordinateur par le
+    //       pilote lui meme.
     void Adapter::Buffer_RxRunning_Zone0(BufferInfo * aBufferInfo)
     {
         ASSERT(NULL                             != aBufferInfo                       );
@@ -691,7 +688,8 @@ namespace OpenNetK
     }
 
     // TODO  ONK_Lib.Adapter.ErrorHandling
-    //       Verify if aIn = NULL and aInSize_byte = 0 cause problem.
+    //       High (Test) - Verify if aIn = NULL and aInSize_byte = 0 cause
+    //       problem.
     int Adapter::IoCtl_Packet_Send(const void * aIn, unsigned int aInSize_byte)
     {
         ASSERT(NULL != mHardware);

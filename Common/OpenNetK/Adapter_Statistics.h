@@ -7,7 +7,7 @@
 // OpenNetK::Adapter class.
 
 // TODO  Common.OpenNetK.Adapter_Statistics
-//       Add statistics about kernel execution time.
+//       Low (Technical) - Add statistics about kernel execution time.
 
 #pragma once
 

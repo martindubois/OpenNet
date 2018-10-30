@@ -442,8 +442,8 @@ void Thread::Run_Wait()
     }
 
     // TODO  OpenNet.Adapter_Internal.Error_Handling
-    //       This is a big program because the driver still use GPU buffer
-    //       and the application is maybe going to release them.
+    //       Low - This is a big problem because the driver still use GPU
+    //       buffer and the application is maybe going to release them.
 
     mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
     throw new KmsLib::Exception(KmsLib::Exception::CODE_TIMEOUT,
@@ -509,8 +509,8 @@ void Thread::Stop_Wait_Zone0(TryToSolveHang aTryToSolveHang, void * aContext)
         if (WAIT_OBJECT_0 == lRet) { break; }
 
         // TODO  OpenNet.Adapter_Internal.ErrorHandling
-        //       This case is a big problem. Terminating the thread
-        //       interracting with the GPU may let the system in an instabla
+        //       Low - This case is a big problem. Terminating the thread
+        //       interracting with the GPU may let the system in an unstable
         //       state. Worst, in this case the drive still use the GPU
         //       buffer.
 

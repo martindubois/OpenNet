@@ -95,7 +95,8 @@ NTSTATUS InitContext(ADAPTER_CONTEXT * aThis)
 {
     ASSERT(NULL != aThis);
 
-    // TODO Dev
+    // TODO  ONK_NDIS
+    //       Normal (Feature)
     (void)(aThis);
 
     return STATUS_SUCCESS;
@@ -105,7 +106,8 @@ NTSTATUS InitRequestQueue(ADAPTER_CONTEXT * aThis)
 {
     ASSERT(NULL != aThis);
 
-    // TODO Dev
+    // TODO  ONK_NDIS
+    //       Normal (Feature)
     (void)(aThis);
 
     return STATUS_SUCCESS;
@@ -118,7 +120,8 @@ NTSTATUS CreateRxQueue(NETADAPTER aAdapter, PNETRXQUEUE_INIT aRxQueueInit)
     ASSERT(NULL != aAdapter    );
     ASSERT(NULL != aRxQueueInit);
 
-    // TODO Dev
+    // TODO  ONK_NDIS
+    //       Normal (Feature)
     (void)(aAdapter    );
     (void)(aRxQueueInit);
 
@@ -130,7 +133,8 @@ NTSTATUS CreateTxQueue(NETADAPTER aAdapter,	PNETTXQUEUE_INIT aTxQueueInit)
     ASSERT(NULL != aAdapter    );
     ASSERT(NULL != aTxQueueInit);
 
-    // TODO Dev
+    // TODO  ONK_NDIS
+    //       Normal (Feature)
     (void)(aAdapter    );
     (void)(aTxQueueInit);
 
@@ -141,7 +145,8 @@ NTSTATUS SetCapabilities(NETADAPTER aAdapter)
 {
     ASSERT(NULL != aAdapter);
 
-    // TODO Dev
+    // TODO  ONK_NDIS
+    //       Normal (Feature)
     (void)(aAdapter);
 
     return STATUS_SUCCESS;

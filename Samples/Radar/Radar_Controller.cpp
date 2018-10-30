@@ -24,8 +24,8 @@
 #define EOL "\n"
 
 // TODO  Sample.Radar.Controller
-//       Creer des kernels pour effacer DstAB, DstCD et SrcCD et les utiliser
-//       au lieu de faire une ecriture.
+//       Normal (Marketing) - Creer des kernels pour effacer DstAB, DstCD et
+//       SrcCD et les utiliser au lieu de faire une ecriture.
 
 static const char * FADE[] =
 {

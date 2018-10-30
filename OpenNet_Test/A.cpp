@@ -43,9 +43,6 @@ KMS_TEST_BEGIN(A_Function_9KB_SetupC)
 }
 KMS_TEST_END
 
-// TODO  OpenNet_Test.A
-//       Ajouter un test a 1000 B - Function et Kernel
-
 KMS_TEST_BEGIN(A_Function_500B_SetupC)
 {
     TestLib::Tester::A_Describe();
@@ -78,7 +75,7 @@ KMS_TEST_BEGIN(A_Function_64B_SetupC)
     lT.SetBandwidth (92.0);
     lT.SetPacketSize(64  );
 
-    KMS_TEST_COMPARE_RETURN(0, lT.A_Verify(60));
+    KMS_TEST_COMPARE_RETURN(0, lT.Verify('A', 60));
 
     lT.DisplaySpeed();
 
@@ -101,7 +98,7 @@ KMS_TEST_BEGIN(A_Function_64B_SetupD)
     lT.SetBandwidth (92.0);
     lT.SetPacketSize(64  );
 
-    KMS_TEST_COMPARE_RETURN(0, lT.A_Verify(64));
+    KMS_TEST_COMPARE_RETURN(0, lT.Verify('A', 64));
 
     lT.DisplaySpeed();
 
@@ -164,7 +161,7 @@ KMS_TEST_BEGIN(A_Kernel_64B_SetupC)
     lT.SetBandwidth (35.0);
     lT.SetPacketSize(64  );
 
-    KMS_TEST_COMPARE_RETURN(0, lT.A_Verify(24))
+    KMS_TEST_COMPARE_RETURN(0, lT.Verify('A', 24))
 
     lT.DisplaySpeed();
 

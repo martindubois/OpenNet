@@ -5,8 +5,9 @@
 /// \file    Includes/OpenNetK/Types.h
 /// \brief   OpenNet_BufferHeader, OpenNet_PacketInfo
 
-// TODO  OpenNetK/Types.h  Use enum for OPEN_NET_BUFFER_STATE_... and
-//                         OPEN_NET_PACKET_STATE
+// TODO  Includes.OpenNetK.Types
+//       Normal (Cleanup) - Move state definition for this file. Also use
+//       enum for them.
 
 #pragma once
 

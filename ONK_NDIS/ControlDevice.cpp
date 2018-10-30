@@ -41,7 +41,8 @@ NTSTATUS ControlDevice_Create(PWDFDEVICE_INIT aDeviceInit)
 
     ASSERT(NULL != aDeviceInit);
 
-    // TODO Dev
+    // TODO  ONK_NDIS
+    //       Normal (Feature)
     (void)(aDeviceInit);
 
     return STATUS_SUCCESS;

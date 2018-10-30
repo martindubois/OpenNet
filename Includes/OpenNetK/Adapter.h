@@ -57,8 +57,8 @@ namespace OpenNetK
     // Internal
 
         // TODO  OpenNetK.Adapter
-        //       Definit la structure BufferInfo dans un fichier prive. En
-        //       faire une classe.
+        //       Normal (Cleanup) - Definir la structure BufferInfo dans un
+        //       fichier prive. En faire une classe.
 
         /// \cond en
         /// \brief  DirectGMA Buffer information. This structur is not

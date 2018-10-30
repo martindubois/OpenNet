@@ -44,6 +44,7 @@ namespace OpenNetK
 
     // ===== SpinLock =======================================================
 
+    // CRITICAL PATH - Buffer
     void SpinLock_WDF::Lock()
     {
         ASSERT(NULL != mSpinLock);
@@ -51,6 +52,7 @@ namespace OpenNetK
         WdfSpinLockAcquire(mSpinLock);
     }
 
+    // CRITICAL PATH - Buffer
     void SpinLock_WDF::Unlock()
     {
         ASSERT(NULL != mSpinLock);

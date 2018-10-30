@@ -329,7 +329,7 @@ unsigned int PacketGenerator_Internal::Run()
         }
         else
         {
-            mStatistics[OpenNet::PACKET_GENERATOR_STATS_NO_PACKET_cycle];
+            mStatistics[OpenNet::PACKET_GENERATOR_STATS_NO_PACKET_cycle] ++;
             lNow = lBefore;
         }
     }
@@ -411,7 +411,7 @@ unsigned int PacketGenerator_Internal::ComputeRepeatCount(const LARGE_INTEGER & 
     unsigned int lResult = static_cast<unsigned int>((lDuration / aPeriod) + 0.5);
     if (REPEAT_COUNT_MAX < lResult)
     {
-        mStatistics[OpenNet::PACKET_GENERATOR_STATS_TOO_MANY_PACKET_cycle];
+        mStatistics[OpenNet::PACKET_GENERATOR_STATS_TOO_MANY_PACKET_cycle] ++;
         lResult = REPEAT_COUNT_MAX;
     }
 

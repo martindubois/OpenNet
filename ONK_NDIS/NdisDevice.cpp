@@ -97,7 +97,8 @@ NTSTATUS D0Entry(WDFDEVICE aDevice, WDF_POWER_DEVICE_STATE aPreviousState)
     UNREFERENCED_PARAMETER(aDevice       );
     UNREFERENCED_PARAMETER(aPreviousState);
 
-    // TODO Dev
+    // TODO  ONK_NDIS
+    //       Normal (Feature)
 
     return STATUS_SUCCESS;
 }
@@ -112,7 +113,8 @@ NTSTATUS D0Exit(WDFDEVICE aDevice, WDF_POWER_DEVICE_STATE aTargetState)
     UNREFERENCED_PARAMETER(aDevice     );
     UNREFERENCED_PARAMETER(aTargetState);
 
-    // TODO Dev
+    // TODO  ONK_NDIS
+    //       Normal (Feature)
 
     return STATUS_SUCCESS;
 }

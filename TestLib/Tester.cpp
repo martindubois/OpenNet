@@ -1233,8 +1233,9 @@ namespace TestLib
         return 0;
     }
 
-    // TODO TestLib.DualTest
-    //      Replacer les exception par un retour de numero de ligne
+    // TODO TestLib.Tester.ErrorHandling
+    //      Normal (Cleanup) - Replacer les exception par un retour de numero
+    //      de ligne
 
     // Exception  KmsLib::Exception *  CODE_ERROR
     void Tester::Start()
@@ -1715,7 +1716,7 @@ namespace TestLib
             const char       * lIndex = mNos     [i];
             unsigned int       lOther = (i + 1) % mAdapterCount0;
 
-            assert(NULL != lAdapter);
+            assert(NULL != lA);
 
             switch (mMode)
             {

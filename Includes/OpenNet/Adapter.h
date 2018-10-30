@@ -47,8 +47,9 @@ namespace OpenNet
             unsigned int mPacketSize_byte;
 
             // TODO  OpenNet.Adapter
-            //       Ajouter un "Buffer Factor" pour allouer un multiple du
-            //       multiple prefere du Kernel (division ou multiplication).
+            //       Normal (Feature) - Ajouter un "Buffer Factor" pour
+            //       allouer un multiple du multiple prefere du Kernel
+            //       (division ou multiplication).
 
             unsigned char mReserved0[1016];
         }
@@ -191,7 +192,7 @@ namespace OpenNet
         virtual bool IsConnected(const System & aSystem) = 0;
 
         // TODO  OpenNet.Adapter
-        //       Ajouter ResetConfig
+        //       Normal (Feature) - Ajouter ResetConfig
 
         /// \cond en
         /// \brief  This methode reset the input filter.

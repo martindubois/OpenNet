@@ -7,7 +7,7 @@
 // type used only to pass data in or out of IoCtl.
 
 // TODO  Common.IoCtl
-//       Retirer le IOCTL_STATISTICS_RESET
+//       Low (Cleanup) - Retirer le IOCTL_STATISTICS_RESET
 
 #pragma once
 

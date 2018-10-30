@@ -77,7 +77,8 @@ void Pro1000::GetState(OpenNetK::Adapter_State * aState)
         aState->mFlags.mTx_Off     = mBAR1->mDeviceStatus.mFields.mTx_Off    ;
 
         // TODO  ONK_Pro1000.Pro1000
-        //       Comprendre pourquoi la vitesse n'est pas indique correctement.
+        //       High (Feature) - Comprendre pourquoi la vitesse n'est pas
+        //       indique correctement.
 
         switch (mBAR1->mDeviceStatus.mFields.mSpeed)
         {
@@ -499,14 +500,18 @@ void Pro1000::Rx_Config_Zone0()
         mBAR1->mMulticastTableArray[i] = 0;
     }
 
-    mBAR1->mRx_Control.mFields.mBroadcastAcceptMode         = true ; // TODO Config
+    // TODO  Includes.OpenNet.Adapter.Configuration
+    //       Low (Feature) - Add configuration field for:
+    //       BroadcastAcceptMode, MulticastPromiscuousEnabled,
+    //       PassMacControlFrames, StoreBadPackets, UnicastPromiscuousEnabled
+    mBAR1->mRx_Control.mFields.mBroadcastAcceptMode         = true ;
     mBAR1->mRx_Control.mFields.mDiscardPauseFrames          = true ;
     mBAR1->mRx_Control.mFields.mLongPacketEnabled           = true ;
-    mBAR1->mRx_Control.mFields.mMulticastPromiscuousEnabled = true ; // TODO Config
-    mBAR1->mRx_Control.mFields.mPassMacControlFrames        = false; // TODO Config
-    mBAR1->mRx_Control.mFields.mStoreBadPackets             = false; // TODO Config
+    mBAR1->mRx_Control.mFields.mMulticastPromiscuousEnabled = true ;
+    mBAR1->mRx_Control.mFields.mPassMacControlFrames        = false;
+    mBAR1->mRx_Control.mFields.mStoreBadPackets             = false;
     mBAR1->mRx_Control.mFields.mStripEthernetCRC            = true ;
-    mBAR1->mRx_Control.mFields.mUnicastPromiscuousEnabled   = true ; // TODO Config
+    mBAR1->mRx_Control.mFields.mUnicastPromiscuousEnabled   = true ;
 
     mBAR1->mRx_DmaMaxOutstandingData.mFields.mValue_256_bytes = 0xfff;
 

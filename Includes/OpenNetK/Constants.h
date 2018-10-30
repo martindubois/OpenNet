@@ -10,8 +10,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // TODO  OpenNetK.Constants
-//       Deplacer OPEN_NET_BUFFER_QTY dans Common/OpenNetK/Constants et
-//       renommer BUFFER_QTY
+//       Normal (Cleanup) - Deplacer OPEN_NET_BUFFER_QTY dans
+//       Common/OpenNetK/Constants et renommer BUFFER_QTY
 
 #define OPEN_NET_BUFFER_QTY (64)
 

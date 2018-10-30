@@ -131,8 +131,6 @@ namespace OpenNetK
     }
     Adapter_Info;
 
-    // TODO  OpenNetK.Interface  Add queued buffer state
-
     /// \cond en
     /// \brief  This structure is used to return the status.
     /// \endcond

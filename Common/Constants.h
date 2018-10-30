@@ -27,6 +27,6 @@
 #define REPEAT_COUNT_MAX (3072)
 
 // TODO  ONK_X.TxOverflowDetection
-//       A network adapter's device driver simply ignore transmit request
-//       when the tx queue or ring is full. It then increment a statistic
-//       counter.
+//       High - A network adapter's device driver simply ignore transmit
+//       request when the tx queue or ring is full. It then increment a
+//       statistic counter. Make this TODO a requirement after!

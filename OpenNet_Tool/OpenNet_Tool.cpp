@@ -276,7 +276,7 @@ void Adapter_GetStats(KmsLib::ToolBase * aToolBase, const char * aArg)
     bool lReset = (0 == strcmp("true", aArg));
 
     // TODO  OpenNet_Tool
-    //       Ajouter un argument pour le MinLevel
+    //       Low (Feature) - Ajouter un argument pour le MinLevel
 
     printf("Adapter GetStats %s\n", lReset ? "true" : "false");
 

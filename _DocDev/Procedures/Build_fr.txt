@@ -24,7 +24,7 @@ Version            _____ . _____ . _____ . _____ - __________________________
 
 [ ] Executer "RunDoxygen.cmd"
 [ ] Executer "Build.cmd"
-[ ] Commetre les fichiers modifiers
+[ ] Commetre les fichiers modifies
 [ ] Ajouter le tag {Major}.{Minor}.{Build}_{Type}
 [ ] Pousser les sourses sur le serveur
 

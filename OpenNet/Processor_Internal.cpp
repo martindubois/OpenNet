@@ -298,7 +298,7 @@ OpenNet::Status Processor_Internal::GetStatistics(unsigned int * aOut, unsigned 
     }
 
     // TODO  OpenNet::Process_Internal
-    //       Statistics
+    //       Low (Feature) - Statistics
 
     if (aReset)
     {
@@ -311,7 +311,7 @@ OpenNet::Status Processor_Internal::GetStatistics(unsigned int * aOut, unsigned 
 OpenNet::Status Processor_Internal::ResetStatistics()
 {
     // TODO  OpenNet::Process_Internal
-    //       Statistics
+    //       Low (Feature) - Statistics
 
     return OpenNet::STATUS_OK;
 }
