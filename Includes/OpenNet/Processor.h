@@ -31,6 +31,14 @@ namespace OpenNet
 
     public:
 
+        // TODO  OpenNet.Processor
+        //       Low (Feature) - Ajouter un chemin de recherche additionnel
+        //       pour les includes dans la configuration.
+
+        // TODO  OpenNet.Processor
+        //       Low (Feature) - Ajouter un parametre de configuration pour
+        //       le chemin de recherche des include d'OpenNet.
+
         /// \cond en
         /// \brief  This structure contains the configuration of a Processor.
         /// \endcond

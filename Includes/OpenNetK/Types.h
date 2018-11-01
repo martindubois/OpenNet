@@ -5,7 +5,7 @@
 /// \file    Includes/OpenNetK/Types.h
 /// \brief   OpenNet_BufferHeader, OpenNet_PacketInfo
 
-// TODO  Includes.OpenNetK.Types
+// TODO  OpenNetK.Types
 //       Normal (Cleanup) - Move state definition for this file. Also use
 //       enum for them.
 

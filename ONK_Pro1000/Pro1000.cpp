@@ -500,7 +500,7 @@ void Pro1000::Rx_Config_Zone0()
         mBAR1->mMulticastTableArray[i] = 0;
     }
 
-    // TODO  Includes.OpenNet.Adapter.Configuration
+    // TODO  OpenNet.Adapter
     //       Low (Feature) - Add configuration field for:
     //       BroadcastAcceptMode, MulticastPromiscuousEnabled,
     //       PassMacControlFrames, StoreBadPackets, UnicastPromiscuousEnabled

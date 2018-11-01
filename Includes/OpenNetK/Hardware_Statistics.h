@@ -13,6 +13,9 @@ namespace OpenNetK
     // Data types
     /////////////////////////////////////////////////////////////////////////
 
+    // TODO  OpenNetK.Hardware_Statistics
+    //       Normal (Cleanup) - Remove duplicated statistics.
+
     typedef enum
     {
         HARDWARE_STATS_D0_ENTRY           =  0,

@@ -80,6 +80,7 @@ Samples/Radar
 
 Scripts .
 	Package.cmd
+	Package_RunTime.txt
 	Package_Samples.txt
 	Package_SDK.txt
 	Package_SDK_DDK.txt

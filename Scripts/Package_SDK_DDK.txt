@@ -59,7 +59,7 @@ ADD RunDoxygen.cmd
 ADD ReadMe.txt
 ADD Samples/Radar/Main.cpp
 ADD Samples/Radar/Radar.vcxproj
-ADD Samples/Radar/Radar.vcxproj.filers
+ADD Samples/Radar/Radar.vcxproj.filters
 ADD Samples/Radar/Radar_Controller.cpp
 ADD Samples/Radar/Radar_Controller.h
 ADD Samples/Radar/Radar_Kernel.cpp

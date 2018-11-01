@@ -6,8 +6,11 @@
 // This file defines the index of statistics counter for the
 // OpenNetK::Adapter class.
 
-// TODO  Common.OpenNetK.Adapter_Statistics
+// TODO  OpenNetK.Adapter_Statistics
 //       Low (Technical) - Add statistics about kernel execution time.
+
+// TODO OpenNetK.Adapter_Statistics
+//      Normal (Cleanup) - Remove duplicated statistics.
 
 #pragma once
 

@@ -162,6 +162,12 @@ cl_program Processor_Internal::Program_Create(OpenNet::Kernel * aKernel)
     cl_program lResult = OCLW_CreateProgramWithSource(mContext, aKernel->GetCodeLineCount(), aKernel->GetCodeLines(), NULL);
     assert(NULL != lResult);
 
+    // TODO  OpenNet::Processor_Internal
+    //       High (Feature) - Utiliser un technique de recherche pour trouver
+    //       le repertoire Includes. Il faut trouver un repertoire qui
+    //       contient le fichier "OpenNetK/Kernel.h". Essayer en premier la
+    //       variable d'environnement OPEN_NET_INCLUDES. Essayer en dernier
+    //       "V:/OpenNet/Includes".
     try
     {
         OCLW_BuildProgram(lResult, 1, &mDevice, "-I V:/OpenNet/Includes", NULL, NULL);
