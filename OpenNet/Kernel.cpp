@@ -20,6 +20,9 @@
 // ===== Common =============================================================
 #include "../Common/OpenNet/Kernel_Statistics.h"
 
+// ===== OpenNet ============================================================
+#include "Constants.h"
+
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
@@ -50,8 +53,6 @@ namespace OpenNet
 
     // Public
     /////////////////////////////////////////////////////////////////////////
-
-    const unsigned int Kernel::BUILD_LOG_MAX_SIZE_byte = 64 * 1024;
 
     Kernel::Kernel()
         : StatisticsProvider(STATISTICS_DESCRIPTIONS, KERNEL_STATS_QTY)

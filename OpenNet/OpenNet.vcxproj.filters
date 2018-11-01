@@ -139,6 +139,9 @@
     <ClInclude Include="PacketGenerator_Internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="_DocUser\ReadMe.txt">

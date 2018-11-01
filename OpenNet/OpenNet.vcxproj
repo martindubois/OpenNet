@@ -119,6 +119,7 @@
   <ItemGroup>
     <ClInclude Include="Adapter_Internal.h" />
     <ClInclude Include="Buffer_Data.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="EthernetAddress.h" />
     <ClInclude Include="PacketGenerator_Internal.h" />
     <ClInclude Include="SourceCode_Forward.h" />

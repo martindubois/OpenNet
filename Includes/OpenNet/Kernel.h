@@ -138,12 +138,6 @@ namespace OpenNet
 
     // Internal:
 
-        // TODO  OpenNet.Kernel
-        //       Low (Cleanup) - Deplacer la definition de
-        //       BUILD_LOG_MAX_SIZE_byte dans un fichier prive.
-
-        static const unsigned int BUILD_LOG_MAX_SIZE_byte;
-
         void ResetCommandQueue();
 
         void SetCommandQueue(void * aCommandQueue);

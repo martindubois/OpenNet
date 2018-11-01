@@ -26,6 +26,7 @@
 
 // ===== OpenNet ============================================================
 #include "Buffer_Data.h"
+#include "Constants.h"
 #include "OCLW.h"
 #include "Thread_Functions.h"
 
@@ -176,7 +177,7 @@ cl_program Processor_Internal::Program_Create(OpenNet::Kernel * aKernel)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
 
-        OCLW_GetProgramBuildInfo(lResult, mDevice, CL_PROGRAM_BUILD_LOG, OpenNet::Kernel::BUILD_LOG_MAX_SIZE_byte, aKernel->AllocateBuildLog());
+        OCLW_GetProgramBuildInfo(lResult, mDevice, CL_PROGRAM_BUILD_LOG, BUILD_LOG_MAX_SIZE_byte, aKernel->AllocateBuildLog());
 
         OCLW_ReleaseProgram(lResult);
         throw;
