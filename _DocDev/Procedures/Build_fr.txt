@@ -12,11 +12,11 @@ Version            _____ . _____ . _____ . _____ - __________________________
 [ ] Ouvrir la solution
     - Fichier Common/Version.h - Changer la version
 	- Fichier _DocUser/ReadMe.txt
+	- Fichier Samples/_DocUser/ReadMe.txt
 	- Fichier ONK_Lib/_DocUser/ReadMe.txt
 	- Fichier ONK_Pro1000/_DocUser/ReadMe.txt
 	- Fichier OpenNet/_DocUser/ReadMe.txt
 	- Fichier OpenNet_Tool/_DocUser/ReadMe.txt
-	- Fichier Samples/_DocUser/ReadMe.txt
     - Projet ONK_NDIS - Changer la propriete  "Stampinf - General - Driver
       Version Number"
     - Projet ONK_Pro1000 - Changer la propriete  "Stampinf - General - Driver
