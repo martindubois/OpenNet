@@ -23,9 +23,53 @@
 
 #define EOL "\n"
 
-// TODO  Sample.Radar.Controller
-//       Normal (Marketing) - Creer des kernels pour effacer DstAB, DstCD et
-//       SrcCD et les utiliser au lieu de faire une ecriture.
+static const char * ERASE_NAMES[Radar_Controller::PART_QTY] =
+{
+    "Erase_DstAB",
+    "Erase_DstCD",
+    "Erase_SrcCD",
+};
+
+static const char * ERASE_DST_AB[] =
+{
+    RADAR_OUT_V
+    "__kernel void Erase_DstAB( __global Radar_Out * aOut )"        EOL,
+    "{"                                                             EOL,
+    "    aOut->mDstAB[ get_global_id(0) ][ get_global_id(1) ] = 0;" EOL,
+    "}"                                                             EOL,
+};
+
+static const char * ERASE_DST_CD[] =
+{
+    RADAR_OUT_V
+    "__kernel void Erase_DstCD( __global Radar_Out * aOut )"        EOL,
+    "{"                                                             EOL,
+    "    aOut->mDstCD[ get_global_id(0) ][ get_global_id(1) ] = 0;" EOL,
+    "}"                                                             EOL,
+};
+
+static const char * ERASE_SRC_CD[] =
+{
+    RADAR_OUT_V
+    "__kernel void Erase_SrcCD( __global Radar_Out * aOut )"        EOL,
+    "{"                                                             EOL,
+    "    aOut->mSrcCD[ get_global_id(0) ][ get_global_id(1) ] = 0;" EOL,
+    "}"                                                             EOL,
+};
+
+static const char ** ERASE_CODES[Radar_Controller::PART_QTY] =
+{
+    ERASE_DST_AB,
+    ERASE_DST_CD,
+    ERASE_SRC_CD,
+};
+
+static const unsigned int ERASE_CODE_LENGTHS[Radar_Controller::PART_QTY] =
+{
+    sizeof(ERASE_DST_AB) / sizeof(ERASE_DST_AB[0]),
+    sizeof(ERASE_DST_CD) / sizeof(ERASE_DST_CD[0]),
+    sizeof(ERASE_SRC_CD) / sizeof(ERASE_SRC_CD[0]),
+};
 
 static const char * FADE[] =
 {
@@ -54,20 +98,32 @@ static void Image_Update(unsigned char aImage[][RADAR_SIZE][Radar_Controller::RG
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-Radar_Controller::Radar_Controller() : mCommandQueue(NULL), mContext(NULL), mCount(0), mDeviceId(NULL), mEventCount(0), mFade_Kernel(NULL), mFade_Program(NULL), mIn(NULL), mProcessor(NULL), mSystem(NULL)
+Radar_Controller::Radar_Controller()
+    : mCommandQueue       (NULL )
+    , mContext            (NULL )
+    , mCount              (    0)
+    , mDeviceId           (NULL )
+    , mEventCount         (    0)
+    , mFade_Kernel        (NULL )
+    , mFade_Program       (NULL )
+    , mIn                 (NULL )
+    , mProcessor          (NULL )
+    , mSystem             (NULL )
+    , mWriteIn_Flag       (false)
 {
     strcpy_s(mStatus, __FUNCTION__);
 
-    memset(&mAdapters, 0, sizeof(mAdapters));
-    memset(&mDstAB   , 0, sizeof(mDstAB   ));
-    memset(&mDstCD   , 0, sizeof(mDstCD   ));
-    memset(&mInValue , 0, sizeof(mInValue ));
-    memset(&mOut     , 0, sizeof(mOut     ));
-    memset(&mOutValue, 0, sizeof(mOutValue));
-    memset(&mSrcAB   , 0, sizeof(mSrcAB   ));
-    memset(&mSrcCD   , 0, sizeof(mSrcCD   ));
-
-    mFlags.mValue = 0;
+    memset(&mAdapters      , 0, sizeof(mAdapters      ));
+    memset(&mDstAB         , 0, sizeof(mDstAB         ));
+    memset(&mDstCD         , 0, sizeof(mDstCD         ));
+    memset(&mErase_Flags   , 0, sizeof(mErase_Flags   ));
+    memset(&mErase_Kernels , 0, sizeof(mErase_Kernels ));
+    memset(&mErase_Programs, 0, sizeof(mErase_Programs));
+    memset(&mInValue       , 0, sizeof(mInValue       ));
+    memset(&mOut           , 0, sizeof(mOut           ));
+    memset(&mOutValue      , 0, sizeof(mOutValue      ));
+    memset(&mSrcAB         , 0, sizeof(mSrcAB         ));
+    memset(&mSrcCD         , 0, sizeof(mSrcCD         ));
 
     mInValue.mAnd    = false;
     mInValue.mDst[0] =    31;
@@ -119,7 +175,7 @@ unsigned char Radar_Controller::GetSrcD() const { return mInValue.mSrc[3]; }
 const unsigned char * Radar_Controller::GetSrcAB() const { return mSrcAB[0][0]; }
 const unsigned char * Radar_Controller::GetSrcCD() const { return mSrcCD[0][0]; }
 
-void Radar_Controller::SetAnd() { mInValue.mAnd = true; Write_In(); Erase_DstAB(); Erase_DstCD(); Images_Update(); }
+void Radar_Controller::SetAnd() { mInValue.mAnd = true; Write_In(); Erase_DstAB(); Images_Update(); }
 
 void Radar_Controller::SetDstA(unsigned char aA) { mInValue.mDst[0] = aA; Write_In(); Image_Draw(mDstAB, mInValue.mDst[0], mInValue.mDst[1]); Erase_DstCD(); Images_Update(); }
 void Radar_Controller::SetDstB(unsigned char aB) { mInValue.mDst[1] = aB; Write_In(); Image_Draw(mDstAB, mInValue.mDst[0], mInValue.mDst[1]); Erase_DstCD(); Images_Update(); }
@@ -129,12 +185,12 @@ void Radar_Controller::SetDstD(unsigned char aD) { mInValue.mDst[3] = aD; Write_
 void Radar_Controller::SetFade(unsigned char aFade) { mInValue.mFade = aFade; Write_In(); }
 void Radar_Controller::SetGain(unsigned char aGain) { mInValue.mGain = aGain; Write_In(); }
 
-void Radar_Controller::SetOr() { mInValue.mAnd = false; Write_In(); Erase_DstAB(); Erase_DstCD(); Images_Update(); }
+void Radar_Controller::SetOr() { mInValue.mAnd = false; Write_In(); Erase_DstAB(); Images_Update(); }
 
 void Radar_Controller::SetSrcA(unsigned char aA) { mInValue.mSrc[0] = aA; Write_In(); Image_Draw(mSrcAB, mInValue.mSrc[0], mInValue.mSrc[1]); Erase_SrcCD(); Images_Update(); }
 void Radar_Controller::SetSrcB(unsigned char aB) { mInValue.mSrc[1] = aB; Write_In(); Image_Draw(mSrcAB, mInValue.mSrc[0], mInValue.mSrc[1]); Erase_SrcCD(); Images_Update(); }
-void Radar_Controller::SetSrcC(unsigned char aC) { mInValue.mSrc[2] = aC; Write_In(); Image_Draw(mSrcCD, mInValue.mSrc[2], mInValue.mSrc[3]);                Images_Update(); }
-void Radar_Controller::SetSrcD(unsigned char aD) { mInValue.mSrc[3] = aD; Write_In(); Image_Draw(mSrcCD, mInValue.mSrc[2], mInValue.mSrc[3]);                Images_Update(); }
+void Radar_Controller::SetSrcC(unsigned char aC) { mInValue.mSrc[2] = aC; Write_In(); Image_Draw(mSrcCD, mInValue.mSrc[2], mInValue.mSrc[3]); if (mInValue.mAnd) { Erase_DstAB(); } Images_Update(); }
+void Radar_Controller::SetSrcD(unsigned char aD) { mInValue.mSrc[3] = aD; Write_In(); Image_Draw(mSrcCD, mInValue.mSrc[2], mInValue.mSrc[3]); if (mInValue.mAnd) { Erase_DstAB(); } Images_Update(); }
 
 const char * Radar_Controller::GetStatus() const { return mStatus; };
 
@@ -179,6 +235,7 @@ bool Radar_Controller::Start()
     assert(NULL != mIn );
     assert(NULL != mOut);
 
+    Erase_Create    ();
     Fade_Create     ();
     Adapters_Connect();
 
@@ -188,7 +245,8 @@ bool Radar_Controller::Start()
 
     Adapter_SetInputFilter();
 
-    mFlags.mValue = 0;
+    memset(&mErase_Flags, 0, sizeof(mErase_Flags));
+    mWriteIn_Flag = false;
 
     lStatus = mSystem->Start(0);
     assert(OpenNet::STATUS_OK == lStatus);
@@ -209,7 +267,8 @@ void Radar_Controller::Stop()
 
     strcpy_s(mStatus, __FUNCTION__);
 
-    mFlags.mValue = 0;
+    memset(&mErase_Flags, 0, sizeof(mErase_Flags));
+    mWriteIn_Flag = false;
 
     OpenNet::Status lStatus = mSystem->Stop();
     assert(OpenNet::STATUS_OK == lStatus);
@@ -218,6 +277,7 @@ void Radar_Controller::Stop()
     assert(OpenNet::STATUS_OK == lStatus);
 
     Fade_Release   ();
+    Erase_Release  ();
     Buffers_Release();
 
     mSystem->Delete();
@@ -314,9 +374,56 @@ void Radar_Controller::Buffers_Release()
     mIn  = NULL;
 }
 
-void Radar_Controller::Erase_DstAB() { memset(&mOutValue.mDstAB, 0, sizeof(mOutValue.mDstAB)); mFlags.mFields.mErase_DstAB = true; }
-void Radar_Controller::Erase_DstCD() { memset(&mOutValue.mDstCD, 0, sizeof(mOutValue.mDstCD)); mFlags.mFields.mErase_DstCD = true; }
-void Radar_Controller::Erase_SrcCD() { memset(&mOutValue.mSrcCD, 0, sizeof(mOutValue.mSrcCD)); mFlags.mFields.mErase_SrcCD = true; }
+void Radar_Controller::Erase_Create()
+{
+    assert(NULL != mContext );
+    assert(NULL != mDeviceId);
+    assert(NULL != mOut     );
+
+    for (unsigned int i = 0; i < PART_QTY; i++)
+    {
+        assert(NULL == mErase_Kernels [i]);
+        assert(NULL == mErase_Programs[i]);
+
+        cl_int lRet;
+
+        mErase_Programs[PART_DST_AB] = clCreateProgramWithSource(mContext, ERASE_CODE_LENGTHS[i], ERASE_CODES[i], NULL, &lRet);
+        assert(CL_SUCCESS == lRet              );
+        assert(NULL       != mErase_Programs[i]);
+
+        lRet = clBuildProgram(mErase_Programs[i], 1, &mDeviceId, NULL, NULL, NULL);
+        assert(CL_SUCCESS == lRet);
+
+        mErase_Kernels[i] = clCreateKernel(mErase_Programs[i], ERASE_NAMES[i], &lRet);
+        assert(CL_SUCCESS == lRet             );
+        assert(NULL       != mErase_Kernels[i]);
+
+        lRet = clSetKernelArg(mErase_Kernels[i], 0, sizeof(cl_mem), &mOut);
+        assert(CL_SUCCESS == lRet);
+    }
+}
+
+void Radar_Controller::Erase_DstAB() { memset(&mOutValue.mDstAB, 0, sizeof(mOutValue.mDstAB)); mErase_Flags[PART_DST_AB] = true; Erase_DstCD(); }
+void Radar_Controller::Erase_DstCD() { memset(&mOutValue.mDstCD, 0, sizeof(mOutValue.mDstCD)); mErase_Flags[PART_DST_CD] = true; }
+void Radar_Controller::Erase_SrcCD() { memset(&mOutValue.mSrcCD, 0, sizeof(mOutValue.mSrcCD)); mErase_Flags[PART_SRC_CD] = true; if (mInValue.mAnd) { Erase_DstAB(); } }
+
+void Radar_Controller::Erase_Release()
+{
+    for (unsigned int i = 0; i < PART_QTY; i++)
+    {
+        assert(NULL != mErase_Kernels [i]);
+        assert(NULL != mErase_Programs[i]);
+
+        cl_int lRet = clReleaseKernel(mErase_Kernels[i]);
+        assert(CL_SUCCESS == lRet);
+
+        lRet = clReleaseProgram(mErase_Programs[i]);
+        assert(CL_SUCCESS == lRet);
+
+        mErase_Kernels [i] = NULL;
+        mErase_Programs[i] = NULL;
+    }
+}
 
 void Radar_Controller::Fade_Create()
 {
@@ -427,40 +534,27 @@ void Radar_Controller::Work_Start()
     unsigned int lEventCount =    0;
     cl_int       lRet;
 
-    if (mFlags.mFields.mWrite_In)
+    if (mWriteIn_Flag)
     {
         lRet = clEnqueueWriteBuffer(mCommandQueue, mIn, CL_FALSE, 0, sizeof(mInValue), &mInValue, lEventCount, lEvent, mEvents + mEventCount);
         assert(CL_SUCCESS == lRet                );
         assert(NULL       != mEvents[mEventCount]);
 
-        mFlags.mFields.mWrite_In = false; lEvent = mEvents + mEventCount; lEventCount = 1; mEventCount++;
+        mWriteIn_Flag = false; lEvent = mEvents + mEventCount; lEventCount = 1; mEventCount++;
     }
 
-    if (mFlags.mFields.mErase_DstAB)
+    for (unsigned int i = 0; i < PART_QTY; i++)
     {
-        lRet = clEnqueueWriteBuffer(mCommandQueue, mOut, CL_FALSE, offsetof(Radar_Out, mDstAB), sizeof(mOutValue.mDstAB), &mOutValue.mDstAB, lEventCount, lEvent, mEvents + mEventCount);
-        assert(CL_SUCCESS == lRet                );
-        assert(NULL       != mEvents[mEventCount]);
+        assert(NULL != mErase_Kernels[i]);
 
-        mFlags.mFields.mErase_DstAB = false; lEvent = mEvents + mEventCount; lEventCount = 1; mEventCount++;
-    }
+        if (mErase_Flags[i])
+        {
+            lRet = clEnqueueNDRangeKernel(mCommandQueue, mErase_Kernels[i], 2, OFFSETS, SIZES, NULL, lEventCount, lEvent, mEvents + mEventCount);
+            assert(CL_SUCCESS == lRet                );
+            assert(NULL       != mEvents[mEventCount]);
 
-    if (mFlags.mFields.mErase_DstCD)
-    {
-        lRet = clEnqueueWriteBuffer(mCommandQueue, mOut, CL_FALSE, offsetof(Radar_Out, mDstCD), sizeof(mOutValue.mDstCD), &mOutValue.mDstCD, lEventCount, lEvent, mEvents + mEventCount);
-        assert(CL_SUCCESS == lRet                );
-        assert(NULL       != mEvents[mEventCount]);
-
-        mFlags.mFields.mErase_DstCD = false; lEvent = mEvents + mEventCount; lEventCount = 1; mEventCount++;
-    }
-
-    if (mFlags.mFields.mErase_SrcCD)
-    {
-        lRet = clEnqueueWriteBuffer(mCommandQueue, mOut, CL_FALSE, offsetof(Radar_Out, mSrcCD), sizeof(mOutValue.mSrcCD), &mOutValue.mSrcCD, lEventCount, lEvent, mEvents + mEventCount);
-        assert(CL_SUCCESS == lRet                );
-        assert(NULL       != mEvents[mEventCount]);
-
-        mFlags.mFields.mErase_SrcCD = false; lEvent = mEvents + mEventCount; lEventCount = 1; mEventCount++;
+            mErase_Flags[i] = false; lEvent = mEvents + mEventCount; lEventCount = 1; mEventCount++;
+        }
     }
 
     lRet = clEnqueueNDRangeKernel(mCommandQueue, mFade_Kernel, 2, OFFSETS, SIZES, NULL, lEventCount, lEvent, mEvents + mEventCount);
@@ -518,7 +612,7 @@ void Radar_Controller::Work_Wait()
 
 void Radar_Controller::Write_In()
 {
-    mFlags.mFields.mWrite_In = true;
+    mWriteIn_Flag = true;
 }
 
 // Static functions

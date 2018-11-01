@@ -27,7 +27,14 @@ public:
     enum
     {
         ADAPTER_QTY = 2,
-        EVENT_QTY   = 6,
+
+        EVENT_QTY = 6,
+
+        PART_DST_AB = 0,
+        PART_DST_CD = 1,
+        PART_SRC_CD = 2,
+
+        PART_QTY = 3,
 
         RGB_RED   = 0,
         RGB_GREEN = 1,
@@ -97,9 +104,11 @@ private:
     void Buffers_Allocate();
     void Buffers_Release ();
 
-    void Erase_DstAB();
-    void Erase_DstCD();
-    void Erase_SrcCD();
+    void Erase_Create ();
+    void Erase_DstAB  ();
+    void Erase_DstCD  ();
+    void Erase_SrcCD  ();
+    void Erase_Release();
 
     void Fade_Create ();
     void Fade_Release();
@@ -116,24 +125,6 @@ private:
 
     void Write_In();
 
-    union
-    {
-        struct
-        {
-            unsigned mErase_DstAB : 1;
-            unsigned mErase_DstCD : 1;
-            unsigned mErase_SrcCD : 1;
-
-            unsigned mReserved0 : 28;
-
-            unsigned mWrite_In : 1;
-        }
-        mFields;
-
-        unsigned int mValue;
-    }
-    mFlags;
-
     OpenNet::Adapter   * mAdapters[ADAPTER_QTY];
     cl_command_queue     mCommandQueue;
     cl_context           mContext     ;
@@ -141,6 +132,9 @@ private:
     cl_device_id         mDeviceId    ;
     unsigned char        mDstAB[RADAR_SIZE][RADAR_SIZE][RGB_QTY];
     unsigned char        mDstCD[RADAR_SIZE][RADAR_SIZE][RGB_QTY];
+    bool                 mErase_Flags   [PART_QTY];
+    cl_kernel            mErase_Kernels [PART_QTY];
+    cl_program           mErase_Programs[PART_QTY];
     unsigned int         mEventCount  ;
     cl_event             mEvents[EVENT_QTY];
     cl_kernel            mFade_Kernel ;
@@ -155,5 +149,6 @@ private:
     unsigned char        mSrcCD[RADAR_SIZE][RADAR_SIZE][RGB_QTY];
     char                 mStatus  [64];
     OpenNet::System    * mSystem      ;
+    bool                 mWriteIn_Flag;
 
 };

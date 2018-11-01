@@ -1,0 +1,18 @@
+
+# Author   KMS - Martin Dubois, ing.
+# Product  OpenNet
+# File     Scripts/Package_RunTime.txt
+
+ADD Binaries/Release_64/OpenNet.dll
+ADD Binaries/Release_64/OpenNet_Tool.exe
+ADD Binaries/Release_64/Radar.exe
+ADD Drivers/Release_64/ONK_NDIS/ONK_NDIS.cat
+ADD Drivers/Release_64/ONK_NDIS/ONK_NDIS.inf
+ADD Drivers/Release_64/ONK_NDIS/ONK_NDIS.sys
+ADD Drivers/Release_64/ONK_Pro1000/ONK_Pro1000.cat
+ADD Drivers/Release_64/ONK_Pro1000/ONK_Pro1000.inf
+ADD Drivers/Release_64/ONK_Pro1000/ONK_Pro1000.sys
+ADD ONK_Pro1000/ReadMe.txt
+ADD OpenNet/ReadMe.txt
+ADD OpenNet_Tool/ReadMe.txt
+ADD ReadMe.txt

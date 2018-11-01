@@ -14,3 +14,4 @@ ADD Samples/Radar/Radar_Types.h
 ADD Samples/Radar/Radar_View.cpp
 ADD Samples/Radar/Radar_View.h
 ADD Samples/Radar/Radar_View.resx
+ADD Samples/ReadMe.txt

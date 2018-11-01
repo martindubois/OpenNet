@@ -130,6 +130,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{DDC857B0-A3ED-4E00-9A0F-5AAAB745368D}"
 	ProjectSection(SolutionItems) = preProject
 		Scripts\Package.cmd = Scripts\Package.cmd
+		Scripts\Package_RunTime.txt = Scripts\Package_RunTime.txt
 		Scripts\Package_Samples.txt = Scripts\Package_Samples.txt
 		Scripts\Package_SDK.txt = Scripts\Package_SDK.txt
 		Scripts\Package_SDK_DDK.txt = Scripts\Package_SDK_DDK.txt
@@ -141,6 +142,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Radar", "Samples\Radar\Radar.vcxproj", "{4F6D256B-937E-4685-AB6D-36CDDAF59A4A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2F3A6ADE-B691-467A-A358-4DA35BCB9918} = {2F3A6ADE-B691-467A-A358-4DA35BCB9918}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocUser", "_DocUser", "{19B520D7-5752-4ED0-B32B-41BA5EFCEE61}"
+	ProjectSection(SolutionItems) = preProject
+		Samples\_DocUser\ReadMe.txt = Samples\_DocUser\ReadMe.txt
 	EndProjectSection
 EndProject
 Global
@@ -227,6 +233,7 @@ Global
 		{2CF49A29-C06C-4972-B8BE-262E1FE62244} = {B19569F8-BE7B-4B34-9AB9-8104A177AC85}
 		{F717FA89-DD40-4CFC-BDA0-FE69C6D37B01} = {B19569F8-BE7B-4B34-9AB9-8104A177AC85}
 		{4F6D256B-937E-4685-AB6D-36CDDAF59A4A} = {43EEE218-F401-4715-B1C2-691A6B898734}
+		{19B520D7-5752-4ED0-B32B-41BA5EFCEE61} = {43EEE218-F401-4715-B1C2-691A6B898734}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3390872B-D3FA-4AAE-8BB2-0888DA87EF63}

@@ -29,32 +29,39 @@ if not exist %KMS_ZIP_EXE% (
 
 rem ===== Execution =========================================================
 
+%KMS_ZIP_EXE% OpenNet_RunTime_%1.zip Package_RunTime.txt .
+if ERRORLEVEL 1 (
+	echo ERROR  %KMS_ZIP_EXE% OpenNet_RunTime_%1.zip Package_RunTime.txt .  failed - %ERRORLEVEL%
+	pause
+	exit /B 3
+)
+
 %KMS_ZIP_EXE% OpenNet_Samples_%1.zip Package_Samples.txt .
 if ERRORLEVEL 1 (
 	echo ERROR  %KMS_ZIP_EXE% OpenNet_Samples_%1.zip Package_Samples.txt .  failed - %ERRORLEVEL%
 	pause
-	exit /B 3
+	exit /B 4
 )
 
 %KMS_ZIP_EXE% OpenNet_SDK_%1.zip Package_SDK.txt .
 if ERRORLEVEL 1 (
 	echo ERROR  %KMS_ZIP_EXE% OpenNet_SDK_%1.zip Package_SDK.txt .  failed - %ERRORLEVEL%
 	pause
-	exit /B 4
+	exit /B 5
 )
 
 %KMS_ZIP_EXE% OpenNet_SDK_DDK_%1.zip Package_SDK_DDK.txt .
 if ERRORLEVEL 1 (
 	echo ERROR  %KMS_ZIP_EXE% OpenNet_SDK_DDK_%1.zip Package_SDK_DDK.txt .  failed - %ERRORLEVEL%
 	pause
-	exit /B 5
+	exit /B 6
 )
 
 %KMS_ZIP_EXE% OpenNet_SDK_Headers_%1.zip Package_SDK_Headers.txt .
 if ERRORLEVEL 1 (
 	echo ERROR  %KMS_ZIP_EXE% OpenNet_SDK_Headers_%1.zip Package_SDK_Headers.txt .  failed - %ERRORLEVEL%
 	pause
-	exit /B 6
+	exit /B 7
 )
 
 rem ===== End ===============================================================

@@ -9,7 +9,6 @@
 . Drivers\Release_64
 . Includes
 . Libraries
-. Samples
 . Tests
 
 .
@@ -61,6 +60,9 @@ OpenNet/_DocUser OpenNet
 	ReadMe.txt
 
 OpenNet_Tool/_DocUser OpenNet_Tool
+	ReadMe.txt
+
+Samples/_DocUser Samples
 	ReadMe.txt
 
 Samples/Radar
