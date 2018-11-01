@@ -387,7 +387,7 @@ void Radar_Controller::Erase_Create()
 
         cl_int lRet;
 
-        mErase_Programs[PART_DST_AB] = clCreateProgramWithSource(mContext, ERASE_CODE_LENGTHS[i], ERASE_CODES[i], NULL, &lRet);
+        mErase_Programs[i] = clCreateProgramWithSource(mContext, ERASE_CODE_LENGTHS[i], ERASE_CODES[i], NULL, &lRet);
         assert(CL_SUCCESS == lRet              );
         assert(NULL       != mErase_Programs[i]);
 
