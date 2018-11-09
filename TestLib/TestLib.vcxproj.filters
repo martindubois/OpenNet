@@ -15,8 +15,49 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Tester.cpp">
+    <ClCompile Include="TestFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestF.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

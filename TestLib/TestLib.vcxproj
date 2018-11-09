@@ -19,7 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Tester.cpp" />
+    <ClCompile Include="Test.cpp" />
+    <ClCompile Include="TestA.cpp" />
+    <ClCompile Include="TestB.cpp" />
+    <ClCompile Include="TestC.cpp" />
+    <ClCompile Include="TestD.cpp" />
+    <ClCompile Include="TestE.cpp" />
+    <ClCompile Include="TestF.cpp" />
+    <ClCompile Include="TestFactory.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestA.h" />
+    <ClInclude Include="TestB.h" />
+    <ClInclude Include="TestC.h" />
+    <ClInclude Include="TestD.h" />
+    <ClInclude Include="TestE.h" />
+    <ClInclude Include="TestF.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

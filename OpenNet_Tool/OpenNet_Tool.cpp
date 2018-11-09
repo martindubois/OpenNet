@@ -27,7 +27,7 @@
 
 // ===== Common =============================================================
 #include "../Common/Version.h"
-#include "../Common/TestLib/Tester.h"
+#include "../Common/TestLib/TestFactory.h"
 
 // ===== OpenNet_Tool =======================================================
 #include "Test.h"
@@ -114,25 +114,57 @@ static const KmsLib::ToolBase::CommandInfo PROCESSOR_COMMANDS[] =
 	{ NULL, NULL, NULL, NULL }
 };
 
-static void Test_A(KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Test_C(KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Test_D(KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Test_E(KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Test_F(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_Search_Bandwidth (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_Search_BufferQty (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_Search_PacketSize(KmsLib::ToolBase * aToolBase, const char * aArg);
 
-static void Test_Mode(KmsLib::ToolBase * aToolBase, const char * aArg);
+static const KmsLib::ToolBase::CommandInfo TEST_SEARCH_COMMANDS[] =
+{
+    { "Bandwidth ", Test_Search_Bandwidth , "Bandwidth  {TestName}", NULL },
+    { "BufferQty ", Test_Search_BufferQty , "BufferQty  {TestName}", NULL },
+    { "PacketSize", Test_Search_PacketSize, "PacketSize {TestName}", NULL },
+
+    { NULL, NULL, NULL, NULL }
+};
+
+static void Test_Verify_Bandwidth (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_Verify_BufferQty (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_Verify_PacketSize(KmsLib::ToolBase * aToolBase, const char * aArg);
+
+static const KmsLib::ToolBase::CommandInfo TEST_VERIFY_COMMANDS[] =
+{
+    { "Bandwidth ", Test_Verify_Bandwidth , "Bandwidth {TestName}" , NULL },
+    { "BufferQty ", Test_Verify_BufferQty , "BufferQty {TestName}" , NULL },
+    { "PacketSize", Test_Verify_PacketSize, "PacketSize {TestName}", NULL },
+
+    { NULL, NULL, NULL, NULL }
+};
+
+static void Test_DisplayConfig(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_Info         (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_ResetConfig  (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_Run          (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_SetBandwidth (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_SetBufferQty (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_SetCode      (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_SetMode      (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_SetPacketSize(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_SetProfiling (KmsLib::ToolBase * aToolBase, const char * aArg);
 
 static const KmsLib::ToolBase::CommandInfo TEST_COMMANDS[] =
 {
-	{ "A", Test_A, "A {BQ} {PS_byte} [BW_MiB/s]", NULL },
-    { "B", Test_B, "B {BQ} {PS_byte} [BW_MiB/s]", NULL },
-    { "C", Test_C, "C {BQ} {PS_byte} [BW_MiB/s]", NULL },
-    { "D", Test_D, "D {BQ} {PS_byte} [BW_MiB/s]", NULL },
-    { "E", Test_E, "E {BQ} {PS_byte} [BW_MiB/s]", NULL },
-    { "F", Test_F, "F {BQ} {PS_byte} [BW_MiB/s]", NULL },
-
-    { "Mode", Test_Mode, "Mode {Function|Kernel}", NULL },
+    { "DisplayConfig", Test_DisplayConfig, "DisplayConfig"                                            , NULL },
+    { "Info"         , Test_Info         , "Info {TestName}"                                          , NULL },
+    { "ResetCongif"  , Test_ResetConfig  , "ResetConfig"                                              , NULL },
+	{ "Run"          , Test_Run          , "Run {TestName}"                                           , NULL },
+    { "Search"       , NULL              , "Search ..."                                               , TEST_SEARCH_COMMANDS },
+    { "SetBandwidth" , Test_SetBandwidth , "SetBandwidth {Bandwidth_MiB/s}"                           , NULL },
+    { "SetBufferQty" , Test_SetBufferQty , "SetBufferQty {BufferQty}"                                 , NULL },
+    { "SetCode"      , Test_SetCode      , "SetCode DEFAULT|FORWARD|NONE|NOTHING|REPLY|REPLY_ON_ERROR", NULL },
+    { "SetMode"      , Test_SetMode      , "SetMode DEFAULT|FUNCTION|KERNEL"                          , NULL },
+    { "SetPacketSize", Test_SetPacketSize, "SetPacketSize {PacketSize_byte}"                          , NULL },
+    { "SetProfiling" , Test_SetProfiling , "SetProfiling false|true"                                  , NULL },
+    { "Verify"       , NULL              , "Verify {TestName}"                                        , TEST_VERIFY_COMMANDS },
 
 	{ NULL, NULL, NULL, NULL }
 };
@@ -163,8 +195,6 @@ static void ReportStatus(OpenNet::Status aStatus, const char * aMsgOK);
 
 static void System_Connect();
 
-static void Test(char aTest, KmsLib::ToolBase * aToolBase, const char * aArg);
-
 // Global variable
 /////////////////////////////////////////////////////////////////////////////
 
@@ -176,7 +206,7 @@ static KernelMap            sKernels;
 static OpenNet::Processor * sProcessor = NULL;
 static OpenNet::System    * sSystem;
 
-static TestLib::Tester::Mode sTest_Mode = TestLib::Tester::MODE_FUNCTION;
+static TestLib::TestFactory sTestFactory;
 
 // Entry point
 /////////////////////////////////////////////////////////////////////////////
@@ -901,73 +931,251 @@ void Processor_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
 	}
 }
 
-void Test_A(KmsLib::ToolBase * aToolBase, const char * aArg)
+void Test_DisplayConfig(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    Test('A', aToolBase, aArg);
+    printf("Test DisplayConfig %s\n", aArg);
+    printf("Test DisplayConfig\n");
+
+    sTestFactory.DisplayConfig();
 }
 
-void Test_B(KmsLib::ToolBase * aToolBase, const char * aArg)
+void Test_Info(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    Test('B', aToolBase, aArg);
-}
+    printf("Test Info %s\n", aArg);
 
-void Test_C(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-    assert(NULL != aArg);
-
-    Test('C', aToolBase, aArg);
-}
-
-void Test_D(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-    assert(NULL != aArg);
-
-    Test('D', aToolBase, aArg);
-}
-
-void Test_E(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-    assert(NULL != aArg);
-
-    Test('E', aToolBase, aArg);
-}
-
-void Test_F(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-    assert(NULL != aArg);
-
-    Test('F', aToolBase, aArg);
-}
-
-void Test_Mode(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-    assert(NULL != aArg);
-
-    printf("Test Mode %s\n", aArg);
-
-    if (0 == _strnicmp("Function", aArg, 8))
+    TestLib::Test * lTest = sTestFactory.CreateTest(aArg);
+    if (NULL != lTest)
     {
-        printf("Test Mode Function\n");
+        lTest->Info_Display();
 
-        sTest_Mode = TestLib::Tester::MODE_FUNCTION;
-
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Test Mode set to Function");
+        delete lTest;
     }
-    else if (0 == _strnicmp("Kernel", aArg, 6))
+}
+
+void Test_ResetConfig(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test ResetConfig %s\n", aArg);
+    printf("Test ResetConfig\n");
+
+    sTestFactory.ResetConfig();
+
+    KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Config reset");
+}
+
+void Test_Run(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test Run %s\n", aArg);
+
+    TestLib::Test * lTest = sTestFactory.CreateTest(aArg);
+    if (NULL != lTest)
     {
-        printf("Test Mode Kernel\n");
+        unsigned int lRet = lTest->Run();
+        if (0 == lRet)
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "PASSED");
+        }
 
-        sTest_Mode = TestLib::Tester::MODE_KERNEL;
-
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Test Mode set to Kernel");
+        delete lTest;
     }
-    else
+}
+
+void Test_Search_Bandwidth(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test Search Bandwidth %s\n", aArg);
+
+    TestLib::Test * lTest = sTestFactory.CreateTest(aArg);
+    if (NULL != lTest)
     {
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
+        unsigned int lRet = lTest->Search_Bandwidth();
+        if (0 == lRet)
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "PASSED");
+        }
+
+        delete lTest;
+    }
+}
+
+void Test_Search_BufferQty(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test Search BufferQty %s\n", aArg);
+
+    TestLib::Test * lTest = sTestFactory.CreateTest(aArg);
+    if (NULL != lTest)
+    {
+        unsigned int lRet = lTest->Search_BufferQty();
+        if (0 == lRet)
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "PASSED");
+        }
+
+        delete lTest;
+    }
+}
+
+void Test_Search_PacketSize(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test Search PacketSize %s\n", aArg);
+
+    TestLib::Test * lTest = sTestFactory.CreateTest(aArg);
+    if (NULL != lTest)
+    {
+        unsigned int lRet = lTest->Search_PacketSize();
+        if (0 == lRet)
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "PASSED");
+        }
+
+        delete lTest;
+    }
+}
+
+void Test_SetBandwidth(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test SetBandwidth %s\n", aArg);
+
+    unsigned int lRet = sTestFactory.SetBandwidth(aArg);
+    if (0 == lRet)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Bandwidth set");
+    }
+}
+
+void Test_SetBufferQty(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test SetBufferQty %s\n", aArg);
+
+    unsigned int lRet = sTestFactory.SetBufferQty(aArg);
+    if (0 == lRet)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Buffer quantity set");
+    }
+}
+
+void Test_SetCode(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test SetCode %s\n", aArg);
+
+    unsigned int lRet = sTestFactory.SetCode(aArg);
+    if (0 == lRet)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Test code set");
+    }
+}
+
+void Test_SetMode(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test SetMode %s\n", aArg);
+
+    unsigned int lRet = sTestFactory.SetMode(aArg);
+    if (0 == lRet)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Test mode set");
+    }
+}
+
+void Test_SetPacketSize(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test SetPacketSize %s\n", aArg);
+
+    unsigned int lRet = sTestFactory.SetPacketSize(aArg);
+    if (0 == lRet)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Packet size set");
+    }
+}
+
+void Test_SetProfiling(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test SetProfiling %s\n", aArg);
+
+    unsigned int lRet = sTestFactory.SetProfiling(aArg);
+    if (0 == lRet)
+    {
+        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Test profiling set");
+    }
+}
+
+void Test_Verify_Bandwidth(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test Verify Bandwidth %s\n", aArg);
+
+    TestLib::Test * lTest = sTestFactory.CreateTest(aArg);
+    if (NULL == lTest)
+    {
+        unsigned int lRet = lTest->Verify_Bandwidth();
+        if (0 == lRet)
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "PASSED");
+        }
+
+        delete lTest;
+    }
+}
+
+void Test_Verify_BufferQty(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test Verify BufferQty %s\n", aArg);
+
+    TestLib::Test * lTest = sTestFactory.CreateTest(aArg);
+    if (NULL == lTest)
+    {
+        unsigned int lRet = lTest->Verify_BufferQty();
+        if (0 == lRet)
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "PASSED");
+        }
+
+        delete lTest;
+    }
+}
+
+void Test_Verify_PacketSize(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    assert(NULL != aArg);
+
+    printf("Test Verify PacketSize %s\n", aArg);
+
+    TestLib::Test * lTest = sTestFactory.CreateTest(aArg);
+    if (NULL == lTest)
+    {
+        unsigned int lRet = lTest->Verify_PacketSize();
+        if (0 == lRet)
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "PASSED");
+        }
+
+        delete lTest;
     }
 }
 
@@ -1035,6 +1243,7 @@ void System_Connect()
     }
 }
 
+/*
 void Test(char aTest, KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
@@ -1066,7 +1275,7 @@ void Test(char aTest, KmsLib::ToolBase * aToolBase, const char * aArg)
 
         try
         {
-            Test(aTest, sTest_Mode, lBufferQty, lPacketSize_byte);
+            Test(aTest, lBufferQty, lPacketSize_byte);
         }
         catch (KmsLib::Exception * eE)
         {
@@ -1091,7 +1300,7 @@ void Test(char aTest, KmsLib::ToolBase * aToolBase, const char * aArg)
 
         try
         {
-            Test(aTest, sTest_Mode, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
+            Test(aTest, lBufferQty, lPacketSize_byte, lBandwidth_MiB_s);
         }
         catch (KmsLib::Exception * eE)
         {
@@ -1103,3 +1312,4 @@ void Test(char aTest, KmsLib::ToolBase * aToolBase, const char * aArg)
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
     }
 }
+*/

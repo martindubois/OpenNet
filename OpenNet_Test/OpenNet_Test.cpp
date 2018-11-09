@@ -17,36 +17,16 @@
 // Setup-B  A computer with at least 1 adapter and 1 processor. The test
 //          program run wihtout administrator privilege. Minimum network
 //          trafic is sent to the adapter.
-// Setup-C  A computer with at least 1 dual ports adapters and 1 processor.
-//          The test program run wihtout administrator privilege. Both ports
-//          of all cards are connected together
-// Setup-D  A computer with at least 2 dual ports adapters and 1 processor.
-///         The test program run without administrator privilege. Ports of
-//          each card are connected to ports of other card.
 KMS_TEST_GROUP_LIST_BEGIN
     KMS_TEST_GROUP_LIST_ENTRY("Base"   )
     KMS_TEST_GROUP_LIST_ENTRY("Display")
     KMS_TEST_GROUP_LIST_ENTRY("Setup-A")
     KMS_TEST_GROUP_LIST_ENTRY("Setup-B")
-    KMS_TEST_GROUP_LIST_ENTRY("Setup-C")
-    KMS_TEST_GROUP_LIST_ENTRY("Setup-C_Release")
-    KMS_TEST_GROUP_LIST_ENTRY("Setup-D_Release")
 KMS_TEST_GROUP_LIST_END
-
-extern int A_Function_9KB_SetupC ();
-extern int A_Function_500B_SetupC();
-extern int A_Function_64B_SetupC ();
-extern int A_Function_64B_SetupD ();
-extern int A_Kernel_9KB_SetupC   ();
-extern int A_Kernel_500B_SetupC  ();
-extern int A_Kernel_64B_SetupC   ();
 
 extern int Adapter_Base   ();
 extern int Adapter_Display();
 extern int Adapter_SetupA ();
-
-extern int B_Function_9KB_SetupC();
-extern int B_Kernel_9KB_SetupC  ();
 
 extern int BlackHole_SetupB();
 
@@ -72,18 +52,9 @@ extern int System_Display();
 extern int System_SetupA ();
 
 KMS_TEST_LIST_BEGIN
-    KMS_TEST_LIST_ENTRY(A_Function_9KB_SetupC , "A - Function - 9 KB - Setup C" , 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(A_Function_500B_SetupC, "A - Function - 500 B - Setup C - Release", 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(A_Function_64B_SetupC , "A - Function - 64 B - Setup C - Release", 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(A_Function_64B_SetupD , "A - Function - 64 B - Setup D - Release" , 6, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(A_Kernel_9KB_SetupC   , "A - Kernel - 9 KB - Setup C"   , 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(A_Kernel_500B_SetupC  , "A - Kernel - 500 B - Setup C - Release"  , 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(A_Kernel_64B_SetupC   , "A - Kernel - 64 B - Setup C - Release"  , 5, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(Adapter_Base          , "Adapter - Base"                , 0, 0)
     KMS_TEST_LIST_ENTRY(Adapter_Display       , "Adapter - Display"             , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(Adapter_SetupA        , "Adapter - Setup A"             , 2, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(B_Function_9KB_SetupC , "B - Function - 9 KB - Setup C" , 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(B_Kernel_9KB_SetupC   , "B - Kernel - 9 KB - Setup C"   , 4, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(BlackHole_SetupB      , "BlackHole - Setup B"           , 3, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(EthernetAddress_Base  , "EthernetAddress - Base"        , 0, 0)
     KMS_TEST_LIST_ENTRY(Kernel_Base           , "Kernel - Base"                 , 0, 0)
