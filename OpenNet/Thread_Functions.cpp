@@ -74,10 +74,6 @@ void Thread_Functions::AddDispatchCode()
 
 // ===== Thread =============================================================
 
-Thread_Functions::~Thread_Functions()
-{
-}
-
 void Thread_Functions::Prepare()
 {
     mProgram = mProcessor->Program_Create(&mKernelFunctions);
@@ -123,6 +119,15 @@ void Thread_Functions::Processing_Wait(unsigned int aIndex)
     Thread::Processing_Wait(mEvents[aIndex]);
 
     mEvents[aIndex] = NULL;
+}
+
+void Thread_Functions::Release()
+{
+    assert(NULL != mProcessor);
+
+    mProcessor->Thread_Release();
+
+    Thread::Release();
 }
 
 // CRITICAL PATH

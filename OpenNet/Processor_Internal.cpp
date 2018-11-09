@@ -209,6 +209,13 @@ Thread * Processor_Internal::Thread_Prepare()
     return mThread;
 }
 
+void Processor_Internal::Thread_Release()
+{
+    assert(NULL != mThread);
+
+    mThread = NULL;
+}
+
 // ===== OpenNet::Processor =================================================
 
 OpenNet::Status Processor_Internal::GetConfig(Config * aOut) const

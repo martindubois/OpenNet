@@ -26,8 +26,6 @@ public:
 
     Thread(Processor_Internal * aProcessor, KmsLib::DebugLog * aDebugLog);
 
-    virtual ~Thread();
-
     void AddAdapter(Adapter_Internal * aAdapter);
 
     OpenNet::Kernel * GetKernel();
@@ -38,6 +36,8 @@ public:
 
     void SetKernel (OpenNet::Kernel * aKernel );
     void SetProgram(cl_program        aProgram);
+
+    virtual void Delete();
 
     virtual void Prepare();
 
@@ -71,11 +71,15 @@ protected:
     }
     State;
 
+    virtual ~Thread();
+
     void Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalSize, cl_event * aEvent);
     void Processing_Wait (cl_event aEvent);
 
     virtual void Processing_Queue(unsigned int aIndex) = 0;
     virtual void Processing_Wait (unsigned int aIndex) = 0;
+
+    virtual void Release();
 
     void Run_Iteration(unsigned int aIndex);
 
@@ -96,8 +100,6 @@ protected:
     State mState;
 
 private:
-
-    void Release();
 
     void Run_Wait();
 

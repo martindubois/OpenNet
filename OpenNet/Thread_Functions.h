@@ -30,15 +30,16 @@ public:
     void AddDispatchCode();
 
     // ===== Thread =========================================================
-
-    virtual      ~Thread_Functions();
-
     virtual void Prepare();
 
 protected:
+
     // ===== Thread =========================================================
+
     virtual void Processing_Queue(unsigned int aIndex);
     virtual void Processing_Wait (unsigned int aIndex);
+
+    virtual void Release();
 
     virtual void Run_Loop ();
     virtual void Run_Start();

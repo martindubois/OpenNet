@@ -429,6 +429,11 @@ OpenNet::Status System_Internal::Start(unsigned int aFlags)
             mThreads[ i ]->Prepare();
         }
 
+        if (!SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS))
+        {
+            mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        }
+
         for (i = 0; i < mThreads.size(); i++)
         {
             mThreads[ i ]->Start();
@@ -498,6 +503,11 @@ OpenNet::Status System_Internal::Stop()
         mDebugLog.Log(eE);
 
         return ExceptionToStatus(eE);
+    }
+
+    if (!SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS))
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
     }
 
     return OpenNet::STATUS_OK;
@@ -756,7 +766,7 @@ void System_Internal::Threads_Release()
     {
         assert(NULL != mThreads[i]);
 
-        delete mThreads[i];
+        mThreads[i]->Delete();
     }
 
     mThreads.clear();

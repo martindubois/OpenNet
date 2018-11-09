@@ -47,42 +47,6 @@ Thread::Thread(Processor_Internal * aProcessor, KmsLib::DebugLog * aDebugLog)
     InitializeCriticalSection(&mZone0);
 }
 
-Thread::~Thread()
-{
-    try
-    {
-        EnterCriticalSection(&mZone0);
-
-            switch (mState)
-            {
-            case STATE_INIT:
-                break;
-
-            case STATE_RUNNING :
-            case STATE_STARTING:
-            case STATE_STOPPING:
-                Stop_Request_Zone0();
-                Stop_Wait_Zone0   (NULL, NULL);
-                // Stop_Wait_Zone0 release the gate when it throw an
-                // exception.
-                break;
-
-            default: assert(false);
-            }
-
-        LeaveCriticalSection(&mZone0);
-    }
-    catch (...)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-    }
-
-    // InitializeCriticalSection ==> DeleteCriticalSection  See Thread::Thread
-    DeleteCriticalSection(&mZone0);
-
-    Release();
-}
-
 // aAdapter [-K-;RW-] The adapter to add
 void Thread::AddAdapter(Adapter_Internal * aAdapter)
 {
@@ -131,6 +95,44 @@ void Thread::SetProgram(cl_program aProgram)
     assert(NULL == mProgram);
 
     mProgram = aProgram;
+}
+
+void Thread::Delete()
+{
+    try
+    {
+        EnterCriticalSection(&mZone0);
+
+            switch (mState)
+            {
+            case STATE_INIT:
+                break;
+
+            case STATE_RUNNING :
+            case STATE_STARTING:
+            case STATE_STOPPING:
+                Stop_Request_Zone0();
+                Stop_Wait_Zone0   (NULL, NULL);
+                // Stop_Wait_Zone0 release the gate when it throw an
+                // exception.
+                break;
+
+            default: assert(false);
+            }
+
+        LeaveCriticalSection(&mZone0);
+    }
+    catch (...)
+    {
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+    }
+
+    // InitializeCriticalSection ==> DeleteCriticalSection  See Thread::Thread
+    DeleteCriticalSection(&mZone0);
+
+    Release();
+
+    delete this;
 }
 
 // Exception  KmsLib::Exception *  See Processor_Internal::CommandQueue_Create
@@ -282,6 +284,10 @@ void Thread::Run()
 // Protected
 /////////////////////////////////////////////////////////////////////////////
 
+Thread::~Thread()
+{
+}
+
 // aGlobalSize [---;R--]
 // aLocalSize  [--O;R--]
 // aEvent      [---;-W-] This methode return a newly created cl_event here.
@@ -334,6 +340,39 @@ void Thread::Processing_Wait(cl_event aEvent)
     OCLW_ReleaseEvent(aEvent);
 }
 
+void Thread::Release()
+{
+    // printf(__FUNCTION__ "()\n");
+
+    assert(NULL != mDebugLog);
+
+    if (NULL != mCommandQueue)
+    {
+        mKernel->ResetCommandQueue();
+
+        try
+        {
+            OCLW_ReleaseCommandQueue(mCommandQueue);
+        }
+        catch (...)
+        {
+            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        }
+
+        if (NULL != mKernel_CL)
+        {
+            try
+            {
+                OCLW_ReleaseKernel(mKernel_CL);
+            }
+            catch (...)
+            {
+                mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+            }
+        }
+    }
+}
+
 // aIndex  The index passed to Processing_Queue and Processing_Wait
 //
 // CRITICAL PATH - Buffer
@@ -379,37 +418,6 @@ void Thread::State_Change(State aFrom, State aTo)
 
 // Private
 /////////////////////////////////////////////////////////////////////////////
-
-void Thread::Release()
-{
-    assert(NULL != mDebugLog);
-
-    if (NULL != mCommandQueue)
-    {
-        mKernel->ResetCommandQueue();
-
-        try
-        {
-            OCLW_ReleaseCommandQueue(mCommandQueue);
-        }
-        catch (...)
-        {
-            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        }
-
-        if (NULL != mKernel_CL)
-        {
-            try
-            {
-                OCLW_ReleaseKernel(mKernel_CL);
-            }
-            catch (...)
-            {
-                mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-            }
-        }
-    }
-}
 
 // Exception  KmsLib::Exception *  CODE_TIMEOUT
 // Thread     Worker

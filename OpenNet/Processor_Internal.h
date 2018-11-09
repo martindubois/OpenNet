@@ -46,6 +46,7 @@ public:
 
     Thread_Functions * Thread_Get    ();
     Thread           * Thread_Prepare();
+    void               Thread_Release();
 
     // ===== OpenNet::Processor =============================================
     virtual OpenNet::Status GetConfig(      Config * aOut   ) const;
