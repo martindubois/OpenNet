@@ -23,14 +23,14 @@
 
 static const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS[] =
 {
-    { "RUN - ENTRY            ", NULL     , 0 }, // 0
+    { "NO_PACKET              ", "cycles" , 0 }, // 0
+    { "RUN - ENTRY            ", NULL     , 0 },
     { "RUN - EXIT             ", NULL     , 0 },
-    { "SEND                   ", "cycles" , 0 },
-    { "SEND                   ", "packets", 1 },
-    { "SEND - ERROR           ", NULL     , 1 },
+    { "SEND                   ", "cycles" , 1 },
+    { "SEND - ERROR           ", "cycles" , 1 },
+    { "SEND                   ", "packets", 1 }, // 5
+    { "TOO_MANY_PACKET        ", "cycles" , 1 },
 
-    VALUE_VECTOR_DESCRIPTION_RESERVED, //  5
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
