@@ -505,7 +505,7 @@ OpenNet::Status System_Internal::Stop()
         return ExceptionToStatus(eE);
     }
 
-    if (!SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS))
+    if (!SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS))
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
     }

@@ -308,9 +308,12 @@ unsigned int PacketGenerator_Internal::Run()
     double lPeriod = ComputePeriod();
     assert(0.0 < lPeriod);
 
+    BOOL lRetB = SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+    assert(lRetB);
+
     LARGE_INTEGER lNow;
 
-    BOOL lRetB = QueryPerformanceCounter(&lNow);
+    lRetB = QueryPerformanceCounter(&lNow);
     assert(lRetB);
 
     while (STATE_RUNNING == mState)
