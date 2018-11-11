@@ -136,7 +136,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{DDC8
 		Scripts\Package_SDK.txt = Scripts\Package_SDK.txt
 		Scripts\Package_SDK_DDK.txt = Scripts\Package_SDK_DDK.txt
 		Scripts\Package_SDK_Headers.txt = Scripts\Package_SDK_Headers.txt
-		Scripts\Test_AB.txt = Scripts\Test_AB.txt
+		Scripts\Test_AB_Function.txt = Scripts\Test_AB_Function.txt
+		Scripts\Test_AB_Kernel.txt = Scripts\Test_AB_Kernel.txt
+		Scripts\Test_CDEF_Function.txt = Scripts\Test_CDEF_Function.txt
+		Scripts\Test_CDEF_Kernel.txt = Scripts\Test_CDEF_Kernel.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{43EEE218-F401-4715-B1C2-691A6B898734}"

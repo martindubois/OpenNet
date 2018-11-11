@@ -24,6 +24,7 @@
 
 // ===== Common =============================================================
 #include "../Common/OpenNet/Adapter_Statistics.h"
+#include "../Common/OpenNet/PacketGenerator_Statistics.h"
 #include "../Common/OpenNetK/Adapter_Statistics.h"
 
 namespace TestLib
@@ -127,9 +128,9 @@ namespace TestLib
 
         Test(const char * aName, Code aCode, Mode aMode);
 
+        unsigned int               GetAdapterStats(unsigned int aIndex, unsigned int aCounter);
         const Config             * GetConfig    () const;
         OpenNet::PacketGenerator * GetGenerator (unsigned int aIndex);
-        unsigned int               GetStatistics(unsigned int aIndex, unsigned int aCounter);
         OpenNet::System          * GetSystem    ();
 
         void SetAdapterCount0 (unsigned int aCount);
@@ -139,10 +140,12 @@ namespace TestLib
         void SetGeneratorCount(unsigned int aCount);
 
         virtual unsigned int Init            ();
-        void                 InitConstraints ();
+        void                 InitAdapterConstraints  ();
+        void                 InitGeneratorConstraints();
         virtual unsigned int Start           ();
         virtual unsigned int Stop            ();
-        unsigned int         VerifyStatistics(unsigned int aAdapterIndex);
+        unsigned int         VerifyAdapterStats  (unsigned int aIndex);
+        unsigned int         VerifyGeneratorStats(unsigned int aIndex);
 
         OpenNet::Adapter                     * mAdapters   [ADAPTER_QTY];
         KmsLib::ValueVector::Constraint_UInt32 mConstraints[STATS_QTY];
@@ -195,18 +198,20 @@ namespace TestLib
 
         unsigned int               mAdapterCount0 ;
         unsigned int               mAdapterCount1 ;
+        unsigned int               mAdapterStats[ADAPTER_QTY][STATS_QTY];
         unsigned int               mBufferQty [ADAPTER_QTY];
         Code                       mCodes     [ADAPTER_QTY];
         Config                     mConfig        ;
         Default                    mDefault       ;
         OpenNet::Function          mFunctions [FUNCTION_QTY];
         unsigned int               mGeneratorCount;
+        unsigned int               mGeneratorStats[GENERATOR_QTY][STATS_QTY];
         OpenNet::PacketGenerator * mGenerators[GENERATOR_QTY];
         OpenNet::Kernel            mKernels   [KERNEL_QTY];
         char                       mName      [16];
         char                       mNos       [ADAPTER_QTY][8];
+        unsigned int               mPriorityClass ;
         OpenNet::Processor       * mProcessor;
-        unsigned int               mStatistics[ADAPTER_QTY][STATS_QTY];
         OpenNet::System          * mSystem;
         
     };

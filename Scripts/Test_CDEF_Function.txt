@@ -1,0 +1,34 @@
+
+# Author   KMS - Martin Dubois, ing.
+# Product  OpenNet
+# File     Scripts/Test_CDEF_Function.txt
+
+Test SetMode Function
+
+# ===== C ===================================================================
+
+Test SetBandwidth 120.0
+Test SetBufferQty 2
+Test SetPacketSize 9000
+Test Run C
+
+# ===== D ===================================================================
+
+Test SetBandwidth 120.0
+Test SetBufferQty 2
+Test SetPacketSize 9000
+Test Run D
+
+# ===== E ===================================================================
+
+Test SetBandwidth 120.0
+Test SetBufferQty 4
+Test SetPacketSize 9000
+Test Run E
+
+# ===== F ===================================================================
+
+Test SetBandwidth 120.0
+Test SetBufferQty 3
+Test SetPacketSize 9000
+Test Run F

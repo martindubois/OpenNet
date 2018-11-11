@@ -41,7 +41,7 @@ static const char * FUNCTION_FORWARD_0 =
 static const char * FUNCTION_FORWARD_1 =
 "#include <OpenNetK/Kernel.h>"                                                       EOL
                                                                                      EOL
-"OPEN_NET_FUNCTION_DECLARE( Forward0 )"                                              EOL
+"OPEN_NET_FUNCTION_DECLARE( Forward1 )"                                              EOL
 "{"                                                                                  EOL
 "    OPEN_NET_FUNCTION_BEGIN"                                                        EOL
                                                                                      EOL
@@ -85,38 +85,35 @@ static const char * FUNCTION_REPLY_ON_ERROR_0 =
 "        unsigned int             lResult = OPEN_NET_PACKET_PROCESSED;"         EOL
 "        unsigned int             i;"                                           EOL
                                                                                 EOL
-"        for ( unsigned int j = 0; j < 10; j ++ )"                              EOL
+"        for ( i = 0; i < 6; i ++)"                                             EOL
 "        {"                                                                     EOL
-"            for ( i = 0; i < 6; i ++)"                                         EOL
+"            if ( 0xff != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0xff != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
+"        }"                                                                     EOL
                                                                                 EOL
-"            for ( i = 6; i < 12; i ++)"                                        EOL
+"        for ( i = 6; i < 12; i ++)"                                            EOL
+"        {"                                                                     EOL
+"            if ( 0x00 != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0x00 != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
+"        }"                                                                     EOL
                                                                                 EOL
-"            for ( i = 12; i < 14; i ++)"                                       EOL
+"        for ( i = 12; i < 14; i ++)"                                           EOL
+"        {"                                                                     EOL
+"            if ( 0x88 != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0x88 != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
+"        }"                                                                     EOL
                                                                                 EOL
-"            for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                  EOL
+"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                      EOL
+"        {"                                                                     EOL
+"            if ( 0x00 != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0x00 != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
 "        }"                                                                     EOL
                                                                                 EOL
@@ -136,38 +133,35 @@ static const char * FUNCTION_REPLY_ON_ERROR_1 =
 "        unsigned int             lResult = OPEN_NET_PACKET_PROCESSED;"         EOL
 "        unsigned int             i;"                                           EOL
                                                                                 EOL
-"        for ( unsigned int j = 0; j < 10; j ++ )"                              EOL
+"        for ( i = 0; i < 6; i ++)"                                             EOL
 "        {"                                                                     EOL
-"            for ( i = 0; i < 6; i ++)"                                         EOL
+"            if ( 0xff != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0xff != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
+"        }"                                                                     EOL
                                                                                 EOL
-"            for ( i = 6; i < 12; i ++)"                                        EOL
+"        for ( i = 6; i < 12; i ++)"                                            EOL
+"        {"                                                                     EOL
+"            if ( 0x00 != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0x00 != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
+"        }"                                                                     EOL
                                                                                 EOL
-"            for ( i = 12; i < 14; i ++)"                                       EOL
+"        for ( i = 12; i < 14; i ++)"                                           EOL
+"        {"                                                                     EOL
+"            if ( 0x88 != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0x88 != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
+"        }"                                                                     EOL
                                                                                 EOL
-"            for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                  EOL
+"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                      EOL
+"        {"                                                                     EOL
+"            if ( 0x00 != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0x00 != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
 "        }"                                                                     EOL
                                                                                 EOL
@@ -200,7 +194,7 @@ static const char * KERNEL_NOTHING =
 "    OPEN_NET_KERNEL_END"                                   EOL
 "}"                                                         EOL;
 
-static const char * KERNEL_REPLY_1 =
+static const char * KERNEL_REPLY =
 "#include <OpenNetK/Kernel.h>"                                                       EOL
                                                                                      EOL
 "OPEN_NET_KERNEL_DECLARE"                                                            EOL
@@ -223,38 +217,35 @@ static const char * KERNEL_REPLY_ON_ERROR =
 "        unsigned int             lResult = OPEN_NET_PACKET_PROCESSED;"         EOL
 "        unsigned int             i;"                                           EOL
                                                                                 EOL
-"        for ( unsigned int j = 0; j < 10; j ++ )"                              EOL
+"        for ( i = 0; i < 6; i ++)"                                             EOL
 "        {"                                                                     EOL
-"            for ( i = 0; i < 6; i ++)"                                         EOL
+"            if ( 0xff != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0xff != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
+"        }"                                                                     EOL
                                                                                 EOL
-"            for ( i = 6; i < 12; i ++)"                                        EOL
+"        for ( i = 6; i < 12; i ++)"                                            EOL
+"        {"                                                                     EOL
+"            if ( 0x00 != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0x00 != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
+"        }"                                                                     EOL
                                                                                 EOL
-"            for ( i = 12; i < 14; i ++)"                                       EOL
+"        for ( i = 12; i < 14; i ++)"                                           EOL
+"        {"                                                                     EOL
+"            if ( 0x88 != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0x88 != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
+"        }"                                                                     EOL
                                                                                 EOL
-"            for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                  EOL
+"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                      EOL
+"        {"                                                                     EOL
+"            if ( 0x00 != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
-"                if ( 0x00 != lData[ i ] )"                                     EOL
-"                {"                                                             EOL
-"                    lResult |= 1 << ADAPTER_INDEX;"                            EOL
-"                }"                                                             EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
 "        }"                                                                     EOL
                                                                                 EOL
@@ -284,8 +275,8 @@ namespace TestLib
     const unsigned int Test::TEST_PACKET_SIZE_MAX_byte = 9000;
     const unsigned int Test::TEST_PACKET_SIZE_MIN_byte =   64;
 
-    // aName [---;R--]
-    // aOut  [---;-W-]
+    // aName [---;R--] DEFAULT|FORWARD|NONE|NOTHING|REPLY|REPLY_ON_ERROR
+    // aOut  [---;-W-] The method writes the enum value there
     //
     // Return
     //      0  OK
@@ -308,8 +299,8 @@ namespace TestLib
         return __LINE__;
     }
 
-    // aName [---;R--]
-    // aOut  [---;-W-]
+    // aName [---;R--] DEFAULT|FUNCTION|KERNEL
+    // aOut  [---;-W-] The method writes the enum value there
     //
     // Return
     //      0  OK
@@ -402,22 +393,30 @@ namespace TestLib
             double lMax_MiB_s = BANDWIDTH_MAX_MiB_s;
             double lMin_MiB_s = BANDWIDTH_MIN_MiB_s;
 
-            while ((lMin_MiB_s + 0.1) < lMax_MiB_s)
+            for (;;)
             {
                 lCenter_MiB_s = (lMax_MiB_s + lMin_MiB_s) / 2.0;
 
-                printf("Search  %f MiB / s\n", lCenter_MiB_s);
+                printf("Search  %.1f MiB / s\n", lCenter_MiB_s);
 
                 mConfig.mBandwidth_MiB_s = lCenter_MiB_s;
 
                 if (0 >= Execute())
                 {
-                    lResult = 0;
+                    if (lMin_MiB_s > (lCenter_MiB_s - 0.1)) { lResult = 0; break; }
                     lMin_MiB_s = lCenter_MiB_s;
                 }
                 else
                 {
-                    lMax_MiB_s = lCenter_MiB_s;
+                    if (lMax_MiB_s < (lCenter_MiB_s + 0.1))
+                    {
+                        if (lMax_MiB_s < (lMin_MiB_s + 0.1)) { lMin_MiB_s -= 0.1; }
+                        lMax_MiB_s -= 0.1;
+                    }
+                    else
+                    {
+                        lMax_MiB_s = lCenter_MiB_s;
+                    }
                 }
             }
 
@@ -464,7 +463,7 @@ namespace TestLib
                     if (lMin == lCenter)
                     {
                         if (lMin == lMax) { lMax++; }
-                        lMin++;
+                        lMin ++;
                     }
                     else
                     {
@@ -551,7 +550,7 @@ namespace TestLib
 
             while (BANDWIDTH_MIN_MiB_s <= mConfig.mBandwidth_MiB_s)
             {
-                printf("Verify  %f MiB / s\n", mConfig.mBandwidth_MiB_s);
+                printf("Verify  %.1f MiB / s\n", mConfig.mBandwidth_MiB_s);
 
                 lResult = Execute();
                 if (0 >= lResult)
@@ -704,9 +703,10 @@ namespace TestLib
         mResult.mBandwidth_MiB_s           = BANDWIDTH_MAX_MiB_s;
         mResult.mPacketThroughput_packet_s =                 0.0;
 
+        memset(&mAdapterStats  , 0, sizeof(mAdapterStats  ));
+        memset(&mGeneratorStats, 0, sizeof(mGeneratorStats));
         memset(&mName      , 0, sizeof(mName      ));
         memset(&mNos       , 0, sizeof(mNos       ));
-        memset(&mStatistics, 0, sizeof(mStatistics));
 
         strncpy_s(mName, aName, sizeof(mName) - 1);
 
@@ -725,6 +725,18 @@ namespace TestLib
         }
     }
 
+    // aIndex
+    // aCounter
+    //
+    // Return
+    unsigned int Test::GetAdapterStats(unsigned int aIndex, unsigned int aCounter)
+    {
+        assert(ADAPTER_QTY > aIndex  );
+        assert(STATS_QTY   > aCounter);
+
+        return mAdapterStats[aIndex][aCounter];
+    }
+
     // Return
     const Test::Config * Test::GetConfig() const
     {
@@ -741,18 +753,6 @@ namespace TestLib
         assert(NULL != mGenerators[aIndex]);
 
         return mGenerators[aIndex];
-    }
-
-    // aIndex
-    // aCounter
-    //
-    // Return
-    unsigned int Test::GetStatistics(unsigned int aIndex, unsigned int aCounter)
-    {
-        assert(ADAPTER_QTY > aIndex  );
-        assert(STATS_QTY   > aCounter);
-
-        return mStatistics[aIndex][aCounter];
     }
 
     // Return
@@ -866,11 +866,18 @@ namespace TestLib
         return 0;
     }
 
-    void Test::InitConstraints()
+    void Test::InitAdapterConstraints()
     {
         KmsLib::ValueVector::Constraint_Init(mConstraints, STATS_QTY);
 
         mConstraints[ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
+    }
+
+    void Test::InitGeneratorConstraints()
+    {
+        KmsLib::ValueVector::Constraint_Init(mConstraints, STATS_QTY);
+
+        mConstraints[OpenNet::PACKET_GENERATOR_STATS_STATISTICS_RESET].mMax = 0xffffffff;
     }
 
     // Return
@@ -926,10 +933,50 @@ namespace TestLib
 
         RetrieveStatistics();
 
-        OpenNet::Status lStatus = mSystem->Stop();
+        OpenNet::Status lStatus;
+
+        unsigned int i;
+
+        if (mConfig.mProfiling)
+        {
+            unsigned int lStats[128];
+
+            switch (mConfig.mMode)
+            {
+            case MODE_FUNCTION:
+                OpenNet::Kernel * lKernel;
+
+                lKernel = GetSystem()->Kernel_Get(0);
+                assert(NULL != lKernel);
+
+                lStatus = lKernel->GetStatistics(lStats, sizeof(lStats), NULL, false);
+                assert(OpenNet::STATUS_OK == lStatus);
+
+                lStatus = lKernel->DisplayStatistics(lStats, sizeof(lStats), stdout);
+                assert(OpenNet::STATUS_OK == lStatus);
+                break;
+
+            case MODE_KERNEL:
+                for (i = 0; i < mAdapterCount0; i++)
+                {
+                    lStatus = mKernels[i].GetStatistics(lStats, sizeof(lStats), NULL, false);
+                    assert(OpenNet::STATUS_OK == lStatus);
+
+                    lStatus = mKernels[i].DisplayStatistics(lStats, sizeof(lStats), stdout);
+                    assert(OpenNet::STATUS_OK == lStatus);
+                }
+                break;
+
+            default: assert(false);
+            }
+        }
+
+        mPriorityClass = GetPriorityClass(GetCurrentProcess());
+
+        lStatus = mSystem->Stop();
         assert(OpenNet::STATUS_OK == lStatus);
 
-        for (unsigned int i = 0; i < mGeneratorCount; i++)
+        for (i = 0; i < mGeneratorCount; i++)
         {
             assert(NULL != mGenerators[i]);
 
@@ -945,16 +992,40 @@ namespace TestLib
     // Return
     //      0  OK
     //  Other  Error
-    unsigned int Test::VerifyStatistics(unsigned int aAdapterIndex)
+    unsigned int Test::VerifyAdapterStats(unsigned int aIndex)
     {
-        assert(ADAPTER_QTY > aAdapterIndex);
+        assert(ADAPTER_QTY > aIndex);
 
-        printf("Verifying statistics of adapter %u\n", aAdapterIndex);
+        printf("Verifying statistics of adapter %u\n", aIndex);
 
-        OpenNet::Adapter * lAdapter = mAdapters[aAdapterIndex];
+        OpenNet::Adapter * lAdapter = mAdapters[aIndex];
         assert(NULL != lAdapter);
 
-        unsigned int lRet = KmsLib::ValueVector::Constraint_Verify(mStatistics[aAdapterIndex], lAdapter->GetStatisticsQty(), mConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(lAdapter->GetStatisticsDescriptions()));
+        unsigned int lRet = KmsLib::ValueVector::Constraint_Verify(mAdapterStats[aIndex], lAdapter->GetStatisticsQty(), mConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(lAdapter->GetStatisticsDescriptions()));
+        if (0 != lRet)
+        {
+            printf(__FUNCTION__ " - ValueVector::Constrain_Verify( , , , ,  ) returned %u\n", lRet);
+            return __LINE__;
+        }
+
+        return 0;
+    }
+
+    // aAdapterIndex
+    //
+    // Return
+    //      0  OK
+    //  Other  Error
+    unsigned int Test::VerifyGeneratorStats(unsigned int aIndex)
+    {
+        assert(ADAPTER_QTY > aIndex);
+
+        printf("Verifying statistics of packet generator %u\n", aIndex);
+
+        OpenNet::PacketGenerator * lGenerator = mGenerators[aIndex];
+        assert(NULL != lGenerator);
+
+        unsigned int lRet = KmsLib::ValueVector::Constraint_Verify(mGeneratorStats[aIndex], lGenerator->GetStatisticsQty(), mConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(lGenerator->GetStatisticsDescriptions()));
         if (0 != lRet)
         {
             printf(__FUNCTION__ " - ValueVector::Constrain_Verify( , , , ,  ) returned %u\n", lRet);
@@ -969,10 +1040,10 @@ namespace TestLib
 
     void Test::ConfigAdapters()
     {
-        assert(          1 <= mAdapterCount1);
-        assert(ADAPTER_QTY >= mAdapterCount1);
+        assert(          1 <= mAdapterCount0);
+        assert(ADAPTER_QTY >= mAdapterCount0);
 
-        for (unsigned int i = 0; i < mAdapterCount1; i++)
+        for (unsigned int i = 0; i < mAdapterCount0; i++)
         {
             assert(BUFFER_QTY_MAX >= mBufferQty[i]);
             assert(BUFFER_QTY_MIN <= mBufferQty[i]);
@@ -1040,8 +1111,8 @@ namespace TestLib
             "Test %s - PASSED\n"
             "    Buffer Quantity = %u\n"
             "    Packet Size     = %u bytes\n"
-            "    Bandwidth       = %f MiB/s\n"
-            "    Throughput      = %f packets/s\n",
+            "    Bandwidth       = %.1f MiB/s\n"
+            "    Throughput      = %.1f packets/s\n",
             mName,
             mConfig.mBufferQty,
             mConfig.mPacketSize_byte,
@@ -1091,14 +1162,12 @@ namespace TestLib
     {
         assert(             0 <  mAdapterCount0);
         assert(ADAPTER_QTY    >= mAdapterCount0);
-        assert(mAdapterCount0 <= mAdapterCount1);
-        assert(ADAPTER_QTY    >= mAdapterCount1);
         assert(NULL           != mProcessor    );
         assert(NULL           != mSystem       );
 
         unsigned int i;
 
-        for (i = 0; i < mAdapterCount1; i++)
+        for (i = 0; i < mAdapterCount0; i++)
         {
             OpenNet::Adapter * lAdapter = mAdapters[i];
             assert(NULL != lAdapter);
@@ -1131,8 +1200,8 @@ namespace TestLib
 
     void Test::ResetInputFilters()
     {
-        assert(          1 <= mAdapterCount1);
-        assert(ADAPTER_QTY >= mAdapterCount1);
+        assert(          1 <= mAdapterCount0);
+        assert(ADAPTER_QTY >= mAdapterCount0);
 
         for (unsigned int i = 0; i < mAdapterCount0; i++)
         {
@@ -1150,6 +1219,8 @@ namespace TestLib
         assert(          1 <= mAdapterCount1);
         assert(ADAPTER_QTY >= mAdapterCount1);
 
+        mGenerators[0]->ResetStatistics();
+
         for (unsigned int i = 0; i < mAdapterCount1; i++)
         {
             assert(NULL != mAdapters[i]);
@@ -1161,14 +1232,28 @@ namespace TestLib
 
     void Test::RetrieveStatistics()
     {
-        assert(          1 <= mAdapterCount1);
-        assert(ADAPTER_QTY >= mAdapterCount1);
+        assert(            1 <= mAdapterCount1 );
+        assert(ADAPTER_QTY   >= mAdapterCount1 );
+        assert(            1 <= mGeneratorCount);
+        assert(GENERATOR_QTY >= mGeneratorCount);
 
-        for (unsigned int i = 0; i < mAdapterCount1; i++)
+        OpenNet::Status lStatus;
+
+        unsigned int i;
+
+        for (i = 0; i < mAdapterCount1; i++)
         {
             assert(NULL != mAdapters[i]);
 
-            OpenNet::Status lStatus = mAdapters[i]->GetStatistics(mStatistics[i], sizeof(mStatistics[i]), NULL, true);
+            OpenNet::Status lStatus = mAdapters[i]->GetStatistics(mAdapterStats[i], sizeof(mAdapterStats[i]), NULL, true);
+            assert(OpenNet::STATUS_OK == lStatus);
+        }
+
+        for (i = 0; i < mGeneratorCount; i ++)
+        {
+            assert(NULL != mGenerators[i]);
+
+            lStatus = mGenerators[0]->GetStatistics(mGeneratorStats[i], sizeof(mGeneratorStats[i]), NULL, true);
             assert(OpenNet::STATUS_OK == lStatus);
         }
     }
@@ -1312,7 +1397,7 @@ namespace TestLib
     {
         assert(NULL != aNote);
 
-        static const char * FILENAME = "K:\\Export\\OpenNet\\TestResults\\f01.txt";
+        static const char * FILENAME = "K:\\Export\\OpenNet\\TestResults\\f02.txt";
 
         FILE * lFile;
 
@@ -1326,7 +1411,7 @@ namespace TestLib
             lRet = fopen_s(&lFile, FILENAME, "w");
             if (0 == lRet)
             {
-                fprintf(lFile, "Name;MiB/s;Buffer;Code;Mode;bytes/packet;Profiling;MiB/s;packet/s;Note;TestLib\n");
+                fprintf(lFile, "Name;MiB/s;Buffer;Code;Mode;bytes/packet;Profiling;MiB/s;packet/s;Note;Priority Class;TestLib\n");
             }
         }
 
@@ -1350,16 +1435,41 @@ namespace TestLib
         assert(NULL != aOut );
         assert(NULL != aNote);
 
+        char lPriorityClass[32];
+
+        switch (mPriorityClass)
+        {
+        case ABOVE_NORMAL_PRIORITY_CLASS: strcpy_s(lPriorityClass, "ABOVE_NORMAL"); break;
+        case BELOW_NORMAL_PRIORITY_CLASS: strcpy_s(lPriorityClass, "BELOW_NORMAL"); break;
+        case HIGH_PRIORITY_CLASS        : strcpy_s(lPriorityClass, "HIGH"        ); break;
+        case IDLE_PRIORITY_CLASS        : strcpy_s(lPriorityClass, "IDLE"        ); break;
+        case NORMAL_PRIORITY_CLASS      : strcpy_s(lPriorityClass, "NORMAL"      ); break;
+        case REALTIME_PRIORITY_CLASS    : strcpy_s(lPriorityClass, "REALTIME"    ); break;
+
+        default: sprintf_s(lPriorityClass, "0x%08x", mPriorityClass);
+        }
+
         // TODO  OpenNet_Tool.Test
-        //       Ajouter des informations : Le filtre des traces de debug du
-        //       driver, la version du driver, la version de la DLL, la
-        //       config du driver (Debug/Release), la config de la DLL
+        //       Normal - Ajouter des informations : Le filtre des traces de
+        //       debug du driver, la version du driver, la version de la DLL,
+        //       la config du driver (Debug/Release), la config de la DLL
         //       (Debug/Release), la date de compilation de TestLib, la date
         //       de compilation de OpenNet.dll, la date de compilation du
         //       driver, la vitesse du lien ethernet, le type de carte
-        //       graphique, nom de l'ordinateur, nom de l'utilisateur,
-        //       administrateur ou non, la date et l'heure d'execution...
-        fprintf(aOut, "%s;%f;%u;%s;%s;%u;%s;%f;%f;%s;%s\n",
+        //       graphique, nom de l'ordinateur, nom de l'utilisateur, la
+        //       date et l'heure d'execution...
+
+        // TODO  OpenNet_Tool.Test
+        //       Normal - Limiter a une decimal le bandwith et a 0 decimal le
+        //       nombre de paquet.
+
+        fprintf(aOut, "%s;%.1f;%u;%s;%s;%u;%s;%.1f;%.1f;%s;%s;"
+#ifdef _DEBUG
+            "Debug"
+#else
+            "Release"
+#endif
+            " - Compiled at " __TIME__ " on " __DATE__ "\n",
             mName                     ,
             mConfig.mBandwidth_MiB_s  ,
             mConfig.mBufferQty        ,
@@ -1370,12 +1480,7 @@ namespace TestLib
             mResult.mBandwidth_MiB_s  ,
             mResult.mPacketThroughput_packet_s,
             aNote,
-#ifdef _DEBUG
-            "Debug"
-#else
-            "Release"
-#endif
-            );
+            lPriorityClass);
     }
 
 }

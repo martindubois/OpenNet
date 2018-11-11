@@ -62,14 +62,10 @@ unsigned int TestF::Init()
     assert(NULL == mAdapters[0]);
     assert(NULL == mAdapters[1]);
     assert(NULL == mAdapters[2]);
-    assert(NULL == mAdapters[3]);
 
     SetAdapterCount0(2);
-    SetAdapterCount1(4);
-    SetBufferQty    (0, GetConfig()->mBufferQty);
-    SetBufferQty    (1, GetConfig()->mBufferQty);
+    SetAdapterCount1(3);
     SetCode         (0, GetConfig()->mCode);
-    SetCode         (1, GetConfig()->mCode);
 
     unsigned int lResult = Test::Init();
     if (0 == lResult)
@@ -95,16 +91,6 @@ unsigned int TestF::Init()
             return __LINE__;
         }
 
-        lStatus = mAdapters[2]->GetInfo(&lInfo);
-        assert(OpenNet::STATUS_OK == lStatus);
-
-        mAdapters[3] = GetSystem()->Adapter_Get(lInfo.mEthernetAddress.mAddress, MASK_E, MASK_1);
-        if (NULL == mAdapters[3])
-        {
-            printf(__FUNCTION__ " - Not enough adapter\n");
-            return __LINE__;
-        }
-
         lStatus = GetGenerator(0)->SetAdapter(mAdapters[2]);
         assert(OpenNet::STATUS_OK == lStatus);
     }
@@ -115,7 +101,6 @@ unsigned int TestF::Init()
 unsigned int TestF::Start()
 {
     SetBufferQty(0, GetConfig()->mBufferQty);
-    SetBufferQty(1, GetConfig()->mBufferQty);
 
     return Test::Start();
 }
@@ -125,7 +110,7 @@ unsigned int TestF::Stop()
     unsigned int lResult = Test::Stop();
     if (0 == lResult)
     {
-        InitConstraints();
+        InitAdapterConstraints();
 
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  1010;
@@ -157,10 +142,10 @@ unsigned int TestF::Stop()
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 771000;
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =  13800;
 
-        lResult = VerifyStatistics(0);
+        lResult = VerifyAdapterStats(0);
         if (0 == lResult)
         {
-            InitConstraints();
+            InitAdapterConstraints();
 
             mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
             mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =  8370;
@@ -189,18 +174,18 @@ unsigned int TestF::Stop()
             mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMax = 771000;
             mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin =  13800;
 
-            lResult = VerifyStatistics(0);
+            lResult = VerifyAdapterStats(1);
             if (0 == lResult)
             {
-                double lRunningTime_ms = GetStatistics(0, TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms);
+                double lRunningTime_ms = GetAdapterStats(0, TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms);
 
-                mResult.mBandwidth_MiB_s  = GetStatistics(0, TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte);;
+                mResult.mBandwidth_MiB_s  = GetAdapterStats(0, TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte);;
                 mResult.mBandwidth_MiB_s /= 1024.0;
                 mResult.mBandwidth_MiB_s /= 1024.0;
                 mResult.mBandwidth_MiB_s *= 1000.0;
                 mResult.mBandwidth_MiB_s /= lRunningTime_ms;
 
-                mResult.mPacketThroughput_packet_s  = GetStatistics(0, TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet);
+                mResult.mPacketThroughput_packet_s  = GetAdapterStats(0, TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet);
                 mResult.mPacketThroughput_packet_s *= 1000.0;
                 mResult.mPacketThroughput_packet_s /= lRunningTime_ms;
             }

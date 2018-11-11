@@ -126,7 +126,7 @@ unsigned int TestD::Stop()
     unsigned int lResult = Test::Stop();
     if (0 == lResult)
     {
-        InitConstraints();
+        InitAdapterConstraints();
 
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10300;
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =    64;
@@ -158,10 +158,10 @@ unsigned int TestD::Stop()
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 1620000;
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =    7010;
 
-        lResult = VerifyStatistics(0);
+        lResult = VerifyAdapterStats(0);
         if (0 == lResult)
         {
-            InitConstraints();
+            InitAdapterConstraints();
 
             mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10300;
             mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =    64;
@@ -193,18 +193,18 @@ unsigned int TestD::Stop()
             mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 1620000;
             mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =    7010;
 
-            lResult = VerifyStatistics(1);
+            lResult = VerifyAdapterStats(1);
             if (0 == lResult)
             {
-                double lRunningTime_ms = GetStatistics(0, TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms);
+                double lRunningTime_ms = GetAdapterStats(0, TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms);
 
                 mResult.mBandwidth_MiB_s           = 0.0;
                 mResult.mPacketThroughput_packet_s = 0.0;
 
                 for (unsigned int i = 0; i < 2; i++)
                 {
-                    mResult.mBandwidth_MiB_s           += GetStatistics(i, TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte  );
-                    mResult.mPacketThroughput_packet_s += GetStatistics(i, TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet);
+                    mResult.mBandwidth_MiB_s           += GetAdapterStats(i, TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte  );
+                    mResult.mPacketThroughput_packet_s += GetAdapterStats(i, TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet);
                 }
 
                 mResult.mBandwidth_MiB_s /= 1024.0;
