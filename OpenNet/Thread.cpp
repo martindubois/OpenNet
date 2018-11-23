@@ -9,6 +9,9 @@
 // ===== C ==================================================================
 #include <assert.h>
 
+// ===== Windows ============================================================
+#include <Windows.h>
+
 // ===== OpenNet ============================================================
 #include "OCLW.h"
 
@@ -22,9 +25,6 @@
 
 static uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam);
 
-// ===== Entry point ========================================================
-static DWORD WINAPI Run(LPVOID aParameter);
-
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
@@ -37,14 +37,11 @@ Thread::Thread(Processor_Internal * aProcessor, KmsLib::DebugLog * aDebugLog)
     , mKernel_CL   (NULL      )
     , mProcessor   (aProcessor)
     , mProgram     (NULL      )
-    , mState       (STATE_INIT)
-    , mThread      (NULL      )
 {
     assert(NULL != aProcessor);
     assert(NULL != aDebugLog );
 
-    // InitializeCriticalSection ==> DeleteCriticalSection  See Thread::~Thread
-    InitializeCriticalSection(&mZone0);
+    SetPriority(PRIORITY_CRITICAL);
 }
 
 // aAdapter [-K-;RW-] The adapter to add
@@ -101,34 +98,28 @@ void Thread::Delete()
 {
     try
     {
-        EnterCriticalSection(&mZone0);
+        switch (GetState())
+        {
+        case STATE_INIT:
+            break;
 
-            switch (mState)
-            {
-            case STATE_INIT:
-                break;
+        case STATE_RUNNING:
+            ThreadBase::Stop();
+            // no break;
 
-            case STATE_RUNNING :
-            case STATE_STARTING:
-            case STATE_STOPPING:
-                Stop_Request_Zone0();
-                Stop_Wait_Zone0   (NULL, NULL);
-                // Stop_Wait_Zone0 release the gate when it throw an
-                // exception.
-                break;
+        case STATE_STOP_REQUESTED:
+        case STATE_STOPPING      :
+            Stop_Wait(NULL, NULL);
+            break;
 
-            default: assert(false);
-            }
-
-        LeaveCriticalSection(&mZone0);
+        default: assert(false);
+        }
     }
-    catch (...)
+    catch (KmsLib::Exception * eE)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(eE);
     }
-
-    // InitializeCriticalSection ==> DeleteCriticalSection  See Thread::Thread
-    DeleteCriticalSection(&mZone0);
 
     Release();
 
@@ -173,34 +164,6 @@ void Thread::Prepare()
     }
 }
 
-// Exception  KmsLib::Exception *  CODE_THREAD_ERROR
-//                                 See State_Change
-// Threads  Apps
-void Thread::Start()
-{
-    assert(NULL != mDebugLog);
-    assert(NULL == mThread  );
-    assert(0    == mThreadId);
-
-    State_Change(STATE_INIT, STATE_START_REQUESTED);
-
-    mThread = CreateThread(NULL, 0, ::Run, this, 0, &mThreadId);
-    if (NULL == mThread)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_THREAD_ERROR,
-            "CreateThread( , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
-    }
-}
-
-// Threads  Apps
-void Thread::Stop_Request()
-{
-    EnterCriticalSection(&mZone0);
-        Stop_Request_Zone0();
-    LeaveCriticalSection(&mZone0);
-}
-
 // aTryToSolveHang [--O;--X]
 // aContext        [--O;---]
 //
@@ -208,14 +171,49 @@ void Thread::Stop_Request()
 // Threads  Apps
 void Thread::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
 {
-    assert(0 < mAdapters.size());
-    assert(0 < mBuffers.size ());
-
-    EnterCriticalSection(&mZone0);
-        Stop_Wait_Zone0(aTryToSolveHang, aContext);
-    LeaveCriticalSection(&mZone0);
+    assert(   0 < mAdapters.size());
+    assert(   0 < mBuffers.size ());
+    assert(NULL != mDebugLog      );
 
     unsigned int i;
+
+    bool lRetB = false;
+
+    switch (GetState())
+    {
+    case STATE_STOP_REQUESTED:
+        if (NULL != aTryToSolveHang)
+        {
+            ThreadBase::Sleep_s(1);
+
+            for (i = 0; i < 2990; i++)
+            {
+                if (STATE_STOP_REQUESTED != GetState())
+                {
+                    break;
+                }
+
+                aTryToSolveHang(aContext, (1 == mAdapters.size()) ? mAdapters[0] : NULL);
+
+                ThreadBase::Sleep_ms(100);
+            }
+
+            lRetB = Wait(true, 1000);
+        }
+        else
+        {
+            lRetB = Wait(true, 300000);
+        }
+        break;
+
+    case STATE_STOPPING:
+        lRetB = Wait(true, 1000);
+        break;
+
+    default: assert(false);
+    }
+
+    assert(lRetB);
 
     for (i = 0; i < mAdapters.size(); i++)
     {
@@ -236,20 +234,15 @@ void Thread::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
 // CRITICAL PATH
 //
 // Thread  Worker
-void Thread::Run()
+unsigned int Thread::Run()
 {
     assert(   0 <  mAdapters.size());
     assert(NULL != mDebugLog       );
 
-    if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL))
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-    }
+    unsigned int lResult = __LINE__;
 
     try
     {
-        State_Change(STATE_START_REQUESTED, STATE_STARTING);
-
         Run_Start();
 
         unsigned int i;
@@ -267,18 +260,17 @@ void Thread::Run()
         }
 
         Run_Wait();
+
+        lResult = 0;
     }
     catch (KmsLib::Exception * eE)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog->Log(eE);
-    }
-    catch (...)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        lResult = __LINE__;
     }
 
-    mState = STATE_STOPPING;
+    return lResult;
 }
 
 // Protected
@@ -382,40 +374,6 @@ void Thread::Run_Iteration(unsigned int aIndex)
     Processing_Queue(aIndex);
 }
 
-// aFrom  The state to leave
-// aTo    The state to enter
-//
-// Exception  KmsLib::Exception *  CODE_STATE_ERROR
-// Threads    Apps, Worker
-void Thread::State_Change(State aFrom, State aTo)
-{
-    assert(STATE_QTY > aFrom);
-    assert(STATE_QTY > aTo  );
-
-    assert(NULL != mDebugLog);
-
-    bool lOK = false;
-
-    EnterCriticalSection(&mZone0);
-
-        assert(STATE_QTY > mState);
-
-        if (mState == aFrom)
-        {
-            lOK    = true;
-            mState = aTo ;
-        }
-
-    LeaveCriticalSection(&mZone0);
-
-    if (!lOK)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_STATE_ERROR,
-            "Invalid state transition", NULL, __FILE__, __FUNCTION__, __LINE__, aTo);
-    }
-}
-
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
@@ -458,111 +416,6 @@ void Thread::Run_Wait()
         "The driver did not release the buffers in time", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
 }
 
-// Threads  Apps
-void Thread::Stop_Request_Zone0()
-{
-    switch (mState)
-    {
-    case STATE_RUNNING :
-    case STATE_STARTING:
-        mState = STATE_STOP_REQUESTED;
-        break;
-
-    case STATE_STOPPING :
-        break;
-
-    default: assert(false);
-    }
-}
-
-// aTryToSolveHang [--O;--X]
-// aContext        [--O;---]
-//
-// This method release the Zone0 when it throw an exception.
-//
-// Exception  KmsLib::Exception *  CODE_THREAD_ERROR
-// Threads  Apps
-void Thread::Stop_Wait_Zone0(TryToSolveHang aTryToSolveHang, void * aContext)
-{
-    assert(   0 <  mAdapters.size());
-    assert(NULL != mDebugLog       );
-    assert(NULL != mThread         );
-
-    switch (mState)
-    {
-    case STATE_STOP_REQUESTED:
-    case STATE_STOPPING      :
-        DWORD lRet;
-
-        if (NULL != aTryToSolveHang)
-        {
-            lRet = Wait_Zone0(1000);
-
-            if (WAIT_OBJECT_0 == lRet) { break; }
-
-            for (unsigned int i = 0; i < 2990; i ++)
-            {
-                aTryToSolveHang(aContext, ( 1 == mAdapters.size() ) ? mAdapters[ 0 ] : NULL);
-
-                lRet = Wait_Zone0(100);
-
-                if (WAIT_OBJECT_0 == lRet) { break; }
-            }
-        }
-        else
-        {
-            lRet = Wait_Zone0(300000);
-        }
-
-        if (WAIT_OBJECT_0 == lRet) { break; }
-
-        // TODO  OpenNet.Adapter_Internal.ErrorHandling
-        //       Low - This case is a big problem. Terminating the thread
-        //       interracting with the GPU may let the system in an unstable
-        //       state. Worst, in this case the drive still use the GPU
-        //       buffer.
-
-        LeaveCriticalSection(&mZone0);
-            if (!TerminateThread(mThread, __LINE__))
-            {
-                mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-                throw new KmsLib::Exception(KmsLib::Exception::CODE_THREAD_ERROR,
-                    "TerminateThread( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
-            }
-        EnterCriticalSection(&mZone0);
-        break;
-
-    default: assert(false);
-    }
-
-    mState = STATE_INIT;
-
-    BOOL lRetB = CloseHandle(mThread);
-    assert(lRetB);
-    (void)(lRetB);
-
-    mThread   = NULL;
-    mThreadId = 0   ;
-}
-
-// aTimeout_ms
-//
-// Return  See WaitForSingleObject
-unsigned int Thread::Wait_Zone0(unsigned int aTimeout_ms)
-{
-    assert(0 < aTimeout_ms);
-
-    assert(NULL != mThread);
-
-    unsigned int lResult;
-
-    LeaveCriticalSection(&mZone0);
-        lResult = WaitForSingleObject(mThread, aTimeout_ms);
-    EnterCriticalSection(&mZone0);
-
-    return lResult;
-}
-
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
 
@@ -584,22 +437,4 @@ uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam)
     OCLW_GetEventProfilingInfo(aEvent, aParam, sizeof(lResult), &lResult);
 
     return lResult;
-}
-
-// ===== Entry point ========================================================
-
-// aParameter [---;RW-] The this pointer
-//
-// Return  This method always return 0
-//
-// Thread  Worker (Entry point)
-DWORD WINAPI Run(LPVOID aParameter)
-{
-    assert(NULL != aParameter);
-
-    Thread * lThis = reinterpret_cast<Thread *>(aParameter);
-
-    lThis->Run();
-
-    return 0;
 }

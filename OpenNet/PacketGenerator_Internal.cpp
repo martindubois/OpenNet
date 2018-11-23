@@ -38,22 +38,21 @@ static const char * STATE_NAMES[] =
 {
     "INIT"    ,
     "RUNNING" ,
+    "START_REQUESTED",
+    "STARTING"       ,
+    "STOP_REQUESTED" ,
     "STOPPING",
 };
-
-// Static function declaration
-/////////////////////////////////////////////////////////////////////////////
-
-// ===== Entry point ========================================================
-static DWORD WINAPI Run(LPVOID aParameter);
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-PacketGenerator_Internal::PacketGenerator_Internal() : mAdapter(NULL), mDebugLog("K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "PackeGenerator"), mState(STATE_INIT), mThread(NULL)
+PacketGenerator_Internal::PacketGenerator_Internal() : mAdapter(NULL), mDebugLog("K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "PackeGenerator")
 {
     memset(&mConfig    , 0, sizeof(mConfig    ));
     memset(&mStatistics, 0, sizeof(mStatistics));
+
+    SetPriority(PRIORITY_HIGH);
 
     mConfig.mBandwidth_MiB_s =   50.0;
     mConfig.mPacketSize_byte = 1024  ;
@@ -65,7 +64,7 @@ PacketGenerator_Internal::~PacketGenerator_Internal()
 {
     OpenNet::Status lStatus;
 
-    switch (mState)
+    switch (GetState())
     {
     case STATE_INIT    :
     case STATE_STOPPING:
@@ -133,13 +132,16 @@ OpenNet::Status PacketGenerator_Internal::SetConfig(const Config & aConfig)
         return lStatus;
     }
 
-    switch (mState)
+    switch (GetState())
     {
     case STATE_INIT :
         break;
 
-    case STATE_RUNNING :
-    case STATE_STOPPING:
+    case STATE_RUNNING        :
+    case STATE_START_REQUESTED:
+    case STATE_STARTING       :
+    case STATE_STOP_REQUESTED :
+    case STATE_STOPPING       :
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_PACKET_GENERATOR_RUNNING;
 
@@ -151,8 +153,6 @@ OpenNet::Status PacketGenerator_Internal::SetConfig(const Config & aConfig)
 
 OpenNet::Status PacketGenerator_Internal::Display(FILE * aOut)
 {
-    assert(STATE_QTY > mState);
-
     if (NULL == aOut)
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
@@ -161,85 +161,48 @@ OpenNet::Status PacketGenerator_Internal::Display(FILE * aOut)
 
     fprintf(aOut, "PacketGenerator :\n");
     fprintf(aOut, "  Adapter   = %s\n", (NULL == mAdapter) ? "Not set" : mAdapter->GetName());
-    fprintf(aOut, "  State     = %s\n", STATE_NAMES[mState]);
-    fprintf(aOut, "  Thread ID = %u\n", mThreadId);
+    fprintf(aOut, "  State     = %s\n", STATE_NAMES[GetState()]);
 
     return OpenNet::STATUS_OK;
 }
 
 OpenNet::Status PacketGenerator_Internal::Start()
 {
-    switch (mState)
+    OpenNet::Status lResult;
+
+    try
     {
-    case STATE_INIT:
-        break;
+        KmsLib::ThreadBase::Start();
 
-    case STATE_RUNNING:
-    case STATE_STOPPING:
+        lResult = OpenNet::STATUS_OK;
+    }
+    catch (KmsLib::Exception * eE)
+    {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_PACKET_GENERATOR_RUNNING;
-
-    default: assert(false);
+        mDebugLog.Log(eE);
+        lResult = OpenNet::STATUS_EXCEPTION;
     }
 
-    assert(NULL == mThread);
-
-    mState = STATE_RUNNING;
-
-    mThread = CreateThread(NULL, 0, ::Run, this, 0, &mThreadId);
-    if (NULL == mThread)
-    {
-        mState = STATE_INIT;
-
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_THREAD_CLOSE_ERROR;
-    }
-
-    return OpenNet::STATUS_OK;
+    return lResult;
 }
 
 OpenNet::Status PacketGenerator_Internal::Stop()
 {
-    switch (mState)
+    OpenNet::Status lResult;
+
+    try
     {
-    case STATE_INIT    :
-    case STATE_STOPPING:
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_PACKET_GENERATOR_STOPPED;
+        bool lRetB = StopAndWait(true, 1000);
+        assert(lRetB);
 
-    case STATE_RUNNING:
-        break;
-
-    default: assert(false);
+        lResult = OpenNet::STATUS_OK;
     }
-
-    assert(NULL != mThread);
-
-    mState = STATE_STOPPING;
-
-    OpenNet::Status lResult = OpenNet::STATUS_OK;
-
-    if (WAIT_OBJECT_0 != WaitForSingleObject(mThread, 1000))
+    catch (KmsLib::Exception * eE)
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-        lResult = OpenNet::STATUS_THREAD_STOP_TIMEOUT;
-
-        if (!TerminateThread(mThread, __LINE__))
-        {
-            mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-            lResult = OpenNet::STATUS_THREAD_TERMINATE_ERROR;
-        }
+        mDebugLog.Log(eE);
+        lResult = OpenNet::STATUS_EXCEPTION;
     }
-
-    mState = STATE_INIT;
-
-    if (!CloseHandle(mThread))
-    {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-        lResult = OpenNet::STATUS_THREAD_CLOSE_ERROR;
-    }
-
-    mThread = NULL;
 
     return lResult;
 }
@@ -308,15 +271,12 @@ unsigned int PacketGenerator_Internal::Run()
     double lPeriod = ComputePeriod();
     assert(0.0 < lPeriod);
 
-    BOOL lRetB = SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
-    assert(lRetB);
-
     LARGE_INTEGER lNow;
 
-    lRetB = QueryPerformanceCounter(&lNow);
+    BOOL lRetB = QueryPerformanceCounter(&lNow);
     assert(lRetB);
 
-    while (STATE_RUNNING == mState)
+    while (IsRunning())
     {
         LARGE_INTEGER lBefore = lNow;
 
@@ -463,17 +423,4 @@ void PacketGenerator_Internal::SendPackets(const IoCtl_Packet_Send_Ex_In * aIn)
     {
         mStatistics[OpenNet::PACKET_GENERATOR_STATS_SEND_ERROR_cycle] ++;
     }
-}
-
-// Static functions
-/////////////////////////////////////////////////////////////////////////////
-
-// ===== Entry point ========================================================
-DWORD WINAPI Run(LPVOID aParameter)
-{
-    assert(NULL != aParameter);
-
-    PacketGenerator_Internal * lThis = reinterpret_cast<PacketGenerator_Internal *>(aParameter);
-
-    return lThis->Run();
 }

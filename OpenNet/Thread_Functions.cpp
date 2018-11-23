@@ -10,6 +10,9 @@
 #include <assert.h>
 #include <stdint.h>
 
+// ===== Windows ============================================================
+#include <Windows.h>
+
 // ===== OpenNet ============================================================
 #include "OCLW.h"
 
@@ -139,16 +142,12 @@ void Thread_Functions::Run_Loop()
     {
         unsigned lIndex = 0;
 
-        State_Change(STATE_STARTING, STATE_RUNNING);
-
-        while (STATE_RUNNING == mState)
+        while (IsRunning())
         {
             Run_Iteration(lIndex);
 
             lIndex = (lIndex + 1) % EVENT_QTY;
         }
-
-        State_Change(STATE_STOP_REQUESTED, STATE_STOPPING);
 
         for (unsigned int i = 0; i < EVENT_QTY; i++)
         {

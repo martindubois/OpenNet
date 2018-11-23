@@ -10,6 +10,7 @@
 
 // ===== Import =============================================================
 #include <KmsLib/DebugLog.h>
+#include <KmsLib/ThreadBase.h>
 
 // ===== Common =============================================================
 #include "../Common/OpenNet/PacketGenerator_Statistics.h"
@@ -23,7 +24,7 @@
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
-class PacketGenerator_Internal : public OpenNet::PacketGenerator
+class PacketGenerator_Internal : public OpenNet::PacketGenerator, KmsLib::ThreadBase
 {
 
 public:
@@ -45,21 +46,12 @@ public:
     virtual OpenNet::Status GetStatistics  (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
     virtual OpenNet::Status ResetStatistics();
 
-// internal:
+protected:
 
+    // ===== KmsLib::ThreadBase =============================================
     unsigned int Run();
 
 private:
-
-    typedef enum
-    {
-        STATE_INIT    ,
-        STATE_RUNNING ,
-        STATE_STOPPING,
-
-        STATE_QTY
-    }
-    State;
 
     OpenNet::Status Config_Apply   (const Config & aConfig);
     OpenNet::Status Config_Validate(const Config & aConfig);
@@ -72,9 +64,6 @@ private:
     Adapter_Internal * mAdapter ;
     Config             mConfig  ;
     KmsLib::DebugLog   mDebugLog;
-    State              mState   ;
-    HANDLE             mThread  ;
-    DWORD              mThreadId;
 
     unsigned int mStatistics[OpenNet::PACKET_GENERATOR_STATS_QTY];
 

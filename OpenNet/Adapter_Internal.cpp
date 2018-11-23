@@ -10,6 +10,9 @@
 #include <assert.h>
 #include <stdint.h>
 
+// ===== Windows ============================================================
+#include <Windows.h>
+
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
 
@@ -51,7 +54,7 @@ static OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE);
 //
 // Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
 // Threads    Apps
-Adapter_Internal::Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog)
+Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog)
     : mBufferCount(0)
     , mDebugLog   (aDebugLog)
     , mHandle     (aHandle)
@@ -77,6 +80,9 @@ Adapter_Internal::Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsL
     mHandle->Control(IOCTL_INFO_GET  , NULL, 0, &mInfo        , sizeof(mInfo        ));
 
     Config_Update();
+
+    // TODO  OpenNet.Adapter
+    //       Normal - Ajouter un espace avant l'adresse MAC
 
     strncpy_s(mName, mInfo.mVersion_Hardware.mComment, sizeof(mName) - 1);
 

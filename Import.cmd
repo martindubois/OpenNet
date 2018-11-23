@@ -13,7 +13,7 @@ set EXPORT_FOLDER=K:\Export
 
 rem ===== Dependencies ======================================================
 
-set KMS_BASE="%EXPORT_FOLDER%\KmsBase\2.5.9_KI"
+set KMS_BASE="%EXPORT_FOLDER%\KmsBase\3.0.1_KI_Windows"
 
 rem ===== Constants =========================================================
 

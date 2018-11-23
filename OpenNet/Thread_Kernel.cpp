@@ -9,6 +9,9 @@
 // ===== C ==================================================================
 #include <assert.h>
 
+// ===== Windows ============================================================
+#include <Windows.h>
+
 // ===== OpenNet ============================================================
 #include "OCLW.h"
 
@@ -56,14 +59,15 @@ void Thread_Kernel::Processing_Queue(unsigned int aIndex)
     assert(NULL != mKernel_CL   );
 
     Buffer_Data * lBuffer = mBuffers[aIndex];
-    assert(NULL != lBuffer      );
-    assert(NULL != lBuffer->mMem);
+    assert(NULL != lBuffer        );
+    assert(NULL == lBuffer->mEvent);
+    assert(NULL != lBuffer->mMem  );
 
     OCLW_SetKernelArg(mKernel_CL, 0, sizeof(lBuffer->mMem), &lBuffer->mMem);
 
     mKernel->SetUserKernelArgs(mKernel_CL);
 
-    // Here, we don't user event between the clEnqueueWaitSignal and the
+    // Here, we don't use event between the clEnqueueWaitSignal and the
     // clEnqueueNDRangeKernel because the command queue force the execution
     // order.
     OCLW_EnqueueWaitSignal(mCommandQueue, lBuffer->mMem, lBuffer->GetMarkerValue(), 0, NULL, NULL);
@@ -98,16 +102,12 @@ void Thread_Kernel::Run_Loop()
     {
         unsigned lIndex = 0;
 
-        State_Change(STATE_STARTING, STATE_RUNNING);
-
-        while (STATE_RUNNING == mState)
+        while (IsRunning())
         {
             Run_Iteration(lIndex);
 
             lIndex = (lIndex + 1) % mBuffers.size();
         }
-
-        State_Change(STATE_STOP_REQUESTED, STATE_STOPPING);
 
         for (unsigned int i = 0; i < mBuffers.size(); i++)
         {

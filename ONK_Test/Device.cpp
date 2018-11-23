@@ -13,8 +13,8 @@
 #include <Windows.h>
 
 // ===== Import/Includes ====================================================
+#include <KmsLib/DriverHandle.h>
 #include <KmsLib/Exception.h>
-#include <KmsLib/Windows/DriverHandle.h>
 #include <KmsTest.h>
 
 // ===== Includes ===========================================================
@@ -33,7 +33,7 @@
 //            Invalid event handle
 KMS_TEST_BEGIN(Device_SetupA)
 {
-    KmsLib::Windows::DriverHandle lDH0;
+    KmsLib::DriverHandle lDH0;
 
     lDH0.Connect(OPEN_NET_DRIVER_INTERFACE, 0, GENERIC_ALL, 0);
 

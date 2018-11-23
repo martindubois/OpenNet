@@ -16,7 +16,7 @@
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/DebugLog.h>
-#include <KmsLib/Windows/DriverHandle.h>
+#include <KmsLib/DriverHandle.h>
 
 // ===== Includes ===========================================================
 #include <OpenNet/Adapter.h>
@@ -43,7 +43,7 @@ public:
 
     typedef void(*TryToSolveHang)(void *, Adapter_Internal *);
 
-    Adapter_Internal(KmsLib::Windows::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog);
+    Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog);
 
     virtual ~Adapter_Internal();
 
@@ -100,7 +100,7 @@ private:
     Config                          mConfig      ;
     KmsLib::DebugLog              * mDebugLog    ;
     OpenNetK::Adapter_Config        mDriverConfig;
-    KmsLib::Windows::DriverHandle * mHandle      ;
+    KmsLib::DriverHandle          * mHandle      ;
     Info                            mInfo        ;
     char                            mName   [ 64];
     Processor_Internal            * mProcessor   ;

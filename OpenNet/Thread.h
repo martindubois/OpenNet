@@ -8,6 +8,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+// ===== Import/Includes ====================================================
+#include <KmsLib/ThreadBase.h>
+
 // ===== OpenNet ============================================================
 #include "Adapter_Internal.h"
 #include "Processor_Internal.h"
@@ -17,7 +20,7 @@ class Buffer_Data;
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
-class Thread
+class Thread : public KmsLib::ThreadBase
 {
 
 public:
@@ -41,35 +44,9 @@ public:
 
     virtual void Prepare();
 
-    void Start       ();
-    void Stop_Request();
     void Stop_Wait   (TryToSolveHang aTryToSolveHang, void * aContext);
 
-// internal:
-
-    void Run();
-
 protected:
-
-    // --> INIT <--+<------------------------------------------------------+
-    //      |      |                                                       |
-    //      |     STOPPING <--+<------+<--------+<--------------+          |
-    //      |                 |       |         |               |          |
-    //      |                 |       |    +--> RUNNING --+     |          |
-    //      |                 |       |    |              |     |          |
-    //      +--> START_REQUESTED --> STARTING ----------->+--> STOP_REQUESTED
-    typedef enum
-    {
-        STATE_INIT           ,
-        STATE_RUNNING        ,
-        STATE_START_REQUESTED,
-        STATE_STARTING       ,
-        STATE_STOP_REQUESTED ,
-        STATE_STOPPING       ,
-        
-        STATE_QTY
-    }
-    State;
 
     virtual ~Thread();
 
@@ -86,7 +63,9 @@ protected:
     virtual void Run_Loop () = 0;
     virtual void Run_Start() = 0;
 
-    void State_Change(State aFrom, State aTo);
+    // ===== KmsLib::ThreadBase =============================================
+
+    virtual unsigned int Run();
 
     Adapter_Vector       mAdapters    ;
     Buffer_Data_Vector   mBuffers     ;
@@ -96,25 +75,10 @@ protected:
     cl_kernel            mKernel_CL   ;
     Processor_Internal * mProcessor   ;
 
-    // ===== Zone 0 =========================================================
-    State mState;
-
 private:
 
     void Run_Wait();
 
-    void Stop_Request_Zone0();
-    void Stop_Wait_Zone0   (TryToSolveHang aTryToSolveHang, void * aContext);
-
-    unsigned int Wait_Zone0(unsigned int aTimeout_ms);
-
     cl_program        mProgram ;
-    HANDLE            mThread  ;
-    DWORD             mThreadId;
-
-    // ===== Zone 0 =========================================================
-    // Threads  Apps
-    //          Worker
-    CRITICAL_SECTION mZone0;
 
 };

@@ -16,7 +16,7 @@
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
-#include <KmsLib/Windows/DriverHandle.h>
+#include <KmsLib/DriverHandle.h>
 
 // ===== Common =============================================================
 #include "../Common/Constants.h"
@@ -482,7 +482,7 @@ OpenNet::Status System_Internal::Stop()
 
         for (i = 0; i < mThreads.size(); i++)
         {
-            mThreads[i]->Stop_Request();
+            mThreads[i]->Stop();
         }
 
         for (i = 0; i < mThreads.size(); i++)
@@ -576,7 +576,7 @@ void System_Internal::FindAdapters()
     for (unsigned int lIndex = 0;; lIndex++)
     {
         // new ==> delete  See Adapter_Internal::~Adapter_Internal
-        KmsLib::Windows::DriverHandle * lHandle = new KmsLib::Windows::DriverHandle();
+        KmsLib::DriverHandle * lHandle = new KmsLib::DriverHandle();
         assert(NULL != lHandle);
 
         try
