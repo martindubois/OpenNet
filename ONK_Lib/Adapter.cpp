@@ -361,8 +361,6 @@ namespace OpenNetK
 
         ASSERT(OPEN_NET_BUFFER_QTY > mBufferCount);
 
-        unsigned int lSize_byte = sizeof(OpenNet_BufferHeader) + sizeof(OpenNet_PacketInfo) * aBuffer.mPacketQty;
-
         memset(mBuffers + mBufferCount, 0, sizeof(mBuffers[mBufferCount]));
 
         mBuffers[mBufferCount].mBuffer = aBuffer;

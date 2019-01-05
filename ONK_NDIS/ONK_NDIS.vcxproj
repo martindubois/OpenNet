@@ -65,6 +65,7 @@
       <AdditionalIncludeDirectories>../Includes;C:\Program Files (x86)\Windows Kits\10\Include\10.0.17134.0\km\netadaptercx\1.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SupportJustMyCode>false</SupportJustMyCode>
       <WppEnabled>true</WppEnabled>
+      <PreprocessorDefinitions>_KMS_WINDOWS_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Inf>
       <TimeStamp>0.0.6.0</TimeStamp>
@@ -80,6 +81,7 @@
       </AdditionalUsingDirectories>
       <AdditionalIncludeDirectories>../Includes;C:\Program Files (x86)\Windows Kits\10\Include\10.0.17134.0\km\netadaptercx\1.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WppEnabled>true</WppEnabled>
+      <PreprocessorDefinitions>_KMS_WINDOWS_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Inf>
       <TimeStamp>0.0.6.0</TimeStamp>

@@ -135,7 +135,7 @@ namespace OpenNet
 
         #endif
 
-        #ifdef _KMS_WINDOW_
+        #ifdef _KMS_WINDOWS_
 
             HANDLE lHandle;
 

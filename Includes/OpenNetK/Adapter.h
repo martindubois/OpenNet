@@ -2,7 +2,7 @@
 // Product / Produit  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \Copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Adapter.h
 /// \brief      OpenNetK::Adapter
 

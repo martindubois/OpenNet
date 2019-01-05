@@ -14,8 +14,10 @@
 #include <memory.h>
 #include <stdint.h>
 
-// ===== System =============================================================
-#include <sys/signal.h>
+#ifdef _KMS_LINUX_
+    // ===== System =========================================================
+    #include <sys/signal.h>
+#endif
 
 #ifdef _KMS_WINDOWS_
     // ===== Windows ========================================================
@@ -186,10 +188,6 @@ OpenNet::Status PacketGenerator_Internal::Display(FILE * aOut)
     fprintf(aOut, "  Adapter   = %s\n", (NULL == mAdapter) ? "Not set" : mAdapter->GetName());
     fprintf(aOut, "  State     = %s\n", STATE_NAMES[GetState()]);
     
-    #ifdef _KMS_WINDOWS_
-        fprintf(aOut, "  Thread ID = %u\n", mThreadId);
-    #endif
-
     return OpenNet::STATUS_OK;
 }
 
