@@ -60,6 +60,10 @@
 // Output  None
 #define IOCTL_STOP              CTL_CODE( 0x8000, 0x870, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
+// TODO  OpenNetK.IoCtl
+//       Normal - Ajouter PACKET_GENERATOR_START et PACKET_GENERATOR_STOP et
+//       implanter un packet generator directement dans ONK_Lib
+
 // Data types
 /////////////////////////////////////////////////////////////////////////////
 

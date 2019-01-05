@@ -73,6 +73,7 @@ namespace OpenNetK
         {
             Buffer mBuffer;
 
+            uint8_t              * mBase  ;
             OpenNet_BufferHeader * mHeader;
             volatile uint32_t    * mMarker;
             Packet               * mPackets;

@@ -64,20 +64,30 @@
       </AdditionalUsingDirectories>
       <AdditionalIncludeDirectories>../Includes;C:\Program Files (x86)\Windows Kits\10\Include\10.0.17134.0\km\netadaptercx\1.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SupportJustMyCode>false</SupportJustMyCode>
+      <WppEnabled>true</WppEnabled>
     </ClCompile>
     <Inf>
       <TimeStamp>0.0.6.0</TimeStamp>
     </Inf>
+    <Link>
+      <AdditionalDependencies>ONK_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
       <AdditionalIncludeDirectories>../Includes;C:\Program Files (x86)\Windows Kits\10\Include\10.0.17134.0\km\netadaptercx\1.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WppEnabled>true</WppEnabled>
     </ClCompile>
     <Inf>
       <TimeStamp>0.0.6.0</TimeStamp>
     </Inf>
+    <Link>
+      <AdditionalDependencies>ONK_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Inf Include="ONK_NDIS.inf" />
@@ -90,15 +100,26 @@
     <ClCompile Include="NdisAdapter.cpp" />
     <ClCompile Include="NdisDevice.cpp" />
     <ClCompile Include="Driver.cpp" />
+    <ClCompile Include="Queue.cpp" />
+    <ClCompile Include="Rx.cpp" />
+    <ClCompile Include="Tx.cpp" />
+    <ClCompile Include="VirtualHardware.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ControlDevice.h" />
     <ClInclude Include="NdisAdapter.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="NdisDevice.h" />
+    <ClInclude Include="Queue.h" />
+    <ClInclude Include="Rx.h" />
+    <ClInclude Include="Tx.h" />
+    <ClInclude Include="VirtualHardware.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Common\Version.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="kdfile_debug" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -38,8 +38,6 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-#define PACKET_STATE_TX_RUNNING   (4)
-
 #define TAG 'LKNO'
 
 // Static function declaration
@@ -133,18 +131,17 @@ namespace OpenNetK
     void Adapter::Buffer_SendPackets(BufferInfo * aBufferInfo)
     {
         ASSERT(NULL != aBufferInfo                                 );
+        ASSERT(NULL != aBufferInfo->mBase                          );
         ASSERT(   0 <  aBufferInfo->mPacketInfoOffset_byte         );
         ASSERT(NULL != aBufferInfo->mPackets                       );
         ASSERT(   0 <  aBufferInfo->mBuffer.mPacketQty             );
-        ASSERT(NULL != aBufferInfo->mHeader                        );
 
         ASSERT(ADAPTER_NO_QTY >  mAdapterNo);
         ASSERT(NULL           != mHardware );
 
         uint32_t  lAdapterBit = 1 << mAdapterNo;
-        uint8_t * lBase       = reinterpret_cast<uint8_t *>(aBufferInfo->mHeader);
 
-        OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<OpenNet_PacketInfo *>(lBase + aBufferInfo->mPacketInfoOffset_byte);
+        OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<OpenNet_PacketInfo *>(aBufferInfo->mBase + aBufferInfo->mPacketInfoOffset_byte);
 
         mHardware->Lock();
 
@@ -152,11 +149,9 @@ namespace OpenNetK
 
             for (unsigned int i = 0; i < aBufferInfo->mBuffer.mPacketQty; i++)
             {
-                ASSERT(0 < aBufferInfo->mPackets[i].mOffset_byte);
-
                 switch (aBufferInfo->mPackets[i].mState)
                 {
-                case OPEN_NET_PACKET_STATE_RX_COMPLETED:
+                case Packet::STATE_RX_COMPLETED:
                     // TODO  ONK_Lib.Adapter
                     //       Normal (Performance) - Use burst
 
@@ -169,14 +164,14 @@ namespace OpenNetK
                     //       Low (Feature)
                     ASSERT(0 != (OPEN_NET_PACKET_PROCESSED & aBufferInfo->mPackets[i].mSendTo));
 
-                    aBufferInfo->mPackets[i].mState = PACKET_STATE_TX_RUNNING;
+                    aBufferInfo->mPackets[i].mState = Packet::STATE_TX_RUNNING;
                     // no break;
 
-                case PACKET_STATE_TX_RUNNING:
+                case Packet::STATE_TX_RUNNING:
                     if (0 != (aBufferInfo->mPackets[i].mSendTo & lAdapterBit))
                     {
                         lPacketQty++;
-                        mHardware->Packet_Send_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].mOffset_byte, lPacketInfo[i].mSize_byte, &aBufferInfo->mTx_Counter); // Reading DirectGMA buffer !!!
+                        mHardware->Packet_Send_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].GetOffset(), aBufferInfo->mPackets[i].GetVirtualAddress(), lPacketInfo[i].mSize_byte, &aBufferInfo->mTx_Counter); // Reading DirectGMA buffer !!!
                     }
                     break;
 
@@ -319,6 +314,7 @@ namespace OpenNetK
 
         ASSERT(NULL != mHardware);
 
+        uint8_t                     * lBase            = reinterpret_cast<uint8_t                     *>(aHeader    );
         volatile OpenNet_PacketInfo * lPacketInfo      = reinterpret_cast<volatile OpenNet_PacketInfo *>(aHeader + 1);
         unsigned int                  lPacketQty       = aBuffer.mPacketQty;
         unsigned int                  lPacketSize_byte = mHardware->GetPacketSize();
@@ -337,13 +333,14 @@ namespace OpenNetK
 
         for (unsigned int i = 0; i < lPacketQty; i++)
         {
-            aPackets[i].mSendTo = OPEN_NET_PACKET_PROCESSED;
-            aPackets[i].mState = PACKET_STATE_TX_RUNNING;
+            uint32_t lOffset_byte;
 
-            SkipDangerousBoundary(aBuffer.mBuffer_PA, &lPacketOffset_byte, lPacketSize_byte, &aPackets[i].mOffset_byte);
+            SkipDangerousBoundary(aBuffer.mBuffer_PA, &lPacketOffset_byte, lPacketSize_byte, &lOffset_byte);
 
-            lPacketInfo[i].mOffset_byte       = aPackets[i].mOffset_byte; // Writing DirectGMA buffer !
-            lPacketInfo[i].mSendTo            = OPEN_NET_PACKET_PROCESSED;  // Writing DirectGMA buffer !
+            aPackets[i].Init(lOffset_byte, lBase + lOffset_byte);
+
+            lPacketInfo[i].mOffset_byte = lOffset_byte             ; // Writing DirectGMA buffer !
+            lPacketInfo[i].mSendTo      = OPEN_NET_PACKET_PROCESSED; // Writing DirectGMA buffer !
         }
 
         mStatistics[ADAPTER_STATS_BUFFER_INIT_HEADER] ++;
@@ -370,10 +367,10 @@ namespace OpenNetK
 
         lPA.QuadPart = aBuffer.mBuffer_PA;
 
-        unsigned int lSize_byte = sizeof(OpenNet_BufferHeader) + sizeof(OpenNet_PacketInfo) * aBuffer.mPacketQty;
+        mBuffers[mBufferCount].mBase = reinterpret_cast<uint8_t *>(MmMapIoSpace(lPA, aBuffer.mSize_byte, MmNonCached));
+        ASSERT(NULL != mBuffers[mBufferCount].mBase);
 
-        mBuffers[mBufferCount].mHeader = reinterpret_cast<OpenNet_BufferHeader *>(MmMapIoSpace(lPA, lSize_byte, MmNonCached));
-        ASSERT(NULL != mBuffers[mBufferCount].mHeader);
+        mBuffers[mBufferCount].mHeader = reinterpret_cast<OpenNet_BufferHeader *>(mBuffers[mBufferCount].mBase);
 
         lPA.QuadPart = aBuffer.mMarker_PA;
 
@@ -414,9 +411,7 @@ namespace OpenNetK
 
                 for (unsigned int i = 0; i < aBufferInfo->mBuffer.mPacketQty; i++)
                 {
-                    ASSERT(0 < aBufferInfo->mPackets[i].mOffset_byte);
-
-                    mHardware->Packet_Receive_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].mOffset_byte, aBufferInfo->mPackets + i, lPacketInfo + i, &aBufferInfo->mRx_Counter);
+                    mHardware->Packet_Receive_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].GetOffset(), aBufferInfo->mPackets + i, lPacketInfo + i, &aBufferInfo->mRx_Counter);
                 }
 
             mHardware->Unlock_AfterReceive(&aBufferInfo->mRx_Counter, aBufferInfo->mBuffer.mPacketQty);
@@ -735,6 +730,10 @@ namespace OpenNetK
         IoCtl_Result lResult;
 
         mZone0->Lock();
+
+            // TODO  ONK_Lib.Adapter
+            //       High - Refuse to start if the number of buffer may cause
+            //       a descriptor overrun.
 
             ASSERT(OPEN_NET_BUFFER_QTY >= mBufferCount);
 

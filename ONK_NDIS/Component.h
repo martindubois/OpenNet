@@ -23,5 +23,5 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #define DEBUG_ID DPFLTR_IHVNETWORK_ID
-#define PREFIX   "ONK_NDIS"
+#define PREFIX   "ONK_NDIS: "
 #define TAG      'NKNO'

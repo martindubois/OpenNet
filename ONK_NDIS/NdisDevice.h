@@ -8,4 +8,4 @@
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
-NTSTATUS NdisDevice_Create(PWDFDEVICE_INIT aDeviceInit);
+extern NTSTATUS NdisDevice_Create(WDFDEVICE_INIT * aDeviceInit);

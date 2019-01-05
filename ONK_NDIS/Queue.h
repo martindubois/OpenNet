@@ -1,7 +1,7 @@
 
 // Author   KMS - Martin Dubois, ing.
 // Product  OpenNet
-// File     ONK_NDIS/ControlDevice.h
+// File     ONK_NDIS/Queue.h
 
 #pragma once
 
@@ -10,5 +10,5 @@
 
 extern "C"
 {
-    extern void ControlDevice_Create(WDFDEVICE_INIT * aDeviceInit);
+    void Queue_Create(WDFDEVICE aDevice, OpenNetK::Adapter_WDF * aAdapter);
 }

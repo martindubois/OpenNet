@@ -232,16 +232,18 @@ namespace OpenNetK
         /// \cond en
         /// \brief  Add the packet to the send queue.
         /// \param  aLogicalAddress    The data
+        /// \param  aVirtualAddress    The data
         /// \param  aSize_byte         The data size
         /// \param  aCounter [-KO;RW-] The operation counter
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le paquet a la queue de transmission
         /// \param  aLogicalAddress    Les donnees
+        /// \param  aVirtualAddress    Les donnees
         /// \param  aSize_byte         La taille des donnees
         /// \param  aCounter [-KO;RW-] Le compteur d'operation
         /// \endcond
-        virtual void Packet_Send_NoLock(uint64_t aLogicalAddress, unsigned int aSize_byte, volatile long * aCounter = NULL) = 0;
+        virtual void Packet_Send_NoLock(uint64_t aLogicalAddress, const void * aVirtualAddress, unsigned int aSize_byte, volatile long * aCounter = NULL) = 0;
 
         /// \cond en
         /// \brief  Add the packet to the send queue.

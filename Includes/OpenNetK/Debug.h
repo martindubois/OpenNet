@@ -15,5 +15,6 @@
 #define DEBUG_FUNCTION     (3)
 #define DEBUG_METHOD       (4)
 #define DEBUG_STATE_CHANGE (5)
+#define DEBUG_WARNING      (6)
 
 #define DEBUG_EOL "\n"

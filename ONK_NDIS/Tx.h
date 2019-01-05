@@ -1,7 +1,8 @@
+#pragma once
 
 // Author   KMS - Martin Dubois, ing.
 // Product  OpenNet
-// File     ONK_NDIS/NdisAdapter.h
+// File     ONK_NDIS/Tx.h
 
 #pragma once
 
@@ -14,4 +15,4 @@
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
-extern NTSTATUS NdisAdapter_Create(WDFDEVICE aDevice, void ** aAdapter, VirtualHardware * aHardware);
+extern  void Tx_Create(NETTXQUEUE_INIT * aQueueInit, VirtualHardware * aHardware);
