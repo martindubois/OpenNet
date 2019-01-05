@@ -1,21 +1,14 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_Lib/Adapter.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_Lib/Adapter.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== WDM ================================================================
-
-#define INITGUID
-
-#include <ntddk.h>
-
-// ===== WDF ================================================================
-#include <wdf.h>
-
 // ===== Includes ===========================================================
+#include <OpenNetK/OS.h>
 #include <OpenNetK/StdInt.h>
 
 #include <OpenNetK/Constants.h>
@@ -116,12 +109,17 @@ namespace OpenNetK
         mAdapters    = NULL;
         mAdapterNo   = ADAPTER_NO_UNKNOWN;
         mBufferCount =    0;
-        mEvent       = NULL;
         mHardware    = NULL;
         mSystemId    =    0;
         mZone0       = aZone0;
 
-        KeQuerySystemTimePrecise(&mStatistics_Start);
+        #ifdef _KMS_WINDOWS_
+
+            mEvent = NULL;
+
+            KeQuerySystemTimePrecise(&mStatistics_Start);
+
+        #endif
     }
 
     // aBuffer [-K-;RW-]
@@ -230,7 +228,7 @@ namespace OpenNetK
                     {
                         // TODO  ONK_Lib.Adapter.ErrorHandling
                         //       High - Add statistic counter
-                        DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %u Corrupted ==> Released" DEBUG_EOL, mAdapterNo, i);
+                        // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %u Corrupted ==> Released" DEBUG_EOL, mAdapterNo, i);
                         mBufferCount--;
                     }
                 }
@@ -249,7 +247,6 @@ namespace OpenNetK
     void Adapter::Disconnect()
     {
         ASSERT(NULL != mAdapters);
-        ASSERT(NULL != mEvent   );
         ASSERT(   0 != mSystemId);
         ASSERT(NULL != mZone0   );
 
@@ -264,8 +261,15 @@ namespace OpenNetK
 
         mAdapters  = NULL              ;
         mAdapterNo = ADAPTER_NO_UNKNOWN;
-        mEvent     = NULL              ;
         mSystemId  =                  0;
+
+        #ifdef _KMS_WINDOWS_
+
+            ASSERT( NULL != mEvent );
+
+            mEvent = NULL;
+
+        #endif
     }
 
     // aIn  [---;R--]
@@ -360,25 +364,30 @@ namespace OpenNetK
 
         ASSERT(OPEN_NET_BUFFER_QTY > mBufferCount);
 
+        unsigned int lSize_byte = sizeof(OpenNet_BufferHeader) + sizeof(OpenNet_PacketInfo) * aBuffer.mPacketQty;
+
         memset(mBuffers + mBufferCount, 0, sizeof(mBuffers[mBufferCount]));
 
         mBuffers[mBufferCount].mBuffer = aBuffer;
         mBuffers[mBufferCount].mPacketInfoOffset_byte = sizeof(OpenNet_BufferHeader);
-        mBuffers[mBufferCount].mPackets               = reinterpret_cast<Packet *>(ExAllocatePoolWithTag(NonPagedPool, sizeof(Packet) * aBuffer.mPacketQty, TAG));
 
-        PHYSICAL_ADDRESS lPA;
+        #ifdef _KMS_WINDOWS_
 
-        lPA.QuadPart = aBuffer.mBuffer_PA;
+            mBuffers[mBufferCount].mPackets = reinterpret_cast<Packet *>(ExAllocatePoolWithTag(NonPagedPool, sizeof(Packet) * aBuffer.mPacketQty, TAG));
 
-        unsigned int lSize_byte = sizeof(OpenNet_BufferHeader) + sizeof(OpenNet_PacketInfo) * aBuffer.mPacketQty;
+            PHYSICAL_ADDRESS lPA;
 
-        mBuffers[mBufferCount].mHeader = reinterpret_cast<OpenNet_BufferHeader *>(MmMapIoSpace(lPA, lSize_byte, MmNonCached));
-        ASSERT(NULL != mBuffers[mBufferCount].mHeader);
+            lPA.QuadPart = aBuffer.mBuffer_PA;
 
-        lPA.QuadPart = aBuffer.mMarker_PA;
+            mBuffers[mBufferCount].mHeader = reinterpret_cast<OpenNet_BufferHeader *>(MmMapIoSpace(lPA, lSize_byte, MmNonCached));
+            ASSERT(NULL != mBuffers[mBufferCount].mHeader);
 
-        mBuffers[mBufferCount].mMarker = reinterpret_cast<uint32_t *>(MmMapIoSpace(lPA, PAGE_SIZE, MmNonCached));
-        ASSERT(NULL != mBuffers[mBufferCount].mMarker);
+            lPA.QuadPart = aBuffer.mMarker_PA;
+
+            mBuffers[mBufferCount].mMarker = reinterpret_cast<uint32_t *>(MmMapIoSpace(lPA, PAGE_SIZE, MmNonCached));
+            ASSERT(NULL != mBuffers[mBufferCount].mMarker);
+
+        #endif
 
         Buffer_InitHeader_Zone0(mBuffers[mBufferCount].mHeader, aBuffer, mBuffers[mBufferCount].mPackets);
         
@@ -528,7 +537,7 @@ namespace OpenNetK
 
         if (aBufferInfo->mFlags.mStopRequested)
         {
-            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_RUNNING ==> STOPPED" DEBUG_EOL, mAdapterNo, aBufferInfo);
+            // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p PX_RUNNING ==> STOPPED" DEBUG_EOL, mAdapterNo, aBufferInfo);
             aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED; // Writing DirectGMA buffer !
         }
     }
@@ -546,7 +555,7 @@ namespace OpenNetK
 
         if (0 == aBufferInfo->mRx_Counter)
         {
-            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p RX_RUNNING ==> PX_RUNNING" DEBUG_EOL, mAdapterNo, aBufferInfo);
+            // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p RX_RUNNING ==> PX_RUNNING" DEBUG_EOL, mAdapterNo, aBufferInfo);
             aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_RUNNING;  // Writing DirectGMA buffer !
             Buffer_WriteMarker_Zone0(aBufferInfo);
         }
@@ -560,13 +569,15 @@ namespace OpenNetK
 
         if (aIndex == (mBufferCount - 1))
         {
-            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %u STOPPED ==> Released" DEBUG_EOL, mAdapterNo, aIndex);
+            // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %u STOPPED ==> Released" DEBUG_EOL, mAdapterNo, aIndex);
 
             mBufferCount--;
 
             ASSERT(NULL != mBuffers[mBufferCount].mPackets);
 
-            ExFreePoolWithTag(mBuffers[mBufferCount].mPackets, TAG);
+            #ifdef _KMS_WINDOWS_
+                ExFreePoolWithTag(mBuffers[mBufferCount].mPackets, TAG);
+            #endif
         }
     }
 
@@ -580,7 +591,7 @@ namespace OpenNetK
         {
             if (aBufferInfo->mFlags.mStopRequested)
             {
-                DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_RUNNING ==> STOPPED" DEBUG_EOL, mAdapterNo, aBufferInfo);
+                // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_RUNNING ==> STOPPED" DEBUG_EOL, mAdapterNo, aBufferInfo);
                 aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED; // Writing DirectGMA buffer !
 
                 Buffer_WriteMarker_Zone0(aBufferInfo);
@@ -590,14 +601,14 @@ namespace OpenNetK
                 // Here, we use a temporary state because Buffer_Receivd_Zone
                 // release the gate to avoid deadlock with the Hardware's
                 // gates.
-                DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_RUNNING ==> RX_PROGRAMMING" DEBUG_EOL, mAdapterNo, aBufferInfo);
+                // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p TX_RUNNING ==> RX_PROGRAMMING" DEBUG_EOL, mAdapterNo, aBufferInfo);
                 aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RX_PROGRAMMING; // Writing DirectGMA buffer !
 
                 Buffer_Receive_Zone0(aBufferInfo);
 
                 ASSERT(OPEN_NET_BUFFER_STATE_RX_PROGRAMMING == aBufferInfo->mHeader->mBufferState); // Reading DirectGMA buffer !!!
 
-                DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p RX_PROGRAMMING ==> RX_RUNNING" DEBUG_EOL, mAdapterNo, aBufferInfo);
+                // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %p RX_PROGRAMMING ==> RX_RUNNING" DEBUG_EOL, mAdapterNo, aBufferInfo);
                 aBufferInfo->mHeader->mBufferState = OPEN_NET_BUFFER_STATE_RX_RUNNING; // Writing DirectGMA buffer !
             }
         }
@@ -639,7 +650,6 @@ namespace OpenNetK
 
         ASSERT(NULL               == mAdapters );
         ASSERT(ADAPTER_NO_UNKNOWN == mAdapterNo);
-        ASSERT(NULL               == mEvent    );
         ASSERT(                 0 == mSystemId );
 
         mStatistics[ADAPTER_STATS_IOCTL_CONNECT] ++;
@@ -654,9 +664,16 @@ namespace OpenNetK
             return IOCTL_RESULT_INVALID_SYSTEM_ID;
         }
 
-        mEvent    = reinterpret_cast<KEVENT   *>(lIn->mEvent       );
         mAdapters = reinterpret_cast<Adapter **>(lIn->mSharedMemory);
         mSystemId =                              lIn->mSystemId     ;
+
+        #ifdef _KMS_WINDOWS_
+
+            ASSERT( NULL == mEvent );
+
+            mEvent = reinterpret_cast<KEVENT *>( lIn->mEvent );
+
+        #endif
 
         for (unsigned int i = 0; i < ADAPTER_NO_QTY; i++)
         {
@@ -789,11 +806,15 @@ namespace OpenNetK
 
         bool lReset = lIn->mFlags.mReset;
 
-        LARGE_INTEGER lNow;
+        #ifdef _KMS_WINDOWS_
 
-        KeQuerySystemTimePrecise(&lNow);
+            LARGE_INTEGER lNow;
 
-        mStatistics[ADAPTER_STATS_RUNNING_TIME_ms] = static_cast<unsigned int>((lNow.QuadPart - mStatistics_Start.QuadPart) / 10000);
+            KeQuerySystemTimePrecise(&lNow);
+
+            mStatistics[ADAPTER_STATS_RUNNING_TIME_ms] = static_cast<unsigned int>((lNow.QuadPart - mStatistics_Start.QuadPart) / 10000);
+
+        #endif
 
         if (sizeof(mStatistics) <= lOutSize_byte)
         {
@@ -815,7 +836,9 @@ namespace OpenNetK
 
         if (lReset)
         {
-            mStatistics_Start = lNow;
+            #ifdef _KMS_WINDOWS_
+                mStatistics_Start = lNow;
+            #endif
 
             memset(&mStatistics, 0, ADAPTER_STATS_RESET_QTY * sizeof(uint32_t));
 
@@ -833,7 +856,9 @@ namespace OpenNetK
     {
         ASSERT(NULL != mHardware);
 
-        KeQuerySystemTimePrecise(&mStatistics_Start);
+        #ifdef _KMS_WINDOWS_
+            KeQuerySystemTimePrecise(&mStatistics_Start);
+        #endif
 
         memset(&mStatistics, 0, sizeof(mStatistics));
 

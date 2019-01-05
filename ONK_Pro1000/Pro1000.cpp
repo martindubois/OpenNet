@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_Pro1000/Pro1000.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_Pro1000/Pro1000.cpp
 
 // REQUIREMENT  ONK_X.InterruptRateLimitation
 //              The adapter driver limit the interruption rate.
@@ -14,7 +15,6 @@
 // ===== Includes ===========================================================
 #include <OpenNetK/Constants.h>
 #include <OpenNetK/Hardware_Statistics.h>
-#include <OpenNetK/Interface.h>
 #include <OpenNetK/SpinLock.h>
 
 // ===== Common =============================================================
@@ -33,7 +33,7 @@
 
 Pro1000::Pro1000()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_CONSTRUCTOR, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_CONSTRUCTOR, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     mConfig.mPacketSize_byte = PACKET_SIZE_byte;
 
@@ -59,7 +59,7 @@ Pro1000::Pro1000()
 
 void Pro1000::GetState(OpenNetK::Adapter_State * aState)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
     ASSERT(NULL != aState);
 
@@ -99,7 +99,7 @@ void Pro1000::GetState(OpenNetK::Adapter_State * aState)
 
 void Pro1000::ResetMemory()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     Hardware::ResetMemory();
 
@@ -112,7 +112,7 @@ void Pro1000::ResetMemory()
 
 void Pro1000::SetCommonBuffer(uint64_t aLogical, void * aVirtual)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
 
     ASSERT(NULL != aVirtual);
 
@@ -158,7 +158,7 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, void * aVirtual)
 //             Memory 0 too small
 bool Pro1000::SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize_byte)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( %u, , %u bytes )" DEBUG_EOL, aIndex, aSize_byte);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( %u, , %u bytes )" DEBUG_EOL, aIndex, aSize_byte);
 
     ASSERT(NULL != aVirtual  );
     ASSERT(   0 <  aSize_byte);
@@ -195,7 +195,7 @@ bool Pro1000::SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize
 
 bool Pro1000::D0_Entry()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
     ASSERT(NULL != mBAR1 );
     ASSERT(NULL != mZone0);
@@ -248,7 +248,7 @@ bool Pro1000::D0_Entry()
 
 bool Pro1000::D0_Exit()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
     Interrupt_Disable();
 
@@ -257,7 +257,7 @@ bool Pro1000::D0_Exit()
 
 void Pro1000::Interrupt_Disable()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     ASSERT(NULL != mZone0);
 
@@ -272,7 +272,7 @@ void Pro1000::Interrupt_Disable()
 
 void Pro1000::Interrupt_Enable()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     ASSERT(NULL != mBAR1 );
     ASSERT(NULL != mZone0);
@@ -442,7 +442,7 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigne
 
 unsigned int Pro1000::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
     Statistics_Update();
 
@@ -451,7 +451,7 @@ unsigned int Pro1000::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte
 
 void Pro1000::Statistics_Reset()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     Statistics_Update();
 
@@ -470,7 +470,7 @@ void Pro1000::Interrupt_Disable_Zone0()
 
 void Pro1000::Reset_Zone0()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     ASSERT(NULL != mBAR1);
 
@@ -490,7 +490,7 @@ void Pro1000::Reset_Zone0()
 // Thread  Init
 void Pro1000::Rx_Config_Zone0()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     ASSERT(NULL != mBAR1                   );
     ASSERT(   0 <  mConfig.mPacketSize_byte);
@@ -563,7 +563,9 @@ void Pro1000::Rx_Process_Zone0()
         mRx_PacketInfo[mRx_Out]->mSize_byte       = mRx_Virtual[mRx_Out].mSize_byte   ; // Writing DirectGMA buffer !
         mRx_PacketInfo[mRx_Out]->mSendTo          =                                  0; // Writing DirectGMA buffer !
 
-        InterlockedDecrement(mRx_Counter[mRx_Out]);
+        #ifdef _KMS_WINDOWS_
+            InterlockedDecrement(mRx_Counter[mRx_Out]);
+        #endif
 
         mRx_Out = (mRx_Out + 1) % RX_DESCRIPTOR_QTY;
 
@@ -573,7 +575,7 @@ void Pro1000::Rx_Process_Zone0()
 
 void Pro1000::Statistics_Update()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     ASSERT(NULL != mBAR1);
 
@@ -605,7 +607,7 @@ void Pro1000::Statistics_Update()
 // Thread  Init
 void Pro1000::Tx_Config_Zone0()
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
 
     ASSERT(NULL != mBAR1);
 
@@ -643,7 +645,9 @@ void Pro1000::Tx_Process_Zone0()
 
         if (NULL != mTx_Counter[mTx_Out])
         {
-            InterlockedDecrement(mTx_Counter[mTx_Out]);
+            #ifdef _KMS_WINDOWS_
+                InterlockedDecrement(mTx_Counter[mTx_Out]);
+            #endif
         }
 
         mTx_Out = (mTx_Out + 1) % TX_DESCRIPTOR_QTY;

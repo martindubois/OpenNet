@@ -1,21 +1,14 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_Lib/SpinLock.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_Lib/SpinLock.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== WDM ================================================================
-
-#define INITGUID
-
-#include <ntddk.h>
-
-// ===== WDF ================================================================
-#include <wdf.h>
-
 // ===== Includes ===========================================================
+#include <OpenNetK/OS.h>
 #include <OpenNetK/StdInt.h>
 
 #include <OpenNetK/SpinLock.h>

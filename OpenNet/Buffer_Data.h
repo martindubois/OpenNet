@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Buffer_Data.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/Buffer_Data.h
 
 #pragma once
 
@@ -11,8 +12,10 @@
 // ===== C++ ================================================================
 #include <vector>
 
-// ===== OpenCL =============================================================
-#include <CL/opencl.h>
+#ifdef _KMS_WINDOWS_
+    // ===== OpenCL =========================================================
+    #include <CL/opencl.h>
+#endif
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
@@ -22,7 +25,9 @@ class Buffer_Data
 
 public:
 
-    Buffer_Data(cl_mem aMem, unsigned int aPacketQty);
+    #ifdef _KMS_WINDOWS_
+        Buffer_Data(cl_mem aMem, unsigned int aPacketQty);
+    #endif
 
     ~Buffer_Data();
 
@@ -31,8 +36,10 @@ public:
 
     void ResetMarkerValue();
 
-    cl_event mEvent;
-    cl_mem   mMem  ;
+    #ifdef _KMS_WINDOWS_
+        cl_event mEvent;
+        cl_mem   mMem  ;
+    #endif
 
 private:
 

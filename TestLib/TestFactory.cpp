@@ -1,10 +1,13 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     TestLib/TestFactory.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       TestLib/TestFactory.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -172,7 +175,7 @@ namespace TestLib
     {
         assert(Test::MODE_QTY > aMode);
 
-        assert(Test::MODE_QTY > mConfig.mCode);
+        assert(Test::MODE_QTY > mConfig.mMode);
 
         mConfig.mMode = aMode;
     }

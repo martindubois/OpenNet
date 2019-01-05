@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Adapter_Internal.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/Adapter_Internal.h
 
 #pragma once
 
@@ -10,9 +11,6 @@
 
 // ===== C++ ================================================================
 #include <vector>
-
-// ===== Windows ============================================================
-#include <Windows.h>
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/DebugLog.h>
@@ -52,7 +50,10 @@ public:
 
     void SetPacketSize(unsigned int aSize_byte);
 
-    void Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers);
+    #ifdef _KMS_WINDOWS_
+        void Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers);
+    #endif
+    
     void Buffers_Release ();
 
     void Connect(IoCtl_Connect_In * aConnect);
@@ -89,7 +90,9 @@ public:
 
 private:
 
-    Buffer_Data * Buffer_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel);
+    #ifdef _KMS_WINDOWS_
+        Buffer_Data * Buffer_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel);
+    #endif // _KMS_WINDOWS_
 
     void Config_Update();
 
@@ -104,9 +107,12 @@ private:
     Info                            mInfo        ;
     char                            mName   [ 64];
     Processor_Internal            * mProcessor   ;
-    cl_program                      mProgram     ;
     OpenNet::SourceCode           * mSourceCode  ;
     unsigned int                    mStatistics[OpenNet::ADAPTER_STATS_QTY];
+    
+    #ifdef _KMS_WINDOWS_
+        cl_program                      mProgram;
+    #endif // _KMS_WINDOWS_
 
 };
 

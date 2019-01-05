@@ -1,17 +1,22 @@
 
 // Author   KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
 // Product  OpenNet
 // File     OpenNet/Processor_Internal.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+#include <KmsBase.h>
+
 // ===== C ==================================================================
 #include <assert.h>
 #include <stdint.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
@@ -27,9 +32,12 @@
 
 // ===== OpenNet ============================================================
 #include "EthernetAddress.h"
-#include "OCLW.h"
 #include "Thread_Functions.h"
 #include "Thread_Kernel.h"
+
+#ifdef _KMS_WINDOWS_
+    #include "OCLW.h"
+#endif
 
 #include "Adapter_Internal.h"
 
@@ -59,8 +67,10 @@ Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::Debug
     , mDebugLog   (aDebugLog)
     , mHandle     (aHandle)
     , mProcessor  (NULL)
-    , mProgram    (NULL)
     , mSourceCode (NULL)
+    #ifdef _KMS_WINDOWS_
+        , mProgram(NULL)
+    #endif
 {
     assert(NULL != aHandle  );
     assert(NULL != aDebugLog);
@@ -103,10 +113,12 @@ Adapter_Internal::~Adapter_Internal()
 
     try
     {
-        if (NULL != mProgram)
-        {
-            OCLW_ReleaseProgram(mProgram);
-        }
+        #ifdef _KMS_WINDOWS_
+            if (NULL != mProgram)
+            {
+                OCLW_ReleaseProgram(mProgram);
+            }
+        #endif
     }
     catch (...)
     {
@@ -170,28 +182,6 @@ void Adapter_Internal::SetPacketSize(unsigned int aSize_byte)
     }
 }
 
-// aCommandQueue [---;RW-]
-// aKernel       [---;R--]
-// aBuffers      [---;RW-] The caller is responsible to release the
-//                         Buffer_Data instances added to this queue when
-//                         they are no longer needed.
-//
-// Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Allocate
-// Thread     Apps
-void Adapter_Internal::Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers)
-{
-    assert(NULL != aCommandQueue);
-    assert(NULL != aKernel      );
-    assert(NULL != aBuffers     );
-
-    assert(0 < mConfig.mBufferQty);
-
-    for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
-    {
-        aBuffers->push_back(Buffer_Allocate(aCommandQueue, aKernel));
-    }
-}
-
 // Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Release
 void Adapter_Internal::Buffers_Release()
 {
@@ -212,27 +202,37 @@ void Adapter_Internal::Connect(IoCtl_Connect_In * aConnect)
     assert(NULL != mDebugLog);
     assert(NULL != mHandle  );
 
-    HANDLE lEvent = reinterpret_cast<HANDLE>(aConnect->mEvent);
-    assert(NULL != lEvent);
+    #ifdef _KMS_WINDOWS_
 
-    DWORD lRet = WaitForSingleObject(lEvent, 60000);
-    if (WAIT_OBJECT_0 != lRet)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_TIMEOUT,
-            "WaitForSingleObject( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet);
-    }
+        HANDLE lEvent = reinterpret_cast<HANDLE>(aConnect->mEvent);
+        assert(NULL != lEvent);
+
+        DWORD lRet = WaitForSingleObject(lEvent, 60000);
+        if (WAIT_OBJECT_0 != lRet)
+        {
+            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+            throw new KmsLib::Exception(KmsLib::Exception::CODE_TIMEOUT,
+                "WaitForSingleObject( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet);
+        }
+
+    #endif
 
     try
     {
         mHandle->Control(IOCTL_CONNECT, aConnect, sizeof(IoCtl_Connect_In), NULL, 0);
 
-        SetEvent(lEvent);
+        #ifdef _KMS_WINDOWS_
+            SetEvent(lEvent);
+        #endif
     }
     catch (...)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        SetEvent(lEvent);
+
+        #ifdef _KMS_WINDOWS_
+            SetEvent(lEvent);
+        #endif
+
         throw;
     }
 }
@@ -290,9 +290,13 @@ Thread * Adapter_Internal::Thread_Prepare()
         OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
         if (NULL != lKernel)
         {
-			assert(NULL != mProgram);
+            #ifdef _KMS_WINDOWS_
 
-			return new Thread_Kernel(mProcessor, this, lKernel, mProgram, mDebugLog);
+                assert(NULL != mProgram);
+
+                return new Thread_Kernel(mProcessor, this, lKernel, mProgram, mDebugLog);
+
+            #endif
         }
 
         OpenNet::Function * lFunction = dynamic_cast<OpenNet::Function *>(mSourceCode);
@@ -306,6 +310,32 @@ Thread * Adapter_Internal::Thread_Prepare()
 
     return NULL;
 }
+
+#ifdef _KMS_WINDOWS_
+
+    // aCommandQueue [---;RW-]
+    // aKernel       [---;R--]
+    // aBuffers      [---;RW-] The caller is responsible to release the
+    //                         Buffer_Data instances added to this queue when
+    //                         they are no longer needed.
+    //
+    // Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Allocate
+    // Thread     Apps
+    void Adapter_Internal::Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers)
+    {
+        assert(NULL != aCommandQueue);
+        assert(NULL != aKernel      );
+        assert(NULL != aBuffers     );
+
+        assert(0 < mConfig.mBufferQty);
+
+        for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
+        {
+            aBuffers->push_back(Buffer_Allocate(aCommandQueue, aKernel));
+        }
+    }
+
+#endif
 
 // ===== OpenNet::Adapter ===================================================
 
@@ -510,22 +540,26 @@ OpenNet::Status Adapter_Internal::ResetInputFilter()
 
     OpenNet::Status lResult = OpenNet::STATUS_OK;
 
-    if (NULL != mProgram)
-    {
-        try
-        {
-            OCLW_ReleaseProgram(mProgram);
-        }
-        catch (KmsLib::Exception * eE)
-        {
-            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-            mDebugLog->Log(eE);
+    #ifdef _KMS_WINDOWS_
 
-            lResult = ExceptionToStatus(eE);
+        if (NULL != mProgram)
+        {
+            try
+            {
+                OCLW_ReleaseProgram(mProgram);
+            }
+            catch (KmsLib::Exception * eE)
+            {
+                mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+                mDebugLog->Log(eE);
+
+                lResult = ExceptionToStatus(eE);
+            }
+
+            mProgram = NULL;
         }
 
-        mProgram = NULL;
-    }
+    #endif
 
     return lResult;
 }
@@ -622,8 +656,6 @@ OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::SourceCode * aSourceCo
         return OpenNet::STATUS_FILTER_ALREADY_SET;
     }
 
-    assert(NULL == mProgram);
-
     if (NULL == mProcessor)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
@@ -636,7 +668,13 @@ OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::SourceCode * aSourceCo
 
         if (NULL != lKernel)
         {
-            mProgram = mProcessor->Program_Create(lKernel);
+            #ifdef _KMS_WINDOWS_
+
+                assert(NULL == mProgram);
+
+                mProgram = mProcessor->Program_Create(lKernel);
+
+            #endif
         }
     }
     catch (KmsLib::Exception * eE)
@@ -731,37 +769,6 @@ OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int a
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
-// aCommandQueue [---;RW-]
-// aKernel       [---;R--]
-//
-// Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
-//                                 See Process_Internal::Buffer_Allocate
-// Threads    Apps
-Buffer_Data * Adapter_Internal::Buffer_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel)
-{
-    assert(NULL != aCommandQueue);
-    assert(NULL != aKernel      );
-
-    assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
-    assert(NULL                != mDebugLog   );
-    assert(NULL                != mProcessor  );
-
-    if (OPEN_NET_BUFFER_QTY <= mBufferCount)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_NOT_ENOUGH_MEMORY,
-            "Too many buffer", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
-    }
-
-    Buffer_Data * lResult = mProcessor->Buffer_Allocate(mConfig.mPacketSize_byte, aCommandQueue, aKernel, mBuffers + mBufferCount);
-
-    mBufferCount++;
-
-    mStatistics[OpenNet::ADAPTER_STATS_BUFFER_ALLOCATED] ++;
-
-    return lResult;
-}
-
 void Adapter_Internal::Config_Update()
 {
     assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte      );
@@ -802,6 +809,41 @@ OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, 
 
     return OpenNet::STATUS_OK;
 }
+
+#ifdef _KMS_WINDOWS_
+
+    // aCommandQueue [---;RW-]
+    // aKernel       [---;R--]
+    //
+    // Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
+    //                                 See Process_Internal::Buffer_Allocate
+    // Threads    Apps
+    Buffer_Data * Adapter_Internal::Buffer_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel)
+    {
+        assert(NULL != aCommandQueue);
+        assert(NULL != aKernel      );
+
+        assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
+        assert(NULL                != mDebugLog   );
+        assert(NULL                != mProcessor  );
+
+        if (OPEN_NET_BUFFER_QTY <= mBufferCount)
+        {
+            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+            throw new KmsLib::Exception(KmsLib::Exception::CODE_NOT_ENOUGH_MEMORY,
+                "Too many buffer", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
+        }
+
+        Buffer_Data * lResult = mProcessor->Buffer_Allocate(mConfig.mPacketSize_byte, aCommandQueue, aKernel, mBuffers + mBufferCount);
+
+        mBufferCount++;
+
+        mStatistics[OpenNet::ADAPTER_STATS_BUFFER_ALLOCATED] ++;
+
+        return lResult;
+    }
+
+#endif
 
 // Static functions
 /////////////////////////////////////////////////////////////////////////////

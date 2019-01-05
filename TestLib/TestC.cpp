@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     TestLib/TestC.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       TestLib/TestC.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -83,7 +84,7 @@ unsigned int TestC::Init()
         mAdapters[1] = GetSystem()->Adapter_Get(lInfo.mEthernetAddress.mAddress, MASK_1, MASK_E);
         if (NULL == mAdapters[1])
         {
-            printf(__FUNCTION__ " - Not enough adapter\n");
+            printf("%s - Not enough adapter\n", __FUNCTION__);
             lResult = __LINE__;
         }
         else

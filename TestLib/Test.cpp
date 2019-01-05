@@ -1,18 +1,26 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     TestLib/Test.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       TestLib/Test.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+#include <KmsBase.h>
+
 // ===== C ==================================================================
 #include <assert.h>
-#include <io.h>
 #include <string.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_WINDOWS_
+#include <io.h>
+#endif
+
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
 
 // ===== Includes ===========================================================
 #include <OpenNetK/Constants.h>
@@ -335,7 +343,7 @@ namespace TestLib
     void Test::SetConfig(const Config & aConfig)
     {
         assert(CODE_QTY > aConfig.mCode);
-        assert(MODE_QTY > aConfig.mCode);
+        assert(MODE_QTY > aConfig.mMode);
 
         assert(CODE_DEFAULT != mConfig.mCode );
         assert(CODE_QTY     >  mConfig.mCode );
@@ -905,7 +913,14 @@ namespace TestLib
             return __LINE__;
         }
 
-        Sleep(100);
+        #ifdef _KMS_LINUX_
+            int lRet = usleep(100000);
+            assert(0 == lRet);
+        #endif
+        
+        #ifdef _KMS_WINDOWS_
+            Sleep(100);
+        #endif
 
         for (unsigned int i = 0; i < mGeneratorCount; i++)
         {
@@ -915,7 +930,14 @@ namespace TestLib
             assert(OpenNet::STATUS_OK == lStatus);
         }
 
-        Sleep(100);
+        #ifdef _KMS_LINUX_
+            lRet = usleep(100000);
+            assert(0 == lRet);
+        #endif
+        
+        #ifdef _KMS_WINDOWS_
+            Sleep(100);
+        #endif
 
         ResetStatistics();
 
@@ -971,7 +993,13 @@ namespace TestLib
             }
         }
 
-        mPriorityClass = GetPriorityClass(GetCurrentProcess());
+        #ifdef _KMS_LINUX_
+            mPriorityClass = 0;
+        #endif
+        
+        #ifdef _KMS_WINDOWS_
+            mPriorityClass = GetPriorityClass(GetCurrentProcess());
+        #endif
 
         lStatus = mSystem->Stop();
         assert(OpenNet::STATUS_OK == lStatus);
@@ -1136,7 +1164,14 @@ namespace TestLib
         unsigned int lResult = Start();
         if (0 == lResult)
         {
-            Sleep(1000);
+            #ifdef _KMS_LINUX_
+                int lRet = sleep(1);
+                assert(0 == lRet);
+            #endif
+            
+            #ifdef _KMS_WINDOWS_
+                Sleep(1000);
+            #endif
 
             lResult = Stop();
         }
@@ -1439,12 +1474,14 @@ namespace TestLib
 
         switch (mPriorityClass)
         {
-        case ABOVE_NORMAL_PRIORITY_CLASS: strcpy_s(lPriorityClass, "ABOVE_NORMAL"); break;
-        case BELOW_NORMAL_PRIORITY_CLASS: strcpy_s(lPriorityClass, "BELOW_NORMAL"); break;
-        case HIGH_PRIORITY_CLASS        : strcpy_s(lPriorityClass, "HIGH"        ); break;
-        case IDLE_PRIORITY_CLASS        : strcpy_s(lPriorityClass, "IDLE"        ); break;
-        case NORMAL_PRIORITY_CLASS      : strcpy_s(lPriorityClass, "NORMAL"      ); break;
-        case REALTIME_PRIORITY_CLASS    : strcpy_s(lPriorityClass, "REALTIME"    ); break;
+            #ifdef _KMS_WINDOWS_
+                case ABOVE_NORMAL_PRIORITY_CLASS: strcpy_s(lPriorityClass, "ABOVE_NORMAL"); break;
+                case BELOW_NORMAL_PRIORITY_CLASS: strcpy_s(lPriorityClass, "BELOW_NORMAL"); break;
+                case HIGH_PRIORITY_CLASS        : strcpy_s(lPriorityClass, "HIGH"        ); break;
+                case IDLE_PRIORITY_CLASS        : strcpy_s(lPriorityClass, "IDLE"        ); break;
+                case NORMAL_PRIORITY_CLASS      : strcpy_s(lPriorityClass, "NORMAL"      ); break;
+                case REALTIME_PRIORITY_CLASS    : strcpy_s(lPriorityClass, "REALTIME"    ); break;
+            #endif
 
         default: sprintf_s(lPriorityClass, "0x%08x", mPriorityClass);
         }

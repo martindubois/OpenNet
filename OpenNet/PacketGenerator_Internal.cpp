@@ -1,18 +1,26 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/PacketGenerator_Internal.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/PacketGenerator_Internal.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
 #include <memory.h>
 #include <stdint.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+// ===== System =============================================================
+#include <sys/signal.h>
+
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
 
 // ===== Includes ===========================================================
 #include <OpenNet/Adapter.h>
@@ -43,6 +51,21 @@ static const char * STATE_NAMES[] =
     "STOP_REQUESTED" ,
     "STOPPING",
 };
+
+// Static function declaration
+/////////////////////////////////////////////////////////////////////////////
+
+static void ReadPerfCounter(PacketGenerator_Internal::PerfCounter * aOut);
+
+// ===== Entry point ========================================================
+
+#ifdef _KMS_LINUX_
+    static void Run(void * aParameter);
+#endif
+
+#ifdef _KMS_WINDOWS_
+    static DWORD WINAPI Run(LPVOID aParameter);
+#endif
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
@@ -162,6 +185,10 @@ OpenNet::Status PacketGenerator_Internal::Display(FILE * aOut)
     fprintf(aOut, "PacketGenerator :\n");
     fprintf(aOut, "  Adapter   = %s\n", (NULL == mAdapter) ? "Not set" : mAdapter->GetName());
     fprintf(aOut, "  State     = %s\n", STATE_NAMES[GetState()]);
+    
+    #ifdef _KMS_WINDOWS_
+        fprintf(aOut, "  Thread ID = %u\n", mThreadId);
+    #endif
 
     return OpenNet::STATUS_OK;
 }
@@ -271,19 +298,34 @@ unsigned int PacketGenerator_Internal::Run()
     double lPeriod = ComputePeriod();
     assert(0.0 < lPeriod);
 
-    LARGE_INTEGER lNow;
+    #ifdef _KMS_LINUX_
+        struct timespec lBefore;
+        struct timespec lNow   ;
+    #endif
+    
+    #ifdef _KMS_WINDOWS_
+        BOOL lRetB = SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+        assert(lRetB);
 
-    BOOL lRetB = QueryPerformanceCounter(&lNow);
-    assert(lRetB);
+        LARGE_INTEGER lBefore;
+        LARGE_INTEGER lNow   ;
+    #endif
+    
+    ReadPerfCounter(&lNow);
 
     while (IsRunning())
     {
-        LARGE_INTEGER lBefore = lNow;
+        lBefore = lNow;
 
-        Sleep(1);
+        #ifdef _KMS_LINUX_
+            usleep(1000);
+        #endif
+        
+        #ifdef _KMS_WINDOWS_
+            Sleep(1);
+        #endif
 
-        lRetB = QueryPerformanceCounter(&lNow);
-        assert(lRetB);
+        ReadPerfCounter(&lNow);
 
         lIn->mRepeatCount = ComputeRepeatCount(lBefore, lNow, lPeriod);
         if (0 < lIn->mRepeatCount)
@@ -343,18 +385,24 @@ OpenNet::Status PacketGenerator_Internal::Config_Validate(const Config & aConfig
 // Return  This method return the time betweed two packet in clock cycle.
 double PacketGenerator_Internal::ComputePeriod() const
 {
-    LARGE_INTEGER lFrequency;
-
-    BOOL lRetB = QueryPerformanceFrequency(&lFrequency);
-    assert(lRetB);
-
     double lPacketPerSecond = mConfig.mBandwidth_MiB_s;
 
     lPacketPerSecond *= 1024; // KiB/s
     lPacketPerSecond *= 1024; // B/s
     lPacketPerSecond /= mConfig.mPacketSize_byte; // packet/s
 
-    return lFrequency.QuadPart / lPacketPerSecond;
+    #ifdef _KMS_LINUX_
+        return 1000000000 / lPacketPerSecond;
+    #endif
+    
+    #ifdef _KMS_WINDOWS_
+        LARGE_INTEGER lFrequency;
+
+        BOOL lRetB = QueryPerformanceFrequency(&lFrequency);
+        assert(lRetB);
+        
+        return lFrequency.QuadPart / lPacketPerSecond;
+    #endif
 }
 
 // aBefore [---;R--] The time before the sleep in clock cycle
@@ -362,13 +410,24 @@ double PacketGenerator_Internal::ComputePeriod() const
 // aPeriod           The period in clock cycle
 //
 // Return  This function return the number of packet to send.
-unsigned int PacketGenerator_Internal::ComputeRepeatCount(const LARGE_INTEGER & aBefore, const LARGE_INTEGER & aNow, double aPeriod)
+unsigned int PacketGenerator_Internal::ComputeRepeatCount(const PerfCounter & aBefore, const PerfCounter & aNow, double aPeriod)
 {
     assert(NULL != (&aBefore));
-    assert(NULL != (&aNow));
-    assert(0.0 <     aPeriod);
+    assert(NULL != (&aNow   ));
+    assert(0.0 <     aPeriod );
 
-    double lDuration = static_cast<double>(aNow.QuadPart - aBefore.QuadPart);
+    double lDuration;
+    
+    #ifdef _KMS_LINUX_
+        lDuration  = aNow.tv_sec - aBefore.tv_sec;
+        lDuration *= 1000000000;
+        lDuration += aNow.tv_nsec - aBefore.tv_nsec;
+    #endif
+    
+    #ifdef _KMS_WINDOWS_
+        lDuration = static_cast<double>(aNow.QuadPart - aBefore.QuadPart);
+    #endif
+    
     assert(0.0 < lDuration);
 
     unsigned int lResult = static_cast<unsigned int>((lDuration / aPeriod) + 0.5);
@@ -424,3 +483,51 @@ void PacketGenerator_Internal::SendPackets(const IoCtl_Packet_Send_Ex_In * aIn)
         mStatistics[OpenNet::PACKET_GENERATOR_STATS_SEND_ERROR_cycle] ++;
     }
 }
+
+// Static functions
+/////////////////////////////////////////////////////////////////////////////
+
+void ReadPerfCounter(PacketGenerator_Internal::PerfCounter * aOut)
+{
+    assert(NULL != aOut);
+ 
+    #ifdef _KMS_LINUX_
+        int lRet = clock_gettime(CLOCK_MONOTONIC, aOut);
+        assert(0 == lRet);
+    #endif
+   
+    #ifdef _KMS_WINDOWS_
+        BOOL lRetB = QueryPerformanceCounter(aOut);
+        assert(lRetB);
+    #endif
+}
+
+// ===== Entry point ========================================================
+
+#ifdef _LMS_LINUX_
+
+    void Run(void * aParameter)
+    {
+        assert(NULL != aParameter);
+        
+        PacketGenerator_Internal * lThis = reinterpret_cast<PacketGenerator_Internal *>(aParameter);
+        
+        unsigned int lRet = lThis->Run();
+        
+        pthread_exit(lRet); 
+    }
+    
+#endif
+
+#ifdef _KMS_WINDOWS_
+
+    DWORD WINAPI Run(LPVOID aParameter)
+    {
+        assert(NULL != aParameter);
+
+        PacketGenerator_Internal * lThis = reinterpret_cast<PacketGenerator_Internal *>(aParameter);
+
+        return lThis->Run();
+    }
+
+#endif

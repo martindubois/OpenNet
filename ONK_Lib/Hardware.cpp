@@ -1,27 +1,19 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_Lib/Hardware.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_Lib/Hardware.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== WDM ================================================================
-
-#define INITGUID
-
-#include <ntddk.h>
-
-// ===== WDF ================================================================
-#include <wdf.h>
-
 // ===== Includes ===========================================================
+#include <OpenNetK/OS.h>
 #include <OpenNetK/StdInt.h>
 
 #include <OpenNetK/Adapter.h>
 #include <OpenNetK/Constants.h>
 #include <OpenNetK/Hardware_Statistics.h>
-#include <OpenNetK/Interface.h>
 #include <OpenNetK/SpinLock.h>
 
 #include <OpenNetK/Hardware.h>
@@ -175,7 +167,9 @@ namespace OpenNetK
         ASSERT(NULL != aCounter );
         ASSERT(0    < aPacketQty);
 
-        InterlockedAdd(aCounter, aPacketQty);
+        #ifdef _KMS_WINDOWS_
+            InterlockedAdd(aCounter, aPacketQty);
+        #endif
 
         Unlock();
     }
@@ -185,7 +179,9 @@ namespace OpenNetK
     {
         if ((0 < aPacketQty) && (NULL != aCounter))
         {
-            InterlockedAdd(aCounter, aPacketQty);
+            #ifdef _KMS_WINDOWS_
+                InterlockedAdd(aCounter, aPacketQty);
+            #endif
         }
 
         Unlock();

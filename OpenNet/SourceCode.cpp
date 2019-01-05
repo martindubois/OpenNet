@@ -1,18 +1,23 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/SourceCode.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/SourceCode.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
 
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/SourceCode.h>
@@ -22,9 +27,11 @@
 
 static char * Allocate(unsigned int aSize_byte);
 
-static OpenNet::Status GetInputFileSize(HANDLE aHandle, unsigned int * aOut_byte);
-static OpenNet::Status OpenInputFile   (const char * aFileName, HANDLE * aOut);
-static OpenNet::Status ReadInputFile   (HANDLE aHandle, void * aOut, unsigned int aOutSize_byte);
+#ifdef _KMS_WINDOWS_
+    static OpenNet::Status GetInputFileSize(HANDLE aHandle, unsigned int * aOut_byte);
+    static OpenNet::Status OpenInputFile   (const char * aFileName, HANDLE * aOut);
+    static OpenNet::Status ReadInputFile   (HANDLE aHandle, void * aOut, unsigned int aOutSize_byte);
+#endif
 
 namespace OpenNet
 {
@@ -122,35 +129,45 @@ namespace OpenNet
 
         assert(0 == mCodeSize_byte);
 
-        HANDLE lHandle;
+        #ifdef _KMS_LINUX_
 
-        Status lResult = OpenInputFile(aFileName, &lHandle);
-        if (STATUS_OK != lResult)
-        {
-            return lResult;
-        }
+            return STATUS_NOT_IMPLEMENTED;
 
-        lResult = GetInputFileSize(lHandle, &mCodeSize_byte);
-        if (STATUS_OK == lResult)
-        {
-            mCode = Allocate(mCodeSize_byte);
-            assert(NULL != mCode);
+        #endif
 
-            lResult = ReadInputFile(lHandle, mCode, mCodeSize_byte);
+        #ifdef _KMS_WINDOW_
+
+            HANDLE lHandle;
+
+            Status lResult = OpenInputFile(aFileName, &lHandle);
             if (STATUS_OK != lResult)
             {
-                ReleaseCode();
-                assert(NULL == mCode         );
-                assert(   0 == mCodeSize_byte);
+                return lResult;
             }
-        }
 
-        if (!CloseHandle(lHandle))
-        {
-            lResult = STATUS_ERROR_CLOSING_FILE;
-        }
+            lResult = GetInputFileSize(lHandle, &mCodeSize_byte);
+            if (STATUS_OK == lResult)
+            {
+                mCode = Allocate(mCodeSize_byte);
+                assert(NULL != mCode);
 
-        return lResult;
+                lResult = ReadInputFile(lHandle, mCode, mCodeSize_byte);
+                if (STATUS_OK != lResult)
+                {
+                    ReleaseCode();
+                    assert(NULL == mCode         );
+                    assert(   0 == mCodeSize_byte);
+                }
+            }
+
+            if (!CloseHandle(lHandle))
+            {
+                lResult = STATUS_ERROR_CLOSING_FILE;
+            }
+
+            return lResult;
+
+        #endif
     }
 
     Status SourceCode::SetCode(const char * aCode, unsigned int aSize_byte)
@@ -383,12 +400,12 @@ namespace OpenNet
 
         for (unsigned int i = 0; i < lResult; i++)
         {
-            strcat_s(lNewCode, mCodeSize_byte + 1, lSrc    );
-            strcat_s(lNewCode, mCodeSize_byte + 1, aReplace);
+            strcat_s(lNewCode SIZE_INFO(mCodeSize_byte + 1), lSrc    );
+            strcat_s(lNewCode SIZE_INFO(mCodeSize_byte + 1), aReplace);
             lSrc += strlen(lSrc) + aSearchLength;
         }
 
-        strcat_s(lNewCode, mCodeSize_byte + 1, lSrc);
+        strcat_s(lNewCode SIZE_INFO(mCodeSize_byte + 1), lSrc);
 
         delete mCode;
         mCode = lNewCode;
@@ -455,74 +472,78 @@ char * Allocate(unsigned int aSize_byte)
     return lResult;
 }
 
-// aOut_byte [---;-W-]
+#ifdef _KMS_WINDOWS_
 
-// NOT TESTED  OpenNet.Filter.ErrorHandling
-//             GetFileSize fail<br>
-//             File too large
-OpenNet::Status GetInputFileSize(HANDLE aHandle, unsigned int * aOut_byte)
-{
-    assert(INVALID_HANDLE_VALUE != aHandle  );
-    assert(NULL                 != aOut_byte);
+    // aOut_byte [---;-W-]
 
-    DWORD lSizeHigh;
-
-    (*aOut_byte) = GetFileSize(aHandle, &lSizeHigh);
-    if (0 != lSizeHigh)
+    // NOT TESTED  OpenNet.Filter.ErrorHandling
+    //             GetFileSize fail<br>
+    //             File too large
+    OpenNet::Status GetInputFileSize(HANDLE aHandle, unsigned int * aOut_byte)
     {
-        return OpenNet::STATUS_INPUT_FILE_TOO_LARGE;
+        assert(INVALID_HANDLE_VALUE != aHandle  );
+        assert(NULL                 != aOut_byte);
+
+        DWORD lSizeHigh;
+
+        (*aOut_byte) = GetFileSize(aHandle, &lSizeHigh);
+        if (0 != lSizeHigh)
+        {
+            return OpenNet::STATUS_INPUT_FILE_TOO_LARGE;
+        }
+
+        if (0 >= (*aOut_byte))
+        {
+            return OpenNet::STATUS_EMPTY_INPUT_FILE;
+        }
+
+        return OpenNet::STATUS_OK;
     }
 
-    if (0 >= (*aOut_byte))
+    // aFileName [---;R--]
+    // aHandle   [---;-W-]
+    OpenNet::Status OpenInputFile(const char * aFileName, HANDLE * aOut)
     {
-        return OpenNet::STATUS_EMPTY_INPUT_FILE;
+        assert(NULL != aOut);
+
+        if (NULL == aFileName)
+        {
+            return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
+        }
+
+        (*aOut) = CreateFile(aFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+        if (INVALID_HANDLE_VALUE == (*aOut))
+        {
+            return OpenNet::STATUS_CANNOT_OPEN_INPUT_FILE;
+        }
+
+        return OpenNet::STATUS_OK;
     }
 
-    return OpenNet::STATUS_OK;
-}
+    // aOut [---;-W-]
 
-// aFileName [---;R--]
-// aHandle   [---;-W-]
-OpenNet::Status OpenInputFile(const char * aFileName, HANDLE * aOut)
-{
-    assert(NULL != aOut);
-
-    if (NULL == aFileName)
+    // NOT TESTED  OpenNet.Filter.ErrorHandling
+    //             ReadFile fail<br>
+    //             ReadFile do not read the expected size
+    OpenNet::Status ReadInputFile(HANDLE aHandle, void * aOut, unsigned int aOutSize_byte)
     {
-        return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
+        assert(INVALID_HANDLE_VALUE != aHandle      );
+        assert(NULL                 != aOut         );
+        assert(                   0 <  aOutSize_byte);
+
+        DWORD lInfo_byte;
+
+        if (!ReadFile(aHandle, aOut, aOutSize_byte, &lInfo_byte, NULL))
+        {
+            return OpenNet::STATUS_CANNOT_READ_INPUT_FILE;
+        }
+
+        if (aOutSize_byte != lInfo_byte)
+        {
+            return OpenNet::STATUS_ERROR_READING_INPUT_FILE;
+        }
+
+        return OpenNet::STATUS_OK;
     }
 
-    (*aOut) = CreateFile(aFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    if (INVALID_HANDLE_VALUE == (*aOut))
-    {
-        return OpenNet::STATUS_CANNOT_OPEN_INPUT_FILE;
-    }
-
-    return OpenNet::STATUS_OK;
-}
-
-// aOut [---;-W-]
-
-// NOT TESTED  OpenNet.Filter.ErrorHandling
-//             ReadFile fail<br>
-//             ReadFile do not read the expected size
-OpenNet::Status ReadInputFile(HANDLE aHandle, void * aOut, unsigned int aOutSize_byte)
-{
-    assert(INVALID_HANDLE_VALUE != aHandle      );
-    assert(NULL                 != aOut         );
-    assert(                   0 <  aOutSize_byte);
-
-    DWORD lInfo_byte;
-
-    if (!ReadFile(aHandle, aOut, aOutSize_byte, &lInfo_byte, NULL))
-    {
-        return OpenNet::STATUS_CANNOT_READ_INPUT_FILE;
-    }
-
-    if (aOutSize_byte != lInfo_byte)
-    {
-        return OpenNet::STATUS_ERROR_READING_INPUT_FILE;
-    }
-
-    return OpenNet::STATUS_OK;
-}
+#endif

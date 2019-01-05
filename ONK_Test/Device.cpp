@@ -1,16 +1,25 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_Test/Device.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_Test/Device.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+#include <KmsBase.h>
+
 // ===== C ==================================================================
 #include <stdint.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_LINUX_
+    #include <fcntl.h>
+#endif
+
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ============================================================
+    #include <Windows.h>
+#endif
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/DriverHandle.h>
@@ -19,7 +28,10 @@
 
 // ===== Includes ===========================================================
 #include <OpenNetK/Adapter_Types.h>
-#include <OpenNetK/Interface.h>
+
+#ifdef _KMS_WINDOWS_
+    #include <OpenNetK/Interface.h>
+#endif
 
 // ===== Common =============================================================
 #include "../Common/IoCtl.h"
@@ -35,7 +47,13 @@ KMS_TEST_BEGIN(Device_SetupA)
 {
     KmsLib::DriverHandle lDH0;
 
-    lDH0.Connect(OPEN_NET_DRIVER_INTERFACE, 0, GENERIC_ALL, 0);
+    #ifdef _KMS_LINUX_
+        lDH0.Connect("/dev/OpenNet0", O_RDWR);
+    #endif
+
+    #ifdef _KMS_WINDOWS_
+        lDH0.Connect(OPEN_NET_DRIVER_INTERFACE, 0, GENERIC_ALL, 0);
+    #endif
 
     try
     {

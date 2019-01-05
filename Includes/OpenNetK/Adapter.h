@@ -1,9 +1,10 @@
 
 // Product / Produit  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNetK/Adapter.h
-/// \brief   OpenNetK::Adapter
+/// \author     KMS - Martin Dubois, ing.
+/// \Copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/Adapter.h
+/// \brief      OpenNetK::Adapter
 
 #pragma once
 
@@ -138,12 +139,15 @@ namespace OpenNetK
 
         Adapter   ** mAdapters ;
         unsigned int mAdapterNo;
-        KEVENT     * mEvent    ;
         Hardware   * mHardware ;
         unsigned int mSystemId ;
 
         mutable uint32_t      mStatistics[32];
-        mutable LARGE_INTEGER mStatistics_Start;
+
+        #ifdef _KMS_WINDOWS_
+            KEVENT              * mEvent           ;
+            mutable LARGE_INTEGER mStatistics_Start;
+        #endif
 
         // ===== Zone 0 =====================================================
         SpinLock * mZone0;

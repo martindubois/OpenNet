@@ -1,13 +1,18 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/PacketGenerator.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/PacketGenerator.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#include <KmsBase.h>
+
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/ValueVector.h>

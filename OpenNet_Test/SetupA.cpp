@@ -1,18 +1,26 @@
 
-// Author   KMA - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Test/SetupA.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Test/SetupA.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
 #include <memory.h>
 #include <stdint.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
+
+// ===== KmsBase ============================================================
+#include <KmsLib/ThreadBase.h>
 
 // ===== OpenNet_Test =======================================================
 #include "SetupA.h"
@@ -70,7 +78,7 @@ int SetupA::Start(unsigned int aFlags)
     if (OpenNet::STATUS_OK != mAdapter->SetInputFilter(&mKernel)) { return __LINE__; }
     if (OpenNet::STATUS_OK != mSystem ->Start         ( aFlags )) { return __LINE__; }
 
-    Sleep(1000);
+    KmsLib::ThreadBase::Sleep_s(1);
 
     return 0;
 }

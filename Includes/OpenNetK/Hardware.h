@@ -1,9 +1,10 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNetK/Hardware.h
-/// \brief   OpenNetK::Hardware
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/Hardware.h
+/// \brief      OpenNetK::Hardware
 
 #pragma once
 
@@ -12,7 +13,6 @@
 
 // ===== Includes ===========================================================
 #include <OpenNetK/Adapter_Types.h>
-#include <OpenNetK/Interface.h>
 #include <OpenNetK/Packet.h>
 #include <OpenNetK/Types.h>
 

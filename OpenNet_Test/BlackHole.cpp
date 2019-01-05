@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Test/BlackHole.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Test/BlackHole.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -10,6 +11,7 @@
 #include <stdint.h>
 
 // ===== Import/Includes ====================================================
+#include <KmsLib/ThreadBase.h>
 #include <KmsTest.h>
 
 // ===== Includes/OpenNet ===================================================
@@ -42,11 +44,11 @@ KMS_TEST_BEGIN(BlackHole_SetupB)
 
     KMS_TEST_COMPARE(0, lSetup.Start(0));
 
-    Sleep(2000);
+    KmsLib::ThreadBase::Sleep_s(2);
 
     KMS_TEST_COMPARE(0, lSetup.Stop());
 
-    Sleep(2000);
+    KmsLib::ThreadBase::Sleep_s(2);
 
     KMS_TEST_COMPARE(0, lSetup.Statistics_Get());
 

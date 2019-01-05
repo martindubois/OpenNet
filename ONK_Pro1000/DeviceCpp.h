@@ -1,0 +1,30 @@
+
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_Pro1000/DeviceCpp.h
+
+#pragma once
+
+// Data types
+/////////////////////////////////////////////////////////////////////////////
+
+typedef enum
+{
+    PIR_IGNORED   ,
+    PIR_PROCESSED ,
+    PIR_TO_PROCESS,
+}
+ProcessIrqResult;
+
+// Functions
+/////////////////////////////////////////////////////////////////////////////
+
+extern unsigned int DeviceCpp_GetContextSize( void );
+
+extern void DeviceCpp_Init  ( void * aThis );
+extern void DeviceCpp_Uninit( void * aThis );
+
+extern ProcessIrqResult DeviceCpp_Interrupt_Process ( void * aThis, unsigned int aMessageId );
+extern void             DeviceCpp_Interrupt_Process2( void * aThis );
+extern int              DeviceCpp_SetMemory         ( void * aThis, unsigned int aIndex, void * aVirtual, unsigned int aSize_byte );

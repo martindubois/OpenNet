@@ -1,16 +1,21 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/System.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/System.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#include <KmsBase.h>
 
-// ===== OpenCL =============================================================
-#include <CL/opencl.h>
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ============================================================
+    #include <Windows.h>
+
+    // ===== OpenCL =============================================================
+    #include <CL/opencl.h>
+#endif
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>

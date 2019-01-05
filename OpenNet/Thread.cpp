@@ -1,19 +1,26 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Thread.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/Thread.h
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+#include <KmsBase.h>
+
 // ===== C ==================================================================
 #include <assert.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
 
 // ===== OpenNet ============================================================
-#include "OCLW.h"
+#ifdef _KMS_WINDOWS_
+    #include "OCLW.h"
+#endif
 
 #include "Thread.h"
 
@@ -23,7 +30,9 @@
 // Static functions declaration
 /////////////////////////////////////////////////////////////////////////////
 
-static uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam);
+#ifdef _KMS_WINDOWS_
+    static uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam);
+#endif
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
@@ -31,12 +40,14 @@ static uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam)
 // aProcessor [-K-;RW-] The processor associated to the thread
 // aDebugLog  [-K-;RW-] The DebugLog instance
 Thread::Thread(Processor_Internal * aProcessor, KmsLib::DebugLog * aDebugLog)
-    : mCommandQueue(NULL      )
-    , mDebugLog    (aDebugLog )
+    : mDebugLog    (aDebugLog )
     , mKernel      (NULL      )
-    , mKernel_CL   (NULL      )
     , mProcessor   (aProcessor)
-    , mProgram     (NULL      )
+    #ifdef _KMS_WINDOWS_
+        , mCommandQueue(NULL)
+        , mKernel_CL   (NULL)
+        , mProgram     (NULL)
+    #endif
 {
     assert(NULL != aProcessor);
     assert(NULL != aDebugLog );
@@ -84,16 +95,6 @@ void Thread::SetKernel(OpenNet::Kernel * aKernel)
     mKernel  = aKernel ;
 }
 
-// aProgram [-K-;RW-] The corresponding cl_program
-void Thread::SetProgram(cl_program aProgram)
-{
-    assert(NULL != aProgram);
-
-    assert(NULL == mProgram);
-
-    mProgram = aProgram;
-}
-
 void Thread::Delete()
 {
     try
@@ -133,35 +134,40 @@ void Thread::Prepare()
 {
     assert(   0 <  mAdapters.size());
     assert(   0 == mBuffers .size());
-    assert(NULL == mCommandQueue   );
     assert(NULL != mKernel         );
     assert(NULL != mProcessor      );
 
-    // Processor_Internal::CommandQueue_Create ==> OCLW_ReleaseCommandQueue  See Release
-    mCommandQueue = mProcessor->CommandQueue_Create(mKernel->IsProfilingEnabled());
-    assert(NULL != mCommandQueue);
+    #ifdef _KMS_WINDOWS_
 
-    mKernel->SetCommandQueue(mCommandQueue);
+        assert(NULL == mCommandQueue   );
 
-    // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Release
-    mKernel_CL = OCLW_CreateKernel(mProgram, "Filter");
-    assert(NULL != mKernel_CL);
+        // Processor_Internal::CommandQueue_Create ==> OCLW_ReleaseCommandQueue  See Release
+        mCommandQueue = mProcessor->CommandQueue_Create(mKernel->IsProfilingEnabled());
+        assert(NULL != mCommandQueue);
 
-    unsigned int i;
+        mKernel->SetCommandQueue(mCommandQueue);
 
-    for (i = 0; i < mAdapters.size(); i++)
-    {
-        assert(NULL != mAdapters[i]);
+        // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Release
+        mKernel_CL = OCLW_CreateKernel(mProgram, "Filter");
+        assert(NULL != mKernel_CL);
 
-        mAdapters[i]->Buffers_Allocate(mCommandQueue, mKernel_CL, &mBuffers);
-    }
+        unsigned int i;
 
-    for (unsigned int i = 0; i < mBuffers.size(); i++)
-    {
-        assert(NULL != mBuffers[i]);
+        for (i = 0; i < mAdapters.size(); i++)
+        {
+            assert(NULL != mAdapters[i]);
 
-        mBuffers[i]->ResetMarkerValue();
-    }
+            mAdapters[i]->Buffers_Allocate(mCommandQueue, mKernel_CL, &mBuffers);
+        }
+
+        for (unsigned int i = 0; i < mBuffers.size(); i++)
+        {
+            assert(NULL != mBuffers[i]);
+
+            mBuffers[i]->ResetMarkerValue();
+        }
+
+    #endif
 }
 
 // aTryToSolveHang [--O;--X]
@@ -228,6 +234,20 @@ void Thread::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
     }
 }
 
+#ifdef _KMS_WINDOWS_
+
+    // aProgram [-K-;RW-] The corresponding cl_program
+    void Thread::SetProgram(cl_program aProgram)
+    {
+        assert(NULL != aProgram);
+
+        assert(NULL == mProgram);
+
+        mProgram = aProgram;
+    }
+
+#endif
+
 // Internal
 /////////////////////////////////////////////////////////////////////////////
 
@@ -280,89 +300,41 @@ Thread::~Thread()
 {
 }
 
-// aGlobalSize [---;R--]
-// aLocalSize  [--O;R--]
-// aEvent      [---;-W-] This methode return a newly created cl_event here.
-//                       This event will be signaled at the end of
-//                       processing. This event must be passed to
-//                       Processing_Wait.
-//
-// CRITICAL PATH - Buffer
-//
-// Processing_Queue ==> Processing_Wait
-void Thread::Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalSize, cl_event * aEvent)
-{
-    assert(NULL != aGlobalSize);
-    assert(NULL != aEvent     );
-
-    assert(NULL != mCommandQueue);
-    assert(NULL != mKernel_CL   );
-
-    size_t lGO = 0;
-
-    // OCLW_EnqueueNDRangeKernel ==> OCLW_ReleaseEvent  See Processing_Wait
-    OCLW_EnqueueNDRangeKernel(mCommandQueue, mKernel_CL, 1, &lGO, aGlobalSize, aLocalSize, 0, NULL, aEvent);
-
-    OCLW_Flush(mCommandQueue);
-}
-
-// aEvent [D--;RW-] The cl_event Processing_Queue created
-//
-// CRITICAL PATH - Buffer
-//
-// Processing_Queue ==> Processing_Wait
-void Thread::Processing_Wait(cl_event aEvent)
-{
-    assert(NULL != aEvent);
-
-    assert(NULL != mKernel);
-
-    OCLW_WaitForEvents(1, &aEvent);
-
-    if (mKernel->IsProfilingEnabled())
-    {
-        uint64_t lQueued = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_QUEUED);
-        uint64_t lSubmit = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_SUBMIT);
-        uint64_t lStart  = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_START );
-        uint64_t lEnd    = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_END   );
-
-        mKernel->AddStatistics(lQueued, lSubmit, lStart, lEnd);
-    }
-
-    OCLW_ReleaseEvent(aEvent);
-}
-
 void Thread::Release()
 {
     // printf(__FUNCTION__ "()\n");
 
     assert(NULL != mDebugLog);
 
-    if (NULL != mCommandQueue)
-    {
-        mKernel->ResetCommandQueue();
+    #ifdef _KMS_WINDOWS_
 
-        try
+        if (NULL != mCommandQueue)
         {
-            OCLW_ReleaseCommandQueue(mCommandQueue);
-        }
-        catch (...)
-        {
-            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        }
+            mKernel->ResetCommandQueue();
 
-        if (NULL != mKernel_CL)
-        {
             try
             {
-                OCLW_ReleaseKernel(mKernel_CL);
+                OCLW_ReleaseCommandQueue(mCommandQueue);
             }
             catch (...)
             {
                 mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
             }
+
+            if (NULL != mKernel_CL)
+            {
+                try
+                {
+                    OCLW_ReleaseKernel(mKernel_CL);
+                }
+                catch (...)
+                {
+                    mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+                }
+            }
         }
-    }
+
+    #endif
 }
 
 // aIndex  The index passed to Processing_Queue and Processing_Wait
@@ -373,6 +345,62 @@ void Thread::Run_Iteration(unsigned int aIndex)
     Processing_Wait (aIndex);
     Processing_Queue(aIndex);
 }
+
+#ifdef _KMS_WINDOWS_
+
+    // aGlobalSize [---;R--]
+    // aLocalSize  [--O;R--]
+    // aEvent      [---;-W-] This methode return a newly created cl_event here.
+    //                       This event will be signaled at the end of
+    //                       processing. This event must be passed to
+    //                       Processing_Wait.
+    //
+    // CRITICAL PATH - Buffer
+    //
+    // Processing_Queue ==> Processing_Wait
+    void Thread::Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalSize, cl_event * aEvent)
+    {
+        assert(NULL != aGlobalSize);
+        assert(NULL != aEvent     );
+
+        assert(NULL != mCommandQueue);
+        assert(NULL != mKernel_CL   );
+
+        size_t lGO = 0;
+
+        // OCLW_EnqueueNDRangeKernel ==> OCLW_ReleaseEvent  See Processing_Wait
+        OCLW_EnqueueNDRangeKernel(mCommandQueue, mKernel_CL, 1, &lGO, aGlobalSize, aLocalSize, 0, NULL, aEvent);
+
+        OCLW_Flush(mCommandQueue);
+    }
+
+    // aEvent [D--;RW-] The cl_event Processing_Queue created
+    //
+    // CRITICAL PATH - Buffer
+    //
+    // Processing_Queue ==> Processing_Wait
+    void Thread::Processing_Wait(cl_event aEvent)
+    {
+        assert(NULL != aEvent);
+
+        assert(NULL != mKernel);
+
+        OCLW_WaitForEvents(1, &aEvent);
+
+        if (mKernel->IsProfilingEnabled())
+        {
+            uint64_t lQueued = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_QUEUED);
+            uint64_t lSubmit = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_SUBMIT);
+            uint64_t lStart  = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_START );
+            uint64_t lEnd    = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_END   );
+
+            mKernel->AddStatistics(lQueued, lSubmit, lStart, lEnd);
+        }
+
+        OCLW_ReleaseEvent(aEvent);
+    }
+
+#endif
 
 // Private
 /////////////////////////////////////////////////////////////////////////////
@@ -404,7 +432,7 @@ void Thread::Run_Wait()
             return;
         }
 
-        Sleep(100);
+        ThreadBase::Sleep_ms(100);
     }
 
     // TODO  OpenNet.Adapter_Internal.Error_Handling
@@ -419,22 +447,26 @@ void Thread::Run_Wait()
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
 
-// aEvent [---;R--]
-// aParam
-//
-// Return  This method return the retrieved information
-//
-// CRITICAL PATH - Buffer
-//
-// Exception  KmsLib::Exception *  See OCLW_GetEventProfilingInfo
-// Thread     Worker
-uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam)
-{
-    assert(NULL != aEvent);
+#ifdef _KMS_WINDOWS_
 
-    uint64_t lResult;
+    // aEvent [---;R--]
+    // aParam
+    //
+    // Return  This method return the retrieved information
+    //
+    // CRITICAL PATH - Buffer
+    //
+    // Exception  KmsLib::Exception *  See OCLW_GetEventProfilingInfo
+    // Thread     Worker
+    uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam)
+    {
+        assert(NULL != aEvent);
 
-    OCLW_GetEventProfilingInfo(aEvent, aParam, sizeof(lResult), &lResult);
+        uint64_t lResult;
 
-    return lResult;
-}
+        OCLW_GetEventProfilingInfo(aEvent, aParam, sizeof(lResult), &lResult);
+
+        return lResult;
+    }
+
+#endif

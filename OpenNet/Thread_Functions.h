@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Thread_Functions.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/Thread_Functions.h
 
 #pragma once
 
@@ -51,8 +52,11 @@ private:
         EVENT_QTY = 3,
     };
 
-    cl_event         mEvents[EVENT_QTY];
     Kernel_Functions mKernelFunctions;
-    cl_program       mProgram        ;
+
+    #ifdef _KMS_WINDOWS_
+        cl_event   mEvents[EVENT_QTY];
+        cl_program mProgram          ;
+    #endif
 
 };

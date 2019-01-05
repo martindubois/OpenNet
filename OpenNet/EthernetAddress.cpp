@@ -1,10 +1,13 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/EthernetAddress.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/EthernetAddress.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <stdint.h>
@@ -154,7 +157,7 @@ namespace OpenNet
             return STATUS_BUFFER_TOO_SMALL;
         }
 
-        sprintf_s(aOut, aOutSize_byte, "%02x:%02x:%02x:%02x:%02x:%02x", aIn.mAddress[0], aIn.mAddress[1], aIn.mAddress[2], aIn.mAddress[3], aIn.mAddress[4], aIn.mAddress[5]);
+        sprintf_s(aOut SIZE_INFO( aOutSize_byte ), "%02x:%02x:%02x:%02x:%02x:%02x", aIn.mAddress[0], aIn.mAddress[1], aIn.mAddress[2], aIn.mAddress[3], aIn.mAddress[4], aIn.mAddress[5]);
 
         return STATUS_OK;
     }

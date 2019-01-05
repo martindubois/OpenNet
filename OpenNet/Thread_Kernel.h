@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Thread_Kernel.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/Thread_Kernel.h
 
 #pragma once
 
@@ -19,7 +20,9 @@ class Thread_Kernel : public Thread
 
 public:
 
-    Thread_Kernel(Processor_Internal * aProcessor, Adapter_Internal * aAdapter, OpenNet::Kernel * aKernel, cl_program aProgram, KmsLib::DebugLog * aDebugLog);
+    #ifdef _KMS_WINDOWS_
+        Thread_Kernel(Processor_Internal * aProcessor, Adapter_Internal * aAdapter, OpenNet::Kernel * aKernel, cl_program aProgram, KmsLib::DebugLog * aDebugLog);
+    #endif
 
     // ===== Thread =========================================================
     virtual ~Thread_Kernel();

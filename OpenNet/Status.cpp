@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Status.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/Status.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -63,6 +64,7 @@ static const StatusInfo STATUS_INFO[] =
     { "NO_BUFFER"                 , "No buffer"                         },
     { "NO_DESTINATION_SET"        , "No destination set"                },
     { "NOT_ALLOWED_NULL_ARGUMENT" , "Not allowed NULL argument"         },
+    { "NOT_IMPLEMENTED"           , "Not implemented"                   },
     { "OPEN_CL_ERROR"             , "OpenCL error"                      },
     { "PACKET_GENERATOR_RUNNING"  , "The packet generator is running"   },
     { "PACKET_GENERATOR_STOPPED"  , "The packet generator is stopped"   },

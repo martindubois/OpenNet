@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/PacketGenerator_Internal.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/PacketGenerator_Internal.h
 
 #pragma once
 
@@ -28,6 +29,14 @@ class PacketGenerator_Internal : public OpenNet::PacketGenerator, KmsLib::Thread
 {
 
 public:
+
+    #ifdef _KMS_LINUX_
+        typedef struct timespec PerfCounter;
+    #endif
+    
+    #ifdef _KMS_WINDOWS_
+        typedef LARGE_INTEGER PerfCounter;
+    #endif
 
     PacketGenerator_Internal();
 
@@ -57,9 +66,10 @@ private:
     OpenNet::Status Config_Validate(const Config & aConfig);
 
     double                    ComputePeriod     () const;
-    unsigned int              ComputeRepeatCount(const LARGE_INTEGER & aBefore, const LARGE_INTEGER & aNow, double aPeriod);
-    IoCtl_Packet_Send_Ex_In * PreparePacket(void * aBuffer);
-    void                      SendPackets  (const IoCtl_Packet_Send_Ex_In * aIn);
+    unsigned int              ComputeRepeatCount(const PerfCounter & aBefore, const PerfCounter & aNow, double aPeriod);
+    IoCtl_Packet_Send_Ex_In * PreparePacket     (void * aBuffer);
+    void                      SendPackets       (const IoCtl_Packet_Send_Ex_In * aIn);
+    
 
     Adapter_Internal * mAdapter ;
     Config             mConfig  ;
