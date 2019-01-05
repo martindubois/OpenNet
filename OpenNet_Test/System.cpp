@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Test/System.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Test/System.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -25,7 +26,7 @@ KMS_TEST_BEGIN(System_Base)
 
     KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
-    OpenNet::System::Config   lC0;
+/*    OpenNet::System::Config   lC0;
     OpenNet::System::Config * lCNP = NULL;
 
     memset(&lC0, 0, sizeof(lC0));
@@ -69,7 +70,7 @@ KMS_TEST_BEGIN(System_Base)
 
     lC0.mPacketSize_byte--;
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem->SetConfig(lC0));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem->SetConfig(lC0)); */
 }
 KMS_TEST_END
 

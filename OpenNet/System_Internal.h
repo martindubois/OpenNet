@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/System_Internal.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/System_Internal.h
 
 #pragma once
 
@@ -16,7 +17,10 @@
 
 // ===== Includes ===========================================================
 #include <OpenNet/System.h>
-#include <OpenNetK/Interface.h>
+
+#ifdef _KMS_WINDOWS_
+    #include <OpenNetK/Interface.h>
+#endif
 
 // ===== OpenNet ============================================================
 #include "Processor_Internal.h"
@@ -84,8 +88,6 @@ private:
     void FindPlatform  ();
     void FindProcessors();
 
-    bool IsExtensionSupported(cl_device_id aDevice);
-
     void SetPacketSize(unsigned int aSize_byte);
 
     OpenNet::Status Adapter_Validate(OpenNet::Adapter * aAdapter);
@@ -94,16 +96,23 @@ private:
     OpenNet::Status Config_Validate(const Config & aConfig);
 
     void Threads_Release();
+    
+    #ifdef _KMS_WINDOWS_
+        bool IsExtensionSupported(cl_device_id aDevice);
+    #endif
 
     Adapter_Vector   mAdapters  ;
     Config           mConfig    ;
     IoCtl_Connect_In mConnect   ;
     KmsLib::DebugLog mDebugLog  ;
     Info             mInfo      ;
-    cl_platform_id   mPlatform  ;
     ProcessorVector  mProcessors;
     unsigned int     mStartFlags;
     State            mState     ;
     ThreadVector     mThreads   ;
+    
+    #ifdef _KMS_WINDOWS_
+        cl_platform_id   mPlatform  ;
+    #endif
 
 };

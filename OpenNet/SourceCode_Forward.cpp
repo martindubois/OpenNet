@@ -1,12 +1,13 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/SourceCode_Forward.h
-
-#pragma once
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/SourceCode_Forward.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>

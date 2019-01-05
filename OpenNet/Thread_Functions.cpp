@@ -1,20 +1,27 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Thread_Functions.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/Thread_Functions.h
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
 #include <stdint.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
 
 // ===== OpenNet ============================================================
-#include "OCLW.h"
+#ifdef _KMS_WINDOWS_
+    #include "OCLW.h"
+#endif
 
 #include "Thread_Functions.h"
 
@@ -55,8 +62,6 @@ void Thread_Functions::AddAdapter(Adapter_Internal * aAdapter, const OpenNet::Fu
 
 void Thread_Functions::AddDispatchCode()
 {
-    assert(NULL == mProgram);
-
     unsigned int lAdapterCount = static_cast<unsigned int>(mAdapters.size());
     assert(0 < lAdapterCount);
 
@@ -79,10 +84,14 @@ void Thread_Functions::AddDispatchCode()
 
 void Thread_Functions::Prepare()
 {
-    mProgram = mProcessor->Program_Create(&mKernelFunctions);
-    assert(NULL != mProgram);
+    #ifdef _KMS_WINDOWS_
 
-    SetProgram(mProgram);
+        mProgram = mProcessor->Program_Create(&mKernelFunctions);
+        assert(NULL != mProgram);
+
+        SetProgram(mProgram);
+
+    #endif
 
     Thread::Prepare();
 }
@@ -105,7 +114,9 @@ void Thread_Functions::Processing_Queue(unsigned int aIndex)
 
     assert(0 < lLS);
 
-    Thread::Processing_Queue(&lGS, &lLS, mEvents + aIndex);
+    #ifdef _KMS_WINDOWS_
+        Thread::Processing_Queue(&lGS, &lLS, mEvents + aIndex);
+    #endif
 }
 
 // CRITICAL_PATH
@@ -117,11 +128,15 @@ void Thread_Functions::Processing_Wait(unsigned int aIndex)
 {
     assert(EVENT_QTY > aIndex);
 
-    assert(NULL != mEvents[aIndex]);
+    #ifdef _KMS_WINDOWS_
 
-    Thread::Processing_Wait(mEvents[aIndex]);
+        assert(NULL != mEvents[aIndex]);
 
-    mEvents[aIndex] = NULL;
+        Thread::Processing_Wait(mEvents[aIndex]);
+
+        mEvents[aIndex] = NULL;
+
+    #endif
 }
 
 void Thread_Functions::Release()
@@ -175,9 +190,13 @@ void Thread_Functions::Run_Start()
 
     for (i = 0; i < mBuffers.size(); i++)
     {
-        assert(NULL != mBuffers[i]->mMem);
+        #ifdef _KMS_WINDOWS_
 
-        OCLW_SetKernelArg(mKernel_CL, i, sizeof(cl_mem), &mBuffers[i]->mMem);
+            assert(NULL != mBuffers[i]->mMem);
+
+            OCLW_SetKernelArg(mKernel_CL, i, sizeof(cl_mem), &mBuffers[i]->mMem);
+
+        #endif
     }
 
     for (i = 0; i < EVENT_QTY; i++)

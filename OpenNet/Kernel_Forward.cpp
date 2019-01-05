@@ -1,18 +1,23 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Kernel_Forward.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved
+// Product    OpenNet
+// File       OpenNet/Kernel_Forward.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
 
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/Adapter.h>

@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Processor_Internal.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/Processor_Internal.h
 
 #pragma once
 
@@ -11,8 +12,10 @@
 // ===== C++ ================================================================
 #include <map>
 
-// ===== OpenCL =============================================================
-#include <CL/opencl.h>
+#ifdef _KMS_WINDOWS_
+    // ===== OpenCL =========================================================
+    #include <CL/opencl.h>
+#endif
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/DebugLog.h>
@@ -34,15 +37,19 @@ class Processor_Internal : public OpenNet::Processor
 
 public:
 
-    Processor_Internal(cl_platform_id aPlatform, cl_device_id aDevice, KmsLib::DebugLog * aDebugLog);
+    #ifdef _KMS_WINDOWS_
+        Processor_Internal(cl_platform_id aPlatform, cl_device_id aDevice, KmsLib::DebugLog * aDebugLog);
+    #endif
 
     ~Processor_Internal();
 
-    Buffer_Data * Buffer_Allocate(unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer);
+    #ifdef _KMS_WINDOWS_
+        Buffer_Data * Buffer_Allocate(unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer);
 
-    cl_command_queue CommandQueue_Create(bool aProfilingEnabled);
+        cl_command_queue CommandQueue_Create(bool aProfilingEnabled);
 
-    cl_program Program_Create(OpenNet::Kernel * aKernel);
+        cl_program Program_Create(OpenNet::Kernel * aKernel);
+    #endif
 
     Thread_Functions * Thread_Get    ();
     Thread           * Thread_Prepare();
@@ -65,18 +72,25 @@ private:
 
     void InitInfo();
 
-    // ===== OpenCL =========================================================
+    #ifdef _KMS_WINDOWS_
+    
+        // ===== OpenCL =========================================================
 
-    bool GetDeviceInfo(cl_device_info aParam);
-    void GetDeviceInfo(cl_device_info aParam, size_t aOutSize_byte, void * aOut);
+        bool GetDeviceInfo(cl_device_info aParam);
+        void GetDeviceInfo(cl_device_info aParam, size_t aOutSize_byte, void * aOut);
 
-    void GetKernelWorkGroupInfo(cl_kernel aKernel, cl_kernel_work_group_info aParam, size_t aOutSize_byte, void * aOut);
+        void GetKernelWorkGroupInfo(cl_kernel aKernel, cl_kernel_work_group_info aParam, size_t aOutSize_byte, void * aOut);
+    
+    #endif
 
     Config             mConfig  ;
-    cl_context         mContext ;
     KmsLib::DebugLog * mDebugLog;
-    cl_device_id       mDevice  ;
     Info               mInfo    ;
     Thread_Functions * mThread  ;
+    
+    #ifdef _KMS_WINDOWS_
+        cl_context   mContext;
+        cl_device_id mDevice ;
+    #endif
 
 };

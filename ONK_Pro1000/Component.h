@@ -1,23 +1,17 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_Pro1000/Component.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_Pro1000/Component.h
 
 #pragma once
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== WDM ================================================================
-
-#define INITGUID
-
-#include <ntddk.h>
-
-// ===== WDF ================================================================
-#include <wdf.h>
-
 // ===== Includes ===========================================================
+#include <OpenNetK/OS.h>
+
 #include <OpenNetK/Debug.h>
 #include <OpenNetK/StdInt.h>
 

@@ -1,8 +1,9 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNet/Status.h
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All right reserved.
+/// \file       Includes/OpenNet/Status.h
 
 #pragma once
 
@@ -68,9 +69,10 @@ namespace OpenNet
         STATUS_NO_BUFFER                 ,
         STATUS_NO_DESTINATION_SET        ,
         STATUS_NOT_ALLOWED_NULL_ARGUMENT ,
+        STATUS_NOT_IMPLEMENTED           ,
         STATUS_OPEN_CL_ERROR             ,
-        STATUS_PACKET_GENERATOR_RUNNING  ,
-        STATUS_PACKET_GENERATOR_STOPPED  , // 40
+        STATUS_PACKET_GENERATOR_RUNNING  , // 40
+        STATUS_PACKET_GENERATOR_STOPPED  ,
         STATUS_PACKET_TOO_LARGE          ,
         STATUS_PACKET_TOO_SMALL          ,
         STATUS_PROCESSOR_ALREADY_SET     ,
@@ -79,8 +81,8 @@ namespace OpenNet
         STATUS_PROFILING_ALREADY_ENABLED ,
         STATUS_SAME_VALUE                ,
         STATUS_SYSTEM_ALREADY_STARTED    ,
-        STATUS_SYSTEM_RUNNING            ,
-        STATUS_SYSTEM_NOT_STARTED        , // 50
+        STATUS_SYSTEM_RUNNING            , // 50
+        STATUS_SYSTEM_NOT_STARTED        ,
         STATUS_THREAD_CREATE_ERROR       ,
         STATUS_THREAD_CLOSE_ERROR        ,
         STATUS_THREAD_STOP_TIMEOUT       ,

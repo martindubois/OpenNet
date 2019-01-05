@@ -1,18 +1,32 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/System_Internal.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/System_Internal.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_LINUX_
+
+    #include <fcntl.h>
+
+    // ===== System =========================================================
+    #include <sys/eventfd.h>
+
+#endif
+
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
@@ -23,14 +37,25 @@
 
 // ===== OpenNet ============================================================
 #include "Adapter_Internal.h"
-#include "OCLW.h"
 #include "Processor_Internal.h"
 #include "Thread.h"
+
+#ifdef _KMS_WINDOWS_
+    #include "OCLW.h"
+#endif
 
 #include "System_Internal.h"
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
+
+#ifdef _KMS_LINUX_
+    #define INVALID_EVENT (-1)
+#endif
+
+#ifdef _KMS_WINDOWS_
+    #define INVALID_EVENT (NULL)
+#endif
 
 static const char * STATE_NAMES[System_Internal::STATE_QTY] =
 {
@@ -53,8 +78,10 @@ static void SendLoopBackPackets(void * aThis, Adapter_Internal * aAdapter);
 // Threads  Apps
 System_Internal::System_Internal()
     : mDebugLog( "K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "System" )
-    , mPlatform(         0)
     , mState   (STATE_IDLE)
+    #ifdef _KMS_WINDOWS_
+        , mPlatform(0)
+    #endif
 {
     memset(&mConfig , 0, sizeof(mConfig ));
     memset(&mConnect, 0, sizeof(mConnect));
@@ -62,7 +89,16 @@ System_Internal::System_Internal()
 
     mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
 
-    mInfo.mSystemId = GetCurrentProcessId();
+    mConnect.mEvent = INVALID_EVENT;
+
+    #ifdef _KMS_LINUX_
+        mInfo.mSystemId = getpid();
+    #endif
+
+    #ifdef _KMS_WINDOWS_
+        mInfo.mSystemId = GetCurrentProcessId();
+    #endif
+
     assert(0 != mInfo.mSystemId);
 
     mConnect.mSystemId = mInfo.mSystemId;
@@ -71,25 +107,43 @@ System_Internal::System_Internal()
     FindPlatform  ();
     FindProcessors();
 
-    if (0 != mPlatform)
-    {
-        OCLW_Initialise(mPlatform);
-    }
+    #ifdef _KMS_LINUX_
 
-    // CreateEvent ==> CloseHandle  See the destructor
-    mConnect.mEvent = reinterpret_cast<uint64_t>(CreateEvent(NULL, FALSE, TRUE, NULL));
-    assert(NULL != mConnect.mEvent);
+        // eventfd ==> close  See the destructor
+        int lEvent = eventfd(0, EFD_CLOEXEC);
+        assert(0 <= lEvent);
 
-    // VirtualAlloc ==> VirtualAlloc  See the destructor
-    mConnect.mSharedMemory = VirtualAlloc(NULL, SHARED_MEMORY_SIZE_byte, MEM_COMMIT, PAGE_READWRITE);
-    assert(NULL != mConnect.mSharedMemory);
+        mConnect.mEvent = lEvent;
+
+        // valloc ==> free  See the descructor
+        mConnect.mSharedMemory = valloc(SHARED_MEMORY_SIZE_byte);
+        assert(NULL != mConnect.mSharedMemory);
+
+    #endif
+
+    #ifdef _KMS_WINDOWS_
+
+        if (0 != mPlatform)
+        {
+            OCLW_Initialise(mPlatform);
+        }
+
+        // CreateEvent ==> CloseHandle  See the destructor
+        mConnect.mEvent = reinterpret_cast<uint64_t>(CreateEvent(NULL, FALSE, TRUE, NULL));
+        assert(NULL != mConnect.mEvent);
+
+        // VirtualAlloc ==> VirtualAlloc  See the destructor
+        mConnect.mSharedMemory = VirtualAlloc(NULL, SHARED_MEMORY_SIZE_byte, MEM_COMMIT, PAGE_READWRITE);
+        assert(NULL != mConnect.mSharedMemory);
+
+    #endif
 }
 
 // Threads  Apps
 System_Internal::~System_Internal()
 {
-    assert(   0 != mConnect.mEvent       );
-    assert(NULL != mConnect.mSharedMemory);
+    assert(INVALID_EVENT != mConnect.mEvent       );
+    assert(NULL          != mConnect.mSharedMemory);
 
     switch (mState)
     {
@@ -119,15 +173,31 @@ System_Internal::~System_Internal()
         delete mProcessors[i];
     }
 
-    // CreateEvent ==> CloseHandle  See the default contructor
-    BOOL lRetB = CloseHandle(reinterpret_cast<HANDLE>(mConnect.mEvent));
-    assert(lRetB);
-    (void)(lRetB);
+    #ifdef _KMS_LINUX_
 
-    // VirtualAlloc ==> VirtualAlloc  See the default constructor
-    void * lRetVP = VirtualAlloc(mConnect.mSharedMemory, SHARED_MEMORY_SIZE_byte, MEM_RESET, 0);
-    assert(NULL == lRetVP);
-    (void)(lRetVP);
+        // eventfd ==> close  See the constructor
+        int lRet = close(mConnect.mEvent);
+        assert(0 == lRet);
+        (void)(lRet);
+
+        // valloc ==> free  See the constructor
+        free(mConnect.mSharedMemory);
+
+    #endif
+
+    #ifdef _KMS_WINDOWS_
+
+        // CreateEvent ==> CloseHandle  See the default contructor
+        BOOL lRetB = CloseHandle(reinterpret_cast<HANDLE>(mConnect.mEvent));
+        assert(lRetB);
+        (void)(lRetB);
+
+        // VirtualAlloc ==> VirtualAlloc  See the default constructor
+        void * lRetVP = VirtualAlloc(mConnect.mSharedMemory, SHARED_MEMORY_SIZE_byte, MEM_RESET, 0);
+        assert(NULL == lRetVP);
+        (void)(lRetVP);
+
+    #endif
 }
 
 // ===== OpenNet::System ====================================================
@@ -429,10 +499,14 @@ OpenNet::Status System_Internal::Start(unsigned int aFlags)
             mThreads[ i ]->Prepare();
         }
 
-        if (!SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS))
-        {
-            mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-        }
+        #ifdef _KMS_WINDOWS_
+
+            if (!SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS))
+            {
+                mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+            }
+
+        #endif
 
         for (i = 0; i < mThreads.size(); i++)
         {
@@ -505,10 +579,14 @@ OpenNet::Status System_Internal::Stop()
         return ExceptionToStatus(eE);
     }
 
-    if (!SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS))
-    {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-    }
+    #ifdef _KMS_WINDOWS_
+
+        if (!SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS))
+        {
+            mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        }
+
+    #endif
 
     return OpenNet::STATUS_OK;
 }
@@ -581,12 +659,22 @@ void System_Internal::FindAdapters()
 
         try
         {
-            lHandle->Connect(OPEN_NET_DRIVER_INTERFACE, lIndex, GENERIC_ALL, 0);
+            #ifdef _KMS_LINUX_
+
+                char lName[16];
+
+                sprintf_s(lName, "/dev/OpenNet%d", lIndex);
+
+                lHandle->Connect(lName, O_RDWR);
+
+            #endif
+
+            #ifdef _KMS_WINDOWS_
+                lHandle->Connect(OPEN_NET_DRIVER_INTERFACE, lIndex, GENERIC_ALL, 0);
+            #endif
         }
         catch (KmsLib::Exception * eE)
         {
-            assert(KmsLib::Exception::CODE_NO_SUCH_DEVICE == eE->GetCode());
-
             (void)(eE);
 
             delete lHandle;
@@ -605,73 +693,61 @@ void System_Internal::FindAdapters()
 // Threads  Apps
 void System_Internal::FindPlatform()
 {
-    assert(0 == mPlatform);
+    #ifdef _KMS_WINDOWS_
 
-    cl_platform_id lPlatforms[32];
+        assert(0 == mPlatform);
 
-    cl_uint lCount;
+        cl_platform_id lPlatforms[32];
 
-    OCLW_GetPlatformIDs(sizeof(lPlatforms) / sizeof(lPlatforms[0]), lPlatforms, &lCount);
+        cl_uint lCount;
 
-    for (unsigned int i = 0; i < lCount; i++)
-    {
-        assert(0 != lPlatforms[i]);
+        OCLW_GetPlatformIDs(sizeof(lPlatforms) / sizeof(lPlatforms[0]), lPlatforms, &lCount);
 
-        char lBuffer[128];
-
-        OCLW_GetPlatformInfo(lPlatforms[i], CL_PLATFORM_VENDOR, sizeof(lBuffer), lBuffer);
-        
-        if (0 == strcmp("Advanced Micro Devices, Inc.", lBuffer))
+        for (unsigned int i = 0; i < lCount; i++)
         {
-            mPlatform = lPlatforms[i];
-            break;
+            assert(0 != lPlatforms[i]);
+
+            char lBuffer[128];
+
+            OCLW_GetPlatformInfo(lPlatforms[i], CL_PLATFORM_VENDOR, sizeof(lBuffer), lBuffer);
+
+            if (0 == strcmp("Advanced Micro Devices, Inc.", lBuffer))
+            {
+                mPlatform = lPlatforms[i];
+                break;
+            }
         }
-    }
+
+    #endif
 }
 
 // Exception  KmsLib::Exception *  See OCLW_GetDeviceIDs
 // Threads  Apps
 void System_Internal::FindProcessors()
 {
-    if (0 != mPlatform)
-    {
-        cl_device_id lDevices[255];
+    #ifdef _KMS_WINDOWS_
 
-        cl_uint lCount;
-
-        OCLW_GetDeviceIDs(mPlatform, CL_DEVICE_TYPE_GPU, sizeof(lDevices) / sizeof(lDevices[0]), lDevices, &lCount);
-        if (0 < lCount)
+        if (0 != mPlatform)
         {
-            for (unsigned int i = 0; i < lCount; i++)
+            cl_device_id lDevices[255];
+
+            cl_uint lCount;
+
+            OCLW_GetDeviceIDs(mPlatform, CL_DEVICE_TYPE_GPU, sizeof(lDevices) / sizeof(lDevices[0]), lDevices, &lCount);
+            if (0 < lCount)
             {
-                if (IsExtensionSupported(lDevices[i]))
+                for (unsigned int i = 0; i < lCount; i++)
                 {
-                    // new ==> Delete  See ~System_Internal
-                    mProcessors.push_back( new Processor_Internal(mPlatform, lDevices[i], &mDebugLog) );
+                    if (IsExtensionSupported(lDevices[i]))
+                    {
+                        // new ==> Delete  See ~System_Internal
+                        mProcessors.push_back( new Processor_Internal(mPlatform, lDevices[i], &mDebugLog) );
+                    }
                 }
             }
         }
-    }
-}
 
-// Threads  Apps
-bool System_Internal::IsExtensionSupported(cl_device_id aDevice)
-{
-    assert(0 != aDevice);
-
-    char   lExtNames[8192];
-    size_t lSize_byte;
-
-    cl_int lStatus = clGetDeviceInfo(aDevice, CL_DEVICE_EXTENSIONS, sizeof(lExtNames), lExtNames, &lSize_byte);
-    if (CL_SUCCESS == lStatus)
-    {
-        if (NULL != strstr(lExtNames, "cl_amd_bus_addressable_memory"))
-        {
-            return true;
-        }
-    }
-
-    return false;
+    #endif
 }
 
 void System_Internal::SetPacketSize(unsigned int aSize_byte)
@@ -771,6 +847,30 @@ void System_Internal::Threads_Release()
 
     mThreads.clear();
 }
+
+#ifdef _KMS_WINDOWS_
+
+    // Threads  Apps
+    bool System_Internal::IsExtensionSupported(cl_device_id aDevice)
+    {
+        assert(0 != aDevice);
+
+        char   lExtNames[8192];
+        size_t lSize_byte;
+
+        cl_int lStatus = clGetDeviceInfo(aDevice, CL_DEVICE_EXTENSIONS, sizeof(lExtNames), lExtNames, &lSize_byte);
+        if (CL_SUCCESS == lStatus)
+        {
+            if (NULL != strstr(lExtNames, "cl_amd_bus_addressable_memory"))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+#endif
 
 // Static functions
 /////////////////////////////////////////////////////////////////////////////

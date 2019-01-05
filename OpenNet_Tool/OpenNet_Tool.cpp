@@ -1,10 +1,13 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Tool/OpenNet_Tool.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Tool/OpenNet_Tool.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -13,8 +16,10 @@
 // ===== C++ ================================================================
 #include <map>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/ToolBase.h>
@@ -441,7 +446,7 @@ void Kernel_Forward_Create(KmsLib::ToolBase * aToolBase, const char * aArg)
 
     char lName[64];
 
-    switch (sscanf_s(aArg, "%s", lName, static_cast<unsigned int>(sizeof(lName))))
+    switch (sscanf_s(aArg, "%s", lName SIZE_INFO(static_cast<unsigned int>(sizeof(lName)))))
     {
     case 1:
         printf("Kernel_Forward Create %s\n", lName);
@@ -575,7 +580,7 @@ void Kernel_Create(KmsLib::ToolBase * aToolBase, const char * aArg)
 
     char lName[64];
 
-    switch (sscanf_s(aArg, "%s", lName, static_cast<unsigned int>(sizeof(lName))))
+    switch (sscanf_s(aArg, "%s", lName SIZE_INFO(static_cast<unsigned int>(sizeof(lName)))))
     {
     case 1:
         printf("Kernel Create %s\n", lName);
@@ -654,7 +659,7 @@ void Kernel_Edit_Remove(KmsLib::ToolBase * aToolBase, const char * aArg)
 
     char lRemove[64];
 
-    switch (sscanf_s(aArg, "%s", lRemove, static_cast<unsigned int>(sizeof(lRemove))))
+    switch (sscanf_s(aArg, "%s", lRemove SIZE_INFO(static_cast<unsigned int>(sizeof(lRemove)))))
     {
     case 1:
         printf("Kernel Edit_Remove %s\n", lRemove);
@@ -685,7 +690,7 @@ void Kernel_Edit_Search(KmsLib::ToolBase * aToolBase, const char * aArg)
 
     char lSearch[64];
 
-    switch (sscanf_s(aArg, "%s", lSearch, static_cast<unsigned int>(sizeof(lSearch))))
+    switch (sscanf_s(aArg, "%s", lSearch SIZE_INFO(static_cast<unsigned int>(sizeof(lSearch)))))
     {
     case 1:
         printf("Kernel Edit_Search %s\n", lSearch);
@@ -717,7 +722,7 @@ void Kernel_Edit_Replace(KmsLib::ToolBase * aToolBase, const char * aArg)
     char lSearch [64];
     char lReplace[64];
 
-    switch (sscanf_s(aArg, "%s %s", lSearch, static_cast<unsigned int>(sizeof(lSearch)), lReplace, static_cast<unsigned int>(sizeof(lReplace))))
+    switch (sscanf_s(aArg, "%s %s", lSearch SIZE_INFO(static_cast<unsigned int>(sizeof(lSearch))), lReplace SIZE_INFO(static_cast<unsigned int>(sizeof(lReplace)))))
     {
     case 1 :
         strcpy_s(lReplace, "");
@@ -811,7 +816,7 @@ void Kernel_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
 
     char lName[64];
 
-    switch (sscanf_s(aArg, "%s", lName, static_cast<unsigned int>(sizeof(lName))))
+    switch (sscanf_s(aArg, "%s", lName SIZE_INFO(static_cast<unsigned int>(sizeof(lName)))))
     {
     case 1:
         printf("Kernel Select %s\n", lName);
@@ -846,7 +851,7 @@ void Kernel_SetCode(KmsLib::ToolBase * aToolBase, const char * aArg)
 
     char lFileName[64];
 
-    switch (sscanf_s(aArg, "%s", lFileName, static_cast<unsigned int>(sizeof(lFileName))))
+    switch (sscanf_s(aArg, "%s", lFileName SIZE_INFO(static_cast<unsigned int>(sizeof(lFileName)))))
     {
     case 1:
         printf("Filter Select %s\n", lFileName);

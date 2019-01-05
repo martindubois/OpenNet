@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Test/Adapte.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Test/Adapte.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -123,8 +124,8 @@ KMS_TEST_BEGIN(Adapter_SetupA)
 
     unsigned int lSs0[1024];
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mAdapter->GetStatistics(NULL, NULL        , false));
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mAdapter->GetStatistics(lSs0, sizeof(lSs0), false));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mAdapter->GetStatistics(NULL,            0));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mAdapter->GetStatistics(lSs0, sizeof(lSs0)));
 
     /*
     OpenNet::Adapter::Stats lSsE;

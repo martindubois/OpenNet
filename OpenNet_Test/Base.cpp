@@ -1,18 +1,23 @@
 
-// Author   KMA - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Test/Base.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) KMS 2018-2019. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Test/Base.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
 #include <memory.h>
 #include <stdint.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ============================================================
+    #include <Windows.h>
+#endif
 
 // ===== OpenNet_Test =======================================================
 #include "Base.h"
