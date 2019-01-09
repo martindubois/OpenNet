@@ -4,7 +4,7 @@
 # Product    OpenNet
 # File       ONK_Lib/makefile
 
-CFLAGS = -D_KMS_DRIVER_ -D_KMS_LINUX_ -g
+include ../KernelCppFlags.mk
 
 INCLUDES = -I ../Includes
 
@@ -21,7 +21,7 @@ SOURCES =	Adapter.cpp        \
 # ===== Rules / Regles ======================================================
 
 .cpp.o:
-	g++ -c $(CFLAGS) -o $@ $(INCLUDES) -fno-builtin -fno-exceptions -fno-pic -fno-rtti -nostdinc $<
+	g++ -c $(CFLAGS) -o $@ $(INCLUDES) $(KERNEL_CPP_FLAGS) $<
 
 # ===== Macros ==============================================================
 

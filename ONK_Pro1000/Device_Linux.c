@@ -30,12 +30,15 @@
 typedef struct
 {
     struct cdev    * mCDev  ;
+    struct class   * mClass ;
     struct pci_dev * mPciDev;
 
     int mIrq        ;
     int mVectorCount;
 
-    unsigned char mReserved0[ 4 ];
+    dev_t mDevId;
+
+    unsigned char mReserved0[ 2 ];
 
     struct tasklet_struct mTasklet;
 
@@ -45,6 +48,9 @@ DeviceContext;
 
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
+
+static int  Device_Init  ( DeviceContext * aThis, unsigned int aIndex );
+static void Device_Uninit( DeviceContext * aThis );
 
 static int  Dma_Init( DeviceContext * aThis );
 
@@ -81,51 +87,49 @@ static struct file_operations sOperations =
 // aPciDev [---;RW-]
 // aMajor
 // aMinor
+// aIndex
+// aClass  [-K-;RW-]
 //
 // Return
 //  NULL   Error
 //  Other  The address of the created instance
-void * Device_Create( struct pci_dev * aPciDev, unsigned char aMajor, unsigned char aMinor )
+void * Device_Create( struct pci_dev * aPciDev, unsigned char aMajor, unsigned char aMinor, unsigned int aIndex, struct class * aClass )
 {
     DeviceContext * lResult;
-    int             lRet   ;
 
     printk( KERN_DEBUG "%s( , %u, %u )\n", __FUNCTION__, aMajor, aMinor );
 
     // kmalloc ==> kfree  See Device_Delete
     lResult = kmalloc( sizeof( DeviceContext ) + DeviceCpp_GetContextSize(), GFP_KERNEL );
-
-    lResult->mPciDev = aPciDev;
-
-    tasklet_init( & lResult->mTasklet, Tasklet, (long unsigned int)( lResult ) ); // reinterpret_cast
-
-    // DeviceCpp_Init ==> DeviceCpp_Uninit  See Device_Delete
-    DeviceCpp_Init( lResult->mDeviceCpp );
-
-    // cdev_alloc ==> cdev_del  See Device_Delete
-    lResult->mCDev = cdev_alloc();
-
-    cdev_init( lResult->mCDev, & sOperations );
-
-    lResult->mCDev->owner = THIS_MODULE;
-
-    lRet = cdev_add( lResult->mCDev, MKDEV( aMajor, aMinor ), 1 );
-    if ( 0 != lRet )
+    if ( NULL == lResult )
     {
-        printk( KERN_ERR "%s - cdev_add( , ,  ) failed - %d\n", __FUNCTION__, lRet );
-        goto Error0;
+        printk( KERN_ERR "%s - kmalloc( ,  )\n", __FUNCTION__ );
     }
+    else
+    {
+        lResult->mClass  = aClass ;
+        lResult->mDevId  = MKDEV( aMajor, aMinor );
+        lResult->mPciDev = aPciDev;
 
-    // pci_enable_device ==> pci_disable_device  See Device_Delete
-    pci_enable_device( aPciDev );
+        tasklet_init( & lResult->mTasklet, Tasklet, (long unsigned int)( lResult ) ); // reinterpret_cast
 
-    // IoMem_Init ==> IoMem_Uninit  See Device_Delete
-    if ( 0 != IoMem_Init( lResult ) )  { goto Error1; }
+        // DeviceCpp_Init ==> DeviceCpp_Uninit  See Device_Delete
+        DeviceCpp_Init( lResult->mDeviceCpp );
 
-    if ( 0 != Dma_Init( lResult ) ) { goto Error2; }
+        // pci_enable_device ==> pci_disable_device  See Device_Delete
+        pci_enable_device( aPciDev );
 
-    // Interrupt_Init ==> Interrupt_Uninit  See Device_Delete
-    if ( 0 != Interrupt_Init( lResult ) ) { goto Error2; }
+        // IoMem_Init ==> IoMem_Uninit  See Device_Delete
+        if ( 0 != IoMem_Init( lResult ) )  { goto Error1; }
+
+        if ( 0 != Dma_Init( lResult ) ) { goto Error2; }
+
+        // Interrupt_Init ==> Interrupt_Uninit  See Device_Delete
+        if ( 0 != Interrupt_Init( lResult ) ) { goto Error2; }
+
+        // Device_Init ==> Device_Uninit  See Device_Delete
+        if ( 0 != Device_Init( lResult, aIndex ) ) { goto Error0; }
+    }
 
     return lResult;
 
@@ -137,7 +141,6 @@ Error1:
 
 Error0:
     DeviceCpp_Uninit( lResult->mDeviceCpp );
-    cdev_del( lResult->mCDev );
     kfree( lResult );
     return NULL;
 }
@@ -149,8 +152,8 @@ void Device_Delete( void * aThis )
 
     printk( KERN_INFO "%s(  )\n", __FUNCTION__ );
 
-    // cdev_alloc ==> cdev_del  See Device_Create
-    cdev_del( lThis->mCDev );
+    // Device_Init ==> Device_Uninit  See Device_Create
+    Device_Uninit( lThis );
 
     // Interrupt_Init ==> Interrupt_Uninit  See Device_Create
     Interrupt_Uninit( lThis );
@@ -170,6 +173,67 @@ void Device_Delete( void * aThis )
 
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
+
+// aThis  [---;RW-]
+// aIndex
+//
+// Return
+//    0  OK
+//  < 0  Error
+//
+// Device_Init ==> Device_Uninit
+int Device_Init( DeviceContext * aThis, unsigned int aIndex )
+{
+    struct device * lDevice;
+    int             lRet   ;
+
+    printk( KERN_INFO "%s( , %u )\n", __FUNCTION__, aIndex );
+
+    // cdev_alloc ==> cdev_del  See Device_Uninit
+    aThis->mCDev = cdev_alloc();
+    if ( NULL == aThis->mCDev )
+    {
+        printk( KERN_ERR "%s - cdev_alloc() failed\n", __FUNCTION__ );
+        return ( - __LINE__ );
+    }
+
+    aThis->mCDev->owner = THIS_MODULE;
+
+    cdev_init( aThis->mCDev, & sOperations );
+
+    lRet = cdev_add( aThis->mCDev, aThis->mDevId, 1 );
+    if ( 0 != lRet )
+    {
+        printk( KERN_ERR "%s - cdev_add( , ,  ) failed - %d\n", __FUNCTION__, lRet );
+        cdev_del( aThis->mCDev );
+        return ( - __LINE__ );
+    }
+
+    // device_create ==> device_destroy  See Device_Uninit
+    lDevice = device_create( aThis->mClass, NULL, aThis->mDevId, NULL, "ONK_Pro1000_%u", aIndex );
+    if ( NULL == lDevice )
+    {
+        printk( KERN_ERR "%s - device_create( , , , , , %u ) failed\n", __FUNCTION__, aIndex );
+        cdev_del( aThis->mCDev );
+        return ( - __LINE__ );
+    }
+
+    return 0;
+}
+
+// aThis [---;RW-]
+//
+// Device_Init ==> Device_Uninit
+void Device_Uninit( DeviceContext * aThis )
+{
+    printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
+    // device_create ==> device_destroy  See Device_Uninit
+    device_destroy( aThis->mClass, aThis->mDevId );
+
+    // cdev_alloc ==> cdev_del  See Device_Init
+    cdev_del( aThis->mCDev );
+}
 
 // aThis [---;RW-]
 //

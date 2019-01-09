@@ -9,5 +9,5 @@
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
-extern void * Device_Create( struct pci_dev * aPciDev, unsigned char aMajor, unsigned char aMinor );
+extern void * Device_Create( struct pci_dev * aPciDev, unsigned char aMajor, unsigned char aMinor, unsigned int aIndex, struct class * aClass );
 extern void   Device_Delete( void * aThis );

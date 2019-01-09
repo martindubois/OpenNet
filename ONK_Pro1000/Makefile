@@ -4,6 +4,8 @@
 # Product    OpenNet
 # File       ONK_Pro1000/makefile
 
+-include ../KernelCppFlags.mk
+
 obj-m += ONK_Pro1000.o
 
 ONK_Pro1000-objs := Device_Linux.o DeviceCpp.o Driver_Linux.o Pro1000.o ../Libraries/ONK_Lib.a
@@ -12,7 +14,7 @@ list-multi := ONK_Pro1000.o
 # ===== Rules ===============================================================
 
 .cpp.o:
-	g++ -c -D_KMS_LINUX_ -I ../Includes -o $@ -fno-builtin -fno-exceptions -fno-pic -fno-rtti -nostdinc $<
+	g++ -c -I ../Includes -o $@ $(KERNEL_CPP_FLAGS) $<
 
 # ===== Targets =============================================================
 

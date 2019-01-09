@@ -30,7 +30,18 @@ typedef long unsigned int size_t;
 #define _IOC_SIZESHIFT ( _IOC_TYPESHIFT + _IOC_TYPEBITS )
 #define _IOC_DIRSHIFT  ( _IOC_SIZESHIFT + _IOC_SIZEBITS )
 
-#define KERN_DEBUG "d"
+#define KERN_SOH "\001"
+
+#define KERN_EMERG   KERN_SOH "0"
+#define KERN_ALERT   KERN_SOH "1"
+#define KERN_CRIT    KERN_SOH "2"
+#define KERN_ERR     KERN_SOH "3"
+#define KERN_WARNING KERN_SOH "4"
+#define KERN_NOTICE  KERN_SOH "5"
+#define KERN_INFO    KERN_SOH "6"
+#define KERN_DEBUG   KERN_SOH "7"
+
+#define KERN_DEFAULT KERN_SOH "d"
 
 #define NULL ( 0 )
 

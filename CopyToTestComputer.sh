@@ -12,13 +12,24 @@ echo Excuting  ImpCopyToTestComputer.sh  ...
 
 TEST_COMPUTER=192.168.0.199
 
+# ===== Initialisation ======================================================
+
+DST_FOLDER=~/OpenNet
+
 # ===== Execution ===========================================================
 
-scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:~/OpenNet/ONK_Pro1000/ONK_Pro1000.ko
+scp Binaries/ONK_Test $TEST_COMPUTER:$DST_FOLDER/Binaries/ONK_Test
 
 if [ 0 != $? ] ; then
-    echo ERROR  scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:~/OpenNet/ONK_Pro1000/ONK_Pro1000.ko  failed - $?
+    echo ERROR  scp Binaries/ONK_Test $TEST_COMPUTER:$DST_FOLDER/Binaries/ONK_Test  failed - $?
     exit 1
+fi
+
+scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Pro1000/ONK_Pro1000.ko
+
+if [ 0 != $? ] ; then
+    echo ERROR  scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Pro1000/ONK_Pro1000.ko  failed - $?
+    exit 2
 fi
 
 # ===== End =================================================================

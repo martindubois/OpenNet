@@ -10,8 +10,11 @@ all:	Binaries/ONK_Test Binaries/OpenNet.so Binaries/OpenNet_Test Binaries/OpenNe
 
 clean:
 	rm -f Binaries/*
+	rm -f ONK_Lib/*.o
+	rm -f ONK_Pro1000/*.o
 	rm -f OpenNet/*.o
 	rm -f OpenNet_Test/*.o
+	rm -f OpenNet_Tool/*.o
 	rm -f Libraries/*.a
 	rm -f TestLib/*.o
 

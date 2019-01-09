@@ -42,10 +42,20 @@ typedef struct
 }
 DeviceInfo;
 
+typedef struct
+{
+    struct class * mClass      ;
+    dev_t          mDevice     ;
+    unsigned int   mDeviceCount;
+    DeviceInfo     mDevices[ DEVICE_COUNT_MAX ];
+}
+DriverContext;
+
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Entry point ========================================================
+static char      * DevNode( struct device * aDev, umode_t * aMode );
 static void __exit Exit  ( void );
 static int  __init Init  ( void );
 static int         Probe ( struct pci_dev * aDev, const struct pci_device_id * aId );
@@ -54,12 +64,6 @@ static void        Remove( struct pci_dev * aDev );
 // Static variables
 /////////////////////////////////////////////////////////////////////////////
 
-static dev_t sDevice;
-
-static unsigned int sDeviceCount = 0;
-
-static DeviceInfo sDevices[ DEVICE_COUNT_MAX ];
-
 static struct pci_driver sPciDriver =
 {
     .name     = NAME    ,
@@ -67,6 +71,8 @@ static struct pci_driver sPciDriver =
     .probe    = Probe   ,
     .remove   = Remove  ,
 };
+
+static DriverContext sThis;
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
@@ -78,13 +84,25 @@ void * Driver_FindDevice( unsigned char aMinor )
 {
     printk( KERN_INFO "%s( %u )\n", __FUNCTION__, aMinor );
 
-    return sDevices[ aMinor - MINOR( sDevice ) ].mDevice;
+    return sThis.mDevices[ aMinor - MINOR( sThis.mDevice ) ].mDevice;
 }
 
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Entry point ========================================================
+
+char * DevNode( struct device * aDev, umode_t * aMode )
+{
+    printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );
+
+    if ( NULL != aMode )
+    {
+        ( * aMode ) = 0666;
+    }
+
+    return NULL;
+}
 
 void Exit()
 {
@@ -93,8 +111,11 @@ void Exit()
     // pci_register_driver ==> pci_unregister_driver  See Init
     pci_unregister_driver( & sPciDriver );
 
+    // class_create ==> class_destroy  See Init
+    class_destroy( sThis.mClass );
+
     // alloc_chrdev_region ==> unregister_chrdev_region  See Init
-    unregister_chrdev_region( sDevice, DEVICE_COUNT_MAX );
+    unregister_chrdev_region( sThis.mDevice, DEVICE_COUNT_MAX );
 }
 
 int Init()
@@ -103,12 +124,27 @@ int Init()
 
     printk( KERN_INFO "%s()\n", __FUNCTION__ );
 
+    sThis.mDeviceCount = 0;
+
+    // class_create ==> class_destroy  See Exit
+    sThis.mClass = class_create( THIS_MODULE, NAME );
+    if ( NULL == sThis.mClass )
+    {
+        printk( KERN_ERR "%s - class_create( ,  ) failed", __FUNCTION__ );
+        return ( - __LINE__ );
+    }
+
+    sThis.mClass->devnode = DevNode;
+
     // alloc_chrdev_region ==> unregister_chrdev_region  See Exit
-    lRet = alloc_chrdev_region( & sDevice, 0, DEVICE_COUNT_MAX, NAME );
+    lRet = alloc_chrdev_region( & sThis.mDevice, 0, DEVICE_COUNT_MAX, NAME );
     if ( 0 != lRet )
     {
         printk( KERN_ERR "%s - alloc_chrdev_region( , , ,  ) failed - %d\n", __FUNCTION__, lRet );
-        return lRet;
+
+        class_destroy( sThis.mClass );
+
+        return ( - __LINE__ );
     }
 
     // pci_register_driver ==> pci_unregister_driver  See Exit
@@ -117,9 +153,11 @@ int Init()
     {
         printk( KERN_ERR "%s - pci_register_driver(  ) failed - %d\n", __FUNCTION__, lRet );
 
-        unregister_chrdev_region( sDevice, DEVICE_COUNT_MAX );
+        unregister_chrdev_region( sThis.mDevice, DEVICE_COUNT_MAX );
+        
+        class_destroy( sThis.mClass );
 
-        return lRet;
+        return ( - __LINE__ );
     }
 
     return 0;
@@ -132,15 +170,15 @@ int Probe( struct pci_dev * aDev, const struct pci_device_id * aId )
 {
     printk( KERN_INFO "%s( ,  )\n", __FUNCTION__ );
 
-    sDevices[ sDeviceCount ].mDevice = Device_Create( aDev, MAJOR( sDevice ), MINOR( sDevice ) + sDeviceCount );
-    sDevices[ sDeviceCount ].mPciDev =                aDev;
+    sThis.mDevices[ sThis.mDeviceCount ].mDevice = Device_Create( aDev, MAJOR( sThis.mDevice ), MINOR( sThis.mDevice ) + sThis.mDeviceCount, sThis.mDeviceCount, sThis.mClass );
+    sThis.mDevices[ sThis.mDeviceCount ].mPciDev =                aDev;
 
-    if ( NULL == sDevices[ sDeviceCount ].mDevice )
+    if ( NULL == sThis.mDevices[ sThis.mDeviceCount ].mDevice )
     {
         return ( - __LINE__ );
     }
 
-    sDeviceCount ++;
+    sThis.mDeviceCount ++;
 
     return 0;
 }
@@ -151,14 +189,14 @@ static void Remove( struct pci_dev * aDev )
 
     printk( KERN_INFO "%s(  )\n", __FUNCTION__ );
 
-    for ( i = 0; i < sDeviceCount; i ++ )
+    for ( i = 0; i < sThis.mDeviceCount; i ++ )
     {
-        if ( aDev == sDevices[ i ].mPciDev )
+        if ( aDev == sThis.mDevices[ i ].mPciDev )
         {
-            Device_Delete( sDevices[ i ].mDevice );
+            Device_Delete( sThis.mDevices[ i ].mDevice );
 
-            sDevices[ i ].mDevice = NULL;
-            sDevices[ i ].mPciDev = NULL;
+            sThis.mDevices[ i ].mDevice = NULL;
+            sThis.mDevices[ i ].mPciDev = NULL;
 
             return;
         }
