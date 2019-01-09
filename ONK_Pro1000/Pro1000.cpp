@@ -383,7 +383,7 @@ void Pro1000::Packet_Receive_NoLock(uint64_t aData, OpenNetK::Packet * aPacketDa
     mRx_PacketData[mRx_In] = aPacketData;
     mRx_PacketInfo[mRx_In] = aPacketInfo;
 
-    mRx_PacketData[mRx_In]->mState = OPEN_NET_PACKET_STATE_RX_RUNNING; // Writing DirectGMA buffer !
+    mRx_PacketData[mRx_In]->IndicateRxRunning();
 
     memset((Pro1000_Rx_Descriptor *)(mRx_Virtual) + mRx_In, 0, sizeof(Pro1000_Rx_Descriptor)); // volatile_cast
 
@@ -393,9 +393,13 @@ void Pro1000::Packet_Receive_NoLock(uint64_t aData, OpenNetK::Packet * aPacketDa
 }
 
 // CRITICAL PATH - Packet
-void Pro1000::Packet_Send_NoLock(uint64_t aData, unsigned int aSize_byte, volatile long * aCounter)
+void Pro1000::Packet_Send_NoLock(uint64_t aLogicalAddress, const void *, unsigned int aSize_byte, volatile long * aCounter)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u,  )" DEBUG_EOL, aSize_byte);
+    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , , %u,  )" DEBUG_EOL, aSize_byte);
+
+    ASSERT(0    != aLogicalAddress);
+    ASSERT(0    <  aSize_byte     );
+    ASSERT(NULL != aCounter       );
 
     ASSERT(TX_DESCRIPTOR_QTY >  mTx_In     );
     ASSERT(NULL              != mTx_Virtual);
@@ -404,7 +408,7 @@ void Pro1000::Packet_Send_NoLock(uint64_t aData, unsigned int aSize_byte, volati
 
     mTx_Virtual[mTx_In].mFields.mDescriptorDone = false     ;
     mTx_Virtual[mTx_In].mFields.mSize_byte      = aSize_byte;
-    mTx_Virtual[mTx_In].mLogicalAddress         = aData     ;
+    mTx_Virtual[mTx_In].mLogicalAddress         = aLogicalAddress;
 
     mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
 }
@@ -434,7 +438,7 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigne
 
         for (unsigned int i = 0; i < aRepeatCount; i++)
         {
-            Packet_Send_NoLock(lPacket_PA, aSize_byte, NULL);
+            Packet_Send_NoLock(lPacket_PA, NULL, aSize_byte, NULL);
         }
 
     Unlock_AfterSend(NULL, aRepeatCount);
@@ -554,14 +558,13 @@ void Pro1000::Rx_Process_Zone0()
             break;
         }
 
-        ASSERT(NULL                             != mRx_Counter   [mRx_Out]              );
-        ASSERT(NULL                             != mRx_PacketData[mRx_Out]              );
-        ASSERT(OPEN_NET_PACKET_STATE_RX_RUNNING == mRx_PacketData[mRx_Out]->mState      );
-        ASSERT(NULL                             != mRx_PacketInfo[mRx_Out]              );
+        ASSERT(NULL != mRx_Counter   [mRx_Out]);
+        ASSERT(NULL != mRx_PacketData[mRx_Out]);
+        ASSERT(NULL != mRx_PacketInfo[mRx_Out]);
 
-        mRx_PacketData[mRx_Out]->mState           = OPEN_NET_PACKET_STATE_RX_COMPLETED;
-        mRx_PacketInfo[mRx_Out]->mSize_byte       = mRx_Virtual[mRx_Out].mSize_byte   ; // Writing DirectGMA buffer !
-        mRx_PacketInfo[mRx_Out]->mSendTo          =                                  0; // Writing DirectGMA buffer !
+        mRx_PacketData[mRx_Out]->IndicateRxCompleted();
+        mRx_PacketInfo[mRx_Out]->mSize_byte = mRx_Virtual[mRx_Out].mSize_byte; // Writing DirectGMA buffer !
+        mRx_PacketInfo[mRx_Out]->mSendTo    =                               0; // Writing DirectGMA buffer !
 
         #ifdef _KMS_WINDOWS_
             InterlockedDecrement(mRx_Counter[mRx_Out]);

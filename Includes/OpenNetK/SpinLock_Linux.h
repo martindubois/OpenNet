@@ -33,11 +33,9 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Constructor
-        /// \param  aDevice [---;RW-] The WDFDEVICE instance
         /// \endcond
         /// \cond fr
         /// \brief  Constructeur
-        /// \param  aDevice [---;RW-] L'intance de WDFDEVICE
         /// \endcond
         SpinLock_Linux();
 

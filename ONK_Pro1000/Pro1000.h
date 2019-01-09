@@ -39,8 +39,8 @@ public:
     virtual void         Interrupt_Process2();
     virtual void         Unlock_AfterReceive  (volatile long * aCounter, unsigned int aPacketQty);
     virtual void         Unlock_AfterSend     (volatile long * aCounter, unsigned int aPacketQty);
-    virtual void         Packet_Receive_NoLock(uint64_t aLogicalAddres, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
-    virtual void         Packet_Send_NoLock   (uint64_t aData, unsigned int aSize_byte, volatile long * aCounter = NULL);
+    virtual void         Packet_Receive_NoLock(uint64_t aLogicalAddress, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
+    virtual void         Packet_Send_NoLock   (uint64_t aLogicalAddress, const void * aVirtualAddress, unsigned int aSize_byte, volatile long * aCounter = NULL);
     virtual void         Packet_Send       (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);
     virtual unsigned int Statistics_Get    (uint32_t * aOut, unsigned int aOutSize_byte, bool aReset);
     virtual void         Statistics_Reset  ();

@@ -32,11 +32,11 @@
 #endif
 
 #ifdef _KMS_WINDOWS_
-    #define IOCTL_CODE(N)      CTL_CODE( 0x8000, 0x800 + N, METHODE_BUFFERED, FILE_ANY_ACCESS)
-    #define IOCTL_CODE_R(N,S)  CTL_CODE( 0x8000, 0x800 + N, METHODE_BUFFERED, FILE_ANY_ACCESS)
-    #define IOCTL_CODE_RW(N,S) CTL_CODE( 0x8000, 0x800 + N, METHODE_BUFFERED, FILE_ANY_ACCESS)
-    #define IOCTL_CODE_W(N,S)  CTL_CODE( 0x8000, 0x800 + N, METHODE_BUFFERED, FILE_ANY_ACCESS)
-    #define IOCTL_CODE_W2(N,S) CTL_CODE( 0x8000, 0x800 + N, METHODE_BUFFERED, FILE_ANY_ACCESS)
+    #define IOCTL_CODE(N)      CTL_CODE( 0x8000, 0x800 + N, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    #define IOCTL_CODE_R(N,S)  CTL_CODE( 0x8000, 0x800 + N, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    #define IOCTL_CODE_RW(N,S) CTL_CODE( 0x8000, 0x800 + N, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    #define IOCTL_CODE_W(N,S)  CTL_CODE( 0x8000, 0x800 + N, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    #define IOCTL_CODE_W2(N,S) CTL_CODE( 0x8000, 0x800 + N, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #endif
 
 // Constants
@@ -88,6 +88,10 @@
 // Input   None
 // Output  None
 #define IOCTL_STOP              IOCTL_CODE(112)
+
+// TODO  OpenNetK.IoCtl
+//       Normal - Ajouter PACKET_GENERATOR_START et PACKET_GENERATOR_STOP et
+//       implanter un packet generator directement dans ONK_Lib
 
 // Data types
 /////////////////////////////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 // Product / Produit  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \Copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Adapter.h
 /// \brief      OpenNetK::Adapter
 
@@ -74,6 +74,7 @@ namespace OpenNetK
         {
             Buffer mBuffer;
 
+            uint8_t              * mBase  ;
             OpenNet_BufferHeader * mHeader;
             volatile uint32_t    * mMarker;
             Packet               * mPackets;

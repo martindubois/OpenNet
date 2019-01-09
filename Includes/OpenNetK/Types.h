@@ -35,13 +35,6 @@
 
 // ===== Packet state / Etat d'un paquet ====================================
 
-// --> TX_RUNNING <------- PX_COMPLETED <--+
-//      |                                  |
-//      +--> RX_RUNNING --> RX_COMPLETED --+
-#define OPEN_NET_PACKET_STATE_PX_COMPLETED (1)
-#define OPEN_NET_PACKET_STATE_RX_COMPLETED (2)
-#define OPEN_NET_PACKET_STATE_RX_RUNNING   (3)
-
 #define OPEN_NET_PACKET_PROCESSED (0x80000000)
 
 // Data type / Type de donnees

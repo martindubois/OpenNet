@@ -43,11 +43,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC
 		Includes\OpenNetK\Interface.h = Includes\OpenNetK\Interface.h
 		Includes\OpenNetK\IPv4.h = Includes\OpenNetK\IPv4.h
 		Includes\OpenNetK\Kernel.h = Includes\OpenNetK\Kernel.h
+		Includes\OpenNetK\OS.h = Includes\OpenNetK\OS.h
 		Includes\OpenNetK\Packet.h = Includes\OpenNetK\Packet.h
 		Includes\OpenNetK\SpinLock.h = Includes\OpenNetK\SpinLock.h
 		Includes\OpenNetK\SpinLock_WDF.h = Includes\OpenNetK\SpinLock_WDF.h
 		Includes\OpenNetK\StdInt.h = Includes\OpenNetK\StdInt.h
 		Includes\OpenNetK\Types.h = Includes\OpenNetK\Types.h
+		Includes\OpenNetK\Windows.h = Includes\OpenNetK\Windows.h
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Lib", "ONK_Lib\ONK_Lib.vcxproj", "{03ADF26E-74F0-4F2A-989B-F408B0AAC441}"

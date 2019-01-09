@@ -55,7 +55,7 @@ public:
     virtual OpenNet::Status GetStatistics  (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
     virtual OpenNet::Status ResetStatistics();
 
-protected:
+// Internal
 
     // ===== KmsLib::ThreadBase =============================================
     unsigned int Run();

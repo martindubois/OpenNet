@@ -47,6 +47,11 @@ namespace OpenNetK
     }
     EthernetAddress;
 
+    // TODO OpenNetK.Adapter_Types
+    //      Normal - Ajouter des informations : debug/release, date et heure
+    //      de compilation, nom du client, type de licence, nombre de
+    //      licences
+
     /// \cond en
     /// \brief  This structure is used to return the version of a component.
     /// \endcond
@@ -101,6 +106,9 @@ namespace OpenNetK
         uint8_t  mReserved1[112];
     }
     Adapter_Config;
+
+    // TODO  OpenNetK.Adapter
+    //       Normal - Ajouter la largeur de lien PCIe a l'information
 
     /// \cond en
     /// \brief  This structure is used to return the information about an

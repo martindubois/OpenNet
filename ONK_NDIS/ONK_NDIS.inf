@@ -29,7 +29,7 @@ ONK_NDIS.sys = 1, ,
 %Str_ManufacturerName% = Standard, NTamd64
 
 [Standard.NTamd64]
-%Str_DeviceDescription% = ONK_NDIS.NT, Root\ONK_NDIS
+%Str_DeviceDescription% = ONK_NDIS.NT, PCI\VEN_8086&DEV_10D3
 
 ; ===== Install =============================================================
 
