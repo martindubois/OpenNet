@@ -25,11 +25,25 @@ if [ 0 != $? ] ; then
     exit 1
 fi
 
+scp Binaries/OpenNet.so $TEST_COMPUTER:$DST_FOLDER/Binaries/OpenNet.so
+
+if [ 0 != $? ] ; then
+    echo ERROR  scp Binaries/OpenNet.so $TEST_COMPUTER:$DST_FOLDER/Binaries/OpenNet.so  failed - $?
+    exit 2
+fi
+
+scp Binaries/OpenNet_Test $TEST_COMPUTER:$DST_FOLDER/Binaries/OpenNet_Test
+
+if [ 0 != $? ] ; then
+    echo ERROR  scp Binaries/OpenNet_Test $TEST_COMPUTER:$DST_FOLDER/Binaries/OpenNet_Test  failed - $?
+    exit 3
+fi
+
 scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Pro1000/ONK_Pro1000.ko
 
 if [ 0 != $? ] ; then
     echo ERROR  scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Pro1000/ONK_Pro1000.ko  failed - $?
-    exit 2
+    exit 4
 fi
 
 # ===== End =================================================================

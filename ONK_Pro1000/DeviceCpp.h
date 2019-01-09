@@ -27,4 +27,6 @@ extern void DeviceCpp_Uninit( void * aThis );
 
 extern ProcessIrqResult DeviceCpp_Interrupt_Process ( void * aThis, unsigned int aMessageId );
 extern void             DeviceCpp_Interrupt_Process2( void * aThis );
+extern int              DeviceCpp_IoCtl             ( void * aThis, unsigned int aCode, void * aInOut );
+extern int              DeviceCpp_IoCtl_GetInfo     ( unsigned int aCode, unsigned int * aInSize_byte, unsigned int * aOutSize_byte );
 extern int              DeviceCpp_SetMemory         ( void * aThis, unsigned int aIndex, void * aVirtual, unsigned int aSize_byte );

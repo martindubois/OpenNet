@@ -8,13 +8,6 @@
 // Data types
 /////////////////////////////////////////////////////////////////////////////
 
-typedef struct
-{
-    unsigned int mIn_MinSize_byte ;
-    unsigned int mOut_MinSize_byte;
-}
-IoCtl_Info;
-
 typedef enum
 {
     IOCTL_RESULT_OK                = 0x00000000,

@@ -44,6 +44,32 @@ namespace OpenNetK
     // Public
     /////////////////////////////////////////////////////////////////////////
 
+    bool Adapter::IoCtl_GetInfo(unsigned int aCode, IoCtl_Info * aInfo)
+    {
+        ASSERT(NULL != aInfo);
+
+        memset(aInfo, 0, sizeof(IoCtl_Info));
+
+        switch (aCode)
+        {
+        case IOCTL_CONFIG_GET      :                                                       aInfo->mOut_MinSize_byte = sizeof(Adapter_Config); break;
+        case IOCTL_CONFIG_SET      : aInfo->mIn_MinSize_byte = sizeof(Adapter_Config    ); aInfo->mOut_MinSize_byte = sizeof(Adapter_Config); break;
+        case IOCTL_CONNECT         : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Connect_In  );                                                    break;
+        case IOCTL_INFO_GET        :                                                       aInfo->mOut_MinSize_byte = sizeof(Adapter_Info  ); break;
+        case IOCTL_PACKET_SEND     :                                                                                                          break;
+        case IOCTL_PACKET_SEND_EX  : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Packet_Send_Ex_In);                                               break;
+        case IOCTL_START           : aInfo->mIn_MinSize_byte = sizeof(Buffer            );                                                    break;
+        case IOCTL_STATE_GET       :                                                       aInfo->mOut_MinSize_byte = sizeof(Adapter_State ); break;
+        case IOCTL_STATISTICS_GET  : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Stats_Get_In);                                                    break;
+        case IOCTL_STATISTICS_RESET:                                                                                                          break;
+        case IOCTL_STOP            :                                                                                                          break;
+
+        default : return false;
+        }
+
+        return true;
+    }
+
     void Adapter::SetHardware(Hardware * aHardware)
     {
         ASSERT(NULL != aHardware);
@@ -55,44 +81,6 @@ namespace OpenNetK
 
     // Internal
     /////////////////////////////////////////////////////////////////////////
-
-    // aInfo [---;-W-]
-    //
-    // Return
-    //  false  Invalid IoCtl code
-    //  true   OK
-    //
-    // Static function - No stats
-    //
-    // Level   SoftInt
-    // Thread  Queue
-    bool Adapter::IoCtl_GetInfo(unsigned int aCode, void * aInfo)
-    {
-        ASSERT(NULL != aInfo);
-
-        IoCtl_Info * lInfo = reinterpret_cast<IoCtl_Info *>(aInfo);
-
-        memset(lInfo, 0, sizeof(IoCtl_Info));
-
-        switch (aCode)
-        {
-        case IOCTL_CONFIG_GET      :                                                       lInfo->mOut_MinSize_byte = sizeof(Adapter_Config); break;
-        case IOCTL_CONFIG_SET      : lInfo->mIn_MinSize_byte = sizeof(Adapter_Config    ); lInfo->mOut_MinSize_byte = sizeof(Adapter_Config); break;
-        case IOCTL_CONNECT         : lInfo->mIn_MinSize_byte = sizeof(IoCtl_Connect_In  );                                                    break;
-        case IOCTL_INFO_GET        :                                                       lInfo->mOut_MinSize_byte = sizeof(Adapter_Info  ); break;
-        case IOCTL_PACKET_SEND     :                                                                                                          break;
-        case IOCTL_PACKET_SEND_EX  : lInfo->mIn_MinSize_byte = sizeof(IoCtl_Packet_Send_Ex_In);                                               break;
-        case IOCTL_START           : lInfo->mIn_MinSize_byte = sizeof(Buffer            );                                                    break;
-        case IOCTL_STATE_GET       :                                                       lInfo->mOut_MinSize_byte = sizeof(Adapter_State ); break;
-        case IOCTL_STATISTICS_GET  : lInfo->mIn_MinSize_byte = sizeof(IoCtl_Stats_Get_In);                                                    break;
-        case IOCTL_STATISTICS_RESET:                                                                                                          break;
-        case IOCTL_STOP            :                                                                                                          break;
-
-        default : return false;
-        }
-
-        return true;
-    }
 
     // aZone0 [-K-;RW-] The spinlock
     //

@@ -15,6 +15,7 @@ SOURCES =	Adapter.cpp        \
 			Hardware.cpp       \
 			Hardware_Linux.cpp \
 			Linux.cpp          \
+			Packet.cpp         \
 			SpinLock.cpp       \
 			SpinLock_Linux.cpp
 

@@ -44,6 +44,28 @@ namespace OpenNetK
 
     public:
 
+        typedef struct
+        {
+            unsigned int mIn_MinSize_byte ;
+            unsigned int mOut_MinSize_byte;
+        }
+        IoCtl_Info;
+
+        /// \cond en
+        /// \brief  Retrieve information about an IoCtl code
+        /// \param  aCode  The IoCtl code
+        /// \param  aInfo  The output buffer
+        /// \retval false  Error
+        /// \endcond
+        /// \cond fr
+        /// \brief  Optenir l'information au sujet d'un code IoCtl
+        /// \param  aCode  Le code IoCtl
+        /// \param  aInfo  L'espace memoire de sortie
+        /// \retval false  Erreur
+        /// \endcond
+        /// \retval true   OK
+        static bool IoCtl_GetInfo(unsigned int aCode, IoCtl_Info * aInfo);
+
         /// \cond en
         /// \brief  Connect the Hardware instance
         /// \param  aHardware [-K-;RW-] The Hardware instance
@@ -95,8 +117,6 @@ namespace OpenNetK
             uint8_t mReserved1[32];
         }
         BufferInfo;
-
-        static bool IoCtl_GetInfo(unsigned int aCode, void * aInfo);
 
         void Init(SpinLock * aZone0);
 

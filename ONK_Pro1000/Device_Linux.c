@@ -11,6 +11,7 @@
 #include <linux/cdev.h>
 #include <linux/interrupt.h>
 #include <linux/pci.h>
+#include <linux/uaccess.h>
 
 // ===== ONK_Pro1000 ========================================================
 #include "DeviceCpp.h"
@@ -361,14 +362,71 @@ void IoMem_Uninit( DeviceContext * aThis )
 
 long IoCtl( struct file * aFile, unsigned int aCode, unsigned long aArg )
 {
-    printk( KERN_INFO "%s( , 0x%08x,  )\n", __FUNCTION__, aCode );
+    unsigned int    lInSize_byte ;
+    unsigned int    lOutSize_byte;
+    int             lResult      ;
+    DeviceContext * lThis        ;
 
-    return 0;
+    printk( KERN_DEBUG "%s( , 0x%08x,  )\n", __FUNCTION__, aCode );
+
+    lThis = (DeviceContext *)( aFile->private_data ); // reinterpret_cast
+
+    lResult = DeviceCpp_IoCtl_GetInfo( aCode, & lInSize_byte, & lOutSize_byte );
+    if ( 0 == lResult )
+    {
+        unsigned int lSize_byte = ( lInSize_byte > lOutSize_byte ) ? lInSize_byte : lOutSize_byte;
+        if ( 0 == lSize_byte )
+        {
+            lResult = DeviceCpp_IoCtl( & lThis->mDeviceCpp, aCode, NULL );
+        }
+        else
+        {
+            void * lArg   = (void *)( aArg ); // reinterpret_cast
+            void * lInOut = kmalloc( lSize_byte, GFP_KERNEL );
+            if ( NULL == lInOut )
+            {
+                printk( KERN_ERR "%s - kmalloc( %u bytes ) failed\n", __FUNCTION__, lSize_byte );
+                lResult = ( - __LINE__ );
+            }
+            else
+            {
+                lResult = 0;
+
+                if ( 0 < lInSize_byte )
+                {
+                    lSize_byte = copy_from_user( lInOut, lArg, lInSize_byte );
+                    if ( 0 != lSize_byte )
+                    {
+                        printk( KERN_ERR "%s - copy_from_user( , , %u bytes ) failed - %u\n", __FUNCTION__, lInSize_byte, lSize_byte );
+                        lResult = ( - __LINE__ );
+                    }
+                }
+
+                if ( 0 == lResult )
+                {
+                    lResult = DeviceCpp_IoCtl( & lThis->mDeviceCpp, aCode, lInOut );
+                    if ( ( 0 == lResult ) && ( 0 < lOutSize_byte ) )
+                    {
+                        lSize_byte = copy_to_user(lArg, lInOut, lOutSize_byte );
+                        if ( 0 != lSize_byte )
+                        {
+                            printk( KERN_ERR "%s - copy_to_user( , , %u bytes ) failed - %u\n", __FUNCTION__, lOutSize_byte, lSize_byte );
+                            lResult = ( - __LINE__ );
+                        }
+                    }
+                }
+
+                kfree( lInOut );
+            }
+        }
+    }
+
+    return lResult;
 }
 
 int Open( struct inode * aINode, struct file * aFile )
 {
-    printk( KERN_INFO "%s( ,  )\n", __FUNCTION__ );
+    printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );
 
     aFile->private_data = Driver_FindDevice( iminor( aINode ) );
 
@@ -377,7 +435,7 @@ int Open( struct inode * aINode, struct file * aFile )
 
 int Release( struct inode * aINode, struct file * aFile )
 {
-    printk( KERN_INFO "%s( ,  )\n", __FUNCTION__ );
+    printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );
 
     return 0;
 }

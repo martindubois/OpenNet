@@ -58,7 +58,6 @@ namespace OpenNetK
         /// \cond en
         /// \brief  Process an IoCtl request
         /// \param  aInOut      The data
-        /// \param  aSize_byte  The maximum data size
         /// \param  aCode       The IoCtl request code
         /// \retval     0  OK
         /// \retval Other  Error
@@ -66,12 +65,11 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Traite une commande IoCtl
         /// \param  aInOut      La requete
-        /// \param  aSize_byte  La taille maximal des donnes
         /// \param  aCode       Le code de la commande IoCtl
         /// \retval     0  OK
         /// \retval Other  Erreur
         /// \endcond
-        int IoDeviceControl( void * aInOut, size_t aSize_byte, unsigned int aCode );
+        int IoDeviceControl( void * aInOut, unsigned int aCode );
 
         /// \cond en
         /// \brief  Process the request in the caller context.

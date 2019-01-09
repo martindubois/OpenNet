@@ -105,6 +105,46 @@ void DeviceCpp_Interrupt_Process2( void * aThis )
     lThis->mHardware.Interrupt_Process2();
 }
 
+// aThis  [---;RW-]
+// aCode
+// aInOut [--O;RW-]
+//
+// Return
+//    0  OK
+//  < 0  Error
+int DeviceCpp_IoCtl( void * aThis, unsigned int aCode, void * aInOut )
+{
+    printk( KERN_DEBUG "%s( , 0x%08x,  )\n", __FUNCTION__, aCode );
+
+    ASSERT( NULL != aThis );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    return lThis->mAdapter_Linux.IoDeviceControl( aInOut, aCode );
+}
+
+// aThis [---;RW-]
+// aCode
+int DeviceCpp_IoCtl_GetInfo( unsigned int aCode, unsigned int * aInSize_byte, unsigned int * aOutSize_byte )
+{
+    printk( KERN_DEBUG "%s( 0x%08x, , )\n", __FUNCTION__, aCode );
+
+    ASSERT( NULL != aInSize_byte  );
+    ASSERT( NULL != aOutSize_byte );
+
+    OpenNetK::Adapter::IoCtl_Info lIoCtlInfo;
+
+    if ( ! OpenNetK::Adapter::IoCtl_GetInfo( aCode, & lIoCtlInfo ) )
+    {
+        return ( - __LINE__ );
+    }
+
+    ( * aInSize_byte  ) = lIoCtlInfo.mIn_MinSize_byte ;
+    ( * aOutSize_byte ) = lIoCtlInfo.mOut_MinSize_byte;
+
+    return 0;
+}
+
 // aThis    [---;RW-]
 // aIndex
 // aVirtual [-K-;RW-]

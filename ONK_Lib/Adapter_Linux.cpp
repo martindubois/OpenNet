@@ -54,23 +54,18 @@ namespace OpenNetK
         }
     }
 
-    int Adapter_Linux::IoDeviceControl( void * aInOut, size_t aSize_byte, unsigned int aCode )
+    int Adapter_Linux::IoDeviceControl( void * aInOut, unsigned int aCode )
     {
         ASSERT( NULL != mAdapter );
 
-        IoCtl_Info lInfo;
+        Adapter::IoCtl_Info lInfo;
 
         if ( ! mAdapter->IoCtl_GetInfo( aCode, & lInfo ) )
         {
             return ( - __LINE__ );
         }
 
-        if ( ( aSize_byte < lInfo.mIn_MinSize_byte ) || ( aSize_byte < lInfo.mOut_MinSize_byte ) )
-        {
-            return ( - __LINE__ );
-        }
-
-        int lRet = mAdapter->IoCtl( aCode, aInOut, static_cast< unsigned int >( aSize_byte ), aInOut, static_cast< unsigned int >( aSize_byte ) );
+        int lRet = mAdapter->IoCtl( aCode, aInOut, lInfo.mIn_MinSize_byte, aInOut, lInfo.mOut_MinSize_byte );
 
         ProcessIoCtlResult( lRet );
 
