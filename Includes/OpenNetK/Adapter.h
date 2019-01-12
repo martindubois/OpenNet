@@ -46,6 +46,7 @@ namespace OpenNetK
 
         typedef struct
         {
+            unsigned int mIn_MaxSize_byte ;
             unsigned int mIn_MinSize_byte ;
             unsigned int mOut_MinSize_byte;
         }

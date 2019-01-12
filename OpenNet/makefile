@@ -6,7 +6,7 @@
 
 CFLAGS = -fpic -g
 
-INCLUDES = -I ../Includes -I ../Import/Includes
+INCLUDES = -I ../Includes -I ../Import/Includes -I /usr/local/cuda/include
 
 LIBRARIES = ../Import/Libraries/KmsLib.a
 
@@ -14,7 +14,9 @@ OUTPUT = ../Binaries/OpenNet.so
 
 SOURCES =	Adapter.cpp                  \
 			Adapter_Internal.cpp		 \
+			Adapter_Linux.cpp            \
 			Buffer_Data.cpp              \
+			CUDAW.cpp                    \
 			Function.cpp                 \
 			Function_Forward.cpp         \
 			Kernel.cpp                   \
@@ -24,12 +26,14 @@ SOURCES =	Adapter.cpp                  \
 			PacketGenerator.cpp          \
 			PacketGenerator_Internal.cpp \
 			Processor.cpp                \
+			Processor_CUDA.cpp           \
 			Processor_Internal.cpp       \
 			SourceCode.cpp			     \
 			SourceCode_Forward.cpp       \
 			StatisticsProvider.cpp       \
 			Status.cpp                   \
 			System.cpp                   \
+			System_CUDA.cpp              \
 			System_Internal.cpp          \
 			Thread.cpp                   \
 			Thread_Functions.cpp		 \
@@ -48,7 +52,7 @@ OBJECTS = $(SOURCES:.cpp=.o)
 # ===== Targets ==============================================================
 
 $(OUTPUT) : $(OBJECTS) $(LIBRARIES)
-	g++ -shared -o $@ $^
+	g++ -L /usr/local/cuda/lib64 -l cudart -shared -o $@ $^
 
 depend:
 	makedepend -Y $(INCLUDES) $(SOURCES)

@@ -32,7 +32,12 @@ typedef struct
 {
     struct cdev    * mCDev  ;
     struct class   * mClass ;
+    struct device  * mDevice;
     struct pci_dev * mPciDev;
+
+    void        * mCommon_Virtual  ;
+    dma_addr_t    mCommon_Physical ;
+    unsigned int  mCommon_Size_byte;
 
     int mIrq        ;
     int mVectorCount;
@@ -49,6 +54,9 @@ DeviceContext;
 
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
+
+static int  Copy_FromUser( void * aOut, const void * aIn, unsigned int aMax_byte, unsigned int aMin_byte, unsigned int * aInfo_byte );
+static int  Copy_ToUser  ( void * aOut, const void * aIn, unsigned int aSize_byte );
 
 static int  Device_Init  ( DeviceContext * aThis, unsigned int aIndex );
 static void Device_Uninit( DeviceContext * aThis );
@@ -94,6 +102,8 @@ static struct file_operations sOperations =
 // Return
 //  NULL   Error
 //  Other  The address of the created instance
+//
+// Device_Create ==> Device_Delete
 void * Device_Create( struct pci_dev * aPciDev, unsigned char aMajor, unsigned char aMinor, unsigned int aIndex, struct class * aClass )
 {
     DeviceContext * lResult;
@@ -121,32 +131,35 @@ void * Device_Create( struct pci_dev * aPciDev, unsigned char aMajor, unsigned c
         pci_enable_device( aPciDev );
 
         // IoMem_Init ==> IoMem_Uninit  See Device_Delete
-        if ( 0 != IoMem_Init( lResult ) )  { goto Error1; }
+        if ( 0 != IoMem_Init( lResult ) )  { goto Error0; }
 
-        if ( 0 != Dma_Init( lResult ) ) { goto Error2; }
+        if ( 0 != Dma_Init( lResult ) ) { goto Error1; }
 
         // Interrupt_Init ==> Interrupt_Uninit  See Device_Delete
-        if ( 0 != Interrupt_Init( lResult ) ) { goto Error2; }
+        if ( 0 != Interrupt_Init( lResult ) ) { goto Error1; }
 
         // Device_Init ==> Device_Uninit  See Device_Delete
-        if ( 0 != Device_Init( lResult, aIndex ) ) { goto Error0; }
+        if ( 0 != Device_Init( lResult, aIndex ) ) { goto Error2; }
     }
 
     return lResult;
 
 Error2:
-    IoMem_Uninit( lResult );
+    Interrupt_Uninit( lResult );
 
 Error1:
-    pci_disable_device( aPciDev );
+    IoMem_Uninit( lResult );
 
 Error0:
+    pci_disable_device( aPciDev );
     DeviceCpp_Uninit( lResult->mDeviceCpp );
     kfree( lResult );
     return NULL;
 }
 
 // aThis [D--;RW-] The instance to delete
+//
+// Device_Create ==> Device_Delete
 void Device_Delete( void * aThis )
 {
     DeviceContext * lThis = aThis;
@@ -175,6 +188,54 @@ void Device_Delete( void * aThis )
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
 
+// aOut       [---;-W-]
+// aIn        [---;R--]
+// aMax_byte            The maximum size to copy
+// aMin_byte            The minimum size to copy
+// aInfo_byte [---;RW-] The function puts the copied size there.
+//
+// Return
+//    0  OK
+//  < 0  Error
+int Copy_FromUser( void * aOut, const void * aIn, unsigned int aMax_byte, unsigned int aMin_byte, unsigned int * aInfo_byte )
+{
+    if ( 0 < aMax_byte )
+    {
+        int lSize_byte = copy_from_user( aOut, aIn, aMax_byte );
+        if ( ( aMax_byte - aMin_byte ) < lSize_byte )
+        {
+            printk( KERN_ERR "%s - copy_from_user( , , %u bytes ) failed - %u\n", __FUNCTION__, aMax_byte, lSize_byte );
+            return ( - __LINE__ );
+        }
+
+        ( * aInfo_byte ) = aMax_byte - lSize_byte;
+    }
+
+    return 0;
+}
+
+// aOut [---;-W-]
+// aIn  [---;R--]
+// aSize_byte     The size to copy
+//
+// Return
+//    0  OK
+//  < 0  Error
+int Copy_ToUser( void * aOut, const void * aIn, unsigned int aSize_byte )
+{
+    if ( 0 < aSize_byte )
+    {
+        int lSize_byte = copy_to_user( aOut, aIn, aSize_byte );
+        if ( 0 != lSize_byte )
+        {
+            printk( KERN_ERR "%s - copy_to_user( %p, %p, %u bytes ) failed - %d\n", __FUNCTION__, aOut, aIn, aSize_byte, lSize_byte );
+            return ( - __LINE__ );
+        }
+    }
+
+    return 0;
+}
+
 // aThis  [---;RW-]
 // aIndex
 //
@@ -185,7 +246,6 @@ void Device_Delete( void * aThis )
 // Device_Init ==> Device_Uninit
 int Device_Init( DeviceContext * aThis, unsigned int aIndex )
 {
-    struct device * lDevice;
     int             lRet   ;
 
     printk( KERN_INFO "%s( , %u )\n", __FUNCTION__, aIndex );
@@ -206,20 +266,37 @@ int Device_Init( DeviceContext * aThis, unsigned int aIndex )
     if ( 0 != lRet )
     {
         printk( KERN_ERR "%s - cdev_add( , ,  ) failed - %d\n", __FUNCTION__, lRet );
-        cdev_del( aThis->mCDev );
-        return ( - __LINE__ );
+        goto Error0;
     }
 
     // device_create ==> device_destroy  See Device_Uninit
-    lDevice = device_create( aThis->mClass, NULL, aThis->mDevId, NULL, "ONK_Pro1000_%u", aIndex );
-    if ( NULL == lDevice )
+    aThis->mDevice = device_create( aThis->mClass, NULL, aThis->mDevId, NULL, "ONK_Pro1000_%u", aIndex );
+    if ( NULL == aThis->mDevice )
     {
         printk( KERN_ERR "%s - device_create( , , , , , %u ) failed\n", __FUNCTION__, aIndex );
-        cdev_del( aThis->mCDev );
-        return ( - __LINE__ );
+        goto Error0;
+    }
+
+    aThis->mCommon_Size_byte = DeviceCpp_CommonBuffer_GetSize( aThis->mDeviceCpp );
+    if ( 0 < aThis->mCommon_Size_byte )
+    {
+        // pci_alloc_consistent ==> pci_free_consistent  See Device_Uninit
+        aThis->mCommon_Virtual = pci_alloc_consistent( aThis->mPciDev, aThis->mCommon_Size_byte, & aThis->mCommon_Physical );
+        if ( NULL == aThis->mCommon_Virtual )
+        {
+            printk( KERN_ERR "%s - pci_alloc_consistent( , %u bytes,  ) failed\n", __FUNCTION__, aThis->mCommon_Size_byte );
+            device_destroy( aThis->mClass, aThis->mDevId );
+            goto Error0;
+        }
+
+        DeviceCpp_CommonBuffer_Set( aThis->mDeviceCpp, aThis->mCommon_Physical, aThis->mCommon_Virtual );
     }
 
     return 0;
+
+Error0:
+    cdev_del( aThis->mCDev );
+    return ( - __LINE__ );
 }
 
 // aThis [---;RW-]
@@ -228,6 +305,9 @@ int Device_Init( DeviceContext * aThis, unsigned int aIndex )
 void Device_Uninit( DeviceContext * aThis )
 {
     printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
+    // pci_alloc_consistent ==> pci_free_consistent  See Device_Init
+    pci_free_consistent( aThis->mPciDev, aThis->mCommon_Size_byte, aThis->mCommon_Virtual, aThis->mCommon_Physical );
 
     // device_create ==> device_destroy  See Device_Uninit
     device_destroy( aThis->mClass, aThis->mDevId );
@@ -247,10 +327,17 @@ int Dma_Init( DeviceContext * aThis )
 
     printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
 
-    lRet = pci_set_dma_mask( aThis->mPciDev, 0xffffffffffffffff );
+    lRet = pci_set_dma_mask( aThis->mPciDev, DMA_BIT_MASK( 64 ) );
     if ( 0 != lRet )
     {
         printk( KERN_ERR "%s - pci_set_dma_mask( ,  ) failed - %d\n", __FUNCTION__, lRet );
+        return __LINE__;
+    }
+
+    lRet = pci_set_consistent_dma_mask( aThis->mPciDev, DMA_BIT_MASK( 64 ) );
+    if ( 0 != lRet )
+    {
+        printk( KERN_ERR "%s - pci_set_consistent_dma_mask( ,  ) failed - %d\n", __FUNCTION__, lRet );
         return __LINE__;
     }
 
@@ -362,22 +449,30 @@ void IoMem_Uninit( DeviceContext * aThis )
 
 long IoCtl( struct file * aFile, unsigned int aCode, unsigned long aArg )
 {
-    unsigned int    lInSize_byte ;
-    unsigned int    lOutSize_byte;
-    int             lResult      ;
-    DeviceContext * lThis        ;
+    unsigned int    lInSizeMax_byte;
+    unsigned int    lInSizeMin_byte;
+    unsigned int    lOutSize_byte  ;
+    int             lResult        ;
+    DeviceContext * lThis          ;
 
-    printk( KERN_DEBUG "%s( , 0x%08x,  )\n", __FUNCTION__, aCode );
+    printk( KERN_DEBUG "%s( %p, 0x%08x, 0x%lx )\n", __FUNCTION__, aFile, aCode, aArg );
 
     lThis = (DeviceContext *)( aFile->private_data ); // reinterpret_cast
 
-    lResult = DeviceCpp_IoCtl_GetInfo( aCode, & lInSize_byte, & lOutSize_byte );
+    lResult = DeviceCpp_IoCtl_GetInfo( aCode, & lInSizeMax_byte, & lInSizeMin_byte, & lOutSize_byte );
     if ( 0 == lResult )
     {
-        unsigned int lSize_byte = ( lInSize_byte > lOutSize_byte ) ? lInSize_byte : lOutSize_byte;
+        int lRet;
+
+        unsigned int lSize_byte = ( lInSizeMax_byte > lOutSize_byte ) ? lInSizeMax_byte : lOutSize_byte;
         if ( 0 == lSize_byte )
         {
-            lResult = DeviceCpp_IoCtl( & lThis->mDeviceCpp, aCode, NULL );
+            lRet = DeviceCpp_IoCtl( & lThis->mDeviceCpp, aCode, NULL, 0 );
+            if ( 0 > lRet )
+            {
+                printk( KERN_ERR "%s - DeviceCpp_IoCtl( , 0x%08x,  ) failed - %d\n", __FUNCTION__, aCode, lRet );
+                lResult = ( - __LINE__ );
+            }
         }
         else
         {
@@ -390,29 +485,20 @@ long IoCtl( struct file * aFile, unsigned int aCode, unsigned long aArg )
             }
             else
             {
-                lResult = 0;
+                unsigned int lInSize_byte = 0; // Avoid the warning
 
-                if ( 0 < lInSize_byte )
-                {
-                    lSize_byte = copy_from_user( lInOut, lArg, lInSize_byte );
-                    if ( 0 != lSize_byte )
-                    {
-                        printk( KERN_ERR "%s - copy_from_user( , , %u bytes ) failed - %u\n", __FUNCTION__, lInSize_byte, lSize_byte );
-                        lResult = ( - __LINE__ );
-                    }
-                }
-
+                lResult = Copy_FromUser( lInOut, lArg, lInSizeMax_byte, lInSizeMin_byte, & lInSize_byte );
                 if ( 0 == lResult )
                 {
-                    lResult = DeviceCpp_IoCtl( & lThis->mDeviceCpp, aCode, lInOut );
-                    if ( ( 0 == lResult ) && ( 0 < lOutSize_byte ) )
+                    lRet = DeviceCpp_IoCtl( & lThis->mDeviceCpp, aCode, lInOut, lInSize_byte );
+                    if ( 0 > lRet )
                     {
-                        lSize_byte = copy_to_user(lArg, lInOut, lOutSize_byte );
-                        if ( 0 != lSize_byte )
-                        {
-                            printk( KERN_ERR "%s - copy_to_user( , , %u bytes ) failed - %u\n", __FUNCTION__, lOutSize_byte, lSize_byte );
-                            lResult = ( - __LINE__ );
-                        }
+                        printk( KERN_ERR "%s - DeviceCpp_IoCtl( , 0x%08x,  ) failed - %d\n", __FUNCTION__, aCode, lRet );
+                        lResult = ( - __LINE__ );
+                    }
+                    else if ( 0 < lRet )
+                    {
+                        lResult = Copy_ToUser( lArg, lInOut, lOutSize_byte );
                     }
                 }
 

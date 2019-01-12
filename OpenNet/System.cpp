@@ -29,7 +29,14 @@
 
 // ===== OpenNet ============================================================
 #include "Adapter_Internal.h"
-#include "System_Internal.h"
+
+#ifdef _KMS_LINUX_
+    #include "System_CUDA.h"
+#endif
+
+#ifdef _KMS_WINDOWS_
+    #include "System_OpenCL.h"
+#endif
 
 namespace OpenNet
 {
@@ -47,7 +54,13 @@ namespace OpenNet
 
         try
         {
-            lResult = new System_Internal();
+            #ifdef _KMS_LINUX_
+                lResult = new System_CUDA();
+            #endif
+
+            #ifdef _KMS_WINDOWS_
+                lResult = new System_OpenCL();
+            #endif
         }
         catch ( ... )
         {

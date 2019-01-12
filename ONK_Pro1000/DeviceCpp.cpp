@@ -76,6 +76,31 @@ void DeviceCpp_Uninit( void * aThis )
 }
 
 // aThis [---;RW-]
+//
+// Return  This function return the size of the needed common buffer in
+//         bytes.
+unsigned int DeviceCpp_CommonBuffer_GetSize( void * aThis )
+{
+    ASSERT( NULL != aThis );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    return lThis->mHardware.GetCommonBufferSize();
+}
+
+// aThis [---;RW-]
+// aPhysical       The physical address of the common buffer
+// aVirtual        The virtual address of the common buffer
+void DeviceCpp_CommonBuffer_Set( void * aThis, unsigned long aPhysical, void * aVirtual )
+{
+    ASSERT( NULL != aThis );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    lThis->mHardware.SetCommonBuffer( aPhysical, aVirtual );
+}
+
+// aThis [---;RW-]
 // aMessageId
 //
 // Return  See PIR_...
@@ -106,41 +131,54 @@ void DeviceCpp_Interrupt_Process2( void * aThis )
 }
 
 // aThis  [---;RW-]
-// aCode
-// aInOut [--O;RW-]
+// aCode            The command code
+// aInOut [--O;RW-] The input and output buffer
+// aInSize_byte     The maximum size of the input buffer
 //
 // Return
 //    0  OK
 //  < 0  Error
-int DeviceCpp_IoCtl( void * aThis, unsigned int aCode, void * aInOut )
+int DeviceCpp_IoCtl( void * aThis, unsigned int aCode, void * aInOut, unsigned int aInSize_byte )
 {
-    printk( KERN_DEBUG "%s( , 0x%08x,  )\n", __FUNCTION__, aCode );
+    printk( KERN_DEBUG "%s( , 0x%08x, , %u bytes )\n", __FUNCTION__, aCode, aInSize_byte );
 
     ASSERT( NULL != aThis );
 
     DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
 
-    return lThis->mAdapter_Linux.IoDeviceControl( aInOut, aCode );
+    return lThis->mAdapter_Linux.IoDeviceControl( aInOut, aCode, aInSize_byte );
 }
 
-// aThis [---;RW-]
 // aCode
-int DeviceCpp_IoCtl_GetInfo( unsigned int aCode, unsigned int * aInSize_byte, unsigned int * aOutSize_byte )
+// aInSizeMax_byte [---;-W-] The function puts the maximum size of the input
+//                           buffer there.
+// aInSizeMin_byte [---;-W-] The function puts the minimum size of the input
+//                           buffer there
+// aOutSize_byte   [---;-W-] The function puts the size of the output buffer
+//                           there.
+//
+// Return
+//    0  OK
+//  < 0  Error
+int DeviceCpp_IoCtl_GetInfo( unsigned int aCode, unsigned int * aInSizeMax_byte, unsigned int * aInSizeMin_byte, unsigned int * aOutSize_byte )
 {
-    printk( KERN_DEBUG "%s( 0x%08x, , )\n", __FUNCTION__, aCode );
+    printk( KERN_DEBUG "%s( 0x%08x, , , )\n", __FUNCTION__, aCode );
 
-    ASSERT( NULL != aInSize_byte  );
-    ASSERT( NULL != aOutSize_byte );
+    ASSERT( NULL != aInSizeMax_byte );
+    ASSERT( NULL != aInSizeMin_byte );
+    ASSERT( NULL != aOutSize_byte   );
 
     OpenNetK::Adapter::IoCtl_Info lIoCtlInfo;
 
     if ( ! OpenNetK::Adapter::IoCtl_GetInfo( aCode, & lIoCtlInfo ) )
     {
+        printk( KERN_ERR "%s - OpenNetK::Adapter::IoCtl_GetInfo( 0x%08x,  ) failed\n", __FUNCTION__, aCode );
         return ( - __LINE__ );
     }
 
-    ( * aInSize_byte  ) = lIoCtlInfo.mIn_MinSize_byte ;
-    ( * aOutSize_byte ) = lIoCtlInfo.mOut_MinSize_byte;
+    ( * aInSizeMax_byte ) = lIoCtlInfo.mIn_MaxSize_byte ;
+    ( * aInSizeMin_byte ) = lIoCtlInfo.mIn_MinSize_byte ;
+    ( * aOutSize_byte   ) = lIoCtlInfo.mOut_MinSize_byte;
 
     return 0;
 }

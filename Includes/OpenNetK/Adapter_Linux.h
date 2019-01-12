@@ -57,19 +57,21 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Process an IoCtl request
-        /// \param  aInOut      The data
-        /// \param  aCode       The IoCtl request code
+        /// \param  aInOut        The data
+        /// \param  aCode         The IoCtl request code
+        /// \param  aInSize_byte  The maximum size of the input space
         /// \retval     0  OK
         /// \retval Other  Error
         /// \endcond
         /// \cond fr
         /// \brief  Traite une commande IoCtl
-        /// \param  aInOut      La requete
-        /// \param  aCode       Le code de la commande IoCtl
+        /// \param  aInOut        La requete
+        /// \param  aCode         Le code de la commande IoCtl
+        /// \param  aInSize_byte  La taille maximale de l'espace memoire d'entre
         /// \retval     0  OK
         /// \retval Other  Erreur
         /// \endcond
-        int IoDeviceControl( void * aInOut, unsigned int aCode );
+        int IoDeviceControl( void * aInOut, unsigned int aCode, unsigned int aInSize_byte );
 
         /// \cond en
         /// \brief  Process the request in the caller context.

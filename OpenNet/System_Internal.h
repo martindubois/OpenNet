@@ -79,14 +79,19 @@ public:
 
     void SendLoopBackPackets(Adapter_Internal * aAdapter);
 
+protected:
+
+    typedef std::vector<Processor_Internal *> ProcessorVector;
+
+    Adapter_Vector   mAdapters  ;
+    IoCtl_Connect_In mConnect   ;
+    KmsLib::DebugLog mDebugLog  ;
+    Info             mInfo      ;
+    ProcessorVector  mProcessors;
+
 private:
 
     typedef std::vector<Thread             *> ThreadVector   ;
-    typedef std::vector<Processor_Internal *> ProcessorVector;
-
-    void FindAdapters  ();
-    void FindPlatform  ();
-    void FindProcessors();
 
     void SetPacketSize(unsigned int aSize_byte);
 
@@ -97,22 +102,9 @@ private:
 
     void Threads_Release();
     
-    #ifdef _KMS_WINDOWS_
-        bool IsExtensionSupported(cl_device_id aDevice);
-    #endif
-
-    Adapter_Vector   mAdapters  ;
     Config           mConfig    ;
-    IoCtl_Connect_In mConnect   ;
-    KmsLib::DebugLog mDebugLog  ;
-    Info             mInfo      ;
-    ProcessorVector  mProcessors;
     unsigned int     mStartFlags;
     State            mState     ;
     ThreadVector     mThreads   ;
     
-    #ifdef _KMS_WINDOWS_
-        cl_platform_id   mPlatform  ;
-    #endif
-
 };

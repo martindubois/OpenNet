@@ -52,17 +52,43 @@ namespace OpenNetK
 
         switch (aCode)
         {
-        case IOCTL_CONFIG_GET      :                                                       aInfo->mOut_MinSize_byte = sizeof(Adapter_Config); break;
-        case IOCTL_CONFIG_SET      : aInfo->mIn_MinSize_byte = sizeof(Adapter_Config    ); aInfo->mOut_MinSize_byte = sizeof(Adapter_Config); break;
-        case IOCTL_CONNECT         : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Connect_In  );                                                    break;
-        case IOCTL_INFO_GET        :                                                       aInfo->mOut_MinSize_byte = sizeof(Adapter_Info  ); break;
-        case IOCTL_PACKET_SEND     :                                                                                                          break;
-        case IOCTL_PACKET_SEND_EX  : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Packet_Send_Ex_In);                                               break;
-        case IOCTL_START           : aInfo->mIn_MinSize_byte = sizeof(Buffer            );                                                    break;
-        case IOCTL_STATE_GET       :                                                       aInfo->mOut_MinSize_byte = sizeof(Adapter_State ); break;
-        case IOCTL_STATISTICS_GET  : aInfo->mIn_MinSize_byte = sizeof(IoCtl_Stats_Get_In);                                                    break;
-        case IOCTL_STATISTICS_RESET:                                                                                                          break;
-        case IOCTL_STOP            :                                                                                                          break;
+        case IOCTL_CONFIG_GET      :
+            aInfo->mOut_MinSize_byte = sizeof(Adapter_Config);
+            break;
+        case IOCTL_CONFIG_SET      :
+            aInfo->mIn_MaxSize_byte  = sizeof(Adapter_Config);
+            aInfo->mIn_MinSize_byte  = sizeof(Adapter_Config);
+            aInfo->mOut_MinSize_byte = sizeof(Adapter_Config);
+            break;
+        case IOCTL_CONNECT         :
+            aInfo->mIn_MaxSize_byte  = sizeof(IoCtl_Connect_In);
+            aInfo->mIn_MinSize_byte  = sizeof(IoCtl_Connect_In);
+            break;
+        case IOCTL_INFO_GET        :
+            aInfo->mOut_MinSize_byte = sizeof(Adapter_Info);
+            break;
+        case IOCTL_PACKET_SEND     :
+            aInfo->mIn_MaxSize_byte  = PACKET_SIZE_MAX_byte;
+            break;
+        case IOCTL_PACKET_SEND_EX  :
+            aInfo->mIn_MaxSize_byte  = sizeof(IoCtl_Packet_Send_Ex_In) + PACKET_SIZE_MAX_byte;
+            aInfo->mIn_MinSize_byte  = sizeof(IoCtl_Packet_Send_Ex_In);
+            break;
+        case IOCTL_START           :
+            aInfo->mIn_MaxSize_byte  = sizeof(Buffer) * OPEN_NET_BUFFER_QTY;
+            aInfo->mIn_MinSize_byte  = sizeof(Buffer);
+            break;
+        case IOCTL_STATE_GET       :
+            aInfo->mOut_MinSize_byte = sizeof(Adapter_State);
+            break;
+        case IOCTL_STATISTICS_GET  :
+            aInfo->mIn_MaxSize_byte  = sizeof(IoCtl_Stats_Get_In);
+            aInfo->mIn_MinSize_byte  = sizeof(IoCtl_Stats_Get_In);
+            break;
+
+        case IOCTL_STATISTICS_RESET:
+        case IOCTL_STOP            :
+            break;
 
         default : return false;
         }

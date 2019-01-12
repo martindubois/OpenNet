@@ -1,5 +1,5 @@
 
-// Product / Produit  OpenNet
+// Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
@@ -11,12 +11,14 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #ifdef _KMS_LINUX_
+    typedef unsigned short     uint16_t;
     typedef unsigned int       uint32_t;
     typedef unsigned long long uint64_t;
     typedef unsigned char      uint8_t ;
 #endif
 
 #ifdef _KMS_WINDOWS_
+    typedef unsigned __int16 uint16_t;
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
     typedef unsigned __int8  uint8_t ;

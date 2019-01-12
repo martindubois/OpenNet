@@ -26,7 +26,7 @@ OBJECTS = $(SOURCES:.cpp=.o)
 # ===== Targets / Cibles ====================================================
 
 $(OUTPUT) : $(OBJECTS) $(LIBRARIES)
-	g++ -pthread -o $@ $^
+	g++ -pthread -o $@ $^  -L /usr/local/cuda/lib64 -l cudart
 
 depend:
 	makedepend -Y $(INCLUDES) $(SOURCES)

@@ -50,22 +50,18 @@ public:
 
     void SetPacketSize(unsigned int aSize_byte);
 
-    #ifdef _KMS_WINDOWS_
-        void Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers);
-    #endif
-    
     void Buffers_Release ();
 
-    void Connect(IoCtl_Connect_In * aConnect);
-
-    void Packet_Send_Ex(const IoCtl_Packet_Send_Ex_In * aIn, unsigned int aInSize_byte);
+    void Packet_Send_Ex(const IoCtl_Packet_Send_Ex_In * aIn);
 
     void SendLoopBackPackets();
 
     void Start();
     void Stop ();
 
-    Thread * Thread_Prepare();
+    virtual void Connect(IoCtl_Connect_In * aConnect) = 0;
+
+    virtual Thread * Thread_Prepare() = 0;
 
     // ===== OpenNet::Adapter ===============================================
 
@@ -86,13 +82,16 @@ public:
 
     virtual OpenNet::Status Display(FILE * aOut) const;
 
-    virtual OpenNet::Status Packet_Send(const void * aData, unsigned int aSize_byte);
+protected:
+
+    KmsLib::DebugLog              * mDebugLog    ;
+    KmsLib::DriverHandle          * mHandle      ;
+    Info                            mInfo        ;
+    Processor_Internal            * mProcessor   ;
+    OpenNet::SourceCode           * mSourceCode  ;
+    unsigned int                    mStatistics[OpenNet::ADAPTER_STATS_QTY];
 
 private:
-
-    #ifdef _KMS_WINDOWS_
-        Buffer_Data * Buffer_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel);
-    #endif // _KMS_WINDOWS_
 
     void Config_Update();
 
@@ -101,19 +100,9 @@ private:
     unsigned int                    mBufferCount ;
     OpenNetK::Buffer                mBuffers[OPEN_NET_BUFFER_QTY];
     Config                          mConfig      ;
-    KmsLib::DebugLog              * mDebugLog    ;
     OpenNetK::Adapter_Config        mDriverConfig;
-    KmsLib::DriverHandle          * mHandle      ;
-    Info                            mInfo        ;
     char                            mName   [ 64];
-    Processor_Internal            * mProcessor   ;
-    OpenNet::SourceCode           * mSourceCode  ;
-    unsigned int                    mStatistics[OpenNet::ADAPTER_STATS_QTY];
     
-    #ifdef _KMS_WINDOWS_
-        cl_program                      mProgram;
-    #endif // _KMS_WINDOWS_
-
 };
 
 typedef std::vector<Adapter_Internal *> Adapter_Vector;

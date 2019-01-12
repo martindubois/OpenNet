@@ -1,0 +1,16 @@
+
+// Author     KMS - Martin Dubois, ing.
+// Copywrite  (C) 2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/CUDAW.h
+
+#pragma once
+
+// Includes
+/////////////////////////////////////////////////////////////////////////////
+
+
+// Functions
+/////////////////////////////////////////////////////////////////////////////
+
+extern void CUDAW_GetDeviceCount( int * aCount );

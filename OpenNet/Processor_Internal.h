@@ -37,18 +37,11 @@ class Processor_Internal : public OpenNet::Processor
 
 public:
 
-    #ifdef _KMS_WINDOWS_
-        Processor_Internal(cl_platform_id aPlatform, cl_device_id aDevice, KmsLib::DebugLog * aDebugLog);
-    #endif
+    Processor_Internal( KmsLib::DebugLog * aDebugLog );
 
     ~Processor_Internal();
 
     #ifdef _KMS_WINDOWS_
-        Buffer_Data * Buffer_Allocate(unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer);
-
-        cl_command_queue CommandQueue_Create(bool aProfilingEnabled);
-
-        cl_program Program_Create(OpenNet::Kernel * aKernel);
     #endif
 
     Thread_Functions * Thread_Get    ();
@@ -70,27 +63,9 @@ public:
 
 private:
 
-    void InitInfo();
-
-    #ifdef _KMS_WINDOWS_
-    
-        // ===== OpenCL =========================================================
-
-        bool GetDeviceInfo(cl_device_info aParam);
-        void GetDeviceInfo(cl_device_info aParam, size_t aOutSize_byte, void * aOut);
-
-        void GetKernelWorkGroupInfo(cl_kernel aKernel, cl_kernel_work_group_info aParam, size_t aOutSize_byte, void * aOut);
-    
-    #endif
-
     Config             mConfig  ;
     KmsLib::DebugLog * mDebugLog;
     Info               mInfo    ;
     Thread_Functions * mThread  ;
     
-    #ifdef _KMS_WINDOWS_
-        cl_context   mContext;
-        cl_device_id mDevice ;
-    #endif
-
 };

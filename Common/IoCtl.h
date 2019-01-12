@@ -115,8 +115,9 @@ typedef struct
     mFlags;
 
     uint32_t mRepeatCount;
+    uint16_t mSize_byte  ;
 
-    uint8_t mReserved0[24];
+    uint8_t mReserved0[22];
 }
 IoCtl_Packet_Send_Ex_In;
 

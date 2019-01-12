@@ -31,6 +31,8 @@ namespace OpenNetK
 
     void Adapter_Linux::Init( Adapter * aAdapter, Hardware_Linux * aHardware_Linux )
     {
+        printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );
+
         ASSERT( NULL != aAdapter        );
         ASSERT( NULL != aHardware_Linux );
 
@@ -44,6 +46,8 @@ namespace OpenNetK
 
     void Adapter_Linux::FileCleanup()
     {
+        printk( KERN_DEBUG "%s()\n", __FUNCTION__ );
+
         ASSERT( NULL != mAdapter );
 
         // TODO  Dev  if ( mFileObject == aFileObject )
@@ -54,18 +58,22 @@ namespace OpenNetK
         }
     }
 
-    int Adapter_Linux::IoDeviceControl( void * aInOut, unsigned int aCode )
+    int Adapter_Linux::IoDeviceControl( void * aInOut, unsigned int aCode, unsigned int aInSize_byte )
     {
+        printk( KERN_DEBUG "%s( , 0x%08x, %u bytes )\n", __FUNCTION__, aCode, aInSize_byte );
+
         ASSERT( NULL != mAdapter );
 
         Adapter::IoCtl_Info lInfo;
 
         if ( ! mAdapter->IoCtl_GetInfo( aCode, & lInfo ) )
         {
+            printk( KERN_ERR "%s - Adapter::IoCtl_GetInfo( 0x%08x,  ) failed\n", __FUNCTION__, aCode );
+
             return ( - __LINE__ );
         }
 
-        int lRet = mAdapter->IoCtl( aCode, aInOut, lInfo.mIn_MinSize_byte, aInOut, lInfo.mOut_MinSize_byte );
+        int lRet = mAdapter->IoCtl( aCode, aInOut, aInSize_byte, aInOut, lInfo.mOut_MinSize_byte );
 
         ProcessIoCtlResult( lRet );
 
@@ -96,6 +104,8 @@ namespace OpenNetK
     // Threads  Users
     int Adapter_Linux::Connect( void * aIn )
     {
+        printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
         ASSERT( NULL != aIn );
 
         IoCtl_Connect_In * lIn = reinterpret_cast< IoCtl_Connect_In * >( aIn );
@@ -107,6 +117,8 @@ namespace OpenNetK
     // Thread  Users
     void Adapter_Linux::Disconnect()
     {
+        printk( KERN_DEBUG "%s()\n", __FUNCTION__ );
+
         // Event_Translate ==> Event_Release  See IoInCallerContext
         Event_Release();
 
@@ -118,6 +130,7 @@ namespace OpenNetK
     // Thread  Users
     void Adapter_Linux::Event_Release()
     {
+            printk( KERN_DEBUG "%s()\n", __FUNCTION__ );
     }
 
     // Event_Translate ==> Event_Release
@@ -126,10 +139,14 @@ namespace OpenNetK
     // Thread  Users
     int Adapter_Linux::Event_Translate(uint64_t * aEvent)
     {
+        printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
         ASSERT(NULL != aEvent);
 
         if (NULL == (*aEvent))
         {
+            printk( KERN_ERR "%s - Invalid event\n", __FUNCTION__ );
+
             return ( - __LINE__ );
         }
 
@@ -140,6 +157,8 @@ namespace OpenNetK
     // Thread  Queue
     void Adapter_Linux::ProcessIoCtlResult(int aIoCtlResult)
     {
+        printk( KERN_DEBUG "%s( %d )\n", __FUNCTION__, aIoCtlResult );
+
         ASSERT( NULL != mHardware_Linux );
 
         IoCtl_Result lIoCtlResult = static_cast< IoCtl_Result >( aIoCtlResult );
@@ -161,6 +180,8 @@ namespace OpenNetK
     // Thread  Users
     int Adapter_Linux::SharedMemory_ProbeAndLock()
     {
+        printk( KERN_DEBUG "%s()\n", __FUNCTION__ );
+
         return 0;
     }
 
@@ -170,6 +191,7 @@ namespace OpenNetK
     // Thread  Users
     void Adapter_Linux::SharedMemory_Release()
     {
+        printk( KERN_DEBUG "%s()\n", __FUNCTION__ );
     }
 
     // aSharedMemory [DK-;RW-]
@@ -180,10 +202,14 @@ namespace OpenNetK
     // Threads  Users
     int Adapter_Linux::SharedMemory_Translate(void ** aSharedMemory)
     {
+        printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
         ASSERT( NULL != aSharedMemory );
 
         if (NULL == ( * aSharedMemory ) )
         {
+            printk( KERN_ERR "%s - Invalid shared memory\n", __FUNCTION__ );
+
             return ( - __LINE__ );
         }
 
@@ -192,6 +218,8 @@ namespace OpenNetK
 
     int Adapter_Linux::ResultToStatus( int aIoCtlResult )
     {
+        printk( KERN_DEBUG "%s( %d )\n", __FUNCTION__, aIoCtlResult );
+
         IoCtl_Result lIoCtlResult = static_cast< IoCtl_Result >( aIoCtlResult );
 
         int lResult;

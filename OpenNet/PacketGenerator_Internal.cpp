@@ -326,6 +326,8 @@ unsigned int PacketGenerator_Internal::Run()
         ReadPerfCounter(&lNow);
 
         lIn->mRepeatCount = ComputeRepeatCount(lBefore, lNow, lPeriod);
+        lIn->mSize_byte   = mConfig.mPacketSize_byte;
+
         if (0 < lIn->mRepeatCount)
         {
             SendPackets(lIn);
@@ -472,7 +474,7 @@ void PacketGenerator_Internal::SendPackets(const IoCtl_Packet_Send_Ex_In * aIn)
 
     try
     {
-        mAdapter->Packet_Send_Ex(aIn, sizeof(IoCtl_Packet_Send_Ex_In) + mConfig.mPacketSize_byte);
+        mAdapter->Packet_Send_Ex( aIn );
 
         mStatistics[OpenNet::PACKET_GENERATOR_STATS_SENT_packet] += aIn->mRepeatCount;
     }

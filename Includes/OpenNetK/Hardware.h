@@ -50,6 +50,19 @@ namespace OpenNetK
         void * operator new(size_t aSize_byte, void * aAddress);
 
         /// \cond en
+        /// \brief  Retrieve the common buffer size
+        /// \return This methode return the needed common buffer size in
+        ///         bytes.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Obtenir la taille de l'espace memoire partage avec le
+        ///         hardware.
+        /// \retval Cette methode retourne la taille necessaire de l'espace
+        ///         memoire partage entre le materiel et le logiciel.
+        /// \endcond
+        unsigned int GetCommonBufferSize() const;
+
+        /// \cond en
         /// \brief  Retrieve the configured maximum packet size
         /// \return This methode return the configured maximum packet size in
         ///         bytes.
@@ -292,8 +305,6 @@ namespace OpenNetK
     // internal:
 
         void Init(SpinLock * aZone0);
-
-        unsigned int GetCommonBufferSize() const;
 
         void GetConfig(Adapter_Config * aConfig);
         void GetInfo  (Adapter_Info   * aInfo  );

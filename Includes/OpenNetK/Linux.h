@@ -48,14 +48,14 @@ typedef long unsigned int size_t;
 // Macros
 /////////////////////////////////////////////////////////////////////////////
 
-#define ASSERT(C) if ( ! ( C ) ) { printk( "Assert failed at line %d of $s - %s\n", __LINE__, __FILE__, #C ); }
+#define ASSERT(C) if ( ! ( C ) ) { printk( "Assert failed at line %d of %s - %s\n", __LINE__, __FILE__, #C ); }
 
 #define _IOC(D,T,N,S) static_cast< unsigned int >( ( (D) << _IOC_DIRSHIFT ) | ( (T) << _IOC_TYPESHIFT ) | ( (N) << _IOC_NRSHIFT ) | ( (S) << _IOC_SIZESHIFT ) ) 
 
 #define _IO(T,N)        _IOC( _IOC_NONE             , (T), (N),           0 )
 #define _IOR(T,N,S)     _IOC( _IOC_READ             , (T), (N), sizeof( S ) )
 #define _IOW(T,N,S)     _IOC( _IOC_WRITE            , (T), (N), sizeof( S ) )
-#define _IOW_BAD(T,N,S) _IOC( _IOC_READ             , (T), (N), sizeof( S ) )
+#define _IOW_BAD(T,N,S) _IOC( _IOC_WRITE            , (T), (N), sizeof( S ) )
 #define _IOWR(T,N,S)    _IOC( _IOC_READ | _IOC_WRITE, (T), (N), sizeof( S ) )
 
 #define SIZE_OF(S) static_cast< uint32_t >( sizeof( S ) )
