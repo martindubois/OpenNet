@@ -30,33 +30,19 @@ public:
 
     void AddDispatchCode();
 
-    // ===== Thread =========================================================
-    virtual void Prepare();
-
 protected:
-
-    // ===== Thread =========================================================
-
-    virtual void Processing_Queue(unsigned int aIndex);
-    virtual void Processing_Wait (unsigned int aIndex);
-
-    virtual void Release();
-
-    virtual void Run_Loop ();
-    virtual void Run_Start();
-
-private:
 
     enum
     {
         EVENT_QTY = 3,
     };
 
-    Kernel_Functions mKernelFunctions;
+    // ===== Thread =========================================================
 
-    #ifdef _KMS_WINDOWS_
-        cl_event   mEvents[EVENT_QTY];
-        cl_program mProgram          ;
-    #endif
+    virtual void Release();
+
+    virtual void Run_Loop ();
+
+    Kernel_Functions mKernelFunctions;
 
 };

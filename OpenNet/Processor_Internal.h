@@ -12,11 +12,6 @@
 // ===== C++ ================================================================
 #include <map>
 
-#ifdef _KMS_WINDOWS_
-    // ===== OpenCL =========================================================
-    #include <CL/opencl.h>
-#endif
-
 // ===== Import/Includes ====================================================
 #include <KmsLib/DebugLog.h>
 
@@ -41,17 +36,13 @@ public:
 
     ~Processor_Internal();
 
-    #ifdef _KMS_WINDOWS_
-    #endif
-
-    Thread_Functions * Thread_Get    ();
     Thread           * Thread_Prepare();
     void               Thread_Release();
 
+    virtual Thread_Functions * Thread_Get() = 0;
+
     // ===== OpenNet::Processor =============================================
     virtual OpenNet::Status GetConfig(      Config * aOut   ) const;
-    virtual void          * GetContext();
-    virtual void          * GetDeviceId();
     virtual OpenNet::Status GetInfo  (      Info   * aOut   ) const;
     virtual const char    * GetName  () const;
     virtual OpenNet::Status SetConfig(const Config & aConfig);
@@ -61,11 +52,11 @@ public:
     virtual OpenNet::Status GetStatistics  (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
     virtual OpenNet::Status ResetStatistics();
 
-private:
+protected:
 
     Config             mConfig  ;
     KmsLib::DebugLog * mDebugLog;
     Info               mInfo    ;
     Thread_Functions * mThread  ;
-    
+
 };

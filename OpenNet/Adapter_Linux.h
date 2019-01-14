@@ -26,12 +26,20 @@ public:
 
     virtual void Connect(IoCtl_Connect_In * aConnect);
 
-    virtual Thread * Thread_Prepare();
-
     // ===== OpenNet::Adapter ==============================================
 
     virtual ~Adapter_Linux();
 
     virtual OpenNet::Status Packet_Send(const void * aData, unsigned int aSize_byte);
+
+protected:
+
+    // ===== Adapter_Internal ===============================================
+
+    virtual OpenNet::Status ResetInputFilter_Internal();
+    virtual void            SetInputFilter_Internal  (OpenNet::Kernel * aKernel);
+
+    virtual Thread * Thread_Prepare_Internal(OpenNet::Kernel * aKernel);
+
 
 };

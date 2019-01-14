@@ -1,8 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
+// Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2018-2019 KMS. All rights reserved.
-// Product  OpenNet
-// File     OpenNet/Processor_Internal.cpp
+// Product    OpenNet
+// File       OpenNet/Processor_Internal.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -11,7 +11,6 @@
 
 // ===== C ==================================================================
 #include <assert.h>
-#include <stdint.h>
 
 #ifdef _KMS_WINDOWS_
     // ===== Windows ========================================================
@@ -21,23 +20,12 @@
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
 
-// ===== Includes ===========================================================
-#include <OpenNet/Function.h>
-#include <OpenNet/Status.h>
-
 // ===== Common =============================================================
 #include "../Common/Constants.h"
-#include "../Common/IoCtl.h"
-#include "../Common/OpenNet/Adapter_Statistics.h"
 
 // ===== OpenNet ============================================================
 #include "EthernetAddress.h"
 #include "Thread_Functions.h"
-#include "Thread_Kernel.h"
-
-#ifdef _KMS_WINDOWS_
-    #include "OCLW.h"
-#endif
 
 #include "Adapter_Internal.h"
 
@@ -48,11 +36,6 @@ static const uint8_t LOOP_BACK_PACKET[64] =
 {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x88, 0x88
 };
-
-// Static functions declaration
-/////////////////////////////////////////////////////////////////////////////
-
-static OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE);
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
@@ -219,11 +202,11 @@ void Adapter_Internal::Stop()
     mHandle->Control(IOCTL_STOP, NULL, 0, NULL, 0);
 }
 
+// Return  This method return the address of the create Thread instance.
+//
 // Thread  Apps
 Thread * Adapter_Internal::Thread_Prepare()
 {
-    assert(NULL != mDebugLog  );
-
     if (NULL != mSourceCode)
     {
         assert(NULL != mProcessor);
@@ -231,13 +214,7 @@ Thread * Adapter_Internal::Thread_Prepare()
         OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
         if (NULL != lKernel)
         {
-            #ifdef _KMS_WINDOWS_
-
-                assert(NULL != mProgram);
-
-                return new Thread_Kernel(mProcessor, this, lKernel, mProgram, mDebugLog);
-
-            #endif
+            return Thread_Prepare_Internal(lKernel);
         }
 
         OpenNet::Function * lFunction = dynamic_cast<OpenNet::Function *>(mSourceCode);
@@ -435,7 +412,8 @@ bool Adapter_Internal::IsConnected(const OpenNet::System & aSystem)
 
 OpenNet::Status Adapter_Internal::ResetInputFilter()
 {
-    assert(NULL != mDebugLog);
+    assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
+    assert(NULL                != mDebugLog   );
 
     if (NULL == mSourceCode)
     {
@@ -449,34 +427,9 @@ OpenNet::Status Adapter_Internal::ResetInputFilter()
         return OpenNet::STATUS_ADAPTER_RUNNING;
     }
 
-    assert(NULL != mProcessor);
-
     mSourceCode = NULL;
 
-    OpenNet::Status lResult = OpenNet::STATUS_OK;
-
-    #ifdef _KMS_WINDOWS_
-
-        if (NULL != mProgram)
-        {
-            try
-            {
-                OCLW_ReleaseProgram(mProgram);
-            }
-            catch (KmsLib::Exception * eE)
-            {
-                mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-                mDebugLog->Log(eE);
-
-                lResult = ExceptionToStatus(eE);
-            }
-
-            mProgram = NULL;
-        }
-
-    #endif
-
-    return lResult;
+    return ResetInputFilter_Internal();
 }
 
 OpenNet::Status Adapter_Internal::ResetProcessor()
@@ -580,16 +533,9 @@ OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::SourceCode * aSourceCo
     try
     {
         OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(aSourceCode);
-
         if (NULL != lKernel)
         {
-            #ifdef _KMS_WINDOWS_
-
-                assert(NULL == mProgram);
-
-                mProgram = mProcessor->Program_Create(lKernel);
-
-            #endif
+            SetInputFilter_Internal(lKernel);
         }
     }
     catch (KmsLib::Exception * eE)
@@ -654,17 +600,25 @@ OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
     return OpenNet::STATUS_OK;
 }
 
-// Private
+// Protected
 /////////////////////////////////////////////////////////////////////////////
 
-void Adapter_Internal::Config_Update()
+// aE [---;R--]
+//
+// Threads  Apps, Worker
+OpenNet::Status Adapter_Internal::ExceptionToStatus(const KmsLib::Exception * aE)
 {
-    assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte      );
-    assert(PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte      );
-    assert(PACKET_SIZE_MAX_byte >= mDriverConfig.mPacketSize_byte);
-    assert(PACKET_SIZE_MIN_byte <= mDriverConfig.mPacketSize_byte);
+    assert(NULL != aE);
 
-    mConfig.mPacketSize_byte = mDriverConfig.mPacketSize_byte;
+    switch (aE->GetCode())
+    {
+    case KmsLib::Exception::CODE_IOCTL_ERROR: return OpenNet::STATUS_IOCTL_ERROR;
+    case KmsLib::Exception::CODE_NOT_ENOUGH_MEMORY: return OpenNet::STATUS_TOO_MANY_BUFFER;
+    case KmsLib::Exception::CODE_OPEN_CL_ERROR: return OpenNet::STATUS_OPEN_CL_ERROR;
+    }
+
+    printf("%s ==> STATUS_EXCEPTION\n", KmsLib::Exception::GetCodeName(aE->GetCode()));
+    return OpenNet::STATUS_EXCEPTION;
 }
 
 // aIn        [--O;R--]
@@ -677,7 +631,7 @@ OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, 
     assert(0 != aCode);
 
     assert(NULL != mDebugLog);
-    assert(NULL != mHandle  );
+    assert(NULL != mHandle);
 
     try
     {
@@ -698,23 +652,15 @@ OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, 
     return OpenNet::STATUS_OK;
 }
 
-// Static functions
+// Private
 /////////////////////////////////////////////////////////////////////////////
 
-// aE [---;R--]
-//
-// Threads  Apps, Worker
-OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE)
+void Adapter_Internal::Config_Update()
 {
-    assert(NULL != aE);
+    assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte      );
+    assert(PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte      );
+    assert(PACKET_SIZE_MAX_byte >= mDriverConfig.mPacketSize_byte);
+    assert(PACKET_SIZE_MIN_byte <= mDriverConfig.mPacketSize_byte);
 
-    switch (aE->GetCode())
-    {
-    case KmsLib::Exception::CODE_IOCTL_ERROR      : return OpenNet::STATUS_IOCTL_ERROR    ;
-    case KmsLib::Exception::CODE_NOT_ENOUGH_MEMORY: return OpenNet::STATUS_TOO_MANY_BUFFER;
-    case KmsLib::Exception::CODE_OPEN_CL_ERROR    : return OpenNet::STATUS_OPEN_CL_ERROR  ;
-    }
-
-    printf("%s ==> STATUS_EXCEPTION\n", KmsLib::Exception::GetCodeName(aE->GetCode()));
-    return OpenNet::STATUS_EXCEPTION;
+    mConfig.mPacketSize_byte = mDriverConfig.mPacketSize_byte;
 }

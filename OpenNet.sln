@@ -46,6 +46,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC
 		Includes\OpenNetK\OS.h = Includes\OpenNetK\OS.h
 		Includes\OpenNetK\Packet.h = Includes\OpenNetK\Packet.h
 		Includes\OpenNetK\SpinLock.h = Includes\OpenNetK\SpinLock.h
+		Includes\OpenNetK\SpinLock_Linux.h = Includes\OpenNetK\SpinLock_Linux.h
 		Includes\OpenNetK\SpinLock_WDF.h = Includes\OpenNetK\SpinLock_WDF.h
 		Includes\OpenNetK\StdInt.h = Includes\OpenNetK\StdInt.h
 		Includes\OpenNetK\Types.h = Includes\OpenNetK\Types.h

@@ -7,10 +7,23 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+#include <KmsBase.h>
+
 // ===== C ==================================================================
 #include <assert.h>
+#include <stdint.h>
+
+// ===== Windows ============================================================
+#include <Windows.h>
+
+// ===== Common =============================================================
+#include "../Common/IoCtl.h"
 
 // ===== OpenNet ============================================================
+#include "OCLW.h"
+#include "Processor_OpenCL.h"
+#include "Thread_Kernel_OpenCL.h"
+
 #include "Adapter_Windows.h"
 
 // Public
@@ -35,7 +48,7 @@ Adapter_Windows::Adapter_Windows(KmsLib::DriverHandle * aHandle, KmsLib::DebugLo
 //
 // Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Allocate
 // Thread     Apps
-void Adapter_Internal::Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers)
+void Adapter_Windows::Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers)
 {
     assert(NULL != aCommandQueue);
     assert(NULL != aKernel      );
@@ -90,37 +103,22 @@ void Adapter_Windows::Connect(IoCtl_Connect_In * aConnect)
     }
 }
 
+// aKernel [---;RW-]
+//
 // Return  This method returns the address of the newly created Thread
 //         instance. The caller is responsible for deleting this instance.
 //
 // Thread  Apps
-Thread * Adapter_Windows::Thread_Prepare()
+Thread * Adapter_Windows::Thread_Prepare_Internal(OpenNet::Kernel * aKernel)
 {
-    assert(NULL != mDebugLog  );
+    assert(NULL != aKernel);
 
-    if (NULL != mSourceCode)
-    {
-        assert(NULL != mProcessor);
+    assert(NULL != mDebugLog );
+    assert(NULL != mProcessor);
+    assert(NULL != mProgram  );
 
-        OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
-        if (NULL != lKernel)
-        {
-            assert(NULL != mProgram);
-
-            // new ==> delete
-            return new Thread_Kernel(mProcessor, this, lKernel, mProgram, mDebugLog);
-        }
-
-        OpenNet::Function * lFunction = dynamic_cast<OpenNet::Function *>(mSourceCode);
-        assert(NULL != lFunction);
-
-        Thread_Functions * lThread = mProcessor->Thread_Get();
-        assert(NULL != lThread);
-
-        lThread->AddAdapter(this, *lFunction);
-    }
-
-    return NULL;
+    // new ==> delete
+    return new Thread_Kernel_OpenCL(mProcessor, this, aKernel, mProgram, mDebugLog);
 }
 
 // ===== OpenNet::Adapter ===================================================
@@ -167,6 +165,48 @@ OpenNet::Status Adapter_Windows::Packet_Send(const void * aData, unsigned int aS
     return Control(IOCTL_PACKET_SEND, aData, aSize_byte, NULL, 0);
 }
 
+// Protected
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== Adapter_Internal ===================================================
+
+OpenNet::Status Adapter_Windows::ResetInputFilter_Internal()
+{
+    OpenNet::Status lResult = OpenNet::STATUS_OK;
+
+    if (NULL != mProgram)
+    {
+        try
+        {
+            OCLW_ReleaseProgram(mProgram);
+        }
+        catch (KmsLib::Exception * eE)
+        {
+            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+            mDebugLog->Log(eE);
+
+            lResult = ExceptionToStatus(eE);
+        }
+
+        mProgram = NULL;
+    }
+
+    return lResult;
+}
+
+void Adapter_Windows::SetInputFilter_Internal(OpenNet::Kernel * aKernel)
+{
+    assert(NULL != aKernel);
+
+    assert(NULL != mProcessor);
+    assert(NULL == mProgram  );
+
+    Processor_OpenCL * lProcessor = dynamic_cast<Processor_OpenCL *>(mProcessor);
+    assert(NULL != lProcessor);
+
+    mProgram = lProcessor->Program_Create(aKernel);
+}
+
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
@@ -178,7 +218,7 @@ OpenNet::Status Adapter_Windows::Packet_Send(const void * aData, unsigned int aS
 // Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
 //                                 See Process_Internal::Buffer_Allocate
 // Threads    Apps
-Buffer_Data * Adapter_Internal::Buffer_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel)
+Buffer_Data * Adapter_Windows::Buffer_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel)
 {
     assert(NULL != aCommandQueue);
     assert(NULL != aKernel      );
@@ -194,7 +234,10 @@ Buffer_Data * Adapter_Internal::Buffer_Allocate(cl_command_queue aCommandQueue, 
             "Too many buffer", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
     }
 
-    Buffer_Data * lResult = mProcessor->Buffer_Allocate(mConfig.mPacketSize_byte, aCommandQueue, aKernel, mBuffers + mBufferCount);
+    Processor_OpenCL * lProcessor = dynamic_cast<Processor_OpenCL *>(mProcessor);
+    assert(NULL != lProcessor);
+
+    Buffer_Data * lResult = lProcessor->Buffer_Allocate(mConfig.mPacketSize_byte, aCommandQueue, aKernel, mBuffers + mBufferCount);
 
     mBufferCount++;
 

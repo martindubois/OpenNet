@@ -2,7 +2,7 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) KMS 2018-2019. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/Thread_Kernel.h
+// File       OpenNet/Thread_Kernel.coo
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -18,38 +18,27 @@
 #endif
 
 // ===== OpenNet ============================================================
-#ifdef _KMS_WINDOWS_
-    #include "OCLW.h"
-#endif
-
 #include "Thread_Kernel.h"
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-#ifdef _KMS_WINDOWS_
+// aProcessor [-K-;RW-]
+// aAdapter   [-K-;RW-]
+// aKernel    [-K-;RW-]
+// aDebugLog  [-K-;RW-]
+Thread_Kernel::Thread_Kernel(Processor_Internal * aProcessor, Adapter_Internal * aAdapter, OpenNet::Kernel * aKernel, KmsLib::DebugLog * aDebugLog)
+    : Thread(aProcessor, aDebugLog)
+{
+    assert(NULL != aProcessor);
+    assert(NULL != aAdapter  );
+    assert(NULL != aKernel   );
+    assert(NULL != aDebugLog );
 
-    // aProcessor [-K-;RW-]
-    // aAdapter   [-K-;RW-]
-    // aKernel    [-K-;RW-]
-    // aProgram   [-K-;RW-]
-    // aDebugLog  [-K-;RW-]
-    Thread_Kernel::Thread_Kernel(Processor_Internal * aProcessor, Adapter_Internal * aAdapter, OpenNet::Kernel * aKernel, cl_program aProgram, KmsLib::DebugLog * aDebugLog)
-        : Thread(aProcessor, aDebugLog)
-    {
-        assert(NULL != aProcessor);
-        assert(NULL != aAdapter  );
-        assert(NULL != aKernel   );
-        assert(NULL != aProgram  );
-        assert(NULL != aDebugLog );
+    SetKernel (aKernel );
 
-        SetKernel (aKernel );
-        SetProgram(aProgram);
-
-        AddAdapter(aAdapter);
-    }
-
-#endif
+    AddAdapter(aAdapter);
+}
 
 // ===== Thread =============================================================
 
@@ -61,56 +50,6 @@ Thread_Kernel::~Thread_Kernel()
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Thread =============================================================
-
-void Thread_Kernel::Processing_Queue(unsigned int aIndex)
-{
-    assert(OPEN_NET_BUFFER_QTY > aIndex);
-
-    #ifdef _KMS_WINDOWS_
-
-        assert(NULL != mCommandQueue);
-        assert(NULL != mKernel_CL   );
-
-        Buffer_Data * lBuffer = mBuffers[aIndex];
-        assert(NULL != lBuffer        );
-        assert(NULL == lBuffer->mEvent);
-        assert(NULL != lBuffer->mMem  );
-
-        OCLW_SetKernelArg(mKernel_CL, 0, sizeof(lBuffer->mMem), &lBuffer->mMem);
-
-        mKernel->SetUserKernelArgs(mKernel_CL);
-
-        // Here, we don't use event between the clEnqueueWaitSignal and the
-        // clEnqueueNDRangeKernel because the command queue force the execution
-        // order.
-        OCLW_EnqueueWaitSignal(mCommandQueue, lBuffer->mMem, lBuffer->GetMarkerValue(), 0, NULL, NULL);
-
-        size_t lGS = lBuffer->GetPacketQty();
-
-        assert(0 < lGS);
-
-        Thread::Processing_Queue(&lGS, NULL, &lBuffer->mEvent);
-
-    #endif
-}
-
-void Thread_Kernel::Processing_Wait(unsigned int aIndex)
-{
-    assert(OPEN_NET_BUFFER_QTY > aIndex);
-
-    Buffer_Data * lBuffer = mBuffers[aIndex];
-    assert(NULL != lBuffer        );
-
-    #ifdef _KMS_WINDOWS_
-
-        assert(NULL != lBuffer->mEvent);
-
-        Thread::Processing_Wait(lBuffer->mEvent);
-
-        lBuffer->mEvent = NULL;
-
-    #endif
-}
 
 void Thread_Kernel::Run_Loop()
 {

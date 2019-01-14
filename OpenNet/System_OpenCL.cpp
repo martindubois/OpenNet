@@ -12,6 +12,9 @@
 // ===== Windows ============================================================
 #include <Windows.h>
 
+// ===== Common =============================================================
+#include "../Common/Constants.h"
+
 // ===== OpenNet ============================================================
 #include "Adapter_Windows.h"
 #include "OCLW.h"
@@ -22,7 +25,7 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-Sytem_OpenCL::System_OpenCL()
+System_OpenCL::System_OpenCL()
     : mPlatform(0)
 {
     mInfo.mSystemId = GetCurrentProcessId();
@@ -153,3 +156,22 @@ void System_OpenCL::FindProcessors()
     }
 }
 
+// Threads  Apps
+bool System_OpenCL::IsExtensionSupported(cl_device_id aDevice)
+{
+    assert(0 != aDevice);
+
+    char   lExtNames[8192];
+    size_t lSize_byte;
+
+    cl_int lStatus = clGetDeviceInfo(aDevice, CL_DEVICE_EXTENSIONS, sizeof(lExtNames), lExtNames, &lSize_byte);
+    if (CL_SUCCESS == lStatus)
+    {
+        if (NULL != strstr(lExtNames, "cl_amd_bus_addressable_memory"))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

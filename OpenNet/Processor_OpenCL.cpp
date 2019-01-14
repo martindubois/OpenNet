@@ -7,11 +7,24 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+#include <KmsBase.h>
+
 // ===== C ==================================================================
 #include <assert.h>
+#include <stdint.h>
+
+// ===== Windows ============================================================
+#include <Windows.h>
+
+// ===== Includes ===========================================================
+#include <OpenNetK/Constants.h>
+#include <OpenNetK/Types.h>
 
 // ===== OpenNet ============================================================
+#include "Buffer_Data_OpenCL.h"
+#include "Constants.h"
 #include "OCLW.h"
+#include "Thread_Functions_OpenCL.h"
 
 #include "Processor_OpenCL.h"
 
@@ -35,7 +48,8 @@ static const cl_queue_properties PROFILING_ENABLED[] =
 //                                 See OCLW_CreateContext
 // Threads  Apps
 Processor_OpenCL::Processor_OpenCL(cl_platform_id aPlatform, cl_device_id aDevice, KmsLib::DebugLog * aDebugLog)
-    : mDevice( aDevice )
+    : Processor_Internal(aDebugLog)
+    , mDevice( aDevice )
 {
     assert(   0 != aPlatform);
     assert(   0 != aDevice  );
@@ -95,7 +109,7 @@ Buffer_Data * Processor_OpenCL::Buffer_Allocate(unsigned int aPacketSize_byte, c
 
     OCLW_EnqueueMakeBufferResident(aCommandQueue, 1, &lMem, CL_TRUE, &lBusAddress, 0, NULL, NULL);
 
-    Buffer_Data * lResult = new Buffer_Data(lMem, static_cast<unsigned int>(lPacketQty));
+    Buffer_Data * lResult = new Buffer_Data_OpenCL(lMem, static_cast<unsigned int>(lPacketQty));
 
     aBuffer->mBuffer_PA = lBusAddress.surface_bus_address;
     aBuffer->mMarker_PA = lBusAddress.marker_bus_address ;
@@ -160,6 +174,21 @@ cl_program Processor_OpenCL::Program_Create(OpenNet::Kernel * aKernel)
 
 // ===== Processor_Internal =================================================
 
+Thread_Functions * Processor_OpenCL::Thread_Get()
+{
+    assert(NULL != mDebugLog);
+
+    if (NULL == mThread)
+    {
+        mThread = new Thread_Functions_OpenCL(this, mConfig.mFlags.mProfilingEnabled, mDebugLog);
+        assert(NULL != mThread);
+    }
+
+    return mThread;
+}
+
+// ===== OpenNet::Processor =================================================
+
 // Exception  KmsLib::Exception *  See OCL_ReleaseContext
 // Threads  Apps
 Processor_OpenCL::~Processor_OpenCL()
@@ -168,6 +197,20 @@ Processor_OpenCL::~Processor_OpenCL()
 
     // OCLW_CreateContext ==> OCLW_ReleaseContext  See Processor_OpenCL
     OCLW_ReleaseContext(mContext);
+}
+
+void * Processor_OpenCL::GetContext()
+{
+    assert(NULL != mContext);
+
+    return mContext;
+}
+
+void * Processor_OpenCL::GetDeviceId()
+{
+    assert(NULL != mDevice);
+
+    return mDevice;
 }
 
 // Private

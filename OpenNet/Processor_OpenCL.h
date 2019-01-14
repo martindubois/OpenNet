@@ -9,6 +9,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+// ===== OpenCL =============================================================
+#include <CL/opencl.h>
+
 // ===== OpenNet ============================================================
 #include "Processor_Internal.h"
 
@@ -30,7 +33,14 @@ public:
 
     // ====== Processor_Internal ============================================
 
+    virtual Thread_Functions * Thread_Get();
+
+    // ===== OpenNet::Processor =============================================
+
     virtual ~Processor_OpenCL();
+
+    virtual void          * GetContext ();
+    virtual void          * GetDeviceId();
 
 private:
 

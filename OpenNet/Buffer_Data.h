@@ -12,11 +12,6 @@
 // ===== C++ ================================================================
 #include <vector>
 
-#ifdef _KMS_WINDOWS_
-    // ===== OpenCL =========================================================
-    #include <CL/opencl.h>
-#endif
-
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
@@ -25,21 +20,15 @@ class Buffer_Data
 
 public:
 
-    #ifdef _KMS_WINDOWS_
-        Buffer_Data(cl_mem aMem, unsigned int aPacketQty);
-    #endif
+    Buffer_Data(unsigned int aPacketQty);
 
-    ~Buffer_Data();
+    virtual ~Buffer_Data();
 
     uint32_t     GetMarkerValue();
     unsigned int GetPacketQty  () const;
 
     void ResetMarkerValue();
 
-    #ifdef _KMS_WINDOWS_
-        cl_event mEvent;
-        cl_mem   mMem  ;
-    #endif
 
 private:
 

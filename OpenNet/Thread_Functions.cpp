@@ -11,7 +11,6 @@
 
 // ===== C ==================================================================
 #include <assert.h>
-#include <stdint.h>
 
 #ifdef _KMS_WINDOWS_
     // ===== Windows ========================================================
@@ -19,16 +18,13 @@
 #endif
 
 // ===== OpenNet ============================================================
-#ifdef _KMS_WINDOWS_
-    #include "OCLW.h"
-#endif
-
 #include "Thread_Functions.h"
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
 // aProcessor [-K-;RW-]
+// aProfilingEnabled
 // aDebugLog  [-K-;RW-]
 Thread_Functions::Thread_Functions(Processor_Internal * aProcessor, bool aProfilingEnabled, KmsLib::DebugLog * aDebugLog)
     : Thread(aProcessor, aDebugLog)
@@ -80,72 +76,16 @@ void Thread_Functions::AddDispatchCode()
     delete[] lBufferQty;
 }
 
-// ===== Thread =============================================================
-
-void Thread_Functions::Prepare()
-{
-    #ifdef _KMS_WINDOWS_
-
-        mProgram = mProcessor->Program_Create(&mKernelFunctions);
-        assert(NULL != mProgram);
-
-        SetProgram(mProgram);
-
-    #endif
-
-    Thread::Prepare();
-}
-
 // Protected
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Thread =============================================================
-
-// CRITICAL PATH - Buffer
-void Thread_Functions::Processing_Queue(unsigned int aIndex)
-{
-    assert(EVENT_QTY > aIndex);
-
-    assert(0    <  mBuffers.size());
-    assert(NULL != mBuffers[0]    );
-
-    size_t lLS = mBuffers[0]->GetPacketQty();
-    size_t lGS = lLS * mBuffers.size();
-
-    assert(0 < lLS);
-
-    #ifdef _KMS_WINDOWS_
-        Thread::Processing_Queue(&lGS, &lLS, mEvents + aIndex);
-    #endif
-}
-
-// CRITICAL_PATH
-//
-// Thread  Worker
-//
-// Processing_Queue ==> Processing_Wait
-void Thread_Functions::Processing_Wait(unsigned int aIndex)
-{
-    assert(EVENT_QTY > aIndex);
-
-    #ifdef _KMS_WINDOWS_
-
-        assert(NULL != mEvents[aIndex]);
-
-        Thread::Processing_Wait(mEvents[aIndex]);
-
-        mEvents[aIndex] = NULL;
-
-    #endif
-}
 
 void Thread_Functions::Release()
 {
     assert(NULL != mProcessor);
 
     mProcessor->Thread_Release();
-
-    Thread::Release();
 }
 
 // CRITICAL PATH
@@ -179,28 +119,5 @@ void Thread_Functions::Run_Loop()
     catch (...)
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-    }
-}
-
-void Thread_Functions::Run_Start()
-{
-    assert(0 < mBuffers.size());
-
-    unsigned int i = 0;
-
-    for (i = 0; i < mBuffers.size(); i++)
-    {
-        #ifdef _KMS_WINDOWS_
-
-            assert(NULL != mBuffers[i]->mMem);
-
-            OCLW_SetKernelArg(mKernel_CL, i, sizeof(cl_mem), &mBuffers[i]->mMem);
-
-        #endif
-    }
-
-    for (i = 0; i < EVENT_QTY; i++)
-    {
-        Processing_Queue(i);
     }
 }

@@ -663,30 +663,6 @@ void System_Internal::Threads_Release()
     mThreads.clear();
 }
 
-#ifdef _KMS_WINDOWS_
-
-    // Threads  Apps
-    bool System_Internal::IsExtensionSupported(cl_device_id aDevice)
-    {
-        assert(0 != aDevice);
-
-        char   lExtNames[8192];
-        size_t lSize_byte;
-
-        cl_int lStatus = clGetDeviceInfo(aDevice, CL_DEVICE_EXTENSIONS, sizeof(lExtNames), lExtNames, &lSize_byte);
-        if (CL_SUCCESS == lStatus)
-        {
-            if (NULL != strstr(lExtNames, "cl_amd_bus_addressable_memory"))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-#endif
-
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
 

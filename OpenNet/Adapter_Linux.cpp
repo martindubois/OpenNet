@@ -63,34 +63,6 @@ void Adapter_Linux::Connect(IoCtl_Connect_In * aConnect)
     }
 }
 
-// Return  This method return the address of the create Thread instance.
-//
-// Thread  Apps
-Thread * Adapter_Linux::Thread_Prepare()
-{
-    assert(NULL != mDebugLog  );
-
-    if (NULL != mSourceCode)
-    {
-        assert(NULL != mProcessor);
-
-        OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
-        if (NULL != lKernel)
-        {
-        }
-
-        OpenNet::Function * lFunction = dynamic_cast<OpenNet::Function *>(mSourceCode);
-        assert(NULL != lFunction);
-
-        Thread_Functions * lThread = mProcessor->Thread_Get();
-        assert(NULL != lThread);
-
-        lThread->AddAdapter(this, *lFunction);
-    }
-
-    return NULL;
-}
-
 // ===== OpenNet::Adapter ===================================================
 
 Adapter_Linux::~Adapter_Linux()
@@ -148,4 +120,31 @@ OpenNet::Status Adapter_Linux::Packet_Send(const void * aData, unsigned int aSiz
     delete [] lBuffer;
 
     return lResult;
+}
+
+// Protected
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== Adapter_Internal ===================================================
+
+OpenNet::Status Adapter_Linux::ResetInputFilter_Internal()
+{
+    // TODO  Dev
+
+    return OpenNet::STATUS_OK;
+}
+
+void Adapter_Linux::SetInputFilter_Internal(OpenNet::Kernel * aKernel)
+{
+    assert(NULL != aKernel);
+
+    // TODO  Dev
+}
+
+Thread * Adapter_Linux::Thread_Prepare_Internal(OpenNet::Kernel * aKernel)
+{
+    assert(NULL != aKernel);
+
+    // TODO  Dev
+    return NULL;
 }

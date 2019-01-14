@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_Lib/Adapter_WDF.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved
+// Product    OpenNet
+// File       ONK_Lib/Adapter_WDF.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -75,7 +76,7 @@ namespace OpenNetK
 
         NTSTATUS lStatus = STATUS_NOT_SUPPORTED;
 
-        IoCtl_Info lInfo;
+        Adapter::IoCtl_Info lInfo;
 
         if (mAdapter->IoCtl_GetInfo(aCode, &lInfo))
         {

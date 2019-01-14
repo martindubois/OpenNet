@@ -9,18 +9,21 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+// ===== OpenCL =============================================================
+#include <CL/opencl.h>
+
 // ===== OpenNet ============================================================
 #include "Adapter_Internal.h"
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
-class Adapter_Linux : public Adapter_Internal
+class Adapter_Windows : public Adapter_Internal
 {
 
 public:
 
-    Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog);
+    Adapter_Windows(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog);
 
     void Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers);
 
@@ -28,13 +31,20 @@ public:
     
     virtual void Connect(IoCtl_Connect_In * aConnect);
 
-    virtual Thread * Thread_Prepare();
-
     // ===== OpenNet::Adapter ===============================================
 
     virtual ~Adapter_Windows();
 
     virtual OpenNet::Status Packet_Send(const void * aData, unsigned int aSize_byte);
+
+protected:
+
+    // ===== Adapter_Internal ===============================================
+
+    virtual OpenNet::Status ResetInputFilter_Internal();
+    virtual void            SetInputFilter_Internal  (OpenNet::Kernel * aKernel);
+
+    virtual Thread * Thread_Prepare_Internal(OpenNet::Kernel * aKernel);
 
 private:
 

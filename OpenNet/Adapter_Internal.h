@@ -59,9 +59,9 @@ public:
     void Start();
     void Stop ();
 
-    virtual void Connect(IoCtl_Connect_In * aConnect) = 0;
+    virtual Thread * Thread_Prepare();
 
-    virtual Thread * Thread_Prepare() = 0;
+    virtual void Connect(IoCtl_Connect_In * aConnect) = 0;
 
     // ===== OpenNet::Adapter ===============================================
 
@@ -84,6 +84,19 @@ public:
 
 protected:
 
+    static OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE);
+
+    OpenNet::Status Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte = NULL);
+
+    virtual OpenNet::Status ResetInputFilter_Internal() = 0;
+    virtual void            SetInputFilter_Internal  (OpenNet::Kernel * aKernel) = 0;
+
+    virtual Thread * Thread_Prepare_Internal(OpenNet::Kernel * aKernel) = 0;
+
+
+    unsigned int                    mBufferCount ;
+    OpenNetK::Buffer                mBuffers[OPEN_NET_BUFFER_QTY];
+    Config                          mConfig      ;
     KmsLib::DebugLog              * mDebugLog    ;
     KmsLib::DriverHandle          * mHandle      ;
     Info                            mInfo        ;
@@ -95,11 +108,6 @@ private:
 
     void Config_Update();
 
-    OpenNet::Status Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte = NULL);
-
-    unsigned int                    mBufferCount ;
-    OpenNetK::Buffer                mBuffers[OPEN_NET_BUFFER_QTY];
-    Config                          mConfig      ;
     OpenNetK::Adapter_Config        mDriverConfig;
     char                            mName   [ 64];
     

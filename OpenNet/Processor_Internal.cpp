@@ -11,8 +11,6 @@
 
 // ===== C ==================================================================
 #include <assert.h>
-#include <memory.h>
-#include <stdint.h>
 
 #ifdef _KMS_WINDOWS_
     // ===== Windows ========================================================
@@ -22,16 +20,7 @@
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
 
-// ===== Includes ===========================================================
-#include <OpenNetK/Constants.h>
-#include <OpenNetK/Types.h>
-
-// ===== Common =============================================================
-#include "../Common/Constants.h"
-
 // ===== OpenNet ============================================================
-#include "Buffer_Data.h"
-#include "Constants.h"
 #include "Thread_Functions.h"
 
 #include "Processor_Internal.h"
@@ -55,19 +44,7 @@ Processor_Internal::~Processor_Internal()
 {
 }
 
-Thread_Functions * Processor_Internal::Thread_Get()
-{
-    assert(NULL != mDebugLog);
-
-    if (NULL == mThread)
-    {
-        mThread = new Thread_Functions(this, mConfig.mFlags.mProfilingEnabled, mDebugLog);
-        assert(NULL != mThread);
-    }
-
-    return mThread;
-}
-
+// Return  This methode return the address of the internal thread instance.
 Thread * Processor_Internal::Thread_Prepare()
 {
     if (NULL != mThread)
@@ -85,11 +62,6 @@ void Processor_Internal::Thread_Release()
     mThread = NULL;
 }
 
-#ifdef _KMS_WINDOWS_
-
-
-#endif
-
 // ===== OpenNet::Processor =================================================
 
 OpenNet::Status Processor_Internal::GetConfig(Config * aOut) const
@@ -105,28 +77,6 @@ OpenNet::Status Processor_Internal::GetConfig(Config * aOut) const
     memcpy(aOut, &mConfig, sizeof(Config));
 
     return OpenNet::STATUS_OK;
-}
-
-void * Processor_Internal::GetContext()
-{
-    #ifdef _KMS_WINDOWS_
-
-        assert(NULL != mContext);
-
-        return mContext;
-
-    #endif
-}
-
-void * Processor_Internal::GetDeviceId()
-{
-    #ifdef _KMS_WINDOWS_
-
-        assert(NULL != mDevice);
-
-        return mDevice;
-
-    #endif
 }
 
 OpenNet::Status Processor_Internal::GetInfo(Info * aOut) const

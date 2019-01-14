@@ -48,28 +48,21 @@ public:
 
     void Stop_Wait   (TryToSolveHang aTryToSolveHang, void * aContext);
 
-    #ifdef _KMS_WINDOWS_
-        void SetProgram(cl_program aProgram);
-    #endif
-
 protected:
 
     virtual ~Thread();
 
+    virtual void Prepare_Internal() = 0;
+
     virtual void Processing_Queue(unsigned int aIndex) = 0;
     virtual void Processing_Wait (unsigned int aIndex) = 0;
 
-    virtual void Release();
-
     void Run_Iteration(unsigned int aIndex);
+
+    virtual void Release() = 0;
 
     virtual void Run_Loop () = 0;
     virtual void Run_Start() = 0;
-
-    #ifdef _KMS_WINDOWS_
-        void Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalSize, cl_event * aEvent);
-        void Processing_Wait (cl_event aEvent);
-    #endif
 
     // ===== KmsLib::ThreadBase =============================================
 
@@ -81,17 +74,8 @@ protected:
     OpenNet::Kernel    * mKernel      ;
     Processor_Internal * mProcessor   ;
 
-    #ifdef _KMS_WINDOWS_
-        cl_command_queue mCommandQueue;
-        cl_kernel        mKernel_CL   ;
-    #endif
-
 private:
 
     void Run_Wait();
-
-    #ifdef _KMS_WINDOWS_
-        cl_program mProgram;
-    #endif
 
 };

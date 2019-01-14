@@ -24,7 +24,14 @@ public:
 
     // ====== Processor_Internal ============================================
 
+    virtual Thread_Functions * Thread_Get();
+
+    // ===== OpenNet::Processor =============================================
+
     virtual ~Processor_CUDA();
+
+    virtual void          * GetContext ();
+    virtual void          * GetDeviceId();
 
 private:
 
