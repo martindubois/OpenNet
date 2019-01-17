@@ -22,14 +22,16 @@ public:
 
     Thread_Functions_CUDA(Processor_Internal * aProcessor, bool aProfilingEnabled, KmsLib::DebugLog * aDebugLog);
 
+    // ===== Thread =========================================================
+
+    virtual void Prepare();
+
 protected:
 
     // ===== Thread =========================================================
 
     virtual void Processing_Queue(unsigned int aIndex);
     virtual void Processing_Wait (unsigned int aIndex);
-
-    virtual void Prepare_Internal();
 
     virtual void Run_Start();
 

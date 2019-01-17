@@ -121,3 +121,11 @@ void Thread_Functions::Run_Loop()
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
     }
 }
+
+void Thread_Functions::Run_Start()
+{
+    for (unsigned int i = 0; i < EVENT_QTY; i++)
+    {
+        Processing_Queue(i);
+    }
+}

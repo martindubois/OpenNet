@@ -52,8 +52,6 @@ protected:
 
     virtual ~Thread();
 
-    virtual void Prepare_Internal() = 0;
-
     virtual void Processing_Queue(unsigned int aIndex) = 0;
     virtual void Processing_Wait (unsigned int aIndex) = 0;
 

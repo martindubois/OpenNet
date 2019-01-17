@@ -23,6 +23,34 @@ Thread_Functions_CUDA::Thread_Functions_CUDA(Processor_Internal * aProcessor, bo
 
 }
 
+// ===== Thread =============================================================
+
+void Thread_Functions_CUDA::Prepare()
+{
+    assert(   0 < mAdapters.size());
+    assert(NULL != mKernel        );
+    assert(NULL != mProcessor     );
+
+    assert(NULL == mCommandQueue);
+
+    // Processor_Internal::CommandQueue_Create ==> OCLW_ReleaseCommandQueue  See Release
+    mCommandQueue = mProcessor->CommandQueue_Create(mKernel->IsProfilingEnabled());
+    assert(NULL != mCommandQueue);
+
+    mKernel->SetCommandQueue(mCommandQueue);
+
+    // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Release
+    mKernel_CL = OCLW_CreateKernel(mProgram, "Filter");
+    assert(NULL != mKernel_CL);
+
+    for (unsigned int i = 0; i < mAdapters.size(); i++)
+    {
+        assert(NULL != mAdapters[i]);
+
+        mAdapters[i]->Buffers_Allocate(mCommandQueue, mKernel_CL, &mBuffers);
+    }
+}
+
 // Protected
 /////////////////////////////////////////////////////////////////////////////
 
@@ -60,33 +88,6 @@ void Thread_Functions_CUDA::Processing_Wait(unsigned int aIndex)
     mEvents[aIndex] = NULL;
 }
 
-void Thread_Functions_CUDA::Prepare_Internal()
-{
-    assert(0 < mAdapters.size());
-    assert(0 == mBuffers.size());
-    assert(NULL != mKernel);
-    assert(NULL != mProcessor);
-
-    assert(NULL == mCommandQueue);
-
-    // Processor_Internal::CommandQueue_Create ==> OCLW_ReleaseCommandQueue  See Release
-    mCommandQueue = mProcessor->CommandQueue_Create(mKernel->IsProfilingEnabled());
-    assert(NULL != mCommandQueue);
-
-    mKernel->SetCommandQueue(mCommandQueue);
-
-    // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Release
-    mKernel_CL = OCLW_CreateKernel(mProgram, "Filter");
-    assert(NULL != mKernel_CL);
-
-    for (unsigned int i = 0; i < mAdapters.size(); i++)
-    {
-        assert(NULL != mAdapters[i]);
-
-        mAdapters[i]->Buffers_Allocate(mCommandQueue, mKernel_CL, &mBuffers);
-    }
-}
-
 void Thread_Functions_CUDA::Run_Start()
 {
     assert(0 < mBuffers.size());
@@ -100,8 +101,5 @@ void Thread_Functions_CUDA::Run_Start()
         OCLW_SetKernelArg(mKernel_CL, i, sizeof(cl_mem), &mBuffers[i]->mMem);
     }
 
-    for (i = 0; i < EVENT_QTY; i++)
-    {
-        Processing_Queue(i);
-    }
+    Thread_Functions::Run_Start();
 }

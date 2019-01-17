@@ -53,22 +53,20 @@ void Thread_Kernel_OpenCL::SetProgram(cl_program aProgram)
     mProgram = aProgram;
 }
 
+// ===== Thread =============================================================
+
+void Thread_Kernel_OpenCL::Prepare()
+{
+    assert(NULL != mKernel        );
+    assert(NULL != mProcessor     );
+
+    Thread_OpenCL::Prepare(dynamic_cast<Processor_OpenCL *>(mProcessor), &mAdapters, mKernel, &mBuffers);
+}
+
 // Protected
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Thread =============================================================
-
-void Thread_Kernel_OpenCL::Prepare_Internal()
-{
-    assert(   0 < mAdapters.size());
-    assert(   0 == mBuffers.size());
-    assert(NULL != mKernel        );
-    assert(NULL != mProcessor     );
-
-    assert(NULL == mCommandQueue);
-
-    Thread_OpenCL::Prepare(dynamic_cast<Processor_OpenCL *>(mProcessor), &mAdapters, mKernel, &mBuffers);
-}
 
 void Thread_Kernel_OpenCL::Processing_Queue(unsigned int aIndex)
 {
@@ -117,6 +115,8 @@ void Thread_Kernel_OpenCL::Processing_Wait(unsigned int aIndex)
 
 void Thread_Kernel_OpenCL::Release()
 {
+    assert(NULL != mKernel);
+
     Thread_OpenCL::Release(mKernel);
 }
 

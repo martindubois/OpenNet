@@ -34,7 +34,7 @@ protected:
     void Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalSize, cl_event * aEvent);
     void Processing_Wait (cl_event aEvent, OpenNet::Kernel * aKernel);
 
-    virtual void Release(OpenNet::Kernel * aKernel);
+    void Release(OpenNet::Kernel * aKernel);
 
     cl_command_queue mCommandQueue;
     cl_kernel        mKernel_CL   ;

@@ -80,6 +80,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Export.cmd = Export.cmd
 		Export.cmd.txt = Export.cmd.txt
 		Import.cmd = Import.cmd
+		README.md = README.md
 		RunDoxygen.cmd = RunDoxygen.cmd
 		Test.cmd = Test.cmd
 	EndProjectSection
@@ -133,16 +134,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestLib", "TestLib", "{F717
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{DDC857B0-A3ED-4E00-9A0F-5AAAB745368D}"
 	ProjectSection(SolutionItems) = preProject
+		Scripts\Import.cmd = Scripts\Import.cmd
+		Scripts\Import.cmd.txt = Scripts\Import.cmd.txt
 		Scripts\Package.cmd = Scripts\Package.cmd
 		Scripts\Package_RunTime.txt = Scripts\Package_RunTime.txt
 		Scripts\Package_Samples.txt = Scripts\Package_Samples.txt
 		Scripts\Package_SDK.txt = Scripts\Package_SDK.txt
 		Scripts\Package_SDK_DDK.txt = Scripts\Package_SDK_DDK.txt
 		Scripts\Package_SDK_Headers.txt = Scripts\Package_SDK_Headers.txt
-		Scripts\Test_AB_Function.txt = Scripts\Test_AB_Function.txt
-		Scripts\Test_AB_Kernel.txt = Scripts\Test_AB_Kernel.txt
-		Scripts\Test_CDEF_Function.txt = Scripts\Test_CDEF_Function.txt
-		Scripts\Test_CDEF_Kernel.txt = Scripts\Test_CDEF_Kernel.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{43EEE218-F401-4715-B1C2-691A6B898734}"
@@ -155,6 +154,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocUser", "_DocUser", "{19B520D7-5752-4ED0-B32B-41BA5EFCEE61}"
 	ProjectSection(SolutionItems) = preProject
 		Samples\_DocUser\ReadMe.txt = Samples\_DocUser\ReadMe.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet_Tool", "OpenNet_Tool", "{7A086992-CDEA-4B24-96B1-404A882FE13A}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\OpenNet_Tool\A00DDN00000001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDN00000001A_WX5100_10.txt
+		Scripts\OpenNet_Tool\A00DDN00000001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDN00000001I_WX5100_10.txt
+		Scripts\OpenNet_Tool\README.md = Scripts\OpenNet_Tool\README.md
 	EndProjectSection
 EndProject
 Global
@@ -242,6 +248,7 @@ Global
 		{F717FA89-DD40-4CFC-BDA0-FE69C6D37B01} = {B19569F8-BE7B-4B34-9AB9-8104A177AC85}
 		{4F6D256B-937E-4685-AB6D-36CDDAF59A4A} = {43EEE218-F401-4715-B1C2-691A6B898734}
 		{19B520D7-5752-4ED0-B32B-41BA5EFCEE61} = {43EEE218-F401-4715-B1C2-691A6B898734}
+		{7A086992-CDEA-4B24-96B1-404A882FE13A} = {DDC857B0-A3ED-4E00-9A0F-5AAAB745368D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3390872B-D3FA-4AAE-8BB2-0888DA87EF63}

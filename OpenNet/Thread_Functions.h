@@ -42,6 +42,7 @@ protected:
     virtual void Release();
 
     virtual void Run_Loop ();
+    virtual void Run_Start();
 
     Kernel_Functions mKernelFunctions;
 

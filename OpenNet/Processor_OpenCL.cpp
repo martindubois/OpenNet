@@ -83,8 +83,6 @@ Processor_OpenCL::Processor_OpenCL(cl_platform_id aPlatform, cl_device_id aDevic
 // Threads  Apps
 Buffer_Data * Processor_OpenCL::Buffer_Allocate(unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer)
 {
-    assert(PACKET_SIZE_MAX_byte >= aPacketSize_byte);
-    assert(PACKET_SIZE_MIN_byte <= aPacketSize_byte);
     assert(NULL                 != aCommandQueue   );
     assert(NULL                 != aKernel         );
     assert(NULL                 != aBuffer         );

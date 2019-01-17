@@ -31,12 +31,28 @@
 // aDebugLog  [-K-;RW-]
 Thread_Functions_OpenCL::Thread_Functions_OpenCL(Processor_Internal * aProcessor, bool aProfilingEnabled, KmsLib::DebugLog * aDebugLog)
     : Thread_Functions(aProcessor, aProfilingEnabled, aDebugLog)
-    , mCommandQueue(NULL)
-    , mKernel_CL   (NULL)
-    , mProgram     (NULL)
 {
     assert(NULL != aProcessor);
     assert(NULL != aDebugLog );
+}
+
+// ===== Thread =============================================================
+
+void Thread_Functions_OpenCL::Prepare()
+{
+    assert(   0 < mAdapters.size());
+    assert(NULL != mKernel        );
+    assert(NULL != mProcessor     );
+
+    assert(NULL == mProgram     );
+
+    Processor_OpenCL * lProcessor = dynamic_cast<Processor_OpenCL *>(mProcessor);
+    assert(NULL != lProcessor);
+
+    mProgram = lProcessor->Program_Create(&mKernelFunctions);
+    assert(NULL != mProgram);
+
+    Thread_OpenCL::Prepare(dynamic_cast<Processor_OpenCL *>(mProcessor), &mAdapters, mKernel, &mBuffers);
 }
 
 // Protected
@@ -76,45 +92,10 @@ void Thread_Functions_OpenCL::Processing_Wait(unsigned int aIndex)
     mEvents[aIndex] = NULL;
 }
 
-void Thread_Functions_OpenCL::Prepare_Internal()
-{
-    assert(   0 < mAdapters.size());
-    assert(   0 == mBuffers.size());
-    assert(NULL != mKernel        );
-    assert(NULL != mProcessor     );
-
-    assert(NULL == mCommandQueue);
-    assert(NULL == mProgram     );
-
-    Processor_OpenCL * lProcessor = dynamic_cast<Processor_OpenCL *>(mProcessor);
-    assert(NULL != lProcessor);
-
-    mProgram = lProcessor->Program_Create(&mKernelFunctions);
-    assert(NULL != mProgram);
-
-    // Processor_Internal::CommandQueue_Create ==> OCLW_ReleaseCommandQueue  See Release
-    mCommandQueue = lProcessor->CommandQueue_Create(mKernel->IsProfilingEnabled());
-    assert(NULL != mCommandQueue);
-
-    mKernel->SetCommandQueue(mCommandQueue);
-
-    // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Release
-    mKernel_CL = OCLW_CreateKernel(mProgram, "Filter");
-    assert(NULL != mKernel_CL);
-
-    for (unsigned int i = 0; i < mAdapters.size(); i++)
-    {
-        assert(NULL != mAdapters[i]);
-
-        Adapter_Windows * lAdapter = dynamic_cast<Adapter_Windows *>(mAdapters[i]);
-        assert(NULL != lAdapter);
-
-        lAdapter->Buffers_Allocate(mCommandQueue, mKernel_CL, &mBuffers);
-    }
-}
-
 void Thread_Functions_OpenCL::Release()
 {
+    assert(NULL != mKernel);
+
     Thread_Functions::Release();
 
     Thread_OpenCL::Release(mKernel);
@@ -138,8 +119,5 @@ void Thread_Functions_OpenCL::Run_Start()
         OCLW_SetKernelArg(mKernel_CL, i, sizeof(cl_mem), &lBuffer->mMem);
     }
 
-    for (i = 0; i < EVENT_QTY; i++)
-    {
-        Processing_Queue(i);
-    }
+    Thread_Functions::Run_Start();
 }

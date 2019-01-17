@@ -23,6 +23,10 @@ public:
 
     Thread_Functions_OpenCL(Processor_Internal * aProcessor, bool aProfilingEnabled, KmsLib::DebugLog * aDebugLog);
 
+    // ===== Thread =========================================================
+
+    virtual void Prepare();
+
 protected:
 
     // ===== Thread =========================================================
@@ -30,17 +34,12 @@ protected:
     virtual void Processing_Queue(unsigned int aIndex);
     virtual void Processing_Wait (unsigned int aIndex);
 
-    virtual void Prepare_Internal();
-
     virtual void Release();
 
     virtual void Run_Start();
 
 private:
 
-    cl_command_queue mCommandQueue;
     cl_event         mEvents[EVENT_QTY];
-    cl_kernel        mKernel_CL   ;
-    cl_program       mProgram     ;
 
 };

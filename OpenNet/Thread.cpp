@@ -115,10 +115,6 @@ void Thread::Prepare()
 {
     assert(   0 <  mAdapters.size());
     assert(   0 == mBuffers .size());
-    assert(NULL != mKernel         );
-    assert(NULL != mProcessor      );
-
-    Prepare_Internal();
 
     for (unsigned int i = 0; i < mBuffers.size(); i++)
     {

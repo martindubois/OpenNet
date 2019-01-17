@@ -25,11 +25,13 @@ public:
 
     void SetProgram(cl_program aProgram);
 
+    // ===== Thread =========================================================
+
+    virtual void Prepare();
+
 protected:
 
     // ===== Thread =========================================================
-
-    virtual void Prepare_Internal();
 
     virtual void Processing_Queue(unsigned int aIndex);
     virtual void Processing_Wait (unsigned int aIndex);

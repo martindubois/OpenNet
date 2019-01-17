@@ -34,7 +34,7 @@ KMS_TEST_BEGIN(Kernel_Base)
 
     #ifdef _KMS_WINDOWS_
         KMS_TEST_COMPARE(OpenNet::STATUS_OK                   , lK0.SetCode         ("OpenNet_Test/Kernel.cpp"));
-        KMS_TEST_COMPARE(                                   56, lK0.GetCodeLineCount());
+        KMS_TEST_COMPARE(                                   63, lK0.GetCodeLineCount());
         KMS_TEST_ASSERT (NULL                                != lK0.GetCodeLines    ());
         KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET     , lK0.SetCode         (" ", 1));
         KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET     , lK0.SetCode         ("OpenNet_Test/Kernel.cpp"));

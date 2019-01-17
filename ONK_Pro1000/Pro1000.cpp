@@ -399,7 +399,6 @@ void Pro1000::Packet_Send_NoLock(uint64_t aLogicalAddress, const void *, unsigne
 
     ASSERT(0    != aLogicalAddress);
     ASSERT(0    <  aSize_byte     );
-    ASSERT(NULL != aCounter       );
 
     ASSERT(TX_DESCRIPTOR_QTY >  mTx_In     );
     ASSERT(NULL              != mTx_Virtual);
