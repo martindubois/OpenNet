@@ -1,11 +1,11 @@
 
-# Author   KMS - Martin Dubois, ing.
-# Product  OpenNet
-# File     Scripts/Package_RunTime.txt
+# Author     KMS - Martin Dubois, ing.
+# Copyright  (C) 2018-2019 KMS. All rights reserved.
+# Product    OpenNet
+# File       Scripts/Package_RunTime.txt
 
 ADD Binaries/Release_64/OpenNet.dll
 ADD Binaries/Release_64/OpenNet_Tool.exe
-ADD Binaries/Release_64/Radar.exe
 ADD Drivers/Release_64/ONK_NDIS/ONK_NDIS.cat
 ADD Drivers/Release_64/ONK_NDIS/ONK_NDIS.inf
 ADD Drivers/Release_64/ONK_NDIS/ONK_NDIS.sys

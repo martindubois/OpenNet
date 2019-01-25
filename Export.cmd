@@ -1,9 +1,10 @@
 @echo off
 
-rem Author / Auteur	   KMS - Martin Dubois, ing.
-rem Product / Produit  OpenNet
-rem File / Fichier     Export.cmd
-rem Usage / Usage      Export.cmd {Ma.Mi.Bu} {Type}
+rem Author 	   KMS - Martin Dubois, ing.
+rem Copyright  (C) 2018-2019 KMS. All rights reserved.
+rem Product    OpenNet
+rem File       Export.cmd
+rem Usage      Export.cmd {Ma.Mi.Bu} {Type}
 
 echo  Executing  Export.cmd %1 %2  ...
 
@@ -13,9 +14,9 @@ set EXPORT_CMD_TXT="Export.cmd.txt"
 set KMS_COPY="C:\Software\KmsTools\KmsCopy.exe"
 
 if ""=="%2" (
-	set DST="K:\Export\OpenNet\%1"
+	set DST="K:\Export\OpenNet\%1_Windows"
 ) else (
-	set DST="K:\Export\OpenNet\%1_%2"
+	set DST="K:\Export\OpenNet\%1_%2_Windows"
 )
 
 rem ===== Verification / Verification =======================================

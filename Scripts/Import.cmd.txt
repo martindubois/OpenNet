@@ -1,6 +1,6 @@
 
 # Author     KMS - Martin Dubois, ing.
-# Copyright  (C) 2019 KMS. All rights reserved.
+# Copyright  (C) 2018-2019 KMS. All rights reserved.
 # Product    OpenNet
 # File       Scripts/Import.cmd.txt
 
@@ -60,33 +60,21 @@ Includes/OpenNet
 	System.h
 
 Includes/OpenNetK
-    Adapter.h
 	Adapter_Types.h
-	Adapter_WDF.h
 	ARP.h
-	Constants.h
-	Debug.h
 	Ethernet.h
-	Hardware.h
-	Hardware_Statistics.h
-	Hardware_WDF.h
-    Interface.h
 	IPv4.h
 	Kernel.h
-	OS.h
-	Packet.h
-	PacketGenerator_Types.h
-	SpinLock.h
-	Spinlock_WDF.h
 	StdInt.h
 	Types.h
-	Windows.h
 
 Libraries/Debug_64
     ONK_Lib.lib
+	OpenNet.lib
 
 Libraries/Release_64
     ONK_Lib.lib
+	OpenNet.lib
 
 ONK_Lib
 	ReadMe.txt

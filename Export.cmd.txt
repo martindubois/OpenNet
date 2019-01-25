@@ -48,6 +48,7 @@ Includes/OpenNetK
     Interface.h
 	IPv4.h
 	Kernel.h
+	OS.h
 	Packet.h
 	PacketGenerator_Types.h
 	SpinLock.h
@@ -68,26 +69,11 @@ OpenNet/_DocUser OpenNet
 OpenNet_Tool/_DocUser OpenNet_Tool
 	ReadMe.txt
 
-Samples/_DocUser Samples
-	ReadMe.txt
-
-Samples/Radar
-	Main.cpp
-	Radar.vcxproj
-	Radar.vcxproj.filters
-	Radar_Controller.cpp
-	Radar_Controller.h
-	Radar_Kernel.cpp
-	Radar_Kernel.h
-	Radar_Types.h
-	Radar_View.cpp
-	Radar_View.h
-	Radar_View.resx
-
 Scripts .
+	Import.cmd
+	Import.cmd.txt
 	Package.cmd
 	Package_RunTime.txt
-	Package_Samples.txt
 	Package_SDK.txt
 	Package_SDK_DDK.txt
 	Package_SDK_Headers.txt
@@ -95,10 +81,10 @@ Scripts .
 x64/Debug Binaries/Debug_64
     OpenNet.dll
     OpenNet_Tool.exe
-	Radar.exe
 
 x64/Debug Libraries/Debug_64
     ONK_Lib.lib
+	OpenNet.lib
 
 x64/Debug Tests/Debug_64
     ONK_Test.exe
@@ -117,10 +103,10 @@ x64/Debug/ONK_Pro1000 Drivers/Debug_64/ONK_Pro1000
 x64/Release Binaries/Release_64
     OpenNet.dll
     OpenNet_Tool.exe
-	Radar.exe
 
 x64/Release Libraries/Release_64
     ONK_Lib.lib
+	OpenNet.lib
 
 x64/Release Tests/Release_64
     ONK_Test.exe
