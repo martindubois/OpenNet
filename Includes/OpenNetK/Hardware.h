@@ -221,11 +221,9 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Process an interrupt at third level
-        /// \param  aNeedMoreProcessing [---;-W-]
         /// \endcond
         /// \cond fr
         /// \brief  Traiter une interruption au troisieme niveau
-        /// \param  aNeedMoreProcessing [---;-W-]
         /// \endcond
         virtual void Interrupt_Process3();
 

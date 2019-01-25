@@ -3,7 +3,7 @@
 
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright (C) 2019 KMS. All rights reserved
-/// \file       Includes/OpenNetK/PacketGenetator_Types.h
+/// \file       Includes/OpenNetK/PacketGenerator_Types.h
 /// \brief      OpenNetK::PacketGenerator_Config
 
 #pragma once
@@ -17,7 +17,7 @@ namespace OpenNetK
     /// \cond fr
     /// \brief  Cette structure est utilise pour passer la configuration.
     /// \endcond
-    /// \toto   Document the members
+    /// \todo   Document the members
     typedef struct
     {
         uint32_t mAllowedIndexRepeat;

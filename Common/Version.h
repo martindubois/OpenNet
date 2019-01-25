@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     Common/Version.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       Common/Version.h
 
 #pragma  once
 
@@ -10,11 +11,11 @@
 
 #define VERSION_MAJOR         (0)
 #define VERSION_MINOR         (0)
-#define VERSION_BUILD         (6)
+#define VERSION_BUILD         (7)
 #define VERSION_COMPATIBILITY (0)
 
-#define VERSION_RC   0,0,6,0
-#define VERSION_STR  "0.0.6.0"
-#define VERSION_STR0 "0.0.6.0\0"
+#define VERSION_RC   0,0,7,0
+#define VERSION_STR  "0.0.7.0"
+#define VERSION_STR0 "0.0.7.0\0"
 
 #define VERSION_TYPE "KI"

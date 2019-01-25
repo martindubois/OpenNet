@@ -63,18 +63,24 @@ Includes/OpenNetK
     Adapter.h
 	Adapter_Types.h
 	Adapter_WDF.h
+	ARP.h
 	Constants.h
 	Debug.h
+	Ethernet.h
 	Hardware.h
 	Hardware_Statistics.h
 	Hardware_WDF.h
     Interface.h
+	IPv4.h
 	Kernel.h
+	OS.h
 	Packet.h
+	PacketGenerator_Types.h
 	SpinLock.h
 	Spinlock_WDF.h
 	StdInt.h
 	Types.h
+	Windows.h
 
 Libraries/Debug_64
     ONK_Lib.lib

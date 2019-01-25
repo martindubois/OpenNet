@@ -1,7 +1,8 @@
 
-Auteur   KMS - Martin Dubois, ing.
-Produit  OpenNet
-Fichier  _DocDev/Procedures/Build_fr.txt
+Auteur     KMS - Martin Dubois, ing.
+Copyright  (C) 2019 KMS. All rights reserved.
+Produit    OpenNet
+Fichier    _DocDev/Procedures/Build_fr.txt
 
 Developpeur        __________________________________________________________
 
@@ -26,7 +27,7 @@ Version            _____ . _____ . _____ . _____ - __________________________
 [ ] Executer "RunDoxygen.cmd"
 [ ] Executer "Build.cmd"
 [ ] Commetre les fichiers modifies
-[ ] Ajouter le tag {Major}.{Minor}.{Build}_{Type}
+[ ] Ajouter le tag {Major}.{Minor}.{Build}_{Type}_{Ubuntu|Windows}
 [ ] Pousser les sourses sur le serveur
 
 Heure et duree      _____ : ______            ______ heures et ______ minutes

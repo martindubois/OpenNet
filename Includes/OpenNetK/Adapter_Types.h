@@ -24,7 +24,7 @@ namespace OpenNetK
     /// \brief  Cette structure est utilise pour passer les informations au sujet
     ///         d'un espace memoire.
     /// \endcond
-    /// \toto   Document the members
+    /// \todo   Document the members
     typedef struct
     {
         uint64_t mBuffer_PA;

@@ -68,7 +68,7 @@
       <PreprocessorDefinitions>_KMS_WINDOWS_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Inf>
-      <TimeStamp>0.0.6.0</TimeStamp>
+      <TimeStamp>0.0.7.0</TimeStamp>
     </Inf>
     <Link>
       <AdditionalDependencies>ONK_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -84,7 +84,7 @@
       <PreprocessorDefinitions>_KMS_WINDOWS_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Inf>
-      <TimeStamp>0.0.6.0</TimeStamp>
+      <TimeStamp>0.0.7.0</TimeStamp>
     </Inf>
     <Link>
       <AdditionalDependencies>ONK_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>

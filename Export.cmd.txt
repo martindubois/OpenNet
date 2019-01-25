@@ -1,7 +1,8 @@
 
-# Author   KMS - Martin Dubois, ing.
-# Product  OpenNet
-# File     Export.cmd.txt
+# Author     KMS - Martin Dubois, ing.
+# Copyright  (C) 2018-2019 KMS. All rights reserved.
+# Product    OpenNet
+# File       Export.cmd.txt
 
 . Binaries
 . Drivers
@@ -37,18 +38,23 @@ Includes/OpenNetK
     Adapter.h
 	Adapter_Types.h
 	Adapter_WDF.h
+	ARP.h
 	Constants.h
 	Debug.h
+	Ethernet.h
 	Hardware.h
 	Hardware_Statistics.h
 	Hardware_WDF.h
     Interface.h
+	IPv4.h
 	Kernel.h
 	Packet.h
+	PacketGenerator_Types.h
 	SpinLock.h
 	Spinlock_WDF.h
 	StdInt.h
 	Types.h
+	Windows.h
 
 ONK_Lib/_DocUser ONK_Lib
 	ReadMe.txt

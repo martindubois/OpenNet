@@ -35,6 +35,9 @@ ADD Includes/OpenNet/SourceCode.h
 ADD Includes/OpenNet/StatisticsProvider.h
 ADD Includes/OpenNet/Status.h
 ADD Includes/OpenNet/System.h
+ADD Includes/OpenNetK/ARP.h
+ADD Includes/OpenNetK/Ethernet.h
+ADD Includes/OpenNetK/IPv4.h
 ADD Includes/OpenNetK/Kernel.h
 ADD Includes/OpenNetK/Types.h
 ADD ONK_Pro1000/ReadMe.txt
