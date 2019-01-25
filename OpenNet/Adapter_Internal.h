@@ -20,6 +20,7 @@
 #include <OpenNet/Adapter.h>
 #include <OpenNet/System.h>
 #include <OpenNetK/Constants.h>
+#include <OpenNetK/PacketGenerator_Types.h>
 
 // ===== Common =============================================================
 #include "../Common/IoCtl.h"
@@ -53,6 +54,11 @@ public:
     void Buffers_Release ();
 
     void Packet_Send_Ex(const IoCtl_Packet_Send_Ex_In * aIn);
+
+    void PacketGenerator_GetConfig(OpenNetK::PacketGenerator_Config * aOut  );
+    void PacketGenerator_SetConfig(OpenNetK::PacketGenerator_Config * aInOut);
+    void PacketGenerator_Start    ();
+    void PacketGenerator_Stop     ();
 
     void SendLoopBackPackets();
 

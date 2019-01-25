@@ -1,7 +1,8 @@
 
-// Author    KMS - Martin Dubois, ing.
-// Product   OpenNet
-// File      ONL_Lib/Hardware_WDF.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONL_Lib/Hardware_WDF.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -37,9 +38,9 @@ typedef struct
 {
     OpenNetK::Hardware_WDF * mHardware_WDF;
 }
-TimerContext;
+ChildContext;
 
-WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(TimerContext, GetTimerContext);
+WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(ChildContext, GetChildContext);
 
 // Static function declaration
 /////////////////////////////////////////////////////////////////////////////
@@ -53,7 +54,7 @@ extern "C"
     static EVT_WDF_INTERRUPT_ENABLE  InterruptEnable ;
     static EVT_WDF_INTERRUPT_ISR     InterruptIsr    ;
     static EVT_WDF_TIMER             Tick            ;
-
+    static EVT_WDF_WORKITEM          Work            ;
 };
 
 namespace OpenNetK
@@ -101,6 +102,7 @@ namespace OpenNetK
                     mHardware->SetCommonBuffer(lLogicalAddress.QuadPart, lVirtualAddress);
 
                     InitTimer();
+                    InitWorkItem();
                 }
             }
         }
@@ -212,8 +214,16 @@ namespace OpenNetK
     void Hardware_WDF::Interrupt_Dpc()
     {
         ASSERT(NULL != mHardware);
+        ASSERT(NULL != mWorkItem);
 
-        mHardware->Interrupt_Process2();
+        bool lNeedMoreProcessing = false;
+
+        mHardware->Interrupt_Process2(&lNeedMoreProcessing);
+
+        if (lNeedMoreProcessing)
+        {
+            WdfWorkItemEnqueue(mWorkItem);
+        }
     }
 
     NTSTATUS Hardware_WDF::Interrupt_Enable()
@@ -255,7 +265,16 @@ namespace OpenNetK
     {
         ASSERT(NULL != mHardware);
 
+        mHardware->Tick();
+
         TrigProcess2();
+    }
+
+    void Hardware_WDF::Work()
+    {
+        ASSERT(NULL != mHardware);
+
+        mHardware->Interrupt_Process3();
     }
 
     // Private
@@ -273,7 +292,7 @@ namespace OpenNetK
 
         WDF_OBJECT_ATTRIBUTES lAttr;
 
-        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&lAttr, TimerContext);
+        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&lAttr, ChildContext);
 
         lAttr.ParentObject = mDevice;
 
@@ -282,10 +301,35 @@ namespace OpenNetK
         ASSERT(NULL           != mTimer );
         (void)(lStatus);
 
-        TimerContext * lTimerContext = GetTimerContext(mTimer);
-        ASSERT(NULL != lTimerContext);
+        ChildContext * lChildContext = GetChildContext(mTimer);
+        ASSERT(NULL != lChildContext);
 
-        lTimerContext->mHardware_WDF = this;
+        lChildContext->mHardware_WDF = this;
+    }
+
+    void Hardware_WDF::InitWorkItem()
+    {
+        ASSERT(NULL != mDevice);
+
+        WDF_WORKITEM_CONFIG lConfig;
+
+        WDF_WORKITEM_CONFIG_INIT(&lConfig, ::Work);
+
+        WDF_OBJECT_ATTRIBUTES lAttr;
+
+        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&lAttr, ChildContext);
+
+        lAttr.ParentObject = mDevice;
+
+        NTSTATUS lStatus = WdfWorkItemCreate(&lConfig, &lAttr, &mWorkItem);
+        ASSERT(STATUS_SUCCESS == lStatus  );
+        ASSERT(NULL           != mWorkItem);
+        (void)(lStatus);
+
+        ChildContext * lChildContext = GetChildContext(mWorkItem);
+        ASSERT(NULL != lChildContext);
+
+        lChildContext->mHardware_WDF = this;
     }
 
     // aTranslated [---;R--]
@@ -427,8 +471,18 @@ VOID Tick(WDFTIMER aTimer)
 {
     ASSERT(NULL != aTimer);
 
-    TimerContext * lTimerContext = GetTimerContext(aTimer);
-    ASSERT(NULL != lTimerContext);
+    ChildContext * lChildContext = GetChildContext(aTimer);
+    ASSERT(NULL != lChildContext);
 
-    lTimerContext->mHardware_WDF->Tick();
+    lChildContext->mHardware_WDF->Tick();
+}
+
+VOID Work(WDFWORKITEM aWorkItem)
+{
+    ASSERT(NULL != aWorkItem);
+
+    ChildContext * lChildContext = GetChildContext(aWorkItem);
+    ASSERT(NULL != lChildContext);
+
+    lChildContext->mHardware_WDF->Work();
 }

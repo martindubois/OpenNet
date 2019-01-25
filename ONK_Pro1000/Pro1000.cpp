@@ -50,6 +50,8 @@ Pro1000::Pro1000()
     strcpy(mInfo.mComment                  , "ONK_Pro1000");
     strcpy(mInfo.mVersion_Driver  .mComment, "ONK_Pro1000");
     strcpy(mInfo.mVersion_Hardware.mComment, "Intel Gigabit ET Dual Port Server Adapter");
+
+    memset((void *)(&mTx_PacketBuffer_Counter), 0, sizeof(mTx_PacketBuffer_Counter)); // volatile_cast
 }
 
 // Protected
@@ -309,9 +311,11 @@ bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcess
 }
 
 // CRITICAL PATH
-void Pro1000::Interrupt_Process2()
+void Pro1000::Interrupt_Process2(bool * aNeedMoreProcessing)
 {
     // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+
+    ASSERT(NULL != aNeedMoreProcessing);
 
     ASSERT(NULL != mZone0);
 
@@ -322,7 +326,7 @@ void Pro1000::Interrupt_Process2()
 
     mZone0->Unlock();
 
-    Hardware::Interrupt_Process2();
+    Hardware::Interrupt_Process2(aNeedMoreProcessing);
 }
 
 // CRITICAL PATH - Buffer
@@ -413,7 +417,7 @@ void Pro1000::Packet_Send_NoLock(uint64_t aLogicalAddress, const void *, unsigne
 }
 
 // CRITICAL PATH
-void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
+bool Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
 {
     // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes,  )" DEBUG_EOL, aSize_byte);
 
@@ -421,26 +425,36 @@ void Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigne
     ASSERT(NULL != mTx_Virtual);
     ASSERT(NULL != mZone0     );
 
-    uint64_t lPacket_PA;
+    bool lResult;
 
     Lock();
 
-        ASSERT(TX_DESCRIPTOR_QTY >  mTx_In                                       );
-        ASSERT(PACKET_BUFFER_QTY >  mTx_PacketBuffer_In                          );
-        ASSERT(NULL              != mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In]);
+    ASSERT(PACKET_BUFFER_QTY >  mTx_PacketBuffer_In                          );
+    ASSERT(NULL              != mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In]);
 
+    lResult = ((0 >= mTx_PacketBuffer_Counter[mTx_PacketBuffer_In]) && (Tx_GetAvailableDescriptor_Zone0() >= aRepeatCount));
+    if (lResult)
+    {
         memcpy(mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In], aPacket, aSize_byte);
 
-        lPacket_PA = mTx_PacketBuffer_Logical[mTx_PacketBuffer_In];
-
-        mTx_PacketBuffer_In = ( mTx_PacketBuffer_In + 1 ) % PACKET_BUFFER_QTY;
+        volatile long * lCounter = mTx_PacketBuffer_Counter + mTx_PacketBuffer_In;
+        uint64_t lPacket_PA = mTx_PacketBuffer_Logical[mTx_PacketBuffer_In];
 
         for (unsigned int i = 0; i < aRepeatCount; i++)
         {
-            Packet_Send_NoLock(lPacket_PA, NULL, aSize_byte, NULL);
+            Packet_Send_NoLock(lPacket_PA, NULL, aSize_byte, lCounter);
         }
 
-    Unlock_AfterSend(NULL, aRepeatCount);
+        mTx_PacketBuffer_In = (mTx_PacketBuffer_In + 1) % PACKET_BUFFER_QTY;
+
+        Unlock_AfterSend(lCounter, aRepeatCount);
+    }
+    else
+    {
+        Unlock_AfterSend(NULL, 0);
+    }
+
+    return lResult;
 }
 
 unsigned int Pro1000::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)
@@ -656,4 +670,12 @@ void Pro1000::Tx_Process_Zone0()
 
         mStatistics[OpenNetK::HARDWARE_STATS_TX_packet] ++;
     }
+}
+
+unsigned int Pro1000::Tx_GetAvailableDescriptor_Zone0()
+{
+    ASSERT(TX_DESCRIPTOR_QTY > mTx_In );
+    ASSERT(TX_DESCRIPTOR_QTY > mTx_Out);
+
+    return ((mTx_Out + TX_DESCRIPTOR_QTY - mTx_In - 1) % TX_DESCRIPTOR_QTY);
 }

@@ -32,7 +32,9 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-static const uint8_t LOOP_BACK_PACKET[64] =
+static const IoCtl_Packet_Send_Ex_In LOOP_BACK_PACKET_HEADER = { 0, 64, 64 };
+
+static const uint8_t LOOP_BACK_PACKET_DATA[64] =
 {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x88, 0x88
 };
@@ -170,16 +172,62 @@ void Adapter_Internal::Packet_Send_Ex(const IoCtl_Packet_Send_Ex_In * aIn)
     assert(0 == lRet);
 }
 
+// aOut [---;-W-]
+//
+// Exception  KmsLib::Exception *  CODE_IOCTL_ERROR
+//                                 See KmsLib::Windows::DriverHandle::Control
+void Adapter_Internal::PacketGenerator_GetConfig(OpenNetK::PacketGenerator_Config * aOut)
+{
+    assert(NULL != aOut);
+
+    unsigned int lRet = mHandle->Control(IOCTL_PACKET_GENERATOR_CONFIG_GET, NULL, 0, aOut, sizeof(OpenNetK::PacketGenerator_Config));
+    if (sizeof(OpenNetK::PacketGenerator_Config) != lRet)
+    {
+        throw new KmsLib::Exception(KmsLib::Exception::CODE_IOCTL_ERROR, "The driver did not return enough data", NULL, __FILE__, __FUNCTION__, __LINE__, lRet);
+    }
+}
+
+// aIn [---;RW-]
+//
+// Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
+void Adapter_Internal::PacketGenerator_SetConfig(OpenNetK::PacketGenerator_Config * aInOut)
+{
+    assert(NULL != aInOut);
+
+    unsigned int lRet = mHandle->Control(IOCTL_PACKET_GENERATOR_CONFIG_SET, aInOut, sizeof(OpenNetK::PacketGenerator_Config), aInOut, sizeof(OpenNetK::PacketGenerator_Config));
+    assert(sizeof(OpenNetK::PacketGenerator_Config) == lRet);
+}
+
+// Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
+void Adapter_Internal::PacketGenerator_Start()
+{
+    unsigned int lRet = mHandle->Control(IOCTL_PACKET_GENERATOR_START, NULL, 0, NULL, 0);
+    assert(0 == lRet);
+}
+
+// Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
+void Adapter_Internal::PacketGenerator_Stop()
+{
+    unsigned int lRet = mHandle->Control(IOCTL_PACKET_GENERATOR_STOP, NULL, 0, NULL, 0);
+    assert(0 == lRet);
+}
+
 // Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
 // Threads    Apps
 void Adapter_Internal::SendLoopBackPackets()
 {
     assert(NULL != mHandle);
 
-    for (unsigned i = 0; i < 64; i++)
+    try
     {
-        mHandle->Control(IOCTL_PACKET_SEND, LOOP_BACK_PACKET, sizeof(LOOP_BACK_PACKET), NULL, 0);
-        mStatistics[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET] ++;
+        mHandle->Control(IOCTL_PACKET_SEND_EX, &LOOP_BACK_PACKET_HEADER, sizeof(LOOP_BACK_PACKET_HEADER) + sizeof(LOOP_BACK_PACKET_DATA), NULL, 0);
+        mStatistics[OpenNet::ADAPTER_STATS_LOOP_BACK_PACKET] += LOOP_BACK_PACKET_HEADER.mRepeatCount;
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog->LogTime();
+        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(eE);
     }
 }
 

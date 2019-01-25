@@ -89,9 +89,23 @@
 // Output  None
 #define IOCTL_STOP              IOCTL_CODE(112)
 
-// TODO  OpenNetK.IoCtl
-//       Normal - Ajouter PACKET_GENERATOR_START et PACKET_GENERATOR_STOP et
-//       implanter un packet generator directement dans ONK_Lib
+// ===== 0.0.7 ==============================================================
+
+// Input   None
+// Output  OpenNetK::Generator_Config
+#define IOCTL_PACKET_GENERATOR_CONFIG_GET  IOCTL_CODE_R(128, OpenNetK::PacketGenerator_Config)
+
+// Input  OpenNetK::Generator_Config
+// Outpt  OpenNetK::Generator_Config
+#define IOCTL_PACKET_GENERATOR_CONFIG_SET  IOCTL_CODE_W(129, OpenNetK::PacketGenetator_Config)
+
+// Input   None
+// Output  None
+#define IOCTL_PACKET_GENERATOR_START      IOCTL_CODE(130)
+
+// Input   None
+// Output  None
+#define IOCTL_PACKET_GENERATOR_STOP       IOCTL_CODE(131)
 
 // Data types
 /////////////////////////////////////////////////////////////////////////////

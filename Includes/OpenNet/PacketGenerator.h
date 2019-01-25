@@ -1,9 +1,10 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNet/PacketGenerator.h
-/// \brief   OpenNet::PacketGenerator
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNet/PacketGenerator.h
+/// \brief      OpenNet::PacketGenerator
 
 #pragma once
 
@@ -12,7 +13,8 @@
 
 // ===== Includes ===========================================================
 #include <OpenNet/OpenNet.h>
-#include <OpenNet/StatisticsProvider.h>
+#include <OpenNet/Status.h>
+#include <OpenNetK/Adapter_Types.h>
 
 namespace OpenNet
 {
@@ -28,10 +30,26 @@ namespace OpenNet
     /// \cond fr
     /// \brief  La class PacketGenerator.
     /// \endcond
-    class PacketGenerator : public StatisticsProvider
+    class PacketGenerator
     {
 
     public:
+
+        /// \cond en
+        /// \brief  This enum indicate the protocol.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette enum indique le protocol.
+        /// \endcond
+        typedef enum
+        {
+            PROTOCOL_ETHERNET,
+            PROTOCOL_IPv4    ,
+            PROTOCOL_IPv4_UDP,
+
+            PROTOCOL_QTY
+        }
+        Protocol;
 
         /// \cond en
         /// \brief  PacketGenerator configuration
@@ -39,13 +57,28 @@ namespace OpenNet
         /// \cond fr
         /// \brief  Configuration du PacketGenerator
         /// \endcond
+        /// \todo   Document the members
         typedef struct
         {
+            OpenNetK::EthernetAddress mDestinationEthernet;
+            OpenNetK::IPv4Address     mDestinationIPv4    ;
+            OpenNetK::IPv4Address     mSourceIPv4         ;
+
             double mBandwidth_MiB_s;
 
-            unsigned int mPacketSize_byte;
+            Protocol mProtocol;
 
-            unsigned char mReserved0[52];
+            uint32_t mAllowedIndexRepeat;
+            uint32_t mIndexOffset_byte  ;
+            uint32_t mPacketSize_byte   ;
+
+            uint16_t mDestinationPort ;
+            uint16_t mEthernetProtocol;
+            uint16_t mSourcePort      ;
+
+            uint8_t mIPv4Protocol;
+
+            uint8_t mReserved1[81];
         }
         Config;
 
@@ -77,7 +110,7 @@ namespace OpenNet
         /// \retval  STATUS_OK
         /// \retval  STATUS_INVALID_REFERENCE
         /// \retval  STATUS_NOT_ALLOWER_NULL_ARGUMENT
-        static OPEN_NET_PUBLIC Status Display(const Config & aConfig, FILE * aOut);
+        OPEN_NET_PUBLIC static Status Display(const Config & aConfig, FILE * aOut);
 
         /// \cond en
         /// \brief   Retrieve the configuration of the PacketGenerator

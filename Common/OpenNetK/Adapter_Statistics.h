@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     Common/OpenNetK/Adapter_Statistics.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       Common/OpenNetK/Adapter_Statistics.h
 //
 // This file defines the index of statistics counter for the
 // OpenNetK::Adapter class.
@@ -28,7 +29,7 @@ namespace OpenNetK
         ADAPTER_STATS_BUFFER_RECEIVE       =  3,
         ADAPTER_STATS_BUFFER_SEND          =  4,
         ADAPTER_STATS_BUFFER_SEND_PACKETS  =  5,
-
+        ADAPTER_STATS_INTERRUPT_PROCESS_3  =  6,
         ADAPTER_STATS_IOCTL_CONFIG_GET     =  7,
         ADAPTER_STATS_IOCTL_CONFIG_SET     =  8,
         ADAPTER_STATS_IOCTL_CONNECT        =  9,
@@ -40,9 +41,16 @@ namespace OpenNetK
         ADAPTER_STATS_IOCTL_STOP           = 15,
         ADAPTER_STATS_RUNNING_TIME_ms      = 16,
         ADAPTER_STATS_TX_packet            = 17,
+        // ===== 0.0.7 =======================================================
+        ADAPTER_STATS_CORRUPTED_BUFFER           = 18,
+        ADAPTER_STATS_CORRUPTED_BUFFER_RELEASED  = 19,
+        ADAPTER_STATS_PACKET_GENERATOR_BREAK     = 20,
+        ADAPTER_STATS_PACKET_GENERATOR_ITERATION = 21,
 
-        ADAPTER_STATS_RESET_QTY = 18,
+        ADAPTER_STATS_RESET_QTY = 22,
 
+        ADAPTER_STATS_PACKET_GENERATOR_REPEAT_COUNT = 29,
+        // ===== 0.0.7 ======================================================
         ADAPTER_STATS_IOCTL_STATISTICS_GET_RESET = 30,
         ADAPTER_STATS_IOCTL_STATISTICS_RESET     = 31,
 

@@ -34,75 +34,52 @@
 #include "Adapter_Internal.h"
 #include "PacketGenerator_Internal.h"
 
-// Constants
-/////////////////////////////////////////////////////////////////////////////
-
-#define BUFFER_SIZE_byte ( sizeof(IoCtl_Packet_Send_Ex_In) + PACKET_SIZE_MAX_byte )
-
-static const unsigned char PACKET[PACKET_SIZE_MAX_byte] =
-{
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x88, 0x88
-};
-
-static const char * STATE_NAMES[] =
-{
-    "INIT"    ,
-    "RUNNING" ,
-    "START_REQUESTED",
-    "STARTING"       ,
-    "STOP_REQUESTED" ,
-    "STOPPING",
-};
-
 // Static function declaration
 /////////////////////////////////////////////////////////////////////////////
 
-static void ReadPerfCounter(PacketGenerator_Internal::PerfCounter * aOut);
-
-// ===== Entry point ========================================================
-
-#ifdef _KMS_LINUX_
-    static void Run(void * aParameter);
-#endif
-
-#ifdef _KMS_WINDOWS_
-    static DWORD WINAPI Run(LPVOID aParameter);
-#endif
+static uint16_t Swap(uint16_t aIn);
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-PacketGenerator_Internal::PacketGenerator_Internal() : mAdapter(NULL), mDebugLog("K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "PackeGenerator")
+PacketGenerator_Internal::PacketGenerator_Internal() : mAdapter(NULL), mDebugLog("K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "PackeGenerator"), mRunning(false)
 {
-    memset(&mConfig    , 0, sizeof(mConfig    ));
-    memset(&mStatistics, 0, sizeof(mStatistics));
+    memset(&mConfig                              ,    0, sizeof(mConfig                              ));
+    memset(&mConfig.mDestinationEthernet.mAddress, 0xff, sizeof(mConfig.mDestinationEthernet.mAddress));
+    memset(&mConfig.mDestinationIPv4             , 0xff, sizeof(mConfig.mDestinationIPv4             ));
+    memset(&mDriverConfig                        ,    0, sizeof(mDriverConfig                        ));
 
-    SetPriority(PRIORITY_HIGH);
-
-    mConfig.mBandwidth_MiB_s =   50.0;
-    mConfig.mPacketSize_byte = 1024  ;
+    mConfig.mAllowedIndexRepeat = REPEAT_COUNT_MAX;
+    mConfig.mBandwidth_MiB_s    =   50.0;
+    mConfig.mDestinationPort    = 0x0a0a;
+    mConfig.mEthernetProtocol   = 0x0a0a;
+    mConfig.mPacketSize_byte    = 1024  ;
+    mConfig.mProtocol           = PROTOCOL_ETHERNET;
+    mConfig.mSourcePort         = 0x0909;
 }
 
 // ===== OpenNet::PacketGenerator ===========================================
 
 PacketGenerator_Internal::~PacketGenerator_Internal()
 {
-    OpenNet::Status lStatus;
-
-    switch (GetState())
+    try
     {
-    case STATE_INIT    :
-    case STATE_STOPPING:
-        break;
+        if (mRunning)
+        {
+            assert(NULL != mAdapter);
 
-    case STATE_RUNNING:
-        lStatus = Stop();
-        assert(OpenNet::STATUS_OK == lStatus);
-        (void)(lStatus);
-        break;
+            mAdapter->PacketGenerator_Stop();
 
-    default:
-        assert(false);
+            mRunning = false;
+        }
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        assert(NULL != eE);
+
+        mDebugLog.LogTime();
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(eE);
     }
 }
 
@@ -139,6 +116,16 @@ OpenNet::Status PacketGenerator_Internal::SetAdapter(OpenNet::Adapter * aAdapter
         return OpenNet::STATUS_INVALID_ADAPTER;
     }
 
+    try
+    {
+        UpdateDriverConfig();
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog.Log(eE);
+        return OpenNet::STATUS_EXCEPTION;
+    }
+
     return OpenNet::STATUS_OK;
 }
 
@@ -157,23 +144,23 @@ OpenNet::Status PacketGenerator_Internal::SetConfig(const Config & aConfig)
         return lStatus;
     }
 
-    switch (GetState())
+    if (mRunning)
     {
-    case STATE_INIT :
-        break;
-
-    case STATE_RUNNING        :
-    case STATE_START_REQUESTED:
-    case STATE_STARTING       :
-    case STATE_STOP_REQUESTED :
-    case STATE_STOPPING       :
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_PACKET_GENERATOR_RUNNING;
-
-    default: assert(false);
     }
 
-    return Config_Apply(aConfig);
+    try
+    {
+        Config_Apply(aConfig);
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog.Log(eE);
+        return OpenNet::STATUS_EXCEPTION;
+    }
+
+    return OpenNet::STATUS_OK;
 }
 
 OpenNet::Status PacketGenerator_Internal::Display(FILE * aOut)
@@ -186,177 +173,97 @@ OpenNet::Status PacketGenerator_Internal::Display(FILE * aOut)
 
     fprintf(aOut, "PacketGenerator :\n");
     fprintf(aOut, "  Adapter   = %s\n", (NULL == mAdapter) ? "Not set" : mAdapter->GetName());
-    fprintf(aOut, "  State     = %s\n", STATE_NAMES[GetState()]);
+    fprintf(aOut, "  Running   = %s\b", mRunning ? "true" : "false");
     
     return OpenNet::STATUS_OK;
 }
 
 OpenNet::Status PacketGenerator_Internal::Start()
 {
-    OpenNet::Status lResult;
+    if (NULL == mAdapter)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_ADAPTER_NOT_SET;
+    }
+
+    if (mRunning)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_PACKET_GENERATOR_RUNNING;
+    }
 
     try
     {
-        KmsLib::ThreadBase::Start();
+        mAdapter->PacketGenerator_Start();
 
-        lResult = OpenNet::STATUS_OK;
+        mRunning = true;
     }
     catch (KmsLib::Exception * eE)
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog.Log(eE);
-        lResult = OpenNet::STATUS_EXCEPTION;
+        return OpenNet::STATUS_EXCEPTION;
     }
 
-    return lResult;
+    return OpenNet::STATUS_OK;
 }
 
 OpenNet::Status PacketGenerator_Internal::Stop()
 {
-    OpenNet::Status lResult;
+    if (NULL == mAdapter)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_ADAPTER_NOT_SET;
+    }
+
+    if (!mRunning)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_PACKET_GENERATOR_STOPPED;
+    }
 
     try
     {
-        bool lRetB = StopAndWait(true, 1000);
-        assert(lRetB);
+        mRunning = false;
 
-        lResult = OpenNet::STATUS_OK;
+        mAdapter->PacketGenerator_Stop();
     }
     catch (KmsLib::Exception * eE)
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog.Log(eE);
-        lResult = OpenNet::STATUS_EXCEPTION;
-    }
-
-    return lResult;
-}
-
-// ===== OpenNet::StatisticsProvider ========================================
-
-OpenNet::Status PacketGenerator_Internal::GetStatistics(unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset)
-{
-    if (NULL == aOut)
-    {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
-    }
-
-    if (0 >= aOutSize_byte)
-    {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_BUFFER_TOO_SMALL;
-    }
-
-    unsigned int lCount = aOutSize_byte / sizeof(unsigned int);
-    if (OpenNet::PACKET_GENERATOR_STATS_QTY < lCount)
-    {
-        lCount = OpenNet::PACKET_GENERATOR_STATS_QTY;
-    }
-
-    unsigned int lSize_byte = lCount * sizeof(unsigned int);
-
-    memcpy(aOut, &mStatistics, lSize_byte);
-
-    if (NULL != aInfo_byte)
-    {
-        (*aInfo_byte) = lSize_byte;
-    }
-
-    if (aReset)
-    {
-        return ResetStatistics();
+        return OpenNet::STATUS_EXCEPTION;
     }
 
     return OpenNet::STATUS_OK;
-}
-
-OpenNet::Status PacketGenerator_Internal::ResetStatistics()
-{
-    mStatistics[OpenNet::PACKET_GENERATOR_STATS_STATISTICS_RESET] ++;
-
-    memset(&mStatistics, 0, sizeof(unsigned int) * OpenNet::PACKET_GENERATOR_STATS_RESET_QTY);
-
-    return OpenNet::STATUS_OK;
-}
-
-// Internal
-/////////////////////////////////////////////////////////////////////////////
-
-// Return  This method always return 0 to indicate success.
-unsigned int PacketGenerator_Internal::Run()
-{
-    mStatistics[OpenNet::PACKET_GENERATOR_STATS_RUN_ENTRY] ++;
-
-    unsigned char lBuffer[BUFFER_SIZE_byte];
-
-    IoCtl_Packet_Send_Ex_In * lIn = PreparePacket(lBuffer);
-    assert(NULL != lIn);
-
-    double lPeriod = ComputePeriod();
-    assert(0.0 < lPeriod);
-
-    #ifdef _KMS_LINUX_
-        struct timespec lBefore;
-        struct timespec lNow   ;
-    #endif
-    
-    #ifdef _KMS_WINDOWS_
-        BOOL lRetB = SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
-        assert(lRetB);
-
-        LARGE_INTEGER lBefore;
-        LARGE_INTEGER lNow   ;
-    #endif
-    
-    ReadPerfCounter(&lNow);
-
-    while (IsRunning())
-    {
-        lBefore = lNow;
-
-        #ifdef _KMS_LINUX_
-            usleep(1000);
-        #endif
-        
-        #ifdef _KMS_WINDOWS_
-            Sleep(1);
-        #endif
-
-        ReadPerfCounter(&lNow);
-
-        lIn->mRepeatCount = ComputeRepeatCount(lBefore, lNow, lPeriod);
-        lIn->mSize_byte   = mConfig.mPacketSize_byte;
-
-        if (0 < lIn->mRepeatCount)
-        {
-            SendPackets(lIn);
-        }
-        else
-        {
-            mStatistics[OpenNet::PACKET_GENERATOR_STATS_NO_PACKET_cycle] ++;
-            lNow = lBefore;
-        }
-    }
-
-    mStatistics[OpenNet::PACKET_GENERATOR_STATS_RUN_EXIT] ++;
-
-    return 0;
 }
 
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
 // aConfig [---;R--]
-OpenNet::Status PacketGenerator_Internal::Config_Apply(const Config & aConfig)
+//
+// Exception  KmsLib::Exception *  See UpdateDriverConfig
+void PacketGenerator_Internal::Config_Apply(const Config & aConfig)
 {
     assert(NULL != (&aConfig));
 
     memcpy(&mConfig, &aConfig, sizeof(mConfig));
 
-    return OpenNet::STATUS_OK;
+    if (NULL != mAdapter)
+    {
+        UpdateDriverConfig();
+    }
 }
 
+void PacketGenerator_Internal::Config_Update()
+{
+    mConfig.mAllowedIndexRepeat = mDriverConfig.mAllowedIndexRepeat;
+    mConfig.mIndexOffset_byte   = mDriverConfig.mIndexOffset_byte  ;
+    mConfig.mPacketSize_byte    = mDriverConfig.mPacketSize_byte   ;
+}
+
+// aConfig [---;R--]
 OpenNet::Status PacketGenerator_Internal::Config_Validate(const Config & aConfig)
 {
     assert(NULL != (&aConfig));
@@ -365,6 +272,12 @@ OpenNet::Status PacketGenerator_Internal::Config_Validate(const Config & aConfig
     {
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         return OpenNet::STATUS_INVALID_BANDWIDTH;
+    }
+
+    if (aConfig.mPacketSize_byte < (aConfig.mIndexOffset_byte + sizeof(uint32_t)))
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_INVALID_OFFSET;
     }
 
     if (0 >= aConfig.mPacketSize_byte)
@@ -379,155 +292,193 @@ OpenNet::Status PacketGenerator_Internal::Config_Validate(const Config & aConfig
         return OpenNet::STATUS_PACKET_TOO_LARGE;
     }
 
+    if (PROTOCOL_QTY <= aConfig.mProtocol)
+    {
+        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        return OpenNet::STATUS_INVALID_PROTOCOL;
+    }
+
     return OpenNet::STATUS_OK;
 }
 
-// Return  This method return the time betweed two packet in clock cycle.
-double PacketGenerator_Internal::ComputePeriod() const
+// Exception  KmsLib::Exception *  See Adapter_Internal::PacketGenerator_GetConfig
+//                                 and Adapter_Internal::PacketGenerator_SetConfig
+void PacketGenerator_Internal::UpdateDriverConfig()
 {
-    double lPacketPerSecond = mConfig.mBandwidth_MiB_s;
-
-    lPacketPerSecond *= 1024; // KiB/s
-    lPacketPerSecond *= 1024; // B/s
-    lPacketPerSecond /= mConfig.mPacketSize_byte; // packet/s
-
-    #ifdef _KMS_LINUX_
-        return 1000000000 / lPacketPerSecond;
-    #endif
-    
-    #ifdef _KMS_WINDOWS_
-        LARGE_INTEGER lFrequency;
-
-        BOOL lRetB = QueryPerformanceFrequency(&lFrequency);
-        assert(lRetB);
-        
-        return lFrequency.QuadPart / lPacketPerSecond;
-    #endif
-}
-
-// aBefore [---;R--] The time before the sleep in clock cycle
-// aNow    [---;R--] The time after the sleep in clock cycle
-// aPeriod           The period in clock cycle
-//
-// Return  This function return the number of packet to send.
-unsigned int PacketGenerator_Internal::ComputeRepeatCount(const PerfCounter & aBefore, const PerfCounter & aNow, double aPeriod)
-{
-    assert(NULL != (&aBefore));
-    assert(NULL != (&aNow   ));
-    assert(0.0 <     aPeriod );
-
-    double lDuration;
-    
-    #ifdef _KMS_LINUX_
-        lDuration  = aNow.tv_sec - aBefore.tv_sec;
-        lDuration *= 1000000000;
-        lDuration += aNow.tv_nsec - aBefore.tv_nsec;
-    #endif
-    
-    #ifdef _KMS_WINDOWS_
-        lDuration = static_cast<double>(aNow.QuadPart - aBefore.QuadPart);
-    #endif
-    
-    assert(0.0 < lDuration);
-
-    unsigned int lResult = static_cast<unsigned int>((lDuration / aPeriod) + 0.5);
-    if (REPEAT_COUNT_MAX < lResult)
-    {
-        mStatistics[OpenNet::PACKET_GENERATOR_STATS_TOO_MANY_PACKET_cycle] ++;
-        lResult = REPEAT_COUNT_MAX;
-    }
-
-    return lResult;
-}
-
-// aBuffer [---;-W-] The buffer to initialize
-//
-// Return  This method return aBuffer converted in IoCtl_Packet_Send_Ex_In
-//         pointer.
-IoCtl_Packet_Send_Ex_In * PacketGenerator_Internal::PreparePacket(void * aBuffer)
-{
-    assert(NULL != aBuffer);
-
-    assert(                   0 <  mConfig.mPacketSize_byte);
-    assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
-
-    memset(aBuffer, 0, BUFFER_SIZE_byte);
-
-    IoCtl_Packet_Send_Ex_In * lResult = reinterpret_cast<IoCtl_Packet_Send_Ex_In *>(aBuffer);
-
-    memcpy(lResult + 1, PACKET, mConfig.mPacketSize_byte);
-
-    return lResult;
-}
-
-// aIn [---;R--] The packet including the IoCtl header
-void PacketGenerator_Internal::SendPackets(const IoCtl_Packet_Send_Ex_In * aIn)
-{
-    assert(NULL != aIn              );
-    assert(   0 <  aIn->mRepeatCount);
-
     assert(NULL                 != mAdapter                );
-    assert(                   0 <  mConfig.mPacketSize_byte);
+    assert(                 0.0 <  mConfig.mBandwidth_MiB_s);
+    assert(                 0   <  mConfig.mPacketSize_byte);
     assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
 
-    mStatistics[OpenNet::PACKET_GENERATOR_STATS_SEND_cycle] ++;
+    mAdapter->PacketGenerator_GetConfig(&mDriverConfig);
 
-    try
+    mDriverConfig.mAllowedIndexRepeat = mConfig.mAllowedIndexRepeat;
+    mDriverConfig.mIndexOffset_byte   = mConfig.mIndexOffset_byte  ;
+    mDriverConfig.mPacketPer100ms     = static_cast<uint32_t>( ( mConfig.mBandwidth_MiB_s * 1000000.0 / 9.0 ) / ( mConfig.mPacketSize_byte + 24 ) );
+    mDriverConfig.mPacketSize_byte    = mConfig.mPacketSize_byte   ;
+
+    UpdatePacket();
+
+    mAdapter->PacketGenerator_SetConfig(&mDriverConfig);
+
+    Config_Update();
+}
+
+// aOffset       Offset where to copy the data
+// aIn [---;R--] Data to copy
+// aInSize_byte  Size of the data to copy
+//
+// Return  This method returns the offset just after the copied data.
+unsigned int PacketGenerator_Internal::Packet_Copy(unsigned int aOffset, const void * aIn, unsigned int aInSize_byte)
+{
+    assert(NULL != aIn         );
+    assert(   0 <  aInSize_byte);
+
+    unsigned int lResult = aOffset;
+
+    memcpy(mDriverConfig.mPacket + lResult, aIn, aInSize_byte); lResult += aInSize_byte;
+
+    return lResult;
+}
+
+// aOffset  Offset where to write the data
+// aValue   The value to write
+//
+// Return  This method returns the offset just after the writen data.
+unsigned int PacketGenerator_Internal::Packet_Write16(unsigned int aOffset, uint16_t aValue)
+{
+    assert(0 < aOffset);
+
+    unsigned int lResult = aOffset;
+
+    (*reinterpret_cast<uint32_t *>(mDriverConfig.mPacket + lResult)) = aValue; lResult += sizeof(aValue);
+
+    return lResult;
+}
+
+// aOffset  Offset where to write the data
+// aValue   The value to write
+//
+// Return  This method returns the offset just after the writen data.
+unsigned int PacketGenerator_Internal::Packet_Write8(unsigned int aOffset, uint8_t aValue)
+{
+    assert(0 < aOffset);
+
+    unsigned int lResult = aOffset;
+
+    (*reinterpret_cast<uint32_t *>(mDriverConfig.mPacket + lResult)) = aValue; lResult += sizeof(aValue);
+
+    return lResult;
+}
+
+// aInfo [---;R--] The information about the adapter
+// aProtocol       The ethernet protocol in network order
+//
+// Return  This method returns the offset just after the writen data.
+unsigned int PacketGenerator_Internal::Packet_WriteEthernet(const OpenNet::Adapter::Info & aInfo, uint16_t aProtocol)
+{
+    assert(NULL != (&aInfo));
+
+    unsigned int lResult = 0;
+
+    lResult = Packet_Copy   (lResult, mConfig.mDestinationEthernet.mAddress, sizeof(mConfig.mDestinationEthernet.mAddress));
+    lResult = Packet_Copy   (lResult, aInfo  .mEthernetAddress    .mAddress, sizeof(aInfo  .mEthernetAddress    .mAddress));
+    lResult = Packet_Write16(lResult, aProtocol);
+
+    return lResult;
+}
+
+// aOffset    Offset where to write the data
+// aProtocol  The IPv4 protocol
+//
+// Return  This method returns the offset just after the write data.
+unsigned int PacketGenerator_Internal::Packet_WriteIPv4(unsigned int aOffset, uint8_t aProtocol)
+{
+    assert(0 < aOffset);
+
+    assert(aOffset < mConfig.mPacketSize_byte);
+
+    unsigned int lResult = aOffset;
+
+    lResult = Packet_Write8 (lResult, 0x54);
+    lResult = Packet_Write8 (lResult, 0x00);
+    lResult = Packet_Write16(lResult, Swap(mConfig.mPacketSize_byte - aOffset));
+    lResult = Packet_Write16(lResult, 0x0000);
+    lResult = Packet_Write8 (lResult, 0x40);
+    lResult = Packet_Write8 (lResult, 0x00);
+    lResult = Packet_Write8 (lResult, 0x80);
+    lResult = Packet_Write8 (lResult, aProtocol);
+    lResult = Packet_Write16(lResult, 0x0000);
+    lResult = Packet_Copy   (lResult, mConfig.mSourceIPv4     .mAddress, sizeof(mConfig.mSourceIPv4     .mAddress));
+    lResult = Packet_Copy   (lResult, mConfig.mDestinationIPv4.mAddress, sizeof(mConfig.mDestinationIPv4.mAddress));
+
+    return lResult;
+}
+
+// aOffset  Offset where to write the data
+//
+// Return  This method returns the offset just after the write data.
+unsigned int PacketGenerator_Internal::Packet_WriteIPv4_UDP(unsigned int aOffset)
+{
+    assert(0 < aOffset);
+
+    assert(aOffset < mConfig.mPacketSize_byte);
+
+    unsigned int lResult = aOffset;
+
+    lResult = Packet_Write16(lResult, mConfig.mSourcePort     );
+    lResult = Packet_Write16(lResult, mConfig.mDestinationPort);
+    lResult = Packet_Write16(lResult, mConfig.mPacketSize_byte - aOffset);
+    lResult = Packet_Write16(lResult, 0x0000);
+
+    return lResult;
+}
+
+void PacketGenerator_Internal::UpdatePacket()
+{
+    assert(NULL != mAdapter);
+
+    OpenNet::Adapter::Info lInfo;
+
+    OpenNet::Status lStatus = mAdapter->GetInfo(&lInfo);
+    assert(OpenNet::STATUS_OK == lStatus);
+    (void)(lStatus);
+
+    unsigned int lOffset;
+
+    switch (mConfig.mProtocol)
     {
-        mAdapter->Packet_Send_Ex( aIn );
+    case PROTOCOL_ETHERNET:
+        lOffset = Packet_WriteEthernet(lInfo, mConfig.mEthernetProtocol);
+        break;
 
-        mStatistics[OpenNet::PACKET_GENERATOR_STATS_SENT_packet] += aIn->mRepeatCount;
+    case PROTOCOL_IPv4    :
+        lOffset = Packet_WriteEthernet(lInfo, 0x0800);
+        lOffset = Packet_WriteIPv4    (lOffset, mConfig.mIPv4Protocol);
+        break;
+
+    case PROTOCOL_IPv4_UDP:
+        lOffset = Packet_WriteEthernet(lInfo, 0x0800);
+        lOffset = Packet_WriteIPv4    (lOffset, 0x11);
+        lOffset = Packet_WriteIPv4_UDP(lOffset);
+        break;
+
+    default: assert(false);
     }
-    catch (...)
+
+    if ((0 != mDriverConfig.mIndexOffset_byte) && (mDriverConfig.mIndexOffset_byte < lOffset))
     {
-        mStatistics[OpenNet::PACKET_GENERATOR_STATS_SEND_ERROR_cycle] ++;
+        mDriverConfig.mIndexOffset_byte = lOffset;
     }
 }
 
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
 
-void ReadPerfCounter(PacketGenerator_Internal::PerfCounter * aOut)
+// aIn  The value to swap
+//
+// Return  The swapped value
+uint16_t Swap(uint16_t aIn)
 {
-    assert(NULL != aOut);
- 
-    #ifdef _KMS_LINUX_
-        int lRet = clock_gettime(CLOCK_MONOTONIC, aOut);
-        assert(0 == lRet);
-    #endif
-   
-    #ifdef _KMS_WINDOWS_
-        BOOL lRetB = QueryPerformanceCounter(aOut);
-        assert(lRetB);
-    #endif
+    return ((aIn << 8) || (aIn >> 8));
 }
-
-// ===== Entry point ========================================================
-
-#ifdef _LMS_LINUX_
-
-    void Run(void * aParameter)
-    {
-        assert(NULL != aParameter);
-        
-        PacketGenerator_Internal * lThis = reinterpret_cast<PacketGenerator_Internal *>(aParameter);
-        
-        unsigned int lRet = lThis->Run();
-        
-        pthread_exit(lRet); 
-    }
-    
-#endif
-
-#ifdef _KMS_WINDOWS_
-
-    DWORD WINAPI Run(LPVOID aParameter)
-    {
-        assert(NULL != aParameter);
-
-        PacketGenerator_Internal * lThis = reinterpret_cast<PacketGenerator_Internal *>(aParameter);
-
-        return lThis->Run();
-    }
-
-#endif

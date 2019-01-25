@@ -11,13 +11,10 @@
 
 // ===== Import =============================================================
 #include <KmsLib/DebugLog.h>
-#include <KmsLib/ThreadBase.h>
-
-// ===== Common =============================================================
-#include "../Common/OpenNet/PacketGenerator_Statistics.h"
 
 // ===== Includes ===========================================================
 #include <OpenNet/PacketGenerator.h>
+#include <OpenNetK/PacketGenerator_Types.h>
 
 // ===== OpenNet ============================================================
 #include "Adapter_Internal.h"
@@ -25,18 +22,10 @@
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
-class PacketGenerator_Internal : public OpenNet::PacketGenerator, KmsLib::ThreadBase
+class PacketGenerator_Internal : public OpenNet::PacketGenerator
 {
 
 public:
-
-    #ifdef _KMS_LINUX_
-        typedef struct timespec PerfCounter;
-    #endif
-    
-    #ifdef _KMS_WINDOWS_
-        typedef LARGE_INTEGER PerfCounter;
-    #endif
 
     PacketGenerator_Internal();
 
@@ -51,30 +40,27 @@ public:
     virtual OpenNet::Status Start     ();
     virtual OpenNet::Status Stop      ();
 
-    // ===== OpenNet::StatisticsProvider ====================================
-    virtual OpenNet::Status GetStatistics  (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
-    virtual OpenNet::Status ResetStatistics();
-
-// Internal
-
-    // ===== KmsLib::ThreadBase =============================================
-    unsigned int Run();
-
 private:
 
-    OpenNet::Status Config_Apply   (const Config & aConfig);
+    void            Config_Apply   (const Config & aConfig);
+    void            Config_Update  ();
     OpenNet::Status Config_Validate(const Config & aConfig);
 
-    double                    ComputePeriod     () const;
-    unsigned int              ComputeRepeatCount(const PerfCounter & aBefore, const PerfCounter & aNow, double aPeriod);
-    IoCtl_Packet_Send_Ex_In * PreparePacket     (void * aBuffer);
-    void                      SendPackets       (const IoCtl_Packet_Send_Ex_In * aIn);
-    
+    unsigned int Packet_Copy         (unsigned int aOffset, const void * aIn, unsigned int aInSize_byte);
+    unsigned int Packet_Write16      (unsigned int aOffset, uint16_t aValue);
+    unsigned int Packet_Write8       (unsigned int aOffset, uint8_t  aValue);
+    unsigned int Packet_WriteEthernet(const OpenNet::Adapter::Info & aInfo, uint16_t aProtocol);
+    unsigned int Packet_WriteIPv4    (unsigned int aOffset, uint8_t aProtocol);
+    unsigned int Packet_WriteIPv4_UDP(unsigned int aOffset);
+
+    void UpdateDriverConfig();
+    void UpdatePacket      ();
 
     Adapter_Internal * mAdapter ;
     Config             mConfig  ;
     KmsLib::DebugLog   mDebugLog;
+    bool               mRunning ;
 
-    unsigned int mStatistics[OpenNet::PACKET_GENERATOR_STATS_QTY];
+    OpenNetK::PacketGenerator_Config  mDriverConfig;
 
 };

@@ -74,6 +74,14 @@ namespace OpenNetK
             aInfo->mIn_MaxSize_byte  = sizeof(IoCtl_Packet_Send_Ex_In) + PACKET_SIZE_MAX_byte;
             aInfo->mIn_MinSize_byte  = sizeof(IoCtl_Packet_Send_Ex_In);
             break;
+        case IOCTL_PACKET_GENERATOR_CONFIG_GET:
+            aInfo->mOut_MinSize_byte = sizeof(PacketGenerator_Config);
+            break;
+        case IOCTL_PACKET_GENERATOR_CONFIG_SET:
+            aInfo->mIn_MaxSize_byte  = sizeof(PacketGenerator_Config);
+            aInfo->mIn_MinSize_byte  = sizeof(PacketGenerator_Config);
+            aInfo->mOut_MinSize_byte = sizeof(PacketGenerator_Config);
+            break;
         case IOCTL_START           :
             aInfo->mIn_MaxSize_byte  = sizeof(Buffer) * OPEN_NET_BUFFER_QTY;
             aInfo->mIn_MinSize_byte  = sizeof(Buffer);
@@ -86,6 +94,8 @@ namespace OpenNetK
             aInfo->mIn_MinSize_byte  = sizeof(IoCtl_Stats_Get_In);
             break;
 
+        case IOCTL_PACKET_GENERATOR_START:
+        case IOCTL_PACKET_GENERATOR_STOP :
         case IOCTL_STATISTICS_RESET:
         case IOCTL_STOP            :
             break;
@@ -116,7 +126,13 @@ namespace OpenNetK
     {
         ASSERT(NULL != aZone0);
 
+        memset(&mPacketGenerator_Config        ,    0, sizeof(mPacketGenerator_Config));
+        memset(&mPacketGenerator_Config.mPacket, 0xff,                               6);
+
         memset(&mStatistics, 0, sizeof(mStatistics));
+
+        mPacketGenerator_Config.mPacketPer100ms  =    1;
+        mPacketGenerator_Config.mPacketSize_byte = 1024;
 
         mAdapters    = NULL;
         mAdapterNo   = ADAPTER_NO_UNKNOWN;
@@ -152,10 +168,9 @@ namespace OpenNetK
         ASSERT(NULL           != mHardware );
 
         uint32_t  lAdapterBit = 1 << mAdapterNo;
+        bool      lLocked     = false          ;
 
         OpenNet_PacketInfo * lPacketInfo = reinterpret_cast<OpenNet_PacketInfo *>(aBufferInfo->mBase + aBufferInfo->mPacketInfoOffset_byte);
-
-        mHardware->Lock();
 
             unsigned int lPacketQty = 0;
 
@@ -182,6 +197,18 @@ namespace OpenNetK
                 case Packet::STATE_TX_RUNNING:
                     if (0 != (aBufferInfo->mPackets[i].mSendTo & lAdapterBit))
                     {
+                        if (!lLocked)
+                        {
+                            // Locking the hardware may delay processing of
+                            // other packets received by other network
+                            // adapters or sent from application or packet
+                            // generator. We only lock the hardware when we
+                            // know the buffer contains packet to be send by
+                            // this network adapter.
+                            mHardware->Lock();
+                            lLocked = true;
+                        }
+
                         lPacketQty++;
                         mHardware->Packet_Send_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].GetOffset(), aBufferInfo->mPackets[i].GetVirtualAddress(), lPacketInfo[i].mSize_byte, &aBufferInfo->mTx_Counter); // Reading DirectGMA buffer !!!
                     }
@@ -191,7 +218,10 @@ namespace OpenNetK
                 }
             }
 
-        mHardware->Unlock_AfterSend(&aBufferInfo->mTx_Counter, lPacketQty);
+        if (lLocked)
+        {
+            mHardware->Unlock_AfterSend(&aBufferInfo->mTx_Counter, lPacketQty);
+        }
 
         mStatistics[ADAPTER_STATS_BUFFER_SEND_PACKETS]++;
         mStatistics[ADAPTER_STATS_TX_packet          ]+= lPacketQty;
@@ -205,7 +235,7 @@ namespace OpenNetK
     // TODO  OpenNetK.Adapter.TxOrder
     //       High - Les paquets doivent etre transmis dans l'ordre de
     //       reception.
-    void Adapter::Buffers_Process()
+    void Adapter::Buffers_Process(bool * aNeedMoreProcessing)
     {
         ASSERT(NULL != mZone0);
 
@@ -231,12 +261,12 @@ namespace OpenNetK
                     // The buffer is clearly corrupted! We don't write to it
                     // and if possible we simply forget about it.
 
-                    // TODO  ONK_Lib.Adapter.ErrorHandling
-                    //       High - Add statistic counter
+                    mStatistics[ADAPTER_STATS_CORRUPTED_BUFFER]++;
+
                     if (i == (mBufferCount - 1))
                     {
-                        // TODO  ONK_Lib.Adapter.ErrorHandling
-                        //       High - Add statistic counter
+                        mStatistics[ADAPTER_STATS_CORRUPTED_BUFFER_RELEASED] ++;
+
                         // DbgPrintEx(DPFLTR_IHVDRIVER_ID, DEBUG_STATE_CHANGE, "%u %u Corrupted ==> Released" DEBUG_EOL, mAdapterNo, i);
                         mBufferCount--;
                     }
@@ -244,6 +274,15 @@ namespace OpenNetK
             }
 
         mZone0->Unlock();
+
+        if (mPacketGenerator_Running)
+        {
+            // If the packet generator is running, we request the execution
+            // of the third level of the interrupt processing. This level is
+            // responsible for generating packet. This way, the packet
+            // generation does not delay packet processing.
+            (*aNeedMoreProcessing) = true;
+        }
 
         mStatistics[ADAPTER_STATS_BUFFERS_PROCESS]++;
     }
@@ -281,6 +320,41 @@ namespace OpenNetK
         #endif
     }
 
+    void Adapter::Interrupt_Process3()
+    {
+        ASSERT(NULL != mHardware                              );
+        ASSERT(   0 <  mPacketGenerator_Config.mPacketPer100ms);
+
+        unsigned int lRepeatCount = mPacketGenerator_Config.mAllowedIndexRepeat;
+
+        if (mPacketGenerator_Config.mPacketPer100ms < lRepeatCount)
+        {
+            lRepeatCount = (mPacketGenerator_Config.mPacketPer100ms / 10) + 1;
+        }
+
+        mStatistics[ADAPTER_STATS_PACKET_GENERATOR_REPEAT_COUNT] = lRepeatCount;
+
+        while (mPacketGenerator_Config.mPacketPer100ms > mPacketGenerator_Counter)
+        {
+            if (0 < mPacketGenerator_Config.mIndexOffset_byte)
+            {
+                (*reinterpret_cast<uint32_t *>(mPacketGenerator_Config.mPacket + mPacketGenerator_Config.mIndexOffset_byte))++;
+            }
+
+            if (!mHardware->Packet_Send(mPacketGenerator_Config.mPacket, mPacketGenerator_Config.mPacketSize_byte, lRepeatCount))
+            {
+                mStatistics[ADAPTER_STATS_PACKET_GENERATOR_BREAK] ++;
+                break;
+            }
+
+            mPacketGenerator_Counter += lRepeatCount;
+
+            mStatistics[ADAPTER_STATS_PACKET_GENERATOR_ITERATION] ++;
+        }
+
+        mStatistics[ADAPTER_STATS_INTERRUPT_PROCESS_3]++;
+    }
+
     // aIn  [---;R--]
     // aOut [---;-W-]
     //
@@ -302,6 +376,10 @@ namespace OpenNetK
         case IOCTL_INFO_GET        : lResult = IoCtl_Info_Get        (reinterpret_cast<      Adapter_Info   *>(aOut)); break;
         case IOCTL_PACKET_SEND     : lResult = IoCtl_Packet_Send     (                                         aIn  , aInSize_byte ); break;
         case IOCTL_PACKET_SEND_EX  : lResult = IoCtl_Packet_Send_Ex  (                                         aIn  , aInSize_byte ); break;
+        case IOCTL_PACKET_GENERATOR_CONFIG_GET: lResult = IoCtl_PacketGenerator_Config_Get(reinterpret_cast<      PacketGenerator_Config *>(aOut)); break;
+        case IOCTL_PACKET_GENERATOR_CONFIG_SET: lResult = IoCtl_PacketGenerator_Config_Set(reinterpret_cast<const PacketGenerator_Config *>(aIn ), reinterpret_cast<PacketGenerator_Config *>(aOut)); break;
+        case IOCTL_PACKET_GENERATOR_START     : lResult = IoCtl_PacketGenerator_Start     (); break;
+        case IOCTL_PACKET_GENERATOR_STOP      : lResult = IoCtl_PacketGenerator_Stop      (); break;
         case IOCTL_START           : lResult = IoCtl_Start           (reinterpret_cast<const Buffer         *>(aIn ), aInSize_byte ); break;
         case IOCTL_STATE_GET       : lResult = IoCtl_State_Get       (reinterpret_cast<      Adapter_State  *>(aOut)); break;
         case IOCTL_STATISTICS_GET  : lResult = IoCtl_Statistics_Get  (                                         aIn  , reinterpret_cast<uint32_t *>(aOut), aOutSize_byte); break;
@@ -312,6 +390,11 @@ namespace OpenNetK
         }
 
         return lResult;
+    }
+
+    void Adapter::Tick()
+    {
+        mPacketGenerator_Counter = 0;
     }
 
     // Private
@@ -720,7 +803,12 @@ namespace OpenNetK
     {
         ASSERT(NULL != mHardware);
 
-        mHardware->Packet_Send(aIn, aInSize_byte);
+        if (!mHardware->Packet_Send(aIn, aInSize_byte))
+        {
+            // TODO  OpenNetK.Adapter
+            //       Create a specific result code
+            return IOCTL_RESULT_NO_BUFFER;
+        }
 
         mStatistics[ADAPTER_STATS_IOCTL_PACKET_SEND] ++;
 
@@ -740,11 +828,70 @@ namespace OpenNetK
             return IOCTL_RESULT_INVALID_PARAMETER;
         }
 
-        mHardware->Packet_Send(lIn + 1, aInSize_byte - sizeof(IoCtl_Packet_Send_Ex_In), lIn->mRepeatCount);
+        if (!mHardware->Packet_Send(lIn + 1, aInSize_byte - sizeof(IoCtl_Packet_Send_Ex_In), lIn->mRepeatCount))
+        {
+            // TODO  OpenNetK.Adapter
+            //       Create a specific result code
+            return IOCTL_RESULT_NO_BUFFER;
+        }
 
         mStatistics[ADAPTER_STATS_IOCTL_PACKET_SEND] += lIn->mRepeatCount;
 
         return IOCTL_RESULT_OK;
+    }
+
+    int Adapter::IoCtl_PacketGenerator_Config_Get(PacketGenerator_Config * aOut)
+    {
+        ASSERT(NULL != aOut);
+
+        memcpy(aOut, &mPacketGenerator_Config, sizeof(mPacketGenerator_Config));
+
+        return sizeof(mPacketGenerator_Config);
+    }
+
+    int Adapter::IoCtl_PacketGenerator_Config_Set(const PacketGenerator_Config * aIn, PacketGenerator_Config * aOut)
+    {
+        memcpy(&mPacketGenerator_Config, aIn, sizeof(mPacketGenerator_Config));
+
+        unsigned int lPacketSize_byte = mHardware->GetPacketSize();
+
+        if      (               0 >= mPacketGenerator_Config.mAllowedIndexRepeat) { mPacketGenerator_Config.mAllowedIndexRepeat =                1; }
+        else if (REPEAT_COUNT_MAX <  mPacketGenerator_Config.mAllowedIndexRepeat) { mPacketGenerator_Config.mAllowedIndexRepeat = REPEAT_COUNT_MAX; }
+
+        if (0 >= mPacketGenerator_Config.mPacketPer100ms) { mPacketGenerator_Config.mPacketPer100ms = 1; }
+
+        if      (              64 > mPacketGenerator_Config.mPacketSize_byte) { mPacketGenerator_Config.mPacketSize_byte =               64; }
+        else if (lPacketSize_byte < mPacketGenerator_Config.mPacketSize_byte) { mPacketGenerator_Config.mPacketSize_byte = lPacketSize_byte; }
+
+        if (mPacketGenerator_Config.mPacketSize_byte < (mPacketGenerator_Config.mIndexOffset_byte + sizeof(uint32_t))) { mPacketGenerator_Config.mIndexOffset_byte = 0; }
+
+        memcpy(aOut, &mPacketGenerator_Config, sizeof(mPacketGenerator_Config));
+
+        return sizeof(mPacketGenerator_Config);
+    }
+
+    int Adapter::IoCtl_PacketGenerator_Start()
+    {
+        mPacketGenerator_Counter =    0;
+        mPacketGenerator_Pending =    0;
+        mPacketGenerator_Running = true;
+
+        if (0 < mPacketGenerator_Config.mIndexOffset_byte)
+        {
+            (*reinterpret_cast<uint32_t *>(mPacketGenerator_Config.mPacket + mPacketGenerator_Config.mIndexOffset_byte)) = 0;
+        }
+
+        return 0;
+    }
+
+    // TODO  OpenNetK.Adapter
+    //       Stop the packet generator when the application who started it
+    //       close the connection.
+    int Adapter::IoCtl_PacketGenerator_Stop()
+    {
+        mPacketGenerator_Running = false;
+
+        return 0;
     }
 
     int Adapter::IoCtl_Start(const Buffer * aIn, unsigned int aInSize_byte)

@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_Pro1000/Pro1000.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_Pro1000/Pro1000.h
 
 #pragma once
 
@@ -36,12 +37,12 @@ public:
     virtual void         Interrupt_Disable ();
     virtual void         Interrupt_Enable  ();
     virtual bool         Interrupt_Process (unsigned int aMessageId, bool * aNeedMoreProcessing);
-    virtual void         Interrupt_Process2();
+    virtual void         Interrupt_Process2(bool * aNeedMoreProcessing);
     virtual void         Unlock_AfterReceive  (volatile long * aCounter, unsigned int aPacketQty);
     virtual void         Unlock_AfterSend     (volatile long * aCounter, unsigned int aPacketQty);
     virtual void         Packet_Receive_NoLock(uint64_t aLogicalAddress, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
     virtual void         Packet_Send_NoLock   (uint64_t aLogicalAddress, const void * aVirtualAddress, unsigned int aSize_byte, volatile long * aCounter = NULL);
-    virtual void         Packet_Send       (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);
+    virtual bool         Packet_Send       (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);
     virtual unsigned int Statistics_Get    (uint32_t * aOut, unsigned int aOutSize_byte, bool aReset);
     virtual void         Statistics_Reset  ();
 
@@ -66,6 +67,8 @@ private:
     void Tx_Config_Zone0 ();
     void Tx_Process_Zone0();
 
+    unsigned int Tx_GetAvailableDescriptor_Zone0();
+
     // ===== Zone 0 =========================================================
 
     volatile Pro1000_BAR1 * mBAR1;
@@ -84,6 +87,7 @@ private:
     unsigned int            mTx_Out    ;
     Pro1000_Tx_Descriptor * mTx_Virtual;
 
+    volatile long mTx_PacketBuffer_Counter[PACKET_BUFFER_QTY];
     unsigned int mTx_PacketBuffer_In;
     uint64_t     mTx_PacketBuffer_Logical[PACKET_BUFFER_QTY];
     void       * mTx_PacketBuffer_Virtual[PACKET_BUFFER_QTY];

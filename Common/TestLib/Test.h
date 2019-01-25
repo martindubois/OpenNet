@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     Common/TestLib/Test.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       Common/TestLib/Test.h
 
 #pragma once
 
@@ -24,7 +25,6 @@
 
 // ===== Common =============================================================
 #include "../Common/OpenNet/Adapter_Statistics.h"
-#include "../Common/OpenNet/PacketGenerator_Statistics.h"
 #include "../Common/OpenNetK/Adapter_Statistics.h"
 
 namespace TestLib
@@ -139,13 +139,12 @@ namespace TestLib
         void SetCode          (unsigned int aIndex, Code         aCode);
         void SetGeneratorCount(unsigned int aCount);
 
+        void                 DisplayAdapterStats     (unsigned int aIndex);
         virtual unsigned int Init            ();
         void                 InitAdapterConstraints  ();
-        void                 InitGeneratorConstraints();
         virtual unsigned int Start           ();
         virtual unsigned int Stop            ();
         unsigned int         VerifyAdapterStats  (unsigned int aIndex);
-        unsigned int         VerifyGeneratorStats(unsigned int aIndex);
 
         OpenNet::Adapter                     * mAdapters   [ADAPTER_QTY];
         KmsLib::ValueVector::Constraint_UInt32 mConstraints[STATS_QTY];
@@ -205,7 +204,6 @@ namespace TestLib
         Default                    mDefault       ;
         OpenNet::Function          mFunctions [FUNCTION_QTY];
         unsigned int               mGeneratorCount;
-        unsigned int               mGeneratorStats[GENERATOR_QTY][STATS_QTY];
         OpenNet::PacketGenerator * mGenerators[GENERATOR_QTY];
         OpenNet::Kernel            mKernels   [KERNEL_QTY];
         char                       mName      [16];

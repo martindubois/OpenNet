@@ -101,17 +101,9 @@ static const char * FUNCTION_REPLY_ON_ERROR_0 =
 "            }"                                                                 EOL
 "        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 6; i < 12; i ++)"                                            EOL
-"        {"                                                                     EOL
-"            if ( 0x00 != lData[ i ] )"                                         EOL
-"            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
-"            }"                                                                 EOL
-"        }"                                                                     EOL
-                                                                                EOL
 "        for ( i = 12; i < 14; i ++)"                                           EOL
 "        {"                                                                     EOL
-"            if ( 0x88 != lData[ i ] )"                                         EOL
+"            if ( 0x0a != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
 "                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
@@ -149,17 +141,9 @@ static const char * FUNCTION_REPLY_ON_ERROR_1 =
 "            }"                                                                 EOL
 "        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 6; i < 12; i ++)"                                            EOL
-"        {"                                                                     EOL
-"            if ( 0x00 != lData[ i ] )"                                         EOL
-"            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
-"            }"                                                                 EOL
-"        }"                                                                     EOL
-                                                                                EOL
 "        for ( i = 12; i < 14; i ++)"                                           EOL
 "        {"                                                                     EOL
-"            if ( 0x88 != lData[ i ] )"                                         EOL
+"            if ( 0x0a != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
 "                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
@@ -233,17 +217,9 @@ static const char * KERNEL_REPLY_ON_ERROR =
 "            }"                                                                 EOL
 "        }"                                                                     EOL
                                                                                 EOL
-"        for ( i = 6; i < 12; i ++)"                                            EOL
-"        {"                                                                     EOL
-"            if ( 0x00 != lData[ i ] )"                                         EOL
-"            {"                                                                 EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                EOL
-"            }"                                                                 EOL
-"        }"                                                                     EOL
-                                                                                EOL
 "        for ( i = 12; i < 14; i ++)"                                           EOL
 "        {"                                                                     EOL
-"            if ( 0x88 != lData[ i ] )"                                         EOL
+"            if ( 0x0a != lData[ i ] )"                                         EOL
 "            {"                                                                 EOL
 "                lResult |= 1 << ADAPTER_INDEX;"                                EOL
 "            }"                                                                 EOL
@@ -296,7 +272,7 @@ namespace TestLib
 
         for (int i = 0; i < CODE_QTY; i++)
         {
-            if (0 == _strnicmp(CODE_NAMES[i], aName, strlen(CODE_NAMES[i])))
+            if (0 == _stricmp(CODE_NAMES[i], aName))
             {
                 (*aOut) = static_cast<Code>(i);
                 return 0;
@@ -712,7 +688,6 @@ namespace TestLib
         mResult.mPacketThroughput_packet_s =                 0.0;
 
         memset(&mAdapterStats  , 0, sizeof(mAdapterStats  ));
-        memset(&mGeneratorStats, 0, sizeof(mGeneratorStats));
         memset(&mName      , 0, sizeof(mName      ));
         memset(&mNos       , 0, sizeof(mNos       ));
 
@@ -834,6 +809,19 @@ namespace TestLib
         mGeneratorCount = aCount;
     }
 
+    void Test::DisplayAdapterStats(unsigned int aIndex)
+    {
+        assert(ADAPTER_QTY > aIndex);
+
+        printf("Displaying statistics of adapter %u\n", aIndex);
+
+        OpenNet::Adapter * lAdapter = mAdapters[aIndex];
+        assert(NULL != lAdapter);
+
+        OpenNet::Status lStatus = lAdapter->DisplayStatistics(mAdapterStats[aIndex], sizeof(mAdapterStats[aIndex]), stdout);
+        assert(OpenNet::STATUS_OK == lStatus);
+    }
+
     // Return
     //      0  OK
     //  Ohter  Error
@@ -879,13 +867,6 @@ namespace TestLib
         KmsLib::ValueVector::Constraint_Init(mConstraints, STATS_QTY);
 
         mConstraints[ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
-    }
-
-    void Test::InitGeneratorConstraints()
-    {
-        KmsLib::ValueVector::Constraint_Init(mConstraints, STATS_QTY);
-
-        mConstraints[OpenNet::PACKET_GENERATOR_STATS_STATISTICS_RESET].mMax = 0xffffffff;
     }
 
     // Return
@@ -1002,7 +983,12 @@ namespace TestLib
         #endif
 
         lStatus = mSystem->Stop();
-        assert(OpenNet::STATUS_OK == lStatus);
+        if (OpenNet::STATUS_OK != lStatus)
+        {
+            printf("WARNING  System::Stop() failed - ");
+            OpenNet::Status_Display(lStatus, stdout);
+            printf("\n");
+        }
 
         for (i = 0; i < mGeneratorCount; i++)
         {
@@ -1030,30 +1016,6 @@ namespace TestLib
         assert(NULL != lAdapter);
 
         unsigned int lRet = KmsLib::ValueVector::Constraint_Verify(mAdapterStats[aIndex], lAdapter->GetStatisticsQty(), mConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(lAdapter->GetStatisticsDescriptions()));
-        if (0 != lRet)
-        {
-            printf(__FUNCTION__ " - ValueVector::Constrain_Verify( , , , ,  ) returned %u\n", lRet);
-            return __LINE__;
-        }
-
-        return 0;
-    }
-
-    // aAdapterIndex
-    //
-    // Return
-    //      0  OK
-    //  Other  Error
-    unsigned int Test::VerifyGeneratorStats(unsigned int aIndex)
-    {
-        assert(ADAPTER_QTY > aIndex);
-
-        printf("Verifying statistics of packet generator %u\n", aIndex);
-
-        OpenNet::PacketGenerator * lGenerator = mGenerators[aIndex];
-        assert(NULL != lGenerator);
-
-        unsigned int lRet = KmsLib::ValueVector::Constraint_Verify(mGeneratorStats[aIndex], lGenerator->GetStatisticsQty(), mConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(lGenerator->GetStatisticsDescriptions()));
         if (0 != lRet)
         {
             printf(__FUNCTION__ " - ValueVector::Constrain_Verify( , , , ,  ) returned %u\n", lRet);
@@ -1243,7 +1205,12 @@ namespace TestLib
             assert(NULL != mAdapters[i]);
 
             OpenNet::Status lStatus = mAdapters[i]->ResetInputFilter();
-            assert(OpenNet::STATUS_OK == lStatus);
+            if (OpenNet::STATUS_OK != lStatus)
+            {
+                printf("WARNING  Adapter::ResetInputFilter() failed - ");
+                OpenNet::Status_Display(lStatus, stdout);
+                printf("\n");
+            }
         }
     }
 
@@ -1253,8 +1220,6 @@ namespace TestLib
 
         assert(          1 <= mAdapterCount1);
         assert(ADAPTER_QTY >= mAdapterCount1);
-
-        mGenerators[0]->ResetStatistics();
 
         for (unsigned int i = 0; i < mAdapterCount1; i++)
         {
@@ -1272,23 +1237,11 @@ namespace TestLib
         assert(            1 <= mGeneratorCount);
         assert(GENERATOR_QTY >= mGeneratorCount);
 
-        OpenNet::Status lStatus;
-
-        unsigned int i;
-
-        for (i = 0; i < mAdapterCount1; i++)
+        for (unsigned int i = 0; i < mAdapterCount1; i++)
         {
             assert(NULL != mAdapters[i]);
 
             OpenNet::Status lStatus = mAdapters[i]->GetStatistics(mAdapterStats[i], sizeof(mAdapterStats[i]), NULL, true);
-            assert(OpenNet::STATUS_OK == lStatus);
-        }
-
-        for (i = 0; i < mGeneratorCount; i ++)
-        {
-            assert(NULL != mGenerators[i]);
-
-            lStatus = mGenerators[0]->GetStatistics(mGeneratorStats[i], sizeof(mGeneratorStats[i]), NULL, true);
             assert(OpenNet::STATUS_OK == lStatus);
         }
     }

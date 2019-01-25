@@ -139,11 +139,20 @@ namespace OpenNetK
     }
 
     // CRITICAL PATH
-    void Hardware::Interrupt_Process2()
+    void Hardware::Interrupt_Process2(bool * aNeedMoreProcessing)
+    {
+        ASSERT(NULL != aNeedMoreProcessing);
+
+        ASSERT(NULL != mAdapter);
+
+        mAdapter->Buffers_Process(aNeedMoreProcessing);
+    }
+
+    void Hardware::Interrupt_Process3()
     {
         ASSERT(NULL != mAdapter);
 
-        mAdapter->Buffers_Process();
+        mAdapter->Interrupt_Process3();
     }
 
     // CRITICAL PATH - Buffer
@@ -253,6 +262,13 @@ namespace OpenNetK
         ASSERT(NULL != aInfo);
 
         memcpy(aInfo, &mInfo, sizeof(mInfo));
+    }
+
+    void Hardware::Tick()
+    {
+        ASSERT(NULL != mAdapter);
+
+        mAdapter->Tick();
     }
 
     // Protected

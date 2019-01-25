@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_NDIS/VirtualHardware.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_NDIS/VirtualHardware.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -178,7 +179,7 @@ void VirtualHardware::Packet_Send_NoLock(uint64_t, const void * aVirtualAddress,
 }
 
 // CRITICAL PATH
-void VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
+bool VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes, %u )" DEBUG_EOL, aSize_byte, aRepeatCount);
 
@@ -212,4 +213,6 @@ void VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte,
 
         Unlock_AfterSend(NULL, aRepeatCount);
     }
+
+    return true;
 }

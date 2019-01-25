@@ -45,6 +45,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC
 		Includes\OpenNetK\Kernel.h = Includes\OpenNetK\Kernel.h
 		Includes\OpenNetK\OS.h = Includes\OpenNetK\OS.h
 		Includes\OpenNetK\Packet.h = Includes\OpenNetK\Packet.h
+		Includes\OpenNetK\PacketGenerator_Types.h = Includes\OpenNetK\PacketGenerator_Types.h
 		Includes\OpenNetK\SpinLock.h = Includes\OpenNetK\SpinLock.h
 		Includes\OpenNetK\SpinLock_Linux.h = Includes\OpenNetK\SpinLock_Linux.h
 		Includes\OpenNetK\SpinLock_WDF.h = Includes\OpenNetK\SpinLock_WDF.h
@@ -116,7 +117,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{B467
 		Common\OpenNet\Adapter_Statistics.h = Common\OpenNet\Adapter_Statistics.h
 		Common\OpenNet\EthernetAddress.h = Common\OpenNet\EthernetAddress.h
 		Common\OpenNet\Kernel_Statistics.h = Common\OpenNet\Kernel_Statistics.h
-		Common\OpenNet\PacketGenerator_Statistics.h = Common\OpenNet\PacketGenerator_Statistics.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{2CF49A29-C06C-4972-B8BE-262E1FE62244}"
@@ -158,8 +158,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocUser", "_DocUser", "{19
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet_Tool", "OpenNet_Tool", "{7A086992-CDEA-4B24-96B1-404A882FE13A}"
 	ProjectSection(SolutionItems) = preProject
+		Scripts\OpenNet_Tool\A00DDC00000001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDC00000001A_WX5100_10.txt
+		Scripts\OpenNet_Tool\A00DDC00000001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDC00000001I_WX5100_10.txt
 		Scripts\OpenNet_Tool\A00DDN00000001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDN00000001A_WX5100_10.txt
 		Scripts\OpenNet_Tool\A00DDN00000001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDN00000001I_WX5100_10.txt
+		Scripts\OpenNet_Tool\A00RRC00000001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00RRC00000001I_WX5100_10.txt
 		Scripts\OpenNet_Tool\README.md = Scripts\OpenNet_Tool\README.md
 	EndProjectSection
 EndProject

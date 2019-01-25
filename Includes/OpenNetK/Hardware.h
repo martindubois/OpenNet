@@ -211,19 +211,74 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Process an interrupt at seconde level
+        /// \param  aNeedMoreProcessing [---;-W-]
         /// \endcond
         /// \cond fr
         /// \brief  Traiter une interruption au second niveau
+        /// \param  aNeedMoreProcessing [---;-W-]
         /// \endcond
-        virtual void Interrupt_Process2();
+        virtual void Interrupt_Process2(bool * aNeedMoreProcessing);
 
+        /// \cond en
+        /// \brief  Process an interrupt at third level
+        /// \param  aNeedMoreProcessing [---;-W-]
+        /// \endcond
+        /// \cond fr
+        /// \brief  Traiter une interruption au troisieme niveau
+        /// \param  aNeedMoreProcessing [---;-W-]
+        /// \endcond
+        virtual void Interrupt_Process3();
+
+        // TODO  OpenNetK.Hardware
+        //       Use two lock, one for Rx and one for Tx
+
+        /// \cond en
+        /// \brief  Lock the hardware
+        /// \endcond
+        /// \cond fr
+        /// \brief  Verouiller l'acces au materiel
+        /// \endcond
         void Lock();
 
+        /// \cond en
+        /// \brief  Unlock the hardware
+        /// \endcond
+        /// \cond fr
+        /// \brief  Deverouiller l'acces au materiel
+        /// \endcond
         void Unlock();
 
+        /// \cond en
+        /// \brief  Unlock the hardware after programming receive descriptors
+        /// \param  aCounter    The counter to increment
+        /// \param  aPacketQty  The number of descriptor programmed
+        /// \endcond
+        /// \cond fr
+        /// \brief  Deverouiller l'acces au materiel apres avoir programmer
+        ///         des descripteurs de reception
+        /// \param  aCounter    Le compteur a incrementer
+        /// \param  aPacketQty  Le nombre de descripteurs programmes
+        /// \endcond
         virtual void Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacketQty);
 
+        /// \cond en
+        /// \brief  Unlock the hardware after programming transmit descriptors
+        /// \param  aCounter    The counter to increment
+        /// \param  aPacketQty  The number of descriptor programmed
+        /// \endcond
+        /// \cond fr
+        /// \brief  Deverouiller l'acces au materiel apres avoir programmer
+        ///         des descripteurs de transmission
+        /// \param  aCounter    Le compteur a incrementer
+        /// \param  aPacketQty  Le nombre de descripteurs programmes
+        /// \endcond
         virtual void Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty);
+
+        // TODO  OpenNetK.Adapter
+        //       Pass the aCounter to Lock rather than at
+        //       Packet_Receive_NoLock and Unlock_AfterSend and do not pass
+        //       aPacketQty to Unlock_AfterSend. Replace it by an internal
+        //       counter.
 
         /// \cond en
         /// \brief  Add the buffer to the receiving queue.
@@ -263,15 +318,18 @@ namespace OpenNetK
         /// \param  aPacket  [---;R--] The packet
         /// \param  aSize_byte         The packet size
         /// \param  aRepeatCount       The repeat count
+        /// \retval false  Error
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le paquet a la queue de transmission
         /// \param  aPacket  [---;R--] Le paquet
         /// \param  aSize_byte         La taille du paquet
         /// \param  aRepeatCount       Le nombre de repetition
+        /// \retval false  Erreur
         /// \endcond
         /// \note   Thread = Queue
-        virtual void Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1) = 0;
+        /// \retval true  OK
+        virtual bool Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1) = 0;
 
         /// \cond en
         /// \brief  Retrieve statistics
@@ -308,6 +366,8 @@ namespace OpenNetK
 
         void GetConfig(Adapter_Config * aConfig);
         void GetInfo  (Adapter_Info   * aInfo  );
+
+        void Tick();
 
     protected:
 
@@ -349,12 +409,38 @@ namespace OpenNetK
         /// \endcond
         Adapter * GetAdapter();
 
+        /// \cond en
+        /// \brief  The adapter configuration
+        /// \endcond
+        /// \cond fr
+        /// \brief  La configuration de l'adapteur
+        /// \endcond
         Adapter_Config mConfig;
+
+        /// \cond en
+        /// \brief  The information about the adapter
+        /// \endcond
+        /// \cond fr
+        /// \brief  L'information au sujet de l'adapteur
+        /// \endcond
         Adapter_Info   mInfo  ;
 
+        /// \cond en
+        /// \brief  The adapter configuration
+        /// \endcond
+        /// \cond fr
+        /// \brief  La configuration de l'adapteur
+        /// \endcond
         mutable uint32_t mStatistics[64];
 
         // ===== Zone 0 =====================================================
+
+        /// \cond en
+        /// \brief  The SpinLock used to lock the hardware
+        /// \endcond
+        /// \cond fr
+        /// \brief  Le SpinLock utilise pour verouille l'access au materiel
+        /// \endcond
         SpinLock * mZone0;
 
     private:

@@ -14,6 +14,7 @@
 // ===== Includes/OpenNetK ==================================================
 #include <OpenNetK/Adapter_Types.h>
 #include <OpenNetK/Constants.h>
+#include <OpenNetK/PacketGenerator_Types.h>
 #include <OpenNetK/Types.h>
 
 class Packet;
@@ -44,6 +45,15 @@ namespace OpenNetK
 
     public:
 
+        /// \cond en
+        /// \brief  This structure contains information about buffer size an
+        ///         IoCtl accepts.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette structure contient les tailles d'espace memoire
+        ///         qu'un IoCtl accepte.
+        /// \endcond
+        /// \todo   Document the members
         typedef struct
         {
             unsigned int mIn_MaxSize_byte ;
@@ -84,15 +94,6 @@ namespace OpenNetK
         //       Normal (Cleanup) - Definir la structure BufferInfo dans un
         //       fichier prive. En faire une classe.
 
-        /// \cond en
-        /// \brief  DirectGMA Buffer information. This structur is not
-        ///         documented and may change or disapear in futur version.
-        /// \endcond
-        /// \cond fr
-        /// \brief  L'information au sujet d'un espace memoire DirectGMA.
-        ///         Cette structure n'est pas documente. Elle peut changer
-        ///         ou disparaitre dans une version future.
-        /// \endcond
         typedef struct
         {
             Buffer mBuffer;
@@ -123,11 +124,17 @@ namespace OpenNetK
 
         void Buffer_SendPackets(BufferInfo * aBufferInfo);
 
-        void Buffers_Process();
+        // TODO  OpenNetK.Adapter
+        //       Renommer Buffers_Process en Interrupt_Process2
+        void Buffers_Process(bool * aNeedMoreProcessing);
 
         void Disconnect();
 
+        void Interrupt_Process3();
+
         int  IoCtl(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte);
+
+        void Tick();
 
     private:
 
@@ -153,6 +160,10 @@ namespace OpenNetK
         int IoCtl_Info_Get        (      Adapter_Info   * aOut) const;
         int IoCtl_Packet_Send     (const void           * aIn , unsigned int aInSize_byte );
         int IoCtl_Packet_Send_Ex  (const void           * aIn , unsigned int aInSize_byte );
+        int IoCtl_PacketGenerator_Config_Get(      PacketGenerator_Config * aOut);
+        int IoCtl_PacketGenerator_Config_Set(const PacketGenerator_Config * aIn , PacketGenerator_Config * aOut);
+        int IoCtl_PacketGenerator_Start     ();
+        int IoCtl_PacketGenerator_Stop      ();
         int IoCtl_Start           (const Buffer         * aIn , unsigned int aInSize_byte );
         int IoCtl_State_Get       (      Adapter_State  * aOut);
         int IoCtl_Statistics_Get  (const void           * aIn , uint32_t * aOut, unsigned int aOutSize_byte) const;
@@ -163,6 +174,11 @@ namespace OpenNetK
         unsigned int mAdapterNo;
         Hardware   * mHardware ;
         unsigned int mSystemId ;
+
+        PacketGenerator_Config mPacketGenerator_Config ;
+        unsigned int           mPacketGenerator_Counter;
+        long                   mPacketGenerator_Pending;
+        bool                   mPacketGenerator_Running;
 
         mutable uint32_t      mStatistics[32];
 

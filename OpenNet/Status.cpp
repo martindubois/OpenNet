@@ -23,7 +23,7 @@ StatusInfo;
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-static const StatusInfo STATUS_INFO[] =
+static const StatusInfo STATUS_INFO[OpenNet::STATUS_QTY] =
 {
     { "OK", "Success" },
 
@@ -83,6 +83,11 @@ static const StatusInfo STATUS_INFO[] =
     { "THREAD_STOP_TIMEOUT"       , "The thread did not stop in allowed time"  },
     { "THREAD_TERMINATE_ERROR"    , "The thread termination reported an error" },
     { "TOO_MANY_BUFFER"           , "Too many buffer allocated"         },
+
+    // ===== 0.0.7 ==========================================================
+    { "ADAPTER_NOT_SET" , "The adapter is not set" },
+    { "INVALID_OFFSET"  , "Invalid offset"         },
+    { "INVALID_PROTOCOL", "Invalid protocol"       },
 };
 
 namespace OpenNet

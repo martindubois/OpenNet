@@ -2,10 +2,12 @@
 // Product / Produit  OpenNet
 
 /// \author  KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
 /// \file    Includes/OpenNetK/Adapter_Types.h
 /// \brief   OpenNetK::Adapter_Config, OpenNetK::Adapter_Info,
 ///          OpenNetK::Adapter_State, OpenNetK::Buffer,
-///          OpenNetK::EthernetAddress, OpenNetK::VersionInfo
+///          OpenNetK::EthernetAddress, OpenNetK::IPv4Address,
+///          OpenNetK::VersionInfo
 
 #pragma once
 
@@ -22,6 +24,7 @@ namespace OpenNetK
     /// \brief  Cette structure est utilise pour passer les informations au sujet
     ///         d'un espace memoire.
     /// \endcond
+    /// \toto   Document the members
     typedef struct
     {
         uint64_t mBuffer_PA;
@@ -34,11 +37,12 @@ namespace OpenNetK
     Buffer;
 
     /// \cond en
-    /// \brief  This structure is used for EthernetAddress.
+    /// \brief  This structure is used for Ethernet address.
     /// \endcond
     /// \cond fr
     /// \brief  Cette structure est utilise pour les adresse Ethernet.
     /// \endcond
+    /// \todo   Document the members
     typedef struct
     {
         uint8_t mAddress[6];
@@ -46,6 +50,19 @@ namespace OpenNetK
         uint8_t mReserved[2];
     }
     EthernetAddress;
+
+    /// \cond en
+    /// \brief  This structure is used for IPv4 address.
+    /// \endcond
+    /// \cond fr
+    /// \brief  Cette structure est utilise pour les adresse IPv4.
+    /// \endcond
+    /// \todo   Document the member
+    typedef struct
+    {
+        uint8_t mAddress[4];
+    }
+    IPv4Address;
 
     // TODO OpenNetK.Adapter_Types
     //      Normal - Ajouter des informations : debug/release, date et heure
@@ -59,6 +76,7 @@ namespace OpenNetK
     /// \brief  Cette structure est utilise pour retourner la version d'un
     ///         composant.
     /// \endcond
+    /// \todo   Document the members
     typedef struct
     {
         uint8_t mMajor        ;
@@ -79,6 +97,7 @@ namespace OpenNetK
     /// \cond fr
     /// \brief  Cette enum indique le type de l'adaptateur.
     /// \endcond
+    /// \todo   Document the values
     typedef enum
     {
         ADAPTER_TYPE_UNKNOWN ,
@@ -95,6 +114,7 @@ namespace OpenNetK
     /// \cond fr
     /// \brief  Cette structure est utilise pour passer la configuration.
     /// \endcond
+    /// \todo   Document the members
     typedef struct
     {
         uint32_t mPacketSize_byte;
@@ -118,6 +138,7 @@ namespace OpenNetK
     /// \brief  Cette structure est utilise pour retourner les information au
     ///         sujet d'un adaptateur.
     /// \endcond
+    /// \todo   Document the members
     typedef struct
     {
         Adapter_Type mAdapterType;
@@ -145,6 +166,7 @@ namespace OpenNetK
     /// \cond fr
     /// \brief  Cette structure est utilise pour retourner l'etat.
     /// \endcond
+    /// \todo   Document the members
     typedef struct
     {
         struct

@@ -28,6 +28,7 @@ namespace OpenNet
     /// \cond fr
     /// \brief  Les code de status
     /// \endcond
+    /// \todo   Document the values
     typedef enum
     {
         STATUS_OK = 0,
@@ -88,6 +89,11 @@ namespace OpenNet
         STATUS_THREAD_STOP_TIMEOUT       ,
         STATUS_THREAD_TERMINATE_ERROR    ,
         STATUS_TOO_MANY_BUFFER           ,
+
+        // ===== 0.0.7 ======================================================
+        STATUS_ADAPTER_NOT_SET ,
+        STATUS_INVALID_OFFSET  ,
+        STATUS_INVALID_PROTOCOL,
 
         STATUS_QTY
     }

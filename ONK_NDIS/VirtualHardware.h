@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_NDIS/VirtualHardware.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_NDIS/VirtualHardware.h
 
 #pragma once
 
@@ -34,7 +35,7 @@ public:
     virtual bool         D0_Entry             ();
     virtual void         Packet_Receive_NoLock(uint64_t aLogicalAddress, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
     virtual void         Packet_Send_NoLock   (uint64_t aLogicalAddress, const void * aVirtualAddress, unsigned int aSize_byte, volatile long * aCounter = NULL);
-    virtual void         Packet_Send          (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);
+    virtual bool         Packet_Send          (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);
 
 private:
 

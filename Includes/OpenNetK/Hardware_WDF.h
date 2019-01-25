@@ -1,9 +1,10 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNetK/Hardware_WDF.h
-/// \brief   OpenNetK::Hardware_WDF
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/Hardware_WDF.h
+/// \brief      OpenNetK::Hardware_WDF
 
 #pragma once
 
@@ -105,9 +106,12 @@ namespace OpenNetK
 
         void TrigProcess2();
 
+        void Work();
+
     private:
 
         void InitTimer();
+        void InitWorkItem();
 
         NTSTATUS PrepareInterrupt(CM_PARTIAL_RESOURCE_DESCRIPTOR * aTranslated, CM_PARTIAL_RESOURCE_DESCRIPTOR * aRaw);
         NTSTATUS PrepareMemory   (CM_PARTIAL_RESOURCE_DESCRIPTOR * aTranslated);
@@ -125,6 +129,8 @@ namespace OpenNetK
         void       * mMemVirtual  [6];
 
         WDFTIMER mTimer;
+
+        WDFWORKITEM mWorkItem;
 
         // ===== Zone 0 =====================================================
         SpinLock_WDF mZone0;

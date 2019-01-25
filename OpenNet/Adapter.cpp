@@ -88,9 +88,7 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     { "OpenNetK::Adapter - BUFFER - RECEIVE        ", ""      , 1 }, // 35
     { "OpenNetK::Adapter - BUFFER - SEND           ", ""      , 1 },
     { "OpenNetK::Adapter - BUFFER - SEND_PACKETS   ", ""      , 1 },
-
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-
+    { "OpenNetK::Adapter - INTERRUPT - PROCESS_3   ", ""      , 1 },
     { "OpenNetK::Adapter - IOCTL - CONFIG - GET    ", ""      , 0 },
     { "OpenNetK::Adapter - IOCTL - CONFIG - SET    ", ""      , 0 }, // 40
     { "OpenNetK::Adapter - IOCTL - CONNECT         ", ""      , 0 },
@@ -102,11 +100,12 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     { "OpenNetK::Adapter - IOCTL - STOP            ", ""      , 0 },
     { "OpenNetK::Adapter - RUNNING_TIME            ", "ms"    , 1 },
     { "OpenNetK::Adapter - TX                      ", "packet", 1 },
+    // ===== 0.0.7 ==========================================================
+    { "OpenNetK::Adapter - CORRUPTED               ", "buffer", 1 }, // 50
+    { "OpenNetK::Adapter - CORRUPTED - RELEASED    ", "buffer", 1 },
+    { "OpenNetK::Adapter - PACKET_GEN. - BREAK     ", ""      , 1 },
+    { "OpenNetK::ADapter - PACKET_GEN. - ITERATION ", ""      , 1 },
 
-    VALUE_VECTOR_DESCRIPTION_RESERVED, // 50
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED, // 55
     VALUE_VECTOR_DESCRIPTION_RESERVED,
@@ -114,8 +113,9 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED, // 60
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
 
+    { "OpenNetK::Adapter - PACKET_GEN. - REPEAT_COUNT       (NR)", "packet", 0 },
+    // ===== 0.0.7 ==========================================================
     { "OpenNetK::Adapter - IOCTL - STATISTICS - GET - RESET (NR)", "", 0 },
     { "OpenNetK::Adapter - IOCTL - STATISTICS - RESET       (NR)", "", 0 },
 
