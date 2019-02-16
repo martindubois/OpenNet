@@ -94,8 +94,9 @@ protected:
 
     OpenNet::Status Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte = NULL);
 
-    virtual OpenNet::Status ResetInputFilter_Internal() = 0;
-    virtual void            SetInputFilter_Internal  (OpenNet::Kernel * aKernel) = 0;
+    // SetInputFilter_Internal ==> ResetInputFilter_Internal
+    virtual void ResetInputFilter_Internal() = 0;
+    virtual void SetInputFilter_Internal  (OpenNet::Kernel * aKernel) = 0;
 
     virtual Thread * Thread_Prepare_Internal(OpenNet::Kernel * aKernel) = 0;
 

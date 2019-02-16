@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/Thread.cpp
 
+#define __CLASS__ "Thread::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -99,20 +101,22 @@ void Thread::Delete()
     }
     catch (KmsLib::Exception * eE)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "Delete", __LINE__);
         mDebugLog->Log(eE);
     }
 
     Release();
 
+    // printf( __CLASS__ "Delete - delete 0x%lx (this)\n", reinterpret_cast< uint64_t >( this ) );
+
     delete this;
 }
 
-// Exception  KmsLib::Exception *  See Processor_Internal::CommandQueue_Create
-//                                 See OCLW_CreateKernel
-//                                 See Adapter_Internal::Buffers_Allocate
+// Exception  KmsLib::Exception *
 void Thread::Prepare()
 {
+    // printf( __CLASS__ "Prepare()\n" );
+
     assert(   0 <  mAdapters.size());
     assert(   0 == mBuffers .size());
 
@@ -131,6 +135,8 @@ void Thread::Prepare()
 // Threads  Apps
 void Thread::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
 {
+    // printf( __CLASS__ "Stop_Wait( ,  )\n" );
+
     assert(   0 < mAdapters.size());
     assert(   0 < mBuffers.size ());
     assert(NULL != mDebugLog      );
@@ -184,6 +190,8 @@ void Thread::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
     {
         assert(NULL != mBuffers[i]);
 
+        printf( __CLASS__ "Stop_Wait - delete 0x%lx (mBuffers[ %u ])\n", reinterpret_cast< uint64_t >( mBuffers[ i ] ), i );
+
         delete mBuffers[i];
     }
 }
@@ -196,6 +204,8 @@ void Thread::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
 // Thread  Worker
 unsigned int Thread::Run()
 {
+    // printf( __CLASS__ "Run()\n" );
+
     assert(   0 <  mAdapters.size());
     assert(NULL != mDebugLog       );
 
@@ -206,6 +216,8 @@ unsigned int Thread::Run()
         Run_Start();
 
         unsigned int i;
+
+        // printf( __CLASS__ "Run - %u adapters\n", static_cast< unsigned int >( mAdapters.size() ) );
 
         for (i = 0; i < mAdapters.size(); i++)
         {
@@ -225,11 +237,13 @@ unsigned int Thread::Run()
     }
     catch (KmsLib::Exception * eE)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        eE->Write( stdout );
+        mDebugLog->Log(__FILE__, __CLASS__ "Run", __LINE__);
         mDebugLog->Log(eE);
         lResult = __LINE__;
     }
 
+    // printf( __CLASS__ "Run - Return %u\n", lResult );
     return lResult;
 }
 
@@ -245,17 +259,18 @@ Thread::~Thread()
 // CRITICAL PATH - Buffer
 void Thread::Run_Iteration(unsigned int aIndex)
 {
+    // printf( __CLASS__ "Run_Iteration( %u )\n", aIndex );
+
     Processing_Wait (aIndex);
     Processing_Queue(aIndex);
 }
-
-// Private
-/////////////////////////////////////////////////////////////////////////////
 
 // Exception  KmsLib::Exception *  CODE_TIMEOUT
 // Thread     Worker
 void Thread::Run_Wait()
 {
+    // printf( __CLASS__ "Run_Wait()\n" );
+
     assert(   0 <  mAdapters.size());
     assert(NULL != mDebugLog       );
 
@@ -286,7 +301,7 @@ void Thread::Run_Wait()
     //       Low - This is a big problem because the driver still use GPU
     //       buffer and the application is maybe going to release them.
 
-    mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+    mDebugLog->Log(__FILE__, __CLASS__ "Run_Wait", __LINE__);
     throw new KmsLib::Exception(KmsLib::Exception::CODE_TIMEOUT,
-        "The driver did not release the buffers in time", NULL, __FILE__, __FUNCTION__, __LINE__, 0);
+        "The driver did not release the buffers in time", NULL, __FILE__, __CLASS__ "Run_Wait", __LINE__, 0);
 }

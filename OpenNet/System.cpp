@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/System.cpp
 
+#define __CLASS__ "System::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -62,8 +64,14 @@ namespace OpenNet
                 lResult = new System_OpenCL();
             #endif
         }
+        catch ( KmsLib::Exception * eE )
+        {
+            printf( __CLASS__ "Create - Exception\n" );
+            eE->Write( stdout );
+        }
         catch ( ... )
         {
+            printf( __CLASS__ "Create - Unknown exception\n" );
             lResult = NULL;
         }
 
@@ -76,6 +84,8 @@ namespace OpenNet
     {
         try
         {
+            // printf( __CLASS__ "Delete - delete 0x%lx (this)\n", reinterpret_cast< uint64_t >( this ) );
+
             delete this;
         }
         catch (...)

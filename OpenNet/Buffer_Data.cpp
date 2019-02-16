@@ -27,6 +27,7 @@ Buffer_Data::Buffer_Data(unsigned int aPacketQty)
     assert(0 < aPacketQty);
 }
 
+// Exception  KmsLib::Exception *
 Buffer_Data::~Buffer_Data()
 {
 }

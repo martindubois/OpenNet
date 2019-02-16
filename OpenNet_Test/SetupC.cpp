@@ -1,18 +1,21 @@
 
-// Author   KMA - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Test/SetupC.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Test/SetupC.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
 #include <memory.h>
 #include <stdint.h>
 
-// ===== Windows ============================================================
-#include <Windows.h>
+// ===== Import/Includes ====================================================
+#include <KmsLib/ThreadBase.h>
 
 // ===== OpenNet_Test =======================================================
 #include "SetupC.h"
@@ -32,6 +35,7 @@ SetupC::SetupC(unsigned int aBufferQty) : mBufferQty(aBufferQty), mProcessor(NUL
 
 SetupC::~SetupC()
 {
+    // printf( "%s()\n", __FUNCTION__ );
 }
 
 int SetupC::Init()
@@ -55,21 +59,15 @@ int SetupC::Init()
     mProcessor = mSystem->Processor_Get(0);
     if (NULL == mProcessor) { return __LINE__; }
 
-    for (i = 0; i < 2; i++)
-    {
-        if (OpenNet::STATUS_OK != mSystem->Adapter_Connect(mAdapters[i])) { return __LINE__; }
-    }
-
-    for (i = 0; i < 2; i++)
-    {
-        if (OpenNet::STATUS_OK != mAdapters[i]->SetProcessor(mProcessor)) { return __LINE__; }
-    }
+    if (OpenNet::STATUS_OK != mSystem->Adapter_Connect(mAdapters[ 0 ])) { return __LINE__; }
+    if (OpenNet::STATUS_OK != mAdapters[0]->SetProcessor(mProcessor)) { return __LINE__; }
 
     return 0;
 }
 
 int SetupC::Start(unsigned int aFlags)
 {
+    assert(NULL != mAdapters[ 0 ]);
     assert(   0 <  mBufferQty);
     assert(NULL != mSystem   );
 
@@ -86,49 +84,29 @@ int SetupC::Start(unsigned int aFlags)
         if (OpenNet::STATUS_OK != mAdapters[i]->SetConfig( lConfig)) { return __LINE__; }
     }
 
-    for (i = 0; i < 2; i++)
-    {
-        assert(NULL != mAdapters[i]);
 
-        if (OpenNet::STATUS_OK != mAdapters[i]->SetInputFilter(mKernels + i)) { return __LINE__; }
+    if (OpenNet::STATUS_OK != mAdapters[ 0 ]->SetInputFilter( & mKernel ))
+    {
+        mKernel.Display( stdout );
+        return __LINE__;
     }
 
     if (OpenNet::STATUS_OK != mSystem->Start(aFlags)) { return __LINE__; }
 
-    Sleep(1000);
+    KmsLib::ThreadBase::Sleep_ms(1000);
 
     return 0;
 }
 
 int SetupC::Stop()
 {
+    assert(NULL != mAdapters[0]);
     assert(   0 <  mBufferQty);
     assert(NULL != mSystem   );
 
     if (OpenNet::STATUS_OK != mSystem->Stop()) { return __LINE__; }
 
-    unsigned int i;
-
-    for (i = 0; i < 2; i++)
-    {
-        if (OpenNet::STATUS_OK != mAdapters[i]->ResetInputFilter()) { return __LINE__; }
-    }
-
-    return 0;
-}
-
-// aPacket [---;R--]
-int SetupC::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aCount)
-{
-    for (unsigned int i = 0; i < aCount; i++)
-    {
-        for (unsigned int j = 0; j < 2; j++)
-        {
-            assert(NULL != mAdapters[j]);
-
-            if (OpenNet::STATUS_OK != mAdapters[j]->Packet_Send(aPacket, aSize_byte)) { return __LINE__; }
-        }
-    }
+    if (OpenNet::STATUS_OK != mAdapters[ 0 ]->ResetInputFilter()) { return __LINE__; }
 
     return 0;
 }

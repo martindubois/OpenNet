@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/Processor_Internal.cpp
 
+#define __CLASS__ "Processor_Internal::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -33,20 +35,25 @@
 // Threads  Apps
 Processor_Internal::Processor_Internal( KmsLib::DebugLog * aDebugLog )
     : mDebugLog( aDebugLog )
+    , mThread  ( NULL      )
 {
     assert( NULL != aDebugLog );
 
     memset(&mInfo, 0, sizeof(mInfo));
 }
 
-// Threads  Apps
+// Exception  KmsLib::Exception *
+// Threads    Apps
 Processor_Internal::~Processor_Internal()
 {
+    // printf( __CLASS__ "~Processor_Internal()\n" );
 }
 
 // Return  This methode return the address of the internal thread instance.
 Thread * Processor_Internal::Thread_Prepare()
 {
+    // printf( __CLASS__ "Thread_Prepare()\n" );
+
     if (NULL != mThread)
     {
         mThread->AddDispatchCode();
@@ -70,7 +77,7 @@ OpenNet::Status Processor_Internal::GetConfig(Config * aOut) const
 
     if (NULL == aOut)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "GetConfig", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -85,7 +92,7 @@ OpenNet::Status Processor_Internal::GetInfo(Info * aOut) const
 
     if (NULL == aOut)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "GetInfo", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -105,7 +112,7 @@ OpenNet::Status Processor_Internal::SetConfig(const Config & aConfig)
 
     if (NULL == (&aConfig))
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetConfig", __LINE__);
         return OpenNet::STATUS_INVALID_REFERENCE;
     }
 
@@ -118,7 +125,7 @@ OpenNet::Status Processor_Internal::Display(FILE * aOut) const
 {
     if (NULL == aOut)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "Display", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -133,13 +140,13 @@ OpenNet::Status Processor_Internal::GetStatistics(unsigned int * aOut, unsigned 
 {
     if (NULL == aOut)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "GetStatistics", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
     if (0 < aOutSize_byte)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "GetStatistics", __LINE__);
         return OpenNet::STATUS_BUFFER_TOO_SMALL;
     }
 

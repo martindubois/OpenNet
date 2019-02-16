@@ -113,7 +113,7 @@ void VirtualHardware::GetState(OpenNetK::Adapter_State * aState)
     aState->mSpeed_MB_s        =  1000;
 }
 
-bool VirtualHardware::D0_Entry()
+void VirtualHardware::D0_Entry()
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
@@ -126,7 +126,7 @@ bool VirtualHardware::D0_Entry()
 
     mZone0->Unlock();
 
-    return Hardware::D0_Entry();
+    Hardware::D0_Entry();
 }
 
 // CRITICAL PATH - Packet

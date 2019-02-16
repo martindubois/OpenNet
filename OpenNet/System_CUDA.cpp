@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/System_CUDA.cpp
 
+#define __CLASS__ "System_CUDA::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -22,7 +24,7 @@
 
 // ===== OpenNet ============================================================
 #include "Adapter_Linux.h"
-#include "CUDAW.h"
+#include "CUW.h"
 #include "Processor_CUDA.h"
 
 #include "System_CUDA.h"
@@ -42,26 +44,16 @@ System_CUDA::System_CUDA()
     FindAdapters  ();
     FindProcessors();
 
-    // eventfd ==> close  See the destructor
-    int lEvent = eventfd( 0, EFD_CLOEXEC );
-    assert( 0 <= lEvent );
-
-    mConnect.mEvent = lEvent;
-
     // valloc ==> free  See the descructor
     mConnect.mSharedMemory = valloc( SHARED_MEMORY_SIZE_byte );
     assert( NULL != mConnect.mSharedMemory );
+
+    memset( mConnect.mSharedMemory, 0, SHARED_MEMORY_SIZE_byte );
 }
 
 System_CUDA::~System_CUDA()
 {
-    assert(    0 <= mConnect.mEvent        );
     assert( NULL != mConnect.mSharedMemory );
-
-    // eventfd ==> close  See the constructor
-    int lRet = close( mConnect.mEvent );
-    assert( 0 == lRet );
-    (void)( lRet );
 
     // valloc ==> free  See the constructor
     free( mConnect.mSharedMemory );
@@ -77,7 +69,7 @@ void System_CUDA::FindAdapters()
 
     for (unsigned int lIndex = 0;; lIndex++)
     {
-        // new ==> delete  See Adapter_Internal::~Adapter_Internal
+        // new ==> delete  See Adapter_Internal::~Adapter_Linux
         KmsLib::DriverHandle * lHandle = new KmsLib::DriverHandle();
         assert(NULL != lHandle);
 
@@ -92,6 +84,8 @@ void System_CUDA::FindAdapters()
         catch (KmsLib::Exception * eE)
         {
             (void)(eE);
+
+            // printf( __CLASS__ "FindAdapters - delete 0x%lx (lHandle)\n", reinterpret_cast< uint64_t >( lHandle ) );
 
             delete lHandle;
             break;
@@ -111,9 +105,21 @@ void System_CUDA::FindProcessors()
 {
     mDebugLog.Log( "System_CUDA::FindProcessors()" );
 
+    try
+    {
+        CUW_Init( 0 );
+    }
+    catch ( KmsLib::Exception * eE )
+    {
+        mDebugLog.Log( __FILE__, __CLASS__ "FindProcessors", __LINE__ );
+        mDebugLog.Log( eE );
+
+        return;
+    }
+
     int lCount;
 
-    CUDAW_GetDeviceCount( & lCount );
+    CUW_DeviceGetCount( & lCount );
 
     for ( int i = 0; i < lCount; i ++ )
     {

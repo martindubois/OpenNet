@@ -170,28 +170,13 @@ OpenNet::Status Adapter_Windows::Packet_Send(const void * aData, unsigned int aS
 
 // ===== Adapter_Internal ===================================================
 
-OpenNet::Status Adapter_Windows::ResetInputFilter_Internal()
+void Adapter_Windows::ResetInputFilter_Internal()
 {
-    OpenNet::Status lResult = OpenNet::STATUS_OK;
-
     if (NULL != mProgram)
     {
-        try
-        {
-            OCLW_ReleaseProgram(mProgram);
-        }
-        catch (KmsLib::Exception * eE)
-        {
-            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-            mDebugLog->Log(eE);
-
-            lResult = ExceptionToStatus(eE);
-        }
-
+        OCLW_ReleaseProgram(mProgram);
         mProgram = NULL;
     }
-
-    return lResult;
 }
 
 void Adapter_Windows::SetInputFilter_Internal(OpenNet::Kernel * aKernel)

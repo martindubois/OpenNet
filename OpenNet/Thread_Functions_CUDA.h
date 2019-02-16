@@ -10,12 +10,13 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== OpenNet ============================================================
+#include "Thread_CUDA.h"
 #include "Thread_Functions.h"
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
-class Thread_Functions_CUDA : public Thread_Functions
+class Thread_Functions_CUDA : public Thread_Functions, public Thread_CUDA
 {
 
 public:
@@ -34,5 +35,10 @@ protected:
     virtual void Processing_Wait (unsigned int aIndex);
 
     virtual void Run_Start();
+    virtual void Run_Wait ();
+
+private:
+
+    void * * mArguments;
 
 };

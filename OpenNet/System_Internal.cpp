@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/System_Internal.cpp
 
+#define __CLASS__ "System_Internal::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -28,6 +30,7 @@
 
 // ===== OpenNet ============================================================
 #include "Adapter_Internal.h"
+#include "Constants.h"
 #include "Processor_Internal.h"
 #include "Thread.h"
 
@@ -35,16 +38,6 @@
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
-
-#ifdef _KMS_LINUX_
-    #define DEBUG_LOG_FOLDER "/tmp/OpenNetDebugLog"
-    #define INVALID_EVENT (-1)
-#endif
-
-#ifdef _KMS_WINDOWS_
-    #define DEBUG_LOG_FOLDER "K:\\Dossiers_Actifs\\OpenNet\\DebugLog"
-    #define INVALID_EVENT (NULL)
-#endif
 
 static const char * STATE_NAMES[System_Internal::STATE_QTY] =
 {
@@ -77,16 +70,13 @@ System_Internal::System_Internal()
 
     mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
 
-    mConnect.mEvent = INVALID_EVENT;
-
     mDebugLog.Log( "System_Internal::System_Internal - OK" );
 }
 
 // Threads  Apps
 System_Internal::~System_Internal()
 {
-    assert(INVALID_EVENT != mConnect.mEvent       );
-    assert(NULL          != mConnect.mSharedMemory);
+    // printf( __CLASS__ "~System_Internal()\n" );
 
     switch (mState)
     {
@@ -106,15 +96,21 @@ System_Internal::~System_Internal()
     
     for (i = 0; i < mAdapters.size(); i++)
     {
+        // printf( __CLASS__ "~System_Internal - delete 0x%lx (mAdapters[ %u ])\n", reinterpret_cast< uint64_t >( mAdapters[ i ] ), i );
+
         // new ==> delete  See FindAdapters
         delete mAdapters[i];
     }
 
     for (i = 0; i < mProcessors.size(); i++)
     {
+        // printf( __CLASS__ "~System_Internal - delete 0x%lx (mProcessors[ %u ]\n", reinterpret_cast< uint64_t >( mProcessors[ i ] ), i );
+
         // new ==> delete  See FindProcessors
         delete mProcessors[i];
     }
+
+    // printf( __CLASS__ "~System_Internal - End\n" );
 }
 
 // ===== OpenNet::System ====================================================
@@ -357,6 +353,8 @@ unsigned int System_Internal::Processor_GetCount() const
 
 OpenNet::Status System_Internal::Start(unsigned int aFlags)
 {
+    // printf( __CLASS__ "Start( 0x%08x )\n", aFlags );
+
     switch (mState)
     {
     case STATE_IDLE :
@@ -443,7 +441,11 @@ OpenNet::Status System_Internal::Start(unsigned int aFlags)
         lResult = ExceptionToStatus(eE);
 
         OpenNet::Status lStatus = Stop();
-        assert(OpenNet::STATUS_OK == lStatus);
+        if ( OpenNet::STATUS_OK != lStatus )
+        {
+            mDebugLog.Log( __FILE__, __FUNCTION__, __LINE__ );
+            mDebugLog.Log( OpenNet::Status_GetName( lStatus ) );
+        }
     }
 
     return lResult;
@@ -653,6 +655,8 @@ OpenNet::Status System_Internal::Config_Validate(const Config & aConfig)
 
 void System_Internal::Threads_Release()
 {
+    // printf( __CLASS__ "Thread_Release()\n" );
+
     for (unsigned int i = 0; i < mThreads.size(); i++)
     {
         assert(NULL != mThreads[i]);
@@ -661,6 +665,8 @@ void System_Internal::Threads_Release()
     }
 
     mThreads.clear();
+
+    // printf( __CLASS__ "Thread_Release - End\n" );
 }
 
 // Static functions

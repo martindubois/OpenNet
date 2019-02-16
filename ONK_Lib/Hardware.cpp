@@ -4,10 +4,14 @@
 // Product    OpenNet
 // File       ONK_Lib/Hardware.cpp
 
+#define __CLASS__     "Hardware::"
+#define __NAMESPACE__ "OpenNetK::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
+#include <OpenNetK/Debug.h>
 #include <OpenNetK/OS.h>
 #include <OpenNetK/StdInt.h>
 
@@ -97,11 +101,9 @@ namespace OpenNetK
         return true;
     }
 
-    bool Hardware::D0_Entry()
+    void Hardware::D0_Entry()
     {
         mStatistics[HARDWARE_STATS_D0_ENTRY] ++;
-
-        return true;
     }
 
     bool Hardware::D0_Exit()
@@ -141,6 +143,8 @@ namespace OpenNetK
     // CRITICAL PATH
     void Hardware::Interrupt_Process2(bool * aNeedMoreProcessing)
     {
+        // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
         ASSERT(NULL != aNeedMoreProcessing);
 
         ASSERT(NULL != mAdapter);
@@ -173,8 +177,14 @@ namespace OpenNetK
 
     void Hardware::Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacketQty)
     {
+        // TRACE_DEBUG "Unlock_AfterReceive( , %u packet )" DEBUG_EOL, aPacketQty TRACE_END;
+
         ASSERT(NULL != aCounter );
         ASSERT(0    < aPacketQty);
+
+        #ifdef _KMS_LINUX_
+            ( * aCounter ) += aPacketQty;
+        #endif 
 
         #ifdef _KMS_WINDOWS_
             InterlockedAdd(aCounter, aPacketQty);
@@ -186,8 +196,14 @@ namespace OpenNetK
     // CRITICAL PATH - Buffer
     void Hardware::Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty)
     {
+        // TRACE_DEBUG "Unlock_AfterSend( , %u packet )" DEBUG_EOL, aPacketQty TRACE_END;
+
         if ((0 < aPacketQty) && (NULL != aCounter))
         {
+            #ifdef _KMS_LINUX_
+                ( * aCounter ) += aPacketQty;
+            #endif
+
             #ifdef _KMS_WINDOWS_
                 InterlockedAdd(aCounter, aPacketQty);
             #endif

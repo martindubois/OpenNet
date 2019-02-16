@@ -35,8 +35,6 @@ public:
     int Start(unsigned int aFlags);
     int Stop ();
 
-    int Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aCount);
-
     int Statistics_Get          ();
     int Statistics_GetAndDisplay(unsigned int aMinLevel = 0);
     int Statistics_Reset        ();
@@ -44,7 +42,7 @@ public:
 
     OpenNet::Adapter      * mAdapters[2];
     unsigned int            mBufferQty  ;
-    OpenNet::Kernel_Forward mKernels [2];
+    OpenNet::Kernel_Forward mKernel     ;
     OpenNet::Processor    * mProcessor  ;
 
     unsigned int mStatistics[2][STATISTICS_QTY];

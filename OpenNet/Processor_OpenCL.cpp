@@ -109,6 +109,7 @@ Buffer_Data * Processor_OpenCL::Buffer_Allocate(unsigned int aPacketSize_byte, c
 
     Buffer_Data * lResult = new Buffer_Data_OpenCL(lMem, static_cast<unsigned int>(lPacketQty));
 
+    aBuffer->mBuffer_DA =                               0;
     aBuffer->mBuffer_PA = lBusAddress.surface_bus_address;
     aBuffer->mMarker_PA = lBusAddress.marker_bus_address ;
     aBuffer->mPacketQty = static_cast<uint32_t>(lPacketQty);

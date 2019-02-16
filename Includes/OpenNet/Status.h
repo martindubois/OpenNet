@@ -91,9 +91,10 @@ namespace OpenNet
         STATUS_TOO_MANY_BUFFER           ,
 
         // ===== 0.0.7 ======================================================
-        STATUS_ADAPTER_NOT_SET ,
-        STATUS_INVALID_OFFSET  ,
-        STATUS_INVALID_PROTOCOL,
+        STATUS_ADAPTER_NOT_SET       ,
+        STATUS_INVALID_ARGUMENT_COUNT,
+        STATUS_INVALID_OFFSET        ,
+        STATUS_INVALID_PROTOCOL      , // 60
 
         STATUS_QTY
     }

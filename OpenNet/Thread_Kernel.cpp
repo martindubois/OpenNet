@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/Thread_Kernel.coo
 
+#define __CLASS__ "Thread_Kernel::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -53,6 +55,8 @@ Thread_Kernel::~Thread_Kernel()
 
 void Thread_Kernel::Run_Loop()
 {
+    // printf( __CLASS__ "Run_Loop()\n" );
+
     assert(                  0 <  mBuffers.size());
     assert(OPEN_NET_BUFFER_QTY >= mBuffers.size());
     assert(NULL                != mDebugLog      );
@@ -77,17 +81,19 @@ void Thread_Kernel::Run_Loop()
     }
     catch (KmsLib::Exception * eE)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "Run_Loop", __LINE__);
         mDebugLog->Log(eE);
     }
     catch (...)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "Run_Loop", __LINE__);
     }
 }
 
 void Thread_Kernel::Run_Start()
 {
+    // printf( __CLASS__ "Run_Start()\n" );
+
     assert(                  0 <  mBuffers.size());
     assert(OPEN_NET_BUFFER_QTY >= mBuffers.size());
 

@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/Thread_Functions.h
 
+#define __CLASS__ "Thread_Function::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -73,6 +75,8 @@ void Thread_Functions::AddDispatchCode()
 
     mKernelFunctions.AddDispatchCode(lBufferQty);
 
+    // printf( __CLASS__ "AddDispatchCode - delete [] 0x%lx (lBufferQty)\n", reinterpret_cast< uint64_t >( lBufferQty ) );
+
     delete[] lBufferQty;
 }
 
@@ -113,12 +117,12 @@ void Thread_Functions::Run_Loop()
     }
     catch (KmsLib::Exception * eE)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "Run_Loop", __LINE__);
         mDebugLog->Log(eE);
     }
     catch (...)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "Run_Loop", __LINE__);
     }
 }
 

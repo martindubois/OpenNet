@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/PacketGenerator_Internal.cpp
 
+#define __CLASS__ "PacketGenerator_Internal::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -32,6 +34,8 @@
 
 // ===== OpenNet ============================================================
 #include "Adapter_Internal.h"
+#include "Constants.h"
+
 #include "PacketGenerator_Internal.h"
 
 // Static function declaration
@@ -42,8 +46,10 @@ static uint16_t Swap(uint16_t aIn);
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-PacketGenerator_Internal::PacketGenerator_Internal() : mAdapter(NULL), mDebugLog("K:\\Dossiers_Actifs\\OpenNet\\DebugLog", "PackeGenerator"), mRunning(false)
+PacketGenerator_Internal::PacketGenerator_Internal() : mAdapter(NULL), mDebugLog( DEBUG_LOG_FOLDER, "PackeGenerator"), mRunning(false)
 {
+    // printf( __CLASS__ "PacketGenerator_Internal() - aThis = 0x%lx\n", reinterpret_cast< uint64_t >( this ) );
+
     memset(&mConfig                              ,    0, sizeof(mConfig                              ));
     memset(&mConfig.mDestinationEthernet.mAddress, 0xff, sizeof(mConfig.mDestinationEthernet.mAddress));
     memset(&mConfig.mDestinationIPv4             , 0xff, sizeof(mConfig.mDestinationIPv4             ));
@@ -62,6 +68,8 @@ PacketGenerator_Internal::PacketGenerator_Internal() : mAdapter(NULL), mDebugLog
 
 PacketGenerator_Internal::~PacketGenerator_Internal()
 {
+    // printf( __CLASS__ "~PacketGenerator_Internal() - aThis = 0x%lx\n", reinterpret_cast< uint64_t >( this ) );
+
     try
     {
         if (mRunning)
@@ -78,7 +86,7 @@ PacketGenerator_Internal::~PacketGenerator_Internal()
         assert(NULL != eE);
 
         mDebugLog.LogTime();
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "~PacketGenerator_Internal", __LINE__);
         mDebugLog.Log(eE);
     }
 }
@@ -99,20 +107,20 @@ OpenNet::Status PacketGenerator_Internal::SetAdapter(OpenNet::Adapter * aAdapter
 {
     if (NULL == aAdapter)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "SetAdapter", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
     if (NULL != mAdapter)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "SetAdapter", __LINE__);
         return OpenNet::STATUS_ADAPTER_ALREADY_SET;
     }
 
     mAdapter = dynamic_cast<Adapter_Internal *>( aAdapter );
     if (NULL == mAdapter)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "SetAdapter", __LINE__);
         return OpenNet::STATUS_INVALID_ADAPTER;
     }
 
@@ -133,20 +141,20 @@ OpenNet::Status PacketGenerator_Internal::SetConfig(const Config & aConfig)
 {
     if (NULL == (&aConfig))
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "SetConfig", __LINE__);
         return OpenNet::STATUS_INVALID_REFERENCE;
     }
 
     OpenNet::Status lStatus = Config_Validate(aConfig);
     if (OpenNet::STATUS_OK != lStatus)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "SetConfig", __LINE__);
         return lStatus;
     }
 
     if (mRunning)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "SetConfig", __LINE__);
         return OpenNet::STATUS_PACKET_GENERATOR_RUNNING;
     }
 
@@ -167,7 +175,7 @@ OpenNet::Status PacketGenerator_Internal::Display(FILE * aOut)
 {
     if (NULL == aOut)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Display", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -182,13 +190,13 @@ OpenNet::Status PacketGenerator_Internal::Start()
 {
     if (NULL == mAdapter)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Start", __LINE__);
         return OpenNet::STATUS_ADAPTER_NOT_SET;
     }
 
     if (mRunning)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Start", __LINE__);
         return OpenNet::STATUS_PACKET_GENERATOR_RUNNING;
     }
 
@@ -200,7 +208,7 @@ OpenNet::Status PacketGenerator_Internal::Start()
     }
     catch (KmsLib::Exception * eE)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Start", __LINE__);
         mDebugLog.Log(eE);
         return OpenNet::STATUS_EXCEPTION;
     }
@@ -212,13 +220,13 @@ OpenNet::Status PacketGenerator_Internal::Stop()
 {
     if (NULL == mAdapter)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Stop", __LINE__);
         return OpenNet::STATUS_ADAPTER_NOT_SET;
     }
 
     if (!mRunning)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Stop", __LINE__);
         return OpenNet::STATUS_PACKET_GENERATOR_STOPPED;
     }
 
@@ -230,7 +238,7 @@ OpenNet::Status PacketGenerator_Internal::Stop()
     }
     catch (KmsLib::Exception * eE)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Stop", __LINE__);
         mDebugLog.Log(eE);
         return OpenNet::STATUS_EXCEPTION;
     }
@@ -270,31 +278,31 @@ OpenNet::Status PacketGenerator_Internal::Config_Validate(const Config & aConfig
 
     if (0.0 >= aConfig.mBandwidth_MiB_s)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Config_Validate", __LINE__);
         return OpenNet::STATUS_INVALID_BANDWIDTH;
     }
 
     if (aConfig.mPacketSize_byte < (aConfig.mIndexOffset_byte + sizeof(uint32_t)))
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Config_Validate", __LINE__);
         return OpenNet::STATUS_INVALID_OFFSET;
     }
 
     if (0 >= aConfig.mPacketSize_byte)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Config_Validate", __LINE__);
         return OpenNet::STATUS_PACKET_TOO_SMALL;
     }
 
     if (PACKET_SIZE_MAX_byte < aConfig.mPacketSize_byte)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Config_Validate", __LINE__);
         return OpenNet::STATUS_PACKET_TOO_LARGE;
     }
 
     if (PROTOCOL_QTY <= aConfig.mProtocol)
     {
-        mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog.Log(__FILE__, __CLASS__ "Config_Validate", __LINE__);
         return OpenNet::STATUS_INVALID_PROTOCOL;
     }
 

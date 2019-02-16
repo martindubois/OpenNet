@@ -11,11 +11,17 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== Includes/OpenNetK ==================================================
+// ===== Includes ===========================================================
 #include <OpenNetK/Adapter_Types.h>
 #include <OpenNetK/Constants.h>
+#include <OpenNetK/IoCtl.h>
 #include <OpenNetK/PacketGenerator_Types.h>
 #include <OpenNetK/Types.h>
+
+extern "C"
+{
+    #include <OpenNetK/OSDep.h>
+}
 
 class Packet;
 
@@ -46,23 +52,6 @@ namespace OpenNetK
     public:
 
         /// \cond en
-        /// \brief  This structure contains information about buffer size an
-        ///         IoCtl accepts.
-        /// \endcond
-        /// \cond fr
-        /// \brief  Cette structure contient les tailles d'espace memoire
-        ///         qu'un IoCtl accepte.
-        /// \endcond
-        /// \todo   Document the members
-        typedef struct
-        {
-            unsigned int mIn_MaxSize_byte ;
-            unsigned int mIn_MinSize_byte ;
-            unsigned int mOut_MinSize_byte;
-        }
-        IoCtl_Info;
-
-        /// \cond en
         /// \brief  Retrieve information about an IoCtl code
         /// \param  aCode  The IoCtl code
         /// \param  aInfo  The output buffer
@@ -75,18 +64,38 @@ namespace OpenNetK
         /// \retval false  Erreur
         /// \endcond
         /// \retval true   OK
-        static bool IoCtl_GetInfo(unsigned int aCode, IoCtl_Info * aInfo);
+        static bool IoCtl_GetInfo(unsigned int aCode, OpenNetK_IoCtl_Info * aInfo);
+
+        /// \cond en
+        /// \brief  Cleanup on file close
+        /// \param  aFileObject  The closing file
+        /// \endcond
+        /// \cond fr
+        /// \brief  Nettoyer a la fermeture d'un fichier
+        /// \param  aFileObject  Le fichier en fermeture
+        /// \endcond
+        void FileCleanup( void * aFileObject );
 
         /// \cond en
         /// \brief  Connect the Hardware instance
-        /// \param  aHardware [-K-;RW-] The Hardware instance
+        /// \param  aHardware  The Hardware instance
         /// \endcond
         /// \cond fr
         /// \brief  Connecter l'instance de la classe Hardware
-        /// \param  aHardware [-K-;RW-] L'instance de la classe Hardware
+        /// \param  aHardware  L'instance de la classe Hardware
         /// \endcond
         /// \note   Level = Thread, Thread = Init
         void SetHardware(Hardware * aHardware);
+
+        /// \cond en
+        /// \brief  Set the OSDep structure
+        /// \param  aOSDep  The OSDep structure
+        /// \endcond
+        /// \cond fr
+        /// \brief  Assigner la structure OSDep
+        /// \param  aOSDep  La structure OSDep
+        /// \endcond
+        void SetOSDep( OpenNetK_OSDep * aOSDep );
 
     // Internal
 
@@ -141,7 +150,7 @@ namespace OpenNetK
 
         void Interrupt_Process3();
 
-        int  IoCtl(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte);
+        int  IoCtl( void * aFileObject, unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte);
 
         void Tick();
 
@@ -149,6 +158,7 @@ namespace OpenNetK
 
         void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader, const Buffer & aBuffer, Packet * aPackets);
         void Buffer_Queue_Zone0      (const Buffer & aBuffer);
+        void Buffer_Release_Zone0    ();
         void Buffer_Receive_Zone0    (BufferInfo * aBufferInfo);
         void Buffer_Send_Zone0       (BufferInfo * aBufferInfo);
         void Buffer_WriteMarker_Zone0(BufferInfo * aBufferInfo);
@@ -165,13 +175,14 @@ namespace OpenNetK
         // ===== IoCtl ======================================================
         int IoCtl_Config_Get      (      Adapter_Config * aOut);
         int IoCtl_Config_Set      (const Adapter_Config * aIn , Adapter_Config * aOut);
-        int IoCtl_Connect         (const void           * aIn );
+        int IoCtl_Connect         (const void           * aIn , void * aFileObject );
         int IoCtl_Info_Get        (      Adapter_Info   * aOut) const;
+        int IoCtl_Packet_Drop     ();
         int IoCtl_Packet_Send     (const void           * aIn , unsigned int aInSize_byte );
         int IoCtl_Packet_Send_Ex  (const void           * aIn , unsigned int aInSize_byte );
         int IoCtl_PacketGenerator_Config_Get(      PacketGenerator_Config * aOut);
         int IoCtl_PacketGenerator_Config_Set(const PacketGenerator_Config * aIn , PacketGenerator_Config * aOut);
-        int IoCtl_PacketGenerator_Start     ();
+        int IoCtl_PacketGenerator_Start     ( void * aFileObject );
         int IoCtl_PacketGenerator_Stop      ();
         int IoCtl_Start           (const Buffer         * aIn , unsigned int aInSize_byte );
         int IoCtl_State_Get       (      Adapter_State  * aOut);
@@ -184,15 +195,18 @@ namespace OpenNetK
         Hardware   * mHardware ;
         unsigned int mSystemId ;
 
+        void * mConnect_FileObject;
+
         PacketGenerator_Config mPacketGenerator_Config ;
         unsigned int           mPacketGenerator_Counter;
+        void                 * mPacketGenerator_FileObject;
         long                   mPacketGenerator_Pending;
-        bool                   mPacketGenerator_Running;
 
         mutable uint32_t      mStatistics[32];
 
+        OpenNetK_OSDep * mOSDep;
+
         #ifdef _KMS_WINDOWS_
-            KEVENT              * mEvent           ;
             mutable LARGE_INTEGER mStatistics_Start;
         #endif
 

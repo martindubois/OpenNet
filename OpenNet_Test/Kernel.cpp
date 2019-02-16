@@ -29,19 +29,19 @@ KMS_TEST_BEGIN(Kernel_Base)
     KMS_TEST_COMPARE(                             0, strcmp("", lK0.GetName         ()));
 
     #ifdef _KMS_LINUX_
-        KMS_TEST_COMPARE(OpenNet::STATUS_NOT_IMPLEMENTED      , lK0.SetCode         ("OpenNet_Test/Kernel.cpp"));
+        KMS_TEST_COMPARE(OpenNet::STATUS_NOT_IMPLEMENTED      , lK0.SetCode         ("OpenNet_Test/Kernel.cpp", 1 ));
     #endif
 
     #ifdef _KMS_WINDOWS_
-        KMS_TEST_COMPARE(OpenNet::STATUS_OK                   , lK0.SetCode         ("OpenNet_Test/Kernel.cpp"));
+        KMS_TEST_COMPARE(OpenNet::STATUS_OK                   , lK0.SetCode         ("OpenNet_Test/Kernel.cpp", 1 ));
         KMS_TEST_COMPARE(                                   63, lK0.GetCodeLineCount());
         KMS_TEST_ASSERT (NULL                                != lK0.GetCodeLines    ());
-        KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET     , lK0.SetCode         (" ", 1));
-        KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET     , lK0.SetCode         ("OpenNet_Test/Kernel.cpp"));
+        KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET     , lK0.SetCode         (" ", 1, 1 ));
+        KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET     , lK0.SetCode         ("OpenNet_Test/Kernel.cpp", 1 ));
         KMS_TEST_COMPARE(OpenNet::STATUS_OK                   , lK0.ResetCode       ());
     #endif
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lK0.SetCode         ("A\nB\n\rC\rD\r\nE", 11));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lK0.SetCode         ("A\nB\n\rC\rD\r\nE", 11, 1 ));
     KMS_TEST_COMPARE(                11, lK0.GetCodeSize     ());
     KMS_TEST_COMPARE(                 5, lK0.GetCodeLineCount());
     KMS_TEST_ASSERT (NULL             != lK0.GetCodeLines    ());

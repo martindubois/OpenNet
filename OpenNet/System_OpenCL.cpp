@@ -50,6 +50,7 @@ System_OpenCL::System_OpenCL()
     mConnect.mSharedMemory = VirtualAlloc(NULL, SHARED_MEMORY_SIZE_byte, MEM_COMMIT, PAGE_READWRITE);
     assert(NULL != mConnect.mSharedMemory);
 
+    memset( mConnect.mSharedMemory, 0, SHARED_MEMORY_SIZE_byte );
 }
 
 System_OpenCL::~System_OpenCL()

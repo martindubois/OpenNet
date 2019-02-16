@@ -8,7 +8,8 @@
 // type used only to pass data in or out of IoCtl.
 
 // TODO  Common.IoCtl
-//       Low (Cleanup) - Retirer le IOCTL_STATISTICS_RESET
+//       Low (Cleanup) - Retirer lee IOCTL_PACKET_SEND et
+//       IOCTL_STATISTICS_RESET
 
 #pragma once
 
@@ -92,12 +93,16 @@
 // ===== 0.0.7 ==============================================================
 
 // Input   None
+// Output  None
+#define IOCTL_PACKET_DROP                  IOCTL_CODE(50)
+
+// Input   None
 // Output  OpenNetK::Generator_Config
 #define IOCTL_PACKET_GENERATOR_CONFIG_GET  IOCTL_CODE_R(128, OpenNetK::PacketGenerator_Config)
 
 // Input  OpenNetK::Generator_Config
 // Outpt  OpenNetK::Generator_Config
-#define IOCTL_PACKET_GENERATOR_CONFIG_SET  IOCTL_CODE_W(129, OpenNetK::PacketGenetator_Config)
+#define IOCTL_PACKET_GENERATOR_CONFIG_SET  IOCTL_CODE_W(129, OpenNetK::PacketGenerator_Config)
 
 // Input   None
 // Output  None
@@ -110,16 +115,22 @@
 // Data types
 /////////////////////////////////////////////////////////////////////////////
 
+// mSharedMemory  The user space virtual address of the memory shared by all
+//                adapter connected to a same system
+// mSystemId      The process id of the process controlling the system
 typedef struct
 {
-    uint64_t mEvent       ;
+    uint8_t  mReserved0[ 8 ];
+
     void *   mSharedMemory;
     uint32_t mSystemId    ;
 
-    uint8_t  mReserved0[44];
+    uint8_t  mReserved1[44];
 }
 IoCtl_Connect_In;
 
+// mRepeatCount  The number of time the packet must be send
+// mSize_byte    The size of packet
 typedef struct
 {
     struct
@@ -135,6 +146,9 @@ typedef struct
 }
 IoCtl_Packet_Send_Ex_In;
 
+// mFlags.mReset  When set to true, all the statisticas counters are reset to
+//                0 just after the reading operation.
+// mOutSize_byte  The size of the output buffer
 typedef struct
 {
     struct
@@ -145,6 +159,8 @@ typedef struct
     }
     mFlags;
 
-    uint8_t mReserved0[60];
+    uint32_t mOutputSize_byte;
+
+    uint8_t mReserved0[ 56 ];
 }
-IoCtl_Stats_Get_In;
+IoCtl_Statistics_Get_In;

@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/Thread_Functions_CUDA.h
 
+#define __CLASS__ "Thread_Functions_CUDA::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -11,14 +13,18 @@
 
 // ===== C ==================================================================
 #include <assert.h>
+#include <stdint.h>
 
 // ===== OpenNet ============================================================
+#include "Buffer_Data_CUDA.h"
+
 #include "Thread_Functions_CUDA.h"
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
 Thread_Functions_CUDA::Thread_Functions_CUDA(Processor_Internal * aProcessor, bool aProfilingEnabled, KmsLib::DebugLog * aDebugLog)
+    : Thread_Functions( aProcessor, aProfilingEnabled, aDebugLog )
 {
 
 }
@@ -27,28 +33,16 @@ Thread_Functions_CUDA::Thread_Functions_CUDA(Processor_Internal * aProcessor, bo
 
 void Thread_Functions_CUDA::Prepare()
 {
-    assert(   0 < mAdapters.size());
-    assert(NULL != mKernel        );
-    assert(NULL != mProcessor     );
+    assert(NULL != mKernel    );
+    assert(NULL != mProcessor );
 
-    assert(NULL == mCommandQueue);
+    Processor_CUDA * lProcessor = dynamic_cast< Processor_CUDA * >( mProcessor );
+    assert( NULL != lProcessor );
 
-    // Processor_Internal::CommandQueue_Create ==> OCLW_ReleaseCommandQueue  See Release
-    mCommandQueue = mProcessor->CommandQueue_Create(mKernel->IsProfilingEnabled());
-    assert(NULL != mCommandQueue);
+    mModule = lProcessor->Module_Create( & mKernelFunctions );
+    assert( NULL != mModule );
 
-    mKernel->SetCommandQueue(mCommandQueue);
-
-    // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Release
-    mKernel_CL = OCLW_CreateKernel(mProgram, "Filter");
-    assert(NULL != mKernel_CL);
-
-    for (unsigned int i = 0; i < mAdapters.size(); i++)
-    {
-        assert(NULL != mAdapters[i]);
-
-        mAdapters[i]->Buffers_Allocate(mCommandQueue, mKernel_CL, &mBuffers);
-    }
+    Thread_CUDA::Prepare( & mAdapters, & mBuffers, EVENT_QTY );
 }
 
 // Protected
@@ -56,50 +50,64 @@ void Thread_Functions_CUDA::Prepare()
 
 // ===== Thread =============================================================
 
-// CRITICAL PATH - Buffer
 void Thread_Functions_CUDA::Processing_Queue(unsigned int aIndex)
 {
+    // printf( __CLASS__ "Processing_Queue( %u )\n", aIndex );
+
     assert(EVENT_QTY > aIndex);
 
-    assert(0 < mBuffers.size());
-    assert(NULL != mBuffers[0]);
+    assert( NULL != mArguments  );
+    assert( NULL != mBuffers[0] );
+    assert( NULL != mKernel     );
 
     size_t lLS = mBuffers[0]->GetPacketQty();
     size_t lGS = lLS * mBuffers.size();
 
-    assert(0 < lLS);
+    assert( 0 < lGS );
 
-    Thread::Processing_Queue(&lGS, &lLS, mEvents + aIndex);
+    Thread_CUDA::Processing_Queue( mKernel, & lGS, & lLS, mArguments );
 }
 
-// CRITICAL_PATH
-//
-// Thread  Worker
-//
-// Processing_Queue ==> Processing_Wait
 void Thread_Functions_CUDA::Processing_Wait(unsigned int aIndex)
 {
-    assert(EVENT_QTY > aIndex);
-
-    assert(NULL != mEvents[aIndex]);
-
-    Thread::Processing_Wait(mEvents[aIndex]);
-
-    mEvents[aIndex] = NULL;
+    Thread_CUDA::Processing_Wait();
 }
 
 void Thread_Functions_CUDA::Run_Start()
 {
+    // printf( __CLASS__ "Run_Start()\n" );
+
+    assert( NULL == mArguments );
+
     assert(0 < mBuffers.size());
 
-    unsigned int i = 0;
+    // new ==> delete  See Run_Wait
+    mArguments = new void * [ mBuffers.size() ];
+    assert( NULL != mArguments );
 
-    for (i = 0; i < mBuffers.size(); i++)
+    memset( mArguments, 0, sizeof( void * ) * mBuffers.size() );
+
+    for ( unsigned int i = 0; i < mBuffers.size(); i++)
     {
-        assert(NULL != mBuffers[i]->mMem);
+        assert( NULL != mBuffers[ i] );
 
-        OCLW_SetKernelArg(mKernel_CL, i, sizeof(cl_mem), &mBuffers[i]->mMem);
+        Buffer_Data_CUDA * lBuffer = dynamic_cast< Buffer_Data_CUDA * >( mBuffers[ i ] );
+        assert( NULL != lBuffer );
+
+        mArguments[ i ] = & lBuffer->mMemory_DA;
     }
 
     Thread_Functions::Run_Start();
+}
+
+void Thread_Functions_CUDA::Run_Wait()
+{
+    assert( NULL != mArguments );
+
+    Thread_Functions::Run_Wait();
+
+    // printf( __CLASS__ "Run_Wait - delete [] 0x%lx (mArguments)\n", reinterpret_cast< uint64_t >( mArguments ) );
+
+    // new ==> delete  See Run_Start
+    delete [] mArguments;
 }

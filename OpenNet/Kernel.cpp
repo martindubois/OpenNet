@@ -3,8 +3,12 @@
 // Product  OpenNet
 // File     OpenNet/Kernel.cpp
 
+#define __CLASS__ "Kernel::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include <KmsBase.h>
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -62,6 +66,7 @@ namespace OpenNet
         , mCodeLines       (NULL )
         , mCommandQueue    (NULL )
         , mProfilingEnabled(false)
+        // new ==> delete  See the destructor
         , mStatistics      (new unsigned int [KERNEL_STATS_QTY])
     {
         assert(NULL != mStatistics);
@@ -131,7 +136,14 @@ namespace OpenNet
 
     Kernel::~Kernel()
     {
+        assert( NULL != mStatistics );
+
         Invalidate();
+
+        // printf( __CLASS__ "~Kernel - delete [] 0x%lx (mStatistics)\n", reinterpret_cast< uint64_t >( mStatistics ) );
+
+        // new ==> delete  See the constructor
+        delete [] mStatistics;
     }
 
     Status Kernel::AppendCode(const char * aCode, unsigned int aCodeSize_byte)
@@ -156,14 +168,20 @@ namespace OpenNet
         return lResult;
     }
 
-    Status Kernel::SetCode(const char * aFileName)
+    Status Kernel::SetCode(const char * aFileName, unsigned int aArgCount )
     {
-        return SourceCode::SetCode(aFileName);
+        Status lResult = SourceCode::SetCode(aFileName, aArgCount );
+        if (STATUS_OK == lResult)
+        {
+            Invalidate();
+        }
+
+        return lResult;
     }
 
-    Status Kernel::SetCode(const char * aCode, unsigned int aCodeSize_byte)
+    Status Kernel::SetCode(const char * aCode, unsigned int aCodeSize_byte, unsigned int aArgCount )
     {
-        Status lResult = SourceCode::SetCode(aCode, aCodeSize_byte);
+        Status lResult = SourceCode::SetCode(aCode, aCodeSize_byte, aArgCount );
         if (STATUS_OK == lResult)
         {
             Invalidate();
@@ -279,6 +297,16 @@ namespace OpenNet
         return STATUS_OK;
     }
 
+    void Kernel::SetUserKernelArgs(void * aKernel)
+    {
+        assert(NULL != aKernel);
+    }
+
+    void Kernel::SetUserKernelArgs( void * * aArguments )
+    {
+        assert( NULL != aArguments );
+    }
+
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
@@ -348,14 +376,17 @@ namespace OpenNet
         return mBuildLog;
     }
 
-    // Protected
-    /////////////////////////////////////////////////////////////////////////
-
-    Status Kernel::SetUserKernelArgs(void * aKernel)
+    char * Kernel::AllocateBuildLog( size_t aSize_byte )
     {
-        assert(NULL != aKernel);
+        assert( 0 < aSize_byte );
 
-        return STATUS_OK;
+        assert(NULL == mBuildLog);
+
+        // new ==> delete  See Kernel::Invalidate
+        mBuildLog = new char[ aSize_byte ];
+        assert( NULL != mBuildLog );
+
+        return mBuildLog;
     }
 
     // Private
@@ -476,6 +507,8 @@ namespace OpenNet
 
         if (NULL != mBuildLog)
         {
+            // printf( __CLASS__ "Invalidate - delete [] 0x%lx (mBuildLog)\n", reinterpret_cast< uint64_t >( mBuildLog ) );
+
             // new ==> delete  See AllocateBuildLog
             delete[] mBuildLog;
 
@@ -485,6 +518,9 @@ namespace OpenNet
         if (NULL != mCodeLines)
         {
             assert(NULL != mCodeLineBuffer);
+
+            // printf( __CLASS__ "Invalidate - delete 0x%lx (mCodeLineBuffer)\n", reinterpret_cast< uint64_t >( mCodeLineBuffer ) );
+            // printf( __CLASS__ "Invalidate - delete 0x%lx (mCodeLines)\n"     , reinterpret_cast< uint64_t >( mCodeLines      ) );
 
             // new ==> delete  See CodeLines_Generate
             delete[] mCodeLineBuffer;

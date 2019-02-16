@@ -29,14 +29,18 @@
 #include "../Common/Constants.h"
 #include "../Common/TestLib/Test.h"
 
-// OpenCL
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define FLAG_DO_NOT_SLEEP           (0x00000001)
+#define FLAG_DO_NOT_START_GENERATOR (0x00000002)
+
+// OpenCL / CUDA
 /////////////////////////////////////////////////////////////////////////////
 
 #define EOL "\n"
 
 static const char * FUNCTION_FORWARD_0 =
-"#include <OpenNetK/Kernel.h>"                                                       EOL
-                                                                                     EOL
 "OPEN_NET_FUNCTION_DECLARE( Forward0 )"                                              EOL
 "{"                                                                                  EOL
 "    OPEN_NET_FUNCTION_BEGIN"                                                        EOL
@@ -47,8 +51,6 @@ static const char * FUNCTION_FORWARD_0 =
 "}"                                                                                  EOL;
 
 static const char * FUNCTION_FORWARD_1 =
-"#include <OpenNetK/Kernel.h>"                                                       EOL
-                                                                                     EOL
 "OPEN_NET_FUNCTION_DECLARE( Forward1 )"                                              EOL
 "{"                                                                                  EOL
 "    OPEN_NET_FUNCTION_BEGIN"                                                        EOL
@@ -59,8 +61,6 @@ static const char * FUNCTION_FORWARD_1 =
 "}"                                                                                  EOL;
 
 static const char * FUNCTION_NOTHING_0 =
-"#include <OpenNetK/Kernel.h>"                              EOL
-                                                            EOL
 "OPEN_NET_FUNCTION_DECLARE( Nothing0 )"                     EOL
 "{"                                                         EOL
 "    OPEN_NET_FUNCTION_BEGIN"                               EOL
@@ -71,8 +71,6 @@ static const char * FUNCTION_NOTHING_0 =
 "}"                                                         EOL;
 
 static const char * FUNCTION_NOTHING_1 =
-"#include <OpenNetK/Kernel.h>"                              EOL
-                                                            EOL
 "OPEN_NET_FUNCTION_DECLARE( Nothing1 )"                     EOL
 "{"                                                         EOL
 "    OPEN_NET_FUNCTION_BEGIN"                               EOL
@@ -83,8 +81,6 @@ static const char * FUNCTION_NOTHING_1 =
 "}"                                                         EOL;
 
 static const char * FUNCTION_REPLY_ON_ERROR_0 =
-"#include <OpenNetK/Kernel.h>"                                                  EOL
-                                                                                EOL
 "OPEN_NET_FUNCTION_DECLARE( ReplyOnError0 )"                                    EOL
 "{"                                                                             EOL
 "    OPEN_NET_FUNCTION_BEGIN"                                                   EOL
@@ -123,8 +119,6 @@ static const char * FUNCTION_REPLY_ON_ERROR_0 =
 "}"                                                                             EOL;
 
 static const char * FUNCTION_REPLY_ON_ERROR_1 =
-"#include <OpenNetK/Kernel.h>"                                                  EOL
-                                                                                EOL
 "OPEN_NET_FUNCTION_DECLARE( ReplyOnError1 )"                                    EOL
 "{"                                                                             EOL
 "    OPEN_NET_FUNCTION_BEGIN"                                                   EOL
@@ -351,7 +345,27 @@ namespace TestLib
         unsigned int lResult = InitAndPrepare();
         if (0 == lResult)
         {
-            lResult = Execute();
+            lResult = Execute( 0 );
+            if (0 == lResult)
+            {
+                DisplayAndWriteResult("Run");
+            }
+
+            Uninit();
+        }
+            
+        return lResult;
+    }
+
+    // Return
+    //      0  OK
+    //  Other  Error
+    unsigned int Test::StartStop()
+    {
+        unsigned int lResult = InitAndPrepare();
+        if (0 == lResult)
+        {
+            lResult = Execute( FLAG_DO_NOT_SLEEP | FLAG_DO_NOT_START_GENERATOR );
             if (0 == lResult)
             {
                 DisplayAndWriteResult("Run");
@@ -385,7 +399,7 @@ namespace TestLib
 
                 mConfig.mBandwidth_MiB_s = lCenter_MiB_s;
 
-                if (0 >= Execute())
+                if (0 >= Execute( 0 ))
                 {
                     if (lMin_MiB_s > (lCenter_MiB_s - 0.1)) { lResult = 0; break; }
                     lMin_MiB_s = lCenter_MiB_s;
@@ -437,7 +451,7 @@ namespace TestLib
 
                 mConfig.mBufferQty = lCenter;
 
-                if (0 >= Execute())
+                if (0 >= Execute( 0 ))
                 {
                     if (lMax == lCenter) { lResult = 0;  break; }
                     lMax = lCenter;
@@ -486,7 +500,7 @@ namespace TestLib
 
                 mConfig.mPacketSize_byte = lCenter_byte;
 
-                if (0 >= Execute())
+                if (0 >= Execute( 0 ))
                 {
                     if (lMax_byte == lCenter_byte) { lResult = 0; break; }
                     lMax_byte = lCenter_byte;
@@ -536,7 +550,7 @@ namespace TestLib
             {
                 printf("Verify  %.1f MiB / s\n", mConfig.mBandwidth_MiB_s);
 
-                lResult = Execute();
+                lResult = Execute( 0 );
                 if (0 >= lResult)
                 {
                     lCount++;
@@ -573,7 +587,7 @@ namespace TestLib
             {
                 printf("Verify  %u buffers\n", mConfig.mBufferQty);
 
-                lResult = Execute();
+                lResult = Execute( 0 );
                 if (0 >= lResult)
                 {
                     lCount++;
@@ -610,7 +624,7 @@ namespace TestLib
             {
                 printf("Verify  %u bytes / packet\n", mConfig.mPacketSize_byte);
 
-                lResult = Execute();
+                lResult = Execute( 0 );
                 if (0 >= lResult)
                 {
                     lCount++;
@@ -869,10 +883,12 @@ namespace TestLib
         mConstraints[ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_RESET].mMax = 0xffffffff;
     }
 
+    // aFlags  See FLAG_
+    //
     // Return
     //      0  OK
     //  Ohter  Error
-    unsigned int Test::Start()
+    unsigned int Test::Start( unsigned int aFlags )
     {
         assert(            1 <= mGeneratorCount);
         assert(GENERATOR_QTY >= mGeneratorCount);
@@ -881,7 +897,7 @@ namespace TestLib
         ConfigAdapters  ();
         ConfigGenerators();
 
-        OpenNet::Status lStatus = mSystem->Start(OpenNet::System::START_FLAG_LOOPBACK);
+        OpenNet::Status lStatus = mSystem->Start( OpenNet::System::START_FLAG_LOOPBACK );
         if (OpenNet::STATUS_OK != lStatus)
         {
             OpenNet::Kernel * lKernel = mSystem->Kernel_Get(0);
@@ -903,12 +919,15 @@ namespace TestLib
             Sleep(100);
         #endif
 
-        for (unsigned int i = 0; i < mGeneratorCount; i++)
+        if ( 0 == ( aFlags && FLAG_DO_NOT_START_GENERATOR ) )
         {
-            assert(NULL != mGenerators[i]);
+            for (unsigned int i = 0; i < mGeneratorCount; i++)
+            {
+                assert(NULL != mGenerators[i]);
 
-            lStatus = mGenerators[i]->Start();
-            assert(OpenNet::STATUS_OK == lStatus);
+                lStatus = mGenerators[i]->Start();
+                assert(OpenNet::STATUS_OK == lStatus);
+            }
         }
 
         #ifdef _KMS_LINUX_
@@ -1118,22 +1137,27 @@ namespace TestLib
         WriteResult  (aNote);
     }
 
+    // aFlags  See FLAG_...
+    //
     // Return
     //      0  OK
     //  Ohter  Error
-    unsigned int Test::Execute()
+    unsigned int Test::Execute( unsigned int aFlags )
     {
-        unsigned int lResult = Start();
+        unsigned int lResult = Start( aFlags );
         if (0 == lResult)
         {
-            #ifdef _KMS_LINUX_
-                int lRet = sleep(1);
-                assert(0 == lRet);
-            #endif
+            if ( 0 == ( aFlags & FLAG_DO_NOT_SLEEP ) )
+            {
+                #ifdef _KMS_LINUX_
+                    int lRet = sleep(1);
+                    assert(0 == lRet);
+                #endif
             
-            #ifdef _KMS_WINDOWS_
-                Sleep(1000);
-            #endif
+                #ifdef _KMS_WINDOWS_
+                    Sleep(1000);
+                #endif
+            }
 
             lResult = Stop();
         }
@@ -1284,8 +1308,14 @@ namespace TestLib
         assert(NULL != aCode    );
         assert(NULL != aName    );
 
-        OpenNet::Status lStatus = aFunction->SetCode(aCode, static_cast<unsigned int>(strlen(aCode)));
-        assert(OpenNet::STATUS_OK == lStatus);
+        OpenNet::Status lStatus = aFunction->SetCode(aCode, static_cast<unsigned int>(strlen(aCode)), 1 );
+        if ( OpenNet::STATUS_OK != lStatus )
+        {
+            printf( "%s - OpenNet::Function::SetCode( ,  ) failed - ", __FUNCTION__ );
+            OpenNet::Status_Display( lStatus, stdout );
+            printf( "\n" );
+            return;
+        }
 
         lStatus = aFunction->SetFunctionName(aName);
         assert(OpenNet::STATUS_OK == lStatus);

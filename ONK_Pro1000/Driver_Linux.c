@@ -30,7 +30,7 @@ static struct pci_device_id ID_TABLE[] =
 
 MODULE_DEVICE_TABLE( pci, ID_TABLE );
 
-#define NAME "ONL_Pro1000"
+#define NAME "ONK_Pro1000"
 
 // Data type
 /////////////////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ static DriverContext sThis;
 // Return  The instance address
 void * Driver_FindDevice( unsigned char aMinor )
 {
-    printk( KERN_INFO "%s( %u )\n", __FUNCTION__, aMinor );
+    // printk( KERN_DEBUG "%s( %u )\n", __FUNCTION__, aMinor );
 
     return sThis.mDevices[ aMinor - MINOR( sThis.mDevice ) ].mDevice;
 }
@@ -94,7 +94,7 @@ void * Driver_FindDevice( unsigned char aMinor )
 
 char * DevNode( struct device * aDev, umode_t * aMode )
 {
-    printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );
+    // printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );
 
     if ( NULL != aMode )
     {
@@ -106,7 +106,7 @@ char * DevNode( struct device * aDev, umode_t * aMode )
 
 void Exit()
 {
-    printk( KERN_INFO "%s()\n", __FUNCTION__ );
+    // printk( KERN_DEBUG "%s()\n", __FUNCTION__ );
 
     // pci_register_driver ==> pci_unregister_driver  See Init
     pci_unregister_driver( & sPciDriver );
@@ -122,7 +122,7 @@ int Init()
 {
     int lRet;
 
-    printk( KERN_INFO "%s()\n", __FUNCTION__ );
+    // printk( KERN_DEBUG "%s()\n", __FUNCTION__ );
 
     sThis.mDeviceCount = 0;
 
@@ -168,13 +168,14 @@ module_exit( Exit );
 
 int Probe( struct pci_dev * aDev, const struct pci_device_id * aId )
 {
-    printk( KERN_INFO "%s( ,  )\n", __FUNCTION__ );
+    // printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );
 
     sThis.mDevices[ sThis.mDeviceCount ].mDevice = Device_Create( aDev, MAJOR( sThis.mDevice ), MINOR( sThis.mDevice ) + sThis.mDeviceCount, sThis.mDeviceCount, sThis.mClass );
     sThis.mDevices[ sThis.mDeviceCount ].mPciDev =                aDev;
 
     if ( NULL == sThis.mDevices[ sThis.mDeviceCount ].mDevice )
     {
+        printk( KERN_ERR "%s - Device_Create( , , , ,  ) failed\n", __FUNCTION__ );
         return ( - __LINE__ );
     }
 
@@ -187,7 +188,7 @@ static void Remove( struct pci_dev * aDev )
 {
     unsigned int i;
 
-    printk( KERN_INFO "%s(  )\n", __FUNCTION__ );
+    // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
 
     for ( i = 0; i < sThis.mDeviceCount; i ++ )
     {

@@ -9,6 +9,10 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+// ===== VIDIA ==============================================================
+#include <cuda.h>
+#include <nvrtc.h>
+
 // ===== OpenNet ============================================================
 #include "Processor_Internal.h"
 
@@ -22,6 +26,10 @@ public:
 
     Processor_CUDA( int aDevice, KmsLib::DebugLog * aDebugLog );
 
+    Buffer_Data * Buffer_Allocate(unsigned int aPacketSize_byte, OpenNetK::Buffer * aBuffer);
+
+    CUmodule Module_Create(OpenNet::Kernel * aKernel);
+
     // ====== Processor_Internal ============================================
 
     virtual Thread_Functions * Thread_Get();
@@ -31,10 +39,15 @@ public:
     virtual ~Processor_CUDA();
 
     virtual void          * GetContext ();
-    virtual void          * GetDeviceId();
+    virtual void          * GetDevice  ();
 
 private:
 
     void InitInfo();
+
+    nvrtcProgram Program_CreateAndCompile( OpenNet::Kernel * aKernel );
+
+    CUcontext mContext;
+    CUdevice  mDevice ;
 
 };
