@@ -52,6 +52,10 @@ protected:
 
     virtual ~Thread();
 
+    // CRITICAL PATH  Buffer-
+    // Thread         Worker
+    //
+    // Processing_Queue ==> Processing_Wait
     virtual void Processing_Queue(unsigned int aIndex) = 0;
     virtual void Processing_Wait (unsigned int aIndex) = 0;
 
@@ -61,6 +65,7 @@ protected:
 
     virtual void Run_Loop () = 0;
     virtual void Run_Start() = 0;
+    virtual void Run_Wait ();
 
     // ===== KmsLib::ThreadBase =============================================
 
@@ -73,7 +78,5 @@ protected:
     Processor_Internal * mProcessor   ;
 
 private:
-
-    void Run_Wait();
 
 };

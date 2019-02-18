@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Import/Includes ====================================================
+#include <KmsLib/ThreadBase.h>
 #include <KmsTest.h>
 
 // ===== Includes/OpenNet ===================================================
@@ -16,9 +17,55 @@
 // ===== OpenNet_Test =======================================================
 #include "Base.h"
 #include "SetupA.h"
+#include "SetupC.h"
+
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+static const uint8_t PACKET[ 64 ] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0a };
 
 // Tests
 /////////////////////////////////////////////////////////////////////////////
+
+KMS_TEST_BEGIN( System_1Packet )
+{
+    SetupC lSetup( 2 );
+
+    KMS_TEST_COMPARE_RETURN( 0, lSetup.Init() );
+    KMS_TEST_COMPARE_RETURN( 0, lSetup.Start( OpenNet::System::START_FLAG_LOOPBACK ) );
+
+    unsigned int i;
+
+    for ( i = 0; i < 28; i ++ )
+    {
+        printf( "Sending packet %u\n", i );
+
+        KmsLib::ThreadBase::Sleep_ms( 500 );
+
+        lSetup.mAdapters[ 1 ]->Packet_Send( PACKET, sizeof( PACKET ) );
+
+        KmsLib::ThreadBase::Sleep_ms( 500 );
+    }
+
+    for ( ; i < 36; i ++ )
+    {
+        printf( "Sending packet %u\n", i );
+
+        KmsLib::ThreadBase::Sleep_ms( 1000 );
+
+        lSetup.mAdapters[ 1 ]->Packet_Send( PACKET, sizeof( PACKET ) );
+
+        KmsLib::ThreadBase::Sleep_ms( 1000 );
+    }
+
+
+    KmsLib::ThreadBase::Sleep_ms( 30000 );
+
+    printf( "Stopping\n" );
+
+    KMS_TEST_COMPARE_RETURN( 0, lSetup.Stop() );
+}
+KMS_TEST_END
 
 KMS_TEST_BEGIN(System_Base)
 {
@@ -26,7 +73,7 @@ KMS_TEST_BEGIN(System_Base)
 
     KMS_TEST_COMPARE_RETURN(0, lSetup.Init());
 
-/*    OpenNet::System::Config   lC0;
+    OpenNet::System::Config   lC0;
     OpenNet::System::Config * lCNP = NULL;
 
     memset(&lC0, 0, sizeof(lC0));
@@ -70,7 +117,7 @@ KMS_TEST_BEGIN(System_Base)
 
     lC0.mPacketSize_byte--;
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem->SetConfig(lC0)); */
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSetup.mSystem->SetConfig(lC0));
 }
 KMS_TEST_END
 

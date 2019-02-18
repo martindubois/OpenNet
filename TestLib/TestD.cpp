@@ -114,12 +114,12 @@ unsigned int TestD::Init()
     return lResult;
 }
 
-unsigned int TestD::Start()
+unsigned int TestD::Start( unsigned int aFlags )
 {
     SetBufferQty(0, GetConfig()->mBufferQty);
     SetBufferQty(1, GetConfig()->mBufferQty);
 
-    return Test::Start();
+    return Test::Start( aFlags );
 }
 
 unsigned int TestD::Stop()

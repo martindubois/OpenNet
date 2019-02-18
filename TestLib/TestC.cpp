@@ -97,11 +97,11 @@ unsigned int TestC::Init()
     return lResult;
 }
 
-unsigned int TestC::Start()
+unsigned int TestC::Start( unsigned int aFlags )
 {
     SetBufferQty(0, GetConfig()->mBufferQty);
 
-    return Test::Start();
+    return Test::Start( aFlags );
 }
 
 unsigned int TestC::Stop()

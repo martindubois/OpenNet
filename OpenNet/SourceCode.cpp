@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/SourceCode.cpp
 
+#define __CLASS__ "SourceCode::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +41,7 @@ namespace OpenNet
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    SourceCode::SourceCode() : mCode(NULL), mCodeSize_byte(0)
+    SourceCode::SourceCode() : mArgumentCount( 1 ), mCode(NULL), mCodeSize_byte(0)
     {
         memset(&mName, 0, sizeof(mName));
     }
@@ -48,7 +50,9 @@ namespace OpenNet
     {
         if (NULL != mCode)
         {
-            delete mCode;
+            // printf( __CLASS__ "~SourceCode - delete [] 0x%lx (mCode)\n", reinterpret_cast< uint64_t >( mCode ) );
+
+            delete [] mCode;
         }
     }
 
@@ -69,6 +73,8 @@ namespace OpenNet
 
         memcpy(lNewCode                 , mCode, mCodeSize_byte);
         memcpy(lNewCode + mCodeSize_byte, aCode, aCodeSize_byte);
+
+        // printf( __CLASS__ "AppendCode - delete [] 0x%lx (mCode)\n", reinterpret_cast< uint64_t >( mCode ) );
 
         delete[] mCode;
 
@@ -120,14 +126,23 @@ namespace OpenNet
     // NOT TESTED  OpenNet.Filter.ErrorHandling
     //             CloseHandle fail<br>
     //             ReadInputFile fail
-    Status SourceCode::SetCode(const char * aFileName)
+    Status SourceCode::SetCode(const char * aFileName, unsigned int aArgCount )
     {
+        assert( 1 <= mArgumentCount );
+
         if (NULL != mCode)
         {
             return STATUS_CODE_ALREADY_SET;
         }
 
+        if ( 1 > aArgCount )
+        {
+            return STATUS_INVALID_ARGUMENT_COUNT;
+        }
+
         assert(0 == mCodeSize_byte);
+
+        mArgumentCount = aArgCount;
 
         #ifdef _KMS_LINUX_
 
@@ -170,8 +185,10 @@ namespace OpenNet
         #endif
     }
 
-    Status SourceCode::SetCode(const char * aCode, unsigned int aSize_byte)
+    Status SourceCode::SetCode(const char * aCode, unsigned int aSize_byte, unsigned int aArgCount )
     {
+        assert( 1 <= mArgumentCount );
+
         if (NULL == aCode)
         {
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
@@ -182,10 +199,19 @@ namespace OpenNet
             return STATUS_EMPTY_CODE;
         }
 
+        if ( 1 > aArgCount )
+        {
+            return STATUS_INVALID_ARGUMENT_COUNT;
+        }
+
         if (NULL != mCode)
         {
             return STATUS_CODE_ALREADY_SET;
         }
+
+        assert( 0 == mCodeSize_byte );
+
+        mArgumentCount = aArgCount;
 
         mCode = Allocate(aSize_byte + 1);
         assert(NULL != mCode);
@@ -223,8 +249,9 @@ namespace OpenNet
             fprintf(aOut, "      Code not set\n");
         }
 
-        fprintf(aOut, "      Code Size = %u bytes\n", mCodeSize_byte);
-        fprintf(aOut, "      Name      = %s\n"      , mName         );
+        fprintf(aOut, "      Arg. Count = %u\n"      , mArgumentCount);
+        fprintf(aOut, "      Code Size  = %u bytes\n", mCodeSize_byte);
+        fprintf(aOut, "      Name       = %s\n"      , mName         );
 
         if (NULL != mCode)
         {
@@ -338,6 +365,13 @@ namespace OpenNet
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
+    unsigned int SourceCode::GetArgumentCount() const
+    {
+        assert( 1 <= mArgumentCount );
+
+        return mArgumentCount;
+    }
+
     const char * SourceCode::GetCode() const
     {
         return mCode;
@@ -407,7 +441,9 @@ namespace OpenNet
 
         strcat_s(lNewCode SIZE_INFO(mCodeSize_byte + 1), lSrc);
 
-        delete mCode;
+        // printf( __CLASS__ "Edit_Replace_ByLonger - delete [] 0x%lx (mCode)\n", reinterpret_cast< uint64_t >( mCode ) );
+
+        delete [] mCode;
         mCode = lNewCode;
 
         return lResult;
@@ -447,7 +483,9 @@ namespace OpenNet
         assert(NULL != mCode         );
         assert(   0 <  mCodeSize_byte);
 
-        delete mCode;
+        // printf( __CLASS__ "ReleaseCode - delete [] 0x%lx (mCode)\n", reinterpret_cast< uint64_t >( mCode ) );
+
+        delete [] mCode;
 
         mCode          = NULL;
         mCodeSize_byte =    0;

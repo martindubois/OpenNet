@@ -10,7 +10,7 @@ echo Excuting  Import.sh  ...
 
 # ===== Dependencies =========================================================
 
-KMS_BASE=~/Export/KmsBase/3.0.4_KI_Linux
+KMS_BASE=~/Export/KmsBase/3.0.6_KI_Linux
 
 # ===== Constants ============================================================
 

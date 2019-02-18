@@ -155,6 +155,7 @@ static void Test_SetCode      (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Test_SetMode      (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Test_SetPacketSize(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Test_SetProfiling (KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Test_StartStop    (KmsLib::ToolBase * aToolBase, const char * aArg);
 
 static const KmsLib::ToolBase::CommandInfo TEST_COMMANDS[] =
 {
@@ -170,6 +171,7 @@ static const KmsLib::ToolBase::CommandInfo TEST_COMMANDS[] =
     { "SetPacketSize", Test_SetPacketSize, "SetPacketSize {PacketSize_byte}"                          , NULL },
     { "SetProfiling" , Test_SetProfiling , "SetProfiling false|true"                                  , NULL },
     { "Verify"       , NULL              , "Verify {TestName}"                                        , TEST_VERIFY_COMMANDS },
+    { "StartStop"    , Test_StartStop    , "StatStop {TestName}"                                      , NULL },
 
 	{ NULL, NULL, NULL, NULL }
 };
@@ -862,7 +864,7 @@ void Kernel_SetCode(KmsLib::ToolBase * aToolBase, const char * aArg)
             return;
         }
 
-        ReportStatus(sKernel->SetCode(lFileName), "Code set");
+        ReportStatus(sKernel->SetCode(lFileName, 1 ), "Code set");
         break;
 
     default:
@@ -926,7 +928,7 @@ void Processor_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
 		}
 
         sProcessor = sSystem->Processor_Get(lIndex);
-		assert(NULL != sAdapter);
+		assert(NULL != sProcessor );
 
 		KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Processor selected");
 		break;
@@ -1125,6 +1127,26 @@ void Test_SetProfiling(KmsLib::ToolBase * aToolBase, const char * aArg)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Test profiling set");
     }
+}
+
+void Test_StartStop( KmsLib::ToolBase * aToolBase, const char * aArg )
+{
+    assert(NULL != aArg);
+
+    printf("Test StartStup %s\n", aArg);
+
+    TestLib::Test * lTest = sTestFactory.CreateTest(aArg);
+    if (NULL != lTest)
+    {
+        unsigned int lRet = lTest->StartStop();
+        if (0 == lRet)
+        {
+            KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "PASSED");
+        }
+
+        delete lTest;
+    }
+
 }
 
 void Test_Verify_Bandwidth(KmsLib::ToolBase * aToolBase, const char * aArg)

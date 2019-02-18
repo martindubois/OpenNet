@@ -85,9 +85,10 @@ static const StatusInfo STATUS_INFO[OpenNet::STATUS_QTY] =
     { "TOO_MANY_BUFFER"           , "Too many buffer allocated"         },
 
     // ===== 0.0.7 ==========================================================
-    { "ADAPTER_NOT_SET" , "The adapter is not set" },
-    { "INVALID_OFFSET"  , "Invalid offset"         },
-    { "INVALID_PROTOCOL", "Invalid protocol"       },
+    { "ADAPTER_NOT_SET"       , "The adapter is not set" },
+    { "INVALID_ARGUMENT_COUNT", "Invalid argument count" },
+    { "INVALID_OFFSET"        , "Invalid offset"         },
+    { "INVALID_PROTOCOL"      , "Invalid protocol"       },
 };
 
 namespace OpenNet

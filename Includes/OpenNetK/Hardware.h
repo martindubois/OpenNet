@@ -153,15 +153,12 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Enter the D0 state
-        /// \retval false Error
         /// \endcond
         /// \cond fr
         /// \brief  Entrer dans l'etat D0
-        /// \retval false Erreur
         /// \endcond
-        /// \retval true  OK
         /// \note   Level = Thread, Thread = Initialisation
-        virtual bool D0_Entry();
+        virtual void D0_Entry();
 
         /// \cond en
         /// \brief  Exit the D0 state
@@ -272,6 +269,17 @@ namespace OpenNetK
         /// \endcond
         virtual void Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty);
 
+        /// \cond en
+        /// \brief  Add a buffer to the receiving queue.
+        /// \retval false  No available buffer
+        /// \endcond
+        /// \cond fr
+        /// \brief  Ajoute un buffer a la queue de reception
+        /// \retval false  Pas d'espace memoire disponible
+        /// \endcond
+        /// \retval true OK
+        virtual bool Packet_Drop() = 0;
+
         // TODO  OpenNetK.Adapter
         //       Pass the aCounter to Lock rather than at
         //       Packet_Receive_NoLock and Unlock_AfterSend and do not pass
@@ -291,7 +299,6 @@ namespace OpenNetK
         /// \param  aPacketData [-K-;RW-] Le Packet
         /// \param  aPacketInfo [-K-;-W-] Le OpenNet_PacketInfo
         /// \param  aCounter    [-K-;RW-] Le compteur d'operation
-        /// \retval false  Erreur
         /// \endcond
         virtual void Packet_Receive_NoLock(uint64_t aLogicalAddress, Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter) = 0;
 

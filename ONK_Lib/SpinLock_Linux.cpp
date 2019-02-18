@@ -19,8 +19,10 @@ namespace OpenNetK
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    SpinLock_Linux::SpinLock_Linux()
+    SpinLock_Linux::SpinLock_Linux( OpenNetK_OSDep * aOSDep, void * aLock ) : mLock( aLock ), mOSDep( aOSDep )
     {
+        ASSERT( NULL != aOSDep );
+        ASSERT( NULL != aLock  );
     }
 
     // ===== SpinLock =======================================================
@@ -28,11 +30,21 @@ namespace OpenNetK
     // CRITICAL PATH - Buffer
     void SpinLock_Linux::Lock()
     {
+        ASSERT( NULL != mLock                );
+        ASSERT( NULL != mOSDep               );
+        ASSERT( NULL != mOSDep->LockSpinlock );
+
+        mOSDep->LockSpinlock( mLock );
     }
 
     // CRITICAL PATH - Buffer
     void SpinLock_Linux::Unlock()
     {
+        ASSERT( NULL != mLock                  );
+        ASSERT( NULL != mOSDep                 );
+        ASSERT( NULL != mOSDep->UnlockSpinlock );
+
+        mOSDep->UnlockSpinlock( mLock );
     }
 
 };

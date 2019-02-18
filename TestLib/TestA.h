@@ -30,7 +30,7 @@ protected:
 
     // ===== TestLib::Test ==================================================
     virtual unsigned int Init ();
-    virtual unsigned int Start();
+    virtual unsigned int Start( unsigned int aFlags );
     virtual unsigned int Stop ();
 
 };

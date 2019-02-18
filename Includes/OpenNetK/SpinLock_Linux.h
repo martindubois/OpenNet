@@ -12,6 +12,11 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
+extern "C"
+{
+    #include <OpenNetK/OSDep.h>
+}
+
 #include <OpenNetK/SpinLock.h>
 
 namespace OpenNetK
@@ -33,11 +38,15 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Constructor
+        /// \param  aOSDep
+        /// \param  aLock
         /// \endcond
         /// \cond fr
         /// \brief  Constructeur
+        /// \param  aOSDep
+        /// \param  aLock
         /// \endcond
-        SpinLock_Linux();
+        SpinLock_Linux( OpenNetK_OSDep * aOSDep, void * aLock );
 
         // ===== SpinLock ===================================================
         virtual void Lock  ();
@@ -45,6 +54,8 @@ namespace OpenNetK
 
     private:
 
+        void           * mLock ;
+        OpenNetK_OSDep * mOSDep;
 
     };
 

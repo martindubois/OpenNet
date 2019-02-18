@@ -116,10 +116,7 @@ namespace OpenNetK
 
         (void)(aPreviousState);
 
-        if (!mHardware->D0_Entry())
-        {
-            return STATUS_UNSUCCESSFUL;
-        }
+        mHardware->D0_Entry();
 
         BOOLEAN lRetB = WdfTimerStart(mTimer, 1000);
         ASSERT(!lRetB);

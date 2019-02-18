@@ -6,9 +6,11 @@
 
 -include ../KernelCppFlags.mk
 
+EXTRA_CFLAGS := -I$(src)/../Includes -I/home/mdubois/NVIDIA-Linux-x86_64-410.93/kernel/nvidia
+
 obj-m += ONK_Pro1000.o
 
-ONK_Pro1000-objs := Device_Linux.o DeviceCpp.o Driver_Linux.o Pro1000.o ../Libraries/ONK_Lib.a
+ONK_Pro1000-objs := Device_Linux.o DeviceCpp.o Driver_Linux.o NvBuffer.o Pro1000.o ../Libraries/ONK_Lib.a
 list-multi := ONK_Pro1000.o
 
 # ===== Rules ===============================================================

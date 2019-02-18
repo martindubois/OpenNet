@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/PacketGenerator.cpp
 
+#define __CLASS__ "PacketGenerator::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -34,6 +36,7 @@ namespace OpenNet
 
         try
         {
+            // new ==> delete  See Delete
             lResult = new PacketGenerator_Internal();
         }
         catch (...)
@@ -50,10 +53,14 @@ namespace OpenNet
     {
         try
         {
+            // printf( __CLASS__ "~Delete - delete 0x%lx (this)\n", reinterpret_cast< uint64_t >( this ) );
+
+            // new ==> delete  See Create
             delete this;
         }
         catch (...)
         {
+            printf( __CLASS__ "~Delete - Exception\n" );
         }
     }
 

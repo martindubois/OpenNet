@@ -7,6 +7,9 @@
 // REQUIREMENT  ONK_X.InterruptRateLimitation
 //              The adapter driver limit the interruption rate.
 
+#define __CLASS__     "Pro1000::"
+#define __NAMESPACE__ ""
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -33,7 +36,12 @@
 
 Pro1000::Pro1000()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_CONSTRUCTOR, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
+
+    ASSERT( 0x0e02c == sizeof( Pro1000_BAR1          ) );
+    ASSERT(       4 == sizeof( Pro1000_DeviceControl ) );
+    ASSERT(      16 == sizeof( Pro1000_Rx_Descriptor ) );
+    ASSERT(      16 == sizeof( Pro1000_Tx_Descriptor ) );
 
     mConfig.mPacketSize_byte = PACKET_SIZE_byte;
 
@@ -51,7 +59,7 @@ Pro1000::Pro1000()
     strcpy(mInfo.mVersion_Driver  .mComment, "ONK_Pro1000");
     strcpy(mInfo.mVersion_Hardware.mComment, "Intel Gigabit ET Dual Port Server Adapter");
 
-    memset((void *)(&mTx_PacketBuffer_Counter), 0, sizeof(mTx_PacketBuffer_Counter)); // volatile_cast
+    memset((void *)(&mPacketBuffer_Counter), 0, sizeof(mPacketBuffer_Counter)); // volatile_cast
 }
 
 // Protected
@@ -61,7 +69,7 @@ Pro1000::Pro1000()
 
 void Pro1000::GetState(OpenNetK::Adapter_State * aState)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    // TRACE_DEBUG "%s( 0x%px )" DEBUG_EOL, __FUNCTION__, aState TRACE_END;
 
     ASSERT(NULL != aState);
 
@@ -74,15 +82,20 @@ void Pro1000::GetState(OpenNetK::Adapter_State * aState)
 
         ASSERT(NULL != mBAR1);
 
-        aState->mFlags.mFullDuplex = mBAR1->mDeviceStatus.mFields.mFullDuplex;
-        aState->mFlags.mLinkUp     = mBAR1->mDeviceStatus.mFields.mLinkUp    ;
-        aState->mFlags.mTx_Off     = mBAR1->mDeviceStatus.mFields.mTx_Off    ;
+        Pro1000_DeviceStatus lDeviceStatus;
+
+        lDeviceStatus.mValue = mBAR1->mDeviceStatus.mValue;
+        // TRACE_DEBUG "%s - STATUS = 0x%08x" DEBUG_EOL, __FUNCTION__, lDeviceStatus.mValue TRACE_END;
+
+        aState->mFlags.mFullDuplex = lDeviceStatus.mFields.mFullDuplex;
+        aState->mFlags.mLinkUp     = lDeviceStatus.mFields.mLinkUp    ;
+        aState->mFlags.mTx_Off     = lDeviceStatus.mFields.mTx_Off    ;
 
         // TODO  ONK_Pro1000.Pro1000
         //       High (Feature) - Comprendre pourquoi la vitesse n'est pas
         //       indique correctement.
 
-        switch (mBAR1->mDeviceStatus.mFields.mSpeed)
+        switch (lDeviceStatus.mFields.mSpeed)
         {
         case 0x0: aState->mSpeed_MB_s =  10; break;
         case 0x1: aState->mSpeed_MB_s = 100; break;
@@ -96,12 +109,16 @@ void Pro1000::GetState(OpenNetK::Adapter_State * aState)
             ASSERT(false);
         }
 
+        // TRACE_DEBUG "%s - EICR = 0x%08x" DEBUG_EOL, __FUNCTION__, reinterpret_cast< volatile uint32_t * >( mBAR1 )[ 0x01580 / 4 ] TRACE_END;
+        // TRACE_DEBUG "%s - RWS  = 0x%08x" DEBUG_EOL, __FUNCTION__, reinterpret_cast< volatile uint32_t * >( mBAR1 )[ 0x01048 / 4 ] TRACE_END;
+        // TRACE_DEBUG "%s - ICR  = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mInterruptCauseRead.mValue                               TRACE_END;
+
     mZone0->Unlock();
 }
 
 void Pro1000::ResetMemory()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
     Hardware::ResetMemory();
 
@@ -114,7 +131,7 @@ void Pro1000::ResetMemory()
 
 void Pro1000::SetCommonBuffer(uint64_t aLogical, void * aVirtual)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
+    // TRACE_DEBUG "%s( 0x%llx, 0x%px )" DEBUG_EOL, __FUNCTION__, aLogical, aVirtual TRACE_END;
 
     ASSERT(NULL != aVirtual);
 
@@ -141,9 +158,9 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, void * aVirtual)
 
         for (i = 0; i < PACKET_BUFFER_QTY; i++)
         {
-            SkipDangerousBoundary(&lLogical, &lVirtual, mConfig.mPacketSize_byte, mTx_PacketBuffer_Logical + i, reinterpret_cast<uint8_t **>(mTx_PacketBuffer_Virtual + i));
+            SkipDangerousBoundary(&lLogical, &lVirtual, mConfig.mPacketSize_byte, mPacketBuffer_Logical + i, reinterpret_cast<uint8_t **>(mPacketBuffer_Virtual + i));
 
-            ASSERT(NULL != mTx_PacketBuffer_Virtual[i]);
+            ASSERT(NULL != mPacketBuffer_Virtual[i]);
         }
 
         for (i = 0; i < TX_DESCRIPTOR_QTY; i++)
@@ -160,7 +177,7 @@ void Pro1000::SetCommonBuffer(uint64_t aLogical, void * aVirtual)
 //             Memory 0 too small
 bool Pro1000::SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize_byte)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( %u, , %u bytes )" DEBUG_EOL, aIndex, aSize_byte);
+    // TRACE_DEBUG "%s( %u, 0x%px, %u bytes )" DEBUG_EOL, __FUNCTION__, aIndex, aVirtual, aSize_byte TRACE_END;
 
     ASSERT(NULL != aVirtual  );
     ASSERT(   0 <  aSize_byte);
@@ -195,9 +212,9 @@ bool Pro1000::SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize
     return Hardware::SetMemory(aIndex, aVirtual, aSize_byte);
 }
 
-bool Pro1000::D0_Entry()
+void Pro1000::D0_Entry()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
     ASSERT(NULL != mBAR1 );
     ASSERT(NULL != mZone0);
@@ -212,14 +229,22 @@ bool Pro1000::D0_Entry()
 
         memset(&mTx_Counter, 0, sizeof(mTx_Counter));
 
-        mTx_PacketBuffer_In = 0;
+        mPacketBuffer_In = 0;
 
         Reset_Zone0();
 
-        mBAR1->mDeviceControl.mFields.mInvertLossOfSignal   = false;
-        // mBAR1->mDeviceControl.mFields.mRx_FlowControlEnable = true ;
-        mBAR1->mDeviceControl.mFields.mSetLinkUp            = true ;
-        // mBAR1->mDeviceControl.mFields.mTx_FlowControlEnable = true ;
+        Pro1000_DeviceControl lCTRL;
+
+        lCTRL.mValue = mBAR1->mDeviceControl.mValue;
+        // TRACE_DEBUG "%s - CTRL (Initial)  = 0x%08x" DEBUG_EOL, __FUNCTION__, lCTRL.mValue TRACE_END;
+
+        lCTRL.mFields.mInvertLossOfSignal   = false;
+        // lCTRL.mFields.mRx_FlowControlEnable = true ;
+        lCTRL.mFields.mSetLinkUp            = true ;
+        // lCTRL.mFields.mTx_FlowControlEnable = true ;
+
+        // TRACE_DEBUG "%s - CTRL (Modified) = 0x%08x" DEBUG_EOL, __FUNCTION__, lCTRL.mValue TRACE_END;
+        mBAR1->mDeviceControl.mValue = lCTRL.mValue;
 
         mBAR1->mGeneralPurposeInterruptEnable.mFields.mExtendedInterruptAutoMaskEnable = true;
 
@@ -245,12 +270,12 @@ bool Pro1000::D0_Entry()
 
     mZone0->Unlock();
 
-    return Hardware::D0_Entry();
+    Hardware::D0_Entry();
 }
 
 bool Pro1000::D0_Exit()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
     Interrupt_Disable();
 
@@ -259,7 +284,7 @@ bool Pro1000::D0_Exit()
 
 void Pro1000::Interrupt_Disable()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
     ASSERT(NULL != mZone0);
 
@@ -274,7 +299,7 @@ void Pro1000::Interrupt_Disable()
 
 void Pro1000::Interrupt_Enable()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
     ASSERT(NULL != mBAR1 );
     ASSERT(NULL != mZone0);
@@ -292,6 +317,8 @@ void Pro1000::Interrupt_Enable()
 // CRITICAL PATH
 bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing)
 {
+    // TRACE_DEBUG "%s( %u, 0x%px )" DEBUG_EOL, __FUNCTION__, aMessageId, aNeedMoreProcessing TRACE_END;
+
     ASSERT(NULL != aNeedMoreProcessing);
 
     ASSERT(NULL != mBAR1);
@@ -313,7 +340,7 @@ bool Pro1000::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcess
 // CRITICAL PATH
 void Pro1000::Interrupt_Process2(bool * aNeedMoreProcessing)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // TRACE_DEBUG "%s( 0x%p )" DEBUG_EOL, __FUNCTION__, aNeedMoreProcessing TRACE_END;
 
     ASSERT(NULL != aNeedMoreProcessing);
 
@@ -332,6 +359,8 @@ void Pro1000::Interrupt_Process2(bool * aNeedMoreProcessing)
 // CRITICAL PATH - Buffer
 void Pro1000::Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacketQty)
 {
+    // TRACE_DEBUG "%s( 0x%px, %u packets )" DEBUG_EOL, __FUNCTION__, aCounter, aPacketQty TRACE_END;
+
     ASSERT(NULL != aCounter  );
     ASSERT(0    <  aPacketQty);
 
@@ -345,7 +374,7 @@ void Pro1000::Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacket
     lReg.mValue         =      0;
     lReg.mFields.mValue = mRx_In;
 
-    mBAR1->mRx_DescriptorTail0.mFields.mValue = lReg.mValue; // Writing hardware !
+    mBAR1->mRx_DescriptorTail0.mValue = lReg.mValue; // Writing hardware !
 
     mStatistics[OpenNetK::HARDWARE_STATS_PACKET_RECEIVE] += aPacketQty;
 }
@@ -353,6 +382,8 @@ void Pro1000::Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacket
 // CRITICAL PATH - Buffer
 void Pro1000::Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty)
 {
+    // TRACE_DEBUG "%s( 0x%px, %u packets )" DEBUG_EOL, __FUNCTION__, aCounter, aPacketQty TRACE_END;
+
     ASSERT(NULL              != mBAR1 );
     ASSERT(RX_DESCRIPTOR_QTY >  mTx_In);
 
@@ -365,16 +396,48 @@ void Pro1000::Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty
         lReg.mValue         =      0;
         lReg.mFields.mValue = mTx_In;
 
-        mBAR1->mTx_DescriptorTail0.mFields.mValue = lReg.mValue; // Writing hardware !
+        // TRACE_DEBUG "%s - TDT (Write) = 0x%08x" DEBUG_EOL, __FUNCTION__, lReg.mValue TRACE_END;
+        mBAR1->mTx_DescriptorTail0.mValue = lReg.mValue; // Writing hardware !
+
+        // TRACE_DEBUG "%s - TDT (Read)  = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mTx_DescriptorTail0.mFields.mValue TRACE_END;
 
         mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
     }
 }
 
+bool Pro1000::Packet_Drop()
+{
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
+
+    ASSERT( PACKET_BUFFER_QTY > mPacketBuffer_In );
+
+    bool lResult;
+
+    Lock();
+
+    lResult = ( ( 0 >= mPacketBuffer_Counter[ mPacketBuffer_In ] ) && ( Rx_GetAvailableDescriptor_Zone0() > 0 ) );
+    if ( lResult )
+    {
+        volatile long * lCounter = mPacketBuffer_Counter + mPacketBuffer_In;
+
+        Packet_Receive_NoLock( mPacketBuffer_Logical[ mPacketBuffer_In ], & mPacketData, & mPacketInfo, lCounter );
+
+        mPacketBuffer_In = (mPacketBuffer_In + 1) % PACKET_BUFFER_QTY;
+
+        Unlock_AfterReceive( lCounter, 1 );
+    }
+    else
+    {
+        Unlock();
+    }
+
+    return lResult;
+}
+
 // CRITICAL PATH - Packet
 void Pro1000::Packet_Receive_NoLock(uint64_t aData, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , , ,  )" DEBUG_EOL);
+    // TRACE_DEBUG "%s( 0x%llx, 0x%px, 0x%px, 0x%px )" DEBUG_EOL, __FUNCTION__, aData, aPacketData, aPacketInfo, aCounter TRACE_END;
 
     ASSERT(NULL != aPacketData);
     ASSERT(NULL != aPacketInfo);
@@ -399,7 +462,7 @@ void Pro1000::Packet_Receive_NoLock(uint64_t aData, OpenNetK::Packet * aPacketDa
 // CRITICAL PATH - Packet
 void Pro1000::Packet_Send_NoLock(uint64_t aLogicalAddress, const void *, unsigned int aSize_byte, volatile long * aCounter)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , , %u,  )" DEBUG_EOL, aSize_byte);
+    // TRACE_DEBUG "%s( 0x%llx, , %u bytes, 0x%px )" DEBUG_EOL, __FUNCTION__, aLogicalAddress, aSize_byte, aCounter TRACE_END;
 
     ASSERT(0    != aLogicalAddress);
     ASSERT(0    <  aSize_byte     );
@@ -419,7 +482,11 @@ void Pro1000::Packet_Send_NoLock(uint64_t aLogicalAddress, const void *, unsigne
 // CRITICAL PATH
 bool Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes,  )" DEBUG_EOL, aSize_byte);
+    // TRACE_DEBUG "%s( 0x%px, %u bytes, %u )" DEBUG_EOL, __FUNCTION__, aPacket, aSize_byte, aRepeatCount TRACE_END;
+
+    ASSERT( NULL != aPacket      );
+    ASSERT(    0 <  aSize_byte   );
+    ASSERT(    0 <  aRepeatCount );
 
     ASSERT(NULL != mBAR1      );
     ASSERT(NULL != mTx_Virtual);
@@ -429,23 +496,23 @@ bool Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigne
 
     Lock();
 
-    ASSERT(PACKET_BUFFER_QTY >  mTx_PacketBuffer_In                          );
-    ASSERT(NULL              != mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In]);
+    ASSERT(PACKET_BUFFER_QTY >  mPacketBuffer_In                       );
+    ASSERT(NULL              != mPacketBuffer_Virtual[mPacketBuffer_In]);
 
-    lResult = ((0 >= mTx_PacketBuffer_Counter[mTx_PacketBuffer_In]) && (Tx_GetAvailableDescriptor_Zone0() >= aRepeatCount));
+    lResult = ((0 >= mPacketBuffer_Counter[mPacketBuffer_In]) && (Tx_GetAvailableDescriptor_Zone0() >= aRepeatCount));
     if (lResult)
     {
-        memcpy(mTx_PacketBuffer_Virtual[mTx_PacketBuffer_In], aPacket, aSize_byte);
+        memcpy(mPacketBuffer_Virtual[mPacketBuffer_In], aPacket, aSize_byte);
 
-        volatile long * lCounter = mTx_PacketBuffer_Counter + mTx_PacketBuffer_In;
-        uint64_t lPacket_PA = mTx_PacketBuffer_Logical[mTx_PacketBuffer_In];
+        volatile long * lCounter = mPacketBuffer_Counter + mPacketBuffer_In;
+        uint64_t lPacket_PA = mPacketBuffer_Logical[mPacketBuffer_In];
 
         for (unsigned int i = 0; i < aRepeatCount; i++)
         {
             Packet_Send_NoLock(lPacket_PA, NULL, aSize_byte, lCounter);
         }
 
-        mTx_PacketBuffer_In = (mTx_PacketBuffer_In + 1) % PACKET_BUFFER_QTY;
+        mPacketBuffer_In = (mPacketBuffer_In + 1) % PACKET_BUFFER_QTY;
 
         Unlock_AfterSend(lCounter, aRepeatCount);
     }
@@ -459,7 +526,7 @@ bool Pro1000::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigne
 
 unsigned int Pro1000::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    // TRACE_DEBUG "%s( 0x%px, %u bytes, %s )" DEBUG_EOL, __FUNCTION__, aOut, aOutSize_byte, aReset ? "true" : "false" TRACE_END;
 
     Statistics_Update();
 
@@ -468,7 +535,7 @@ unsigned int Pro1000::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte
 
 void Pro1000::Statistics_Reset()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
     Statistics_Update();
 
@@ -480,6 +547,8 @@ void Pro1000::Statistics_Reset()
 
 void Pro1000::Interrupt_Disable_Zone0()
 {
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
+
     ASSERT(NULL != mBAR1);
 
     mBAR1->mInterruptMaskClear.mValue = 0xffffffff;
@@ -487,7 +556,7 @@ void Pro1000::Interrupt_Disable_Zone0()
 
 void Pro1000::Reset_Zone0()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
     ASSERT(NULL != mBAR1);
 
@@ -495,19 +564,24 @@ void Pro1000::Reset_Zone0()
 
     mBAR1->mDeviceControl.mFields.mReset = true;
 
-    while (mBAR1->mDeviceControl.mFields.mReset);
+    while (mBAR1->mDeviceControl.mFields.mReset)
+    {
+        // TRACE_DEBUG "%s - Waiting ..." DEBUG_EOL, __FUNCTION__ TRACE_END;
+    }
 
     Interrupt_Disable_Zone0();
 
     uint32_t lValue = mBAR1->mInterruptCauseRead.mValue;
     (void)(lValue);
+
+    // TRACE_DEBUG "%s - ICR = 0x%08x" DEBUG_EOL, __FUNCTION__, lValue TRACE_END;
 }
 
 // Level   Thread
 // Thread  Init
 void Pro1000::Rx_Config_Zone0()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
     ASSERT(NULL != mBAR1                   );
     ASSERT(   0 <  mConfig.mPacketSize_byte);
@@ -552,6 +626,12 @@ void Pro1000::Rx_Config_Zone0()
     mBAR1->mRx_DescriptorControl0.mFields.mQueueEnable        = true;
 
     mBAR1->mRx_Control.mFields.mEnable = true;
+
+    // TRACE_DEBUG "%s - RCTL              = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mRx_Control.mValue               TRACE_END;
+    // TRACE_DEBUG "%s - RDBAH             = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mRx_DescriptorBaseAddressHigh0   TRACE_END;
+    // TRACE_DEBUG "%s - RDBAL             = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mRx_DescriptorBaseAddressLow0    TRACE_END;
+    // TRACE_DEBUG "%s - RDLEN             = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mRx_DescriptorRingLength0.mValue TRACE_END;
+    // TRACE_DEBUG "%s - RXDCTL            = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mRx_DescriptorControl0.mValue    TRACE_END;
 }
 
 // CRITICAL PATH
@@ -560,6 +640,8 @@ void Pro1000::Rx_Config_Zone0()
 // Thread  SoftInt
 void Pro1000::Rx_Process_Zone0()
 {
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
+
     ASSERT(RX_DESCRIPTOR_QTY >  mRx_In     );
     ASSERT(RX_DESCRIPTOR_QTY >  mRx_Out    );
     ASSERT(NULL              != mRx_Virtual);
@@ -571,6 +653,8 @@ void Pro1000::Rx_Process_Zone0()
             break;
         }
 
+        // TRACE_DEBUG "%s - Rx Packet !" DEBUG_EOL, __FUNCTION__ TRACE_END;
+
         ASSERT(NULL != mRx_Counter   [mRx_Out]);
         ASSERT(NULL != mRx_PacketData[mRx_Out]);
         ASSERT(NULL != mRx_PacketInfo[mRx_Out]);
@@ -578,6 +662,10 @@ void Pro1000::Rx_Process_Zone0()
         mRx_PacketData[mRx_Out]->IndicateRxCompleted();
         mRx_PacketInfo[mRx_Out]->mSize_byte = mRx_Virtual[mRx_Out].mSize_byte; // Writing DirectGMA buffer !
         mRx_PacketInfo[mRx_Out]->mSendTo    =                               0; // Writing DirectGMA buffer !
+
+        #ifdef _KMS_LINUX_
+            ( * mRx_Counter[ mRx_Out ] ) --;
+        #endif
 
         #ifdef _KMS_WINDOWS_
             InterlockedDecrement(mRx_Counter[mRx_Out]);
@@ -589,9 +677,19 @@ void Pro1000::Rx_Process_Zone0()
     }
 }
 
+unsigned int Pro1000::Rx_GetAvailableDescriptor_Zone0()
+{
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
+
+    ASSERT(RX_DESCRIPTOR_QTY > mTx_In );
+    ASSERT(RX_DESCRIPTOR_QTY > mTx_Out);
+
+    return ((mRx_Out + RX_DESCRIPTOR_QTY - mRx_In - 1) % RX_DESCRIPTOR_QTY);
+}
+
 void Pro1000::Statistics_Update()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
     ASSERT(NULL != mBAR1);
 
@@ -623,7 +721,7 @@ void Pro1000::Statistics_Update()
 // Thread  Init
 void Pro1000::Tx_Config_Zone0()
 {
-    // DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "()" DEBUG_EOL);
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
     ASSERT(NULL != mBAR1);
 
@@ -634,12 +732,26 @@ void Pro1000::Tx_Config_Zone0()
 
     mBAR1->mTx_PacketBufferSize.mFields.mValue_KB = 20;
 
-    mBAR1->mTx_DescriptorControl0.mFields.mHostThreshold      =   16;
-    mBAR1->mTx_DescriptorControl0.mFields.mPrefetchThreshold  =   16;
-    mBAR1->mTx_DescriptorControl0.mFields.mWriteBackThreshold =   16;
-    mBAR1->mTx_DescriptorControl0.mFields.mQueueEnable        = true;
+    Pro1000_Tx_DescriptorControl lTXDCTL;
+
+    lTXDCTL.mValue = mBAR1->mTx_DescriptorControl0.mValue;
+    // TRACE_DEBUG "%s - TXDCTL (Initial)  = 0x%08x" DEBUG_EOL, __FUNCTION__, lTXDCTL.mValue TRACE_END;
+
+    lTXDCTL.mFields.mHostThreshold      =   16;
+    lTXDCTL.mFields.mPrefetchThreshold  =   16;
+    lTXDCTL.mFields.mWriteBackThreshold =   16;
+    lTXDCTL.mFields.mQueueEnable        = true;
+
+    mBAR1->mTx_DescriptorControl0.mValue = lTXDCTL.mValue;
+    // TRACE_DEBUG "%s - TXDCTL (Modified) = 0x%08x" DEBUG_EOL, __FUNCTION__, lTXDCTL.mValue TRACE_END;
 
     mBAR1->mTx_Control.mFields.mEnable = true;
+
+    // TRACE_DEBUG "%s - TCTL              = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mTx_Control.mValue               TRACE_END;
+    // TRACE_DEBUG "%s - TDBAH             = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mTx_DescriptorBaseAddressHigh0   TRACE_END;
+    // TRACE_DEBUG "%s - TDBAL             = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mTx_DescriptorBaseAddressLow0    TRACE_END;
+    // TRACE_DEBUG "%s - TDLEN             = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mTx_DescriptorRingLength0.mValue TRACE_END;
+    // TRACE_DEBUG "%s - TXDCTL            = 0x%08x" DEBUG_EOL, __FUNCTION__, mBAR1->mTx_DescriptorControl0.mValue    TRACE_END;
 }
 
 // CRITICAL PATH
@@ -648,6 +760,8 @@ void Pro1000::Tx_Config_Zone0()
 // Thread  SoftInt
 void Pro1000::Tx_Process_Zone0()
 {
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
+
     ASSERT(TX_DESCRIPTOR_QTY >  mTx_In     );
     ASSERT(TX_DESCRIPTOR_QTY >  mTx_Out    );
     ASSERT(NULL              != mTx_Virtual);
@@ -661,6 +775,10 @@ void Pro1000::Tx_Process_Zone0()
 
         if (NULL != mTx_Counter[mTx_Out])
         {
+            #ifdef _KMS_LINUX_
+                ( * mTx_Counter[ mTx_Out ] ) --;
+            #endif
+
             #ifdef _KMS_WINDOWS_
                 InterlockedDecrement(mTx_Counter[mTx_Out]);
             #endif
@@ -674,6 +792,8 @@ void Pro1000::Tx_Process_Zone0()
 
 unsigned int Pro1000::Tx_GetAvailableDescriptor_Zone0()
 {
+    // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
+
     ASSERT(TX_DESCRIPTOR_QTY > mTx_In );
     ASSERT(TX_DESCRIPTOR_QTY > mTx_Out);
 

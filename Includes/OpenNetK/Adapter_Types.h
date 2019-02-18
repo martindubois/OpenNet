@@ -32,7 +32,9 @@ namespace OpenNetK
         uint32_t mPacketQty;
         uint32_t mSize_byte;
 
-        uint8_t mReserved1[40];
+        uint64_t mBuffer_DA;
+
+        uint8_t mReserved1[32];
     }
     Buffer;
 

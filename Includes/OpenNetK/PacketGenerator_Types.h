@@ -25,7 +25,7 @@ namespace OpenNetK
         uint32_t mPacketPer100ms    ;
         uint32_t mPacketSize_byte   ;
 
-        unsigned int mReserved2[48];
+        uint8_t  mReserved2[48];
 
         uint8_t  mPacket[16 * 1024];
     }

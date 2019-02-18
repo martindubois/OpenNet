@@ -1,9 +1,10 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNet/SourceCode.h
-/// \brief   OpenNet::SourceCode
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNet/SourceCode.h
+/// \brief      OpenNet::SourceCode
 
 #pragma once
 
@@ -124,13 +125,22 @@ namespace OpenNet
         /// \retval STATUS_CODE_NOT_SET
         OPEN_NET_PUBLIC virtual Status ResetCode();
 
+        // TODO  OpenNet.SourceCode
+        //       Normal (Interface) - Remove the aArgCount of the SetCode
+        //       methods and add a SetArgumentCount method
+
         /// \cond en
         /// \brief  Set the code using a source file
         /// \param  aFileName [---;R--] The source file name
+        /// \param  aArgCount           This argument indicates how many
+        ///                             arguments must be passed to the code.
         /// \endcond
         /// \cond fr
         /// \brief  Assigner le code en utilisant un fichier source
         /// \param  aFileName [---;R--] Le nom du fichier source
+        /// \param  aArgCount           Cet argument indique le nombre
+        ///                             d'argument qui doit etre passes au
+        ///                             code.
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_CANNOT_OPEN_INPUT_FILE
@@ -140,22 +150,27 @@ namespace OpenNet
         /// \retval STATUS_ERROR_CLOSING_INPUT_FILE
         /// \retval STATUS_ERROR_READING_INPUT_FILE
         /// \retval STATUS_INPUT_FILE_TOO_LARGE
-        OPEN_NET_PUBLIC virtual Status SetCode(const char * aFileName);
+        OPEN_NET_PUBLIC virtual Status SetCode(const char * aFileName, unsigned int aArgCount );
 
         /// \cond en
         /// \brief  Set the code
         /// \param  aCode [---;R--] The code
         /// \param  aCodeSize_byte  La taille du code
+        /// \param  aArgCount           This argument indicates how many
+        ///                             arguments must be passed to the code.
         /// \endcond
         /// \cond fr
         /// \brief  Assigner le code
         /// \param  aCode [---;R--] Le code
         /// \param  aCodeSize_byte  La taille du code
+        /// \param  aArgCount           Cet argument indique le nombre
+        ///                             d'argument qui doit etre passes au
+        ///                             code.
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_CODE_ALREADY_SET
         /// \retval STATUS_EMPTY_CODE
-        OPEN_NET_PUBLIC virtual Status SetCode(const char * aCode, unsigned int aCodeSize_byte);
+        OPEN_NET_PUBLIC virtual Status SetCode(const char * aCode, unsigned int aCodeSize_byte, unsigned int aArgCount );
 
         /// \cond en
         /// \brief  Set the instance's name
@@ -224,6 +239,7 @@ namespace OpenNet
 
     // internal:
 
+        unsigned int GetArgumentCount() const;
         const char * GetCode() const;
 
     protected:
@@ -243,6 +259,7 @@ namespace OpenNet
 
         void ReleaseCode();
 
+        char mArgumentCount;
         char mName[64];
 
     };

@@ -32,7 +32,7 @@ public:
     virtual void         ResetMemory       ();
     virtual void         SetCommonBuffer   (uint64_t aLogicalAddress, void * aVirtualAddress);
     virtual bool         SetMemory         (unsigned int aIndex, void * aVirtual, unsigned int aSize_byte);
-    virtual bool         D0_Entry          ();
+    virtual void         D0_Entry          ();
     virtual bool         D0_Exit           ();
     virtual void         Interrupt_Disable ();
     virtual void         Interrupt_Enable  ();
@@ -40,6 +40,7 @@ public:
     virtual void         Interrupt_Process2(bool * aNeedMoreProcessing);
     virtual void         Unlock_AfterReceive  (volatile long * aCounter, unsigned int aPacketQty);
     virtual void         Unlock_AfterSend     (volatile long * aCounter, unsigned int aPacketQty);
+    virtual bool         Packet_Drop          ();
     virtual void         Packet_Receive_NoLock(uint64_t aLogicalAddress, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
     virtual void         Packet_Send_NoLock   (uint64_t aLogicalAddress, const void * aVirtualAddress, unsigned int aSize_byte, volatile long * aCounter = NULL);
     virtual bool         Packet_Send       (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);
@@ -50,7 +51,7 @@ private:
 
     enum
     {
-        PACKET_BUFFER_QTY =        32,
+        PACKET_BUFFER_QTY =        64,
         RX_DESCRIPTOR_QTY = 32 * 1024,
         TX_DESCRIPTOR_QTY = 32 * 1024,
     };
@@ -62,12 +63,17 @@ private:
     void Rx_Config_Zone0 ();
     void Rx_Process_Zone0();
 
+    unsigned int Rx_GetAvailableDescriptor_Zone0();
+
     void Statistics_Update();
 
     void Tx_Config_Zone0 ();
     void Tx_Process_Zone0();
 
     unsigned int Tx_GetAvailableDescriptor_Zone0();
+
+    OpenNetK::Packet   mPacketData;
+    OpenNet_PacketInfo mPacketInfo;
 
     // ===== Zone 0 =========================================================
 
@@ -87,9 +93,9 @@ private:
     unsigned int            mTx_Out    ;
     Pro1000_Tx_Descriptor * mTx_Virtual;
 
-    volatile long mTx_PacketBuffer_Counter[PACKET_BUFFER_QTY];
-    unsigned int mTx_PacketBuffer_In;
-    uint64_t     mTx_PacketBuffer_Logical[PACKET_BUFFER_QTY];
-    void       * mTx_PacketBuffer_Virtual[PACKET_BUFFER_QTY];
+    volatile long mPacketBuffer_Counter[PACKET_BUFFER_QTY];
+    unsigned int  mPacketBuffer_In;
+    uint64_t      mPacketBuffer_Logical[PACKET_BUFFER_QTY];
+    void        * mPacketBuffer_Virtual[PACKET_BUFFER_QTY];
 
 };

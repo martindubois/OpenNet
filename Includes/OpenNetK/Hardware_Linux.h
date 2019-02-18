@@ -39,90 +39,19 @@ namespace OpenNetK
         /// \cond en
         /// \brief  Initialize the instance.
         /// \param  aHardware  The Hardware
-        /// \retval     0  OK
-        /// \retval Other  Error
+        /// \param  aOSDep     The operating system dependent function table
+        /// \param  aZone0     The spinlock to use
         /// \endcond
         /// \cond fr
         /// \brief  Initialise l'instance
         /// \param  aHardware  L'Hardware
-        /// \retval     0  OK
-        /// \retval Other  Erreur
+        /// \param  aOSDep     La table de fonctions dependente du systeme
+        ///                    d'exploitation
+        /// \param  aZone0     Le spinlock a utiliser
         /// \endcond
-        int Init( Hardware * aHardware );
-
-        /// \cond en
-        /// \brief  Enter the D0 state
-        /// \retval     0  OK
-        /// \retval Other  Error
-        /// \endcond
-        /// \cond fr
-        /// \brief  Entrer dans l'etat D0
-        /// \retval     0  OK
-        /// \retval Other  Erreur
-        /// \endcond
-        int D0Entry();
-
-        /// \cond en
-        /// \brief  Exit the D0 state
-        /// \retval     0  OK
-        /// \retval Other  Error
-        /// \endcond
-        /// \cond fr
-        /// \brief  Sortir de l'etat D0
-        /// \retval     0  OK
-        /// \retval Other  Erreur
-        /// \endcond
-        int D0Exit();
-
-        /// \cond en
-        /// \brief  Prepare the hardware
-        /// \retval     0  OK
-        /// \retval Other  Error
-        /// \endcond
-        /// \cond fr
-        /// \brief  Prepare le meteriel
-        /// \retval     0  OK
-        /// \retval Other  Erreur
-        /// \endcond
-        int PrepareHardware();
-
-        /// \cond en
-        /// \brief  Release the hardware
-        /// \retval     0  OK
-        /// \retval Other  Error
-        /// \endcond
-        /// \cond fr
-        /// \brief  Relacher le materiel
-        /// \retval     0  OK
-        /// \retval Other  Erreur
-        /// \endcond
-        int ReleaseHardware();
-
-    //internal:
-
-        int  Interrupt_Disable ();
-        int  Interrupt_Enable  ();
-        bool Interrupt_Isr     (unsigned int aMessageId);
-        void Interrupt_Dpc     ();
-
-        void Tick();
-
-        void TrigProcess2();
+        void Init( Hardware * aHardware, OpenNetK_OSDep * aOSDep, void * aZone0 );
 
     private:
-
-        void InitTimer();
-
-        int PrepareInterrupt();
-        int PrepareMemory   ();
-
-        Hardware * mHardware;
-
-        unsigned int mIntCount ;
-
-        unsigned int mMemCount;
-        unsigned int mMemSize_byte[6];
-        void       * mMemVirtual  [6];
 
         // ===== Zone 0 =====================================================
         SpinLock_Linux mZone0;

@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/Processor_Internal.cpp
 
+#define __CLASS__ "Adapter_Internal::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -93,8 +95,13 @@ Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::Debug
 // Threads  Apps
 Adapter_Internal::~Adapter_Internal()
 {
+    // printf( __CLASS__ "~AdapterInternal()\n" );
+
     assert(NULL != mHandle);
 
+    // printf( __CLASS__ "~Adapter_Internal - delete 0x%lx (mHandle)\n", reinterpret_cast< uint64_t >( mHandle ) );
+
+    // new ==> delete
     delete mHandle;
 }
 
@@ -145,9 +152,9 @@ void Adapter_Internal::SetPacketSize(unsigned int aSize_byte)
 
         if (mConfig.mPacketSize_byte != aSize_byte)
         {
-            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+            mDebugLog->Log(__FILE__, __CLASS__ "SetPacketSize", __LINE__);
             throw new KmsLib::Exception(KmsLib::Exception::CODE_INVALID_ARGUMENT,
-                "Invalid packet size", NULL, __FILE__, __FUNCTION__, __LINE__, mDriverConfig.mPacketSize_byte);
+                "Invalid packet size", NULL, __FILE__, __CLASS__ "SetPacketSize", __LINE__, mDriverConfig.mPacketSize_byte);
         }
     }
 }
@@ -183,7 +190,7 @@ void Adapter_Internal::PacketGenerator_GetConfig(OpenNetK::PacketGenerator_Confi
     unsigned int lRet = mHandle->Control(IOCTL_PACKET_GENERATOR_CONFIG_GET, NULL, 0, aOut, sizeof(OpenNetK::PacketGenerator_Config));
     if (sizeof(OpenNetK::PacketGenerator_Config) != lRet)
     {
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_IOCTL_ERROR, "The driver did not return enough data", NULL, __FILE__, __FUNCTION__, __LINE__, lRet);
+        throw new KmsLib::Exception(KmsLib::Exception::CODE_IOCTL_ERROR, "The driver did not return enough data", NULL, __FILE__, __CLASS__ "PacketGenerator_GetConfig", __LINE__, lRet);
     }
 }
 
@@ -226,7 +233,7 @@ void Adapter_Internal::SendLoopBackPackets()
     catch (KmsLib::Exception * eE)
     {
         mDebugLog->LogTime();
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SendLoopBackPakets", __LINE__);
         mDebugLog->Log(eE);
     }
 }
@@ -235,6 +242,8 @@ void Adapter_Internal::SendLoopBackPackets()
 // Threads    Apps
 void Adapter_Internal::Start()
 {
+    // printf( __CLASS__ "Start()\n" );
+
     assert(   0 <  mBufferCount);
     assert(NULL != mHandle     );
 
@@ -255,6 +264,8 @@ void Adapter_Internal::Stop()
 // Thread  Apps
 Thread * Adapter_Internal::Thread_Prepare()
 {
+    // printf( __CLASS__ "Thread_Pepare()\n" );
+
     if (NULL != mSourceCode)
     {
         assert(NULL != mProcessor);
@@ -285,7 +296,7 @@ OpenNet::Status Adapter_Internal::GetAdapterNo(unsigned int * aOut)
 
     if (NULL == aOut)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "GetAdapterNo", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -296,14 +307,14 @@ OpenNet::Status Adapter_Internal::GetAdapterNo(unsigned int * aOut)
     {
         if (ADAPTER_NO_UNKNOWN == lState.mAdapterNo)
         {
-            mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+            mDebugLog->Log(__FILE__, __CLASS__ "GetAdapterNo", __LINE__);
             lResult = OpenNet::STATUS_ADAPTER_NOT_CONNECTED;
         }
         else
         {
             if (ADAPTER_NO_QTY <= lState.mAdapterNo)
             {
-                mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+                mDebugLog->Log(__FILE__, __CLASS__ "GetAdapterNo", __LINE__);
                 lResult = OpenNet::STATUS_CORRUPTED_DRIVER_DATA;
             }
             else
@@ -322,7 +333,7 @@ OpenNet::Status Adapter_Internal::GetConfig(Config * aOut) const
 
     if (NULL == aOut)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "GetConfig", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -337,7 +348,7 @@ OpenNet::Status Adapter_Internal::GetInfo(Info * aOut) const
 
     if (NULL == aOut)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "GetInfo", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -358,7 +369,7 @@ OpenNet::Status Adapter_Internal::GetState(State * aOut)
 
     if (NULL == aOut)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "GetState", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -372,7 +383,7 @@ OpenNet::Status Adapter_Internal::GetStatistics(unsigned int * aOut, unsigned in
 
     if ((NULL == aOut) && (0 < aOutSize_byte))
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "GetStatistics", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -403,11 +414,12 @@ OpenNet::Status Adapter_Internal::GetStatistics(unsigned int * aOut, unsigned in
         memset(&mStatistics, 0, sizeof(unsigned int) * OpenNet::ADAPTER_STATS_RESET_QTY);
     }
 
-    IoCtl_Stats_Get_In lIn;
+    IoCtl_Statistics_Get_In lIn;
 
     memset(&lIn, 0, sizeof(lIn));
 
     lIn.mFlags.mReset = aReset;
+    lIn.mOutputSize_byte = aOutSize_byte;
 
     unsigned int lInfo_byte;
 
@@ -425,6 +437,8 @@ OpenNet::Status Adapter_Internal::GetStatistics(unsigned int * aOut, unsigned in
 
 bool Adapter_Internal::IsConnected()
 {
+    // printf( __CLASS__ "IsConnected()\n" );
+
     State lState;
 
     OpenNet::Status lStatus = GetState(&lState);
@@ -439,7 +453,7 @@ bool Adapter_Internal::IsConnected(const OpenNet::System & aSystem)
 {
     if (NULL == (&aSystem))
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "IsConnected", __LINE__);
         return false;
     }
 
@@ -460,24 +474,38 @@ bool Adapter_Internal::IsConnected(const OpenNet::System & aSystem)
 
 OpenNet::Status Adapter_Internal::ResetInputFilter()
 {
+    // printf( __CLASS__ "ResetInputFilter()\n" );
+
     assert(OPEN_NET_BUFFER_QTY >= mBufferCount);
     assert(NULL                != mDebugLog   );
 
     if (NULL == mSourceCode)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "ResetInputFilter", __LINE__);
         return OpenNet::STATUS_FILTER_NOT_SET;
     }
 
     if (0 < mBufferCount)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "ResetInputFilter", __LINE__);
         return OpenNet::STATUS_ADAPTER_RUNNING;
     }
 
     mSourceCode = NULL;
 
-    return ResetInputFilter_Internal();
+    try
+    {
+        ResetInputFilter_Internal();
+    }
+    catch ( KmsLib::Exception * eE )
+    {
+        mDebugLog->Log( __FILE__, __CLASS__ "ResetInputFilter", __LINE__ );
+        mDebugLog->Log( eE );
+
+        return ExceptionToStatus( eE );
+    }
+
+    return OpenNet::STATUS_OK;
 }
 
 OpenNet::Status Adapter_Internal::ResetProcessor()
@@ -486,13 +514,13 @@ OpenNet::Status Adapter_Internal::ResetProcessor()
 
     if (NULL == mProcessor)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "ResetProcessor", __LINE__);
         return OpenNet::STATUS_PROCESSOR_NOT_SET;
     }
 
     if (NULL != mSourceCode)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "ResetProcessor", __LINE__);
         return OpenNet::STATUS_FILTER_SET;
     }
 
@@ -515,31 +543,31 @@ OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
 
     if (NULL == (&aConfig))
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetConfig", __LINE__);
         return OpenNet::STATUS_INVALID_REFERENCE;
     }
 
     if (PACKET_SIZE_MAX_byte < aConfig.mPacketSize_byte)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetConfig", __LINE__);
         return OpenNet::STATUS_PACKET_TOO_LARGE;
     }
 
     if (PACKET_SIZE_MIN_byte > aConfig.mPacketSize_byte)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetConfig", __LINE__);
         return OpenNet::STATUS_PACKET_TOO_SMALL;
     }
 
     if (OPEN_NET_BUFFER_QTY < aConfig.mBufferQty)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetConfig", __LINE__);
         return OpenNet::STATUS_TOO_MANY_BUFFER;
     }
 
     if (0 >= aConfig.mBufferQty)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetConfig", __LINE__);
         return OpenNet::STATUS_NO_BUFFER;
     }
 
@@ -562,19 +590,19 @@ OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::SourceCode * aSourceCo
 
     if (NULL == aSourceCode)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetInputFilter", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
     if (NULL != mSourceCode)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetInputFilter", __LINE__);
         return OpenNet::STATUS_FILTER_ALREADY_SET;
     }
 
     if (NULL == mProcessor)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetInputFilter", __LINE__);
         return OpenNet::STATUS_PROCESSOR_NOT_SET;
     }
 
@@ -588,7 +616,7 @@ OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::SourceCode * aSourceCo
     }
     catch (KmsLib::Exception * eE)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetInputFilter", __LINE__);
         mDebugLog->Log(eE);
         return ExceptionToStatus(eE);
     }
@@ -604,13 +632,13 @@ OpenNet::Status Adapter_Internal::SetProcessor(OpenNet::Processor * aProcessor)
 
     if (NULL == aProcessor)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetProcessor", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
     if (NULL != mProcessor)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetProcessor", __LINE__);
         return OpenNet::STATUS_PROCESSOR_ALREADY_SET;
     }
 
@@ -618,7 +646,7 @@ OpenNet::Status Adapter_Internal::SetProcessor(OpenNet::Processor * aProcessor)
 
     if (NULL == mProcessor)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "SetProcessor", __LINE__);
         return OpenNet::STATUS_INVALID_PROCESSOR;
     }
 
@@ -632,7 +660,7 @@ OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
 
     if (NULL == aOut)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "Display", __LINE__);
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
@@ -692,7 +720,7 @@ OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, 
     }
     catch (KmsLib::Exception * eE)
     {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(__FILE__, __CLASS__ "Control", __LINE__);
         mDebugLog->Log(eE);
         return ExceptionToStatus(eE);
     }

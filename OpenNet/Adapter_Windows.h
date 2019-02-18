@@ -41,8 +41,8 @@ protected:
 
     // ===== Adapter_Internal ===============================================
 
-    virtual OpenNet::Status ResetInputFilter_Internal();
-    virtual void            SetInputFilter_Internal  (OpenNet::Kernel * aKernel);
+    virtual void ResetInputFilter_Internal();
+    virtual void SetInputFilter_Internal  (OpenNet::Kernel * aKernel);
 
     virtual Thread * Thread_Prepare_Internal(OpenNet::Kernel * aKernel);
 

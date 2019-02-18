@@ -32,7 +32,7 @@ public:
 
     // ===== OpenNetK::Hardware =============================================
     virtual void         GetState             (OpenNetK::Adapter_State * aStats);
-    virtual bool         D0_Entry             ();
+    virtual void         D0_Entry             ();
     virtual void         Packet_Receive_NoLock(uint64_t aLogicalAddress, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
     virtual void         Packet_Send_NoLock   (uint64_t aLogicalAddress, const void * aVirtualAddress, unsigned int aSize_byte, volatile long * aCounter = NULL);
     virtual bool         Packet_Send          (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);

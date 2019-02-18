@@ -32,3 +32,16 @@ $(OUTPUT) : $(OBJECTS) $(LIBRARIES)
 depend:
 	makedepend -Y $(INCLUDES) $(SOURCES)
 
+# DO NOT DELETE
+
+Device.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
+Device.o: ../Import/Includes/WindowsToLinux.h
+Device.o: ../Import/Includes/KmsLib/DriverHandle.h
+Device.o: ../Import/Includes/KmsLib/FileHandle.h
+Device.o: ../Import/Includes/KmsLib/Exception.h
+Device.o: ../Import/Includes/KmsLib/ThreadBase.h ../Import/Includes/KmsTest.h
+Device.o: ../Includes/OpenNetK/Adapter_Types.h
+Device.o: ../Includes/OpenNetK/PacketGenerator_Types.h ../Common/Constants.h
+Device.o: ../Common/IoCtl.h
+ONK_Test.o: ../Import/Includes/KmsTest.h ../Import/Includes/KmsBase.h
+ONK_Test.o: ../Import/Includes/SafeAPI.h ../Import/Includes/WindowsToLinux.h

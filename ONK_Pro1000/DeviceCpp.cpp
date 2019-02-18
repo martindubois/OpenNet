@@ -3,6 +3,12 @@
 // Copyright  (C) 2018-2019 KMS. All rights reserved.
 // Product    OpenNet
 // File       ONK_Pro1000/DeviceCpp.cpp
+//
+// This file if the glue between the linux C code compiled using kbuild and
+// the cpp code of the ONK_Lib.
+//
+// The code in this file do not depend on any linux header. It can be
+// compiled without using kbuild and can run with any kernel version.
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -45,12 +51,18 @@ unsigned int DeviceCpp_GetContextSize()
     return sizeof( DeviceCppContext );
 }
 
-// aThis [---;-W-]
-void DeviceCpp_Init( void * aThis )
+// aThis         [---;-W-]
+// aOSDep        [-K-;R--] The OS dependent functions
+// aAdapterLock  [-K-;RW-] The spinlock for the Adapter instance
+// aHardwareLock [-K-]RW-] The spinlock for the Hardware instance
+void DeviceCpp_Init( void * aThis, OpenNetK_OSDep * aOSDep, void * aAdapterLock, void * aHardwareLock )
 {
-    printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+    // printk( KERN_DEBUG "%s( , , ,  )\n", __FUNCTION__ );
 
-    ASSERT( NULL != aThis );
+    ASSERT( NULL != aThis         );
+    ASSERT( NULL != aOSDep        );
+    ASSERT( NULL != aAdapterLock  );
+    ASSERT( NULL != aHardwareLock );
 
     DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
 
@@ -58,17 +70,18 @@ void DeviceCpp_Init( void * aThis )
 
     new ( & lThis->mHardware ) Pro1000();
 
-    lThis->mHardware_Linux.Init( & lThis->mHardware );
-    lThis->mAdapter_Linux .Init( & lThis->mAdapter, & lThis->mHardware_Linux );
+    lThis->mHardware_Linux.Init( & lThis->mHardware, aOSDep, aHardwareLock );
+    lThis->mAdapter_Linux .Init( & lThis->mAdapter, aOSDep, aAdapterLock );
 
     lThis->mAdapter .SetHardware( & lThis->mHardware );
+    lThis->mAdapter .SetOSDep   ( aOSDep             );
     lThis->mHardware.SetAdapter ( & lThis->mAdapter  );
 }
 
 // aThis [---;RW-]
 void DeviceCpp_Uninit( void * aThis )
 {
-    printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+    // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
 
     ASSERT( NULL != aThis );
 
@@ -81,6 +94,8 @@ void DeviceCpp_Uninit( void * aThis )
 //         bytes.
 unsigned int DeviceCpp_CommonBuffer_GetSize( void * aThis )
 {
+    // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
     ASSERT( NULL != aThis );
 
     DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
@@ -91,8 +106,10 @@ unsigned int DeviceCpp_CommonBuffer_GetSize( void * aThis )
 // aThis [---;RW-]
 // aPhysical       The physical address of the common buffer
 // aVirtual        The virtual address of the common buffer
-void DeviceCpp_CommonBuffer_Set( void * aThis, unsigned long aPhysical, void * aVirtual )
+void DeviceCpp_CommonBuffer_Set( void * aThis, uint64_t aPhysical, void * aVirtual )
 {
+    // printk( KERN_DEBUG "%s( , 0x%llx, 0x%px )\n", __FUNCTION__, aPhysical, aVirtual );
+
     ASSERT( NULL != aThis );
 
     DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
@@ -101,11 +118,60 @@ void DeviceCpp_CommonBuffer_Set( void * aThis, unsigned long aPhysical, void * a
 }
 
 // aThis [---;RW-]
+//
+// DeviceCpp_D0_Entry ==> DeviceCpp_D0_Exit
+void DeviceCpp_D0_Entry( void * aThis )
+{
+    // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
+    ASSERT( NULL != aThis );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    // Hardware::D0_Entry ==> Hardware::D0_Exit  See DeviceCpp_D0_Exit
+    lThis->mHardware.D0_Entry();
+}
+
+// aThis [---;RW-]
+//
+// DeviceCpp_D0_Entry ==> DeviceCpp_D0_Exit
+void DeviceCpp_D0_Exit( void * aThis )
+{
+    // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
+    ASSERT( NULL != aThis );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    // Hardware::D0_Entry ==> Hardware::D0_Exit  See DeviceCpp_D0_Entry
+    lThis->mHardware.D0_Exit();
+}
+
+// aThis [---;RW-]
+//
+// DeviceCpp_Interrupt_Enable ==> DeviceCpp_D0_Exit
+void DeviceCpp_Interrupt_Enable( void * aThis )
+{
+    // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
+    ASSERT( NULL != aThis );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    // Hardware::Interrupt_Enabled ==> Hardware::D0_Exit  See DeviceCpp_D0_Exit
+    lThis->mHardware.Interrupt_Enable();
+}
+
+// aThis [---;RW-]
 // aMessageId
 //
 // Return  See PIR_...
+//
+// CRITICAL_PATH  Buffer+
 ProcessIrqResult DeviceCpp_Interrupt_Process( void * aThis, unsigned int aMessageId )
 {
+    // printk( KERN_DEBUG "%s( , %u )\n", __FUNCTION__, aMessageId );
+
     ASSERT( NULL != aThis );
 
     DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
@@ -120,67 +186,102 @@ ProcessIrqResult DeviceCpp_Interrupt_Process( void * aThis, unsigned int aMessag
     return PIR_IGNORED;
 }
 
-// aThis [---;RW-]
-void DeviceCpp_Interrupt_Process2( void * aThis )
+// aThis               [---;RW-]
+// aNeedMoreProcessing [---;-W-]
+//
+// CRITICAL_PATH  Buffer+
+void DeviceCpp_Interrupt_Process2( void * aThis, bool * aNeedMoreProcessing )
 {
+    // printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );
+
+    ASSERT( NULL != aThis );
+    ASSERT( NULL != aNeedMoreProcessing );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    lThis->mHardware.Interrupt_Process2( aNeedMoreProcessing );
+}
+
+// aThis [---;RW-]
+void DeviceCpp_Interrupt_Process3( void * aThis )
+{
+    // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
     ASSERT( NULL != aThis );
 
     DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
 
-    lThis->mHardware.Interrupt_Process2();
+    lThis->mHardware.Interrupt_Process3();
 }
 
-// aThis  [---;RW-]
-// aCode            The command code
-// aInOut [--O;RW-] The input and output buffer
-// aInSize_byte     The maximum size of the input buffer
+// aThis       [---;RW-]
+// aFileObject [-K-;---] The file object used to send the IoCtl request
+// aCode                 The command code
+// aIn         [--O;R--] The input buffer
+// aInSize_byte          The maximum size of the input buffer
+// aOut        [--O;-W-] The output buffer
+// aOutSize_byte         The size of the output buffer
 //
 // Return
 //    0  OK
 //  < 0  Error
-int DeviceCpp_IoCtl( void * aThis, unsigned int aCode, void * aInOut, unsigned int aInSize_byte )
+int DeviceCpp_IoCtl( void * aThis, void * aFileObject, unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte )
 {
-    printk( KERN_DEBUG "%s( , 0x%08x, , %u bytes )\n", __FUNCTION__, aCode, aInSize_byte );
+    // printk( KERN_DEBUG "%s( , 0x%08x, , %u bytes, , %u bytes )\n", __FUNCTION__, aCode, aInSize_byte, aOutSize_byte );
 
-    ASSERT( NULL != aThis );
+    ASSERT( NULL != aThis       );
+    ASSERT( NULL != aFileObject );
 
     DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
 
-    return lThis->mAdapter_Linux.IoDeviceControl( aInOut, aCode, aInSize_byte );
+    return lThis->mAdapter.IoCtl( aFileObject, aCode, aIn, aInSize_byte, aOut, aOutSize_byte );
 }
 
 // aCode
-// aInSizeMax_byte [---;-W-] The function puts the maximum size of the input
-//                           buffer there.
-// aInSizeMin_byte [---;-W-] The function puts the minimum size of the input
-//                           buffer there
-// aOutSize_byte   [---;-W-] The function puts the size of the output buffer
-//                           there.
+// aInfo [---;-W-] The function puts the info here
 //
 // Return
 //    0  OK
 //  < 0  Error
-int DeviceCpp_IoCtl_GetInfo( unsigned int aCode, unsigned int * aInSizeMax_byte, unsigned int * aInSizeMin_byte, unsigned int * aOutSize_byte )
+int DeviceCpp_IoCtl_GetInfo( unsigned int aCode, OpenNetK_IoCtl_Info * aInfo )
 {
-    printk( KERN_DEBUG "%s( 0x%08x, , , )\n", __FUNCTION__, aCode );
+    // printk( KERN_DEBUG "%s( 0x%08x,  )\n", __FUNCTION__, aCode );
 
-    ASSERT( NULL != aInSizeMax_byte );
-    ASSERT( NULL != aInSizeMin_byte );
-    ASSERT( NULL != aOutSize_byte   );
+    ASSERT( NULL != aInfo );
 
-    OpenNetK::Adapter::IoCtl_Info lIoCtlInfo;
-
-    if ( ! OpenNetK::Adapter::IoCtl_GetInfo( aCode, & lIoCtlInfo ) )
+    if ( ! OpenNetK::Adapter::IoCtl_GetInfo( aCode, aInfo ) )
     {
         printk( KERN_ERR "%s - OpenNetK::Adapter::IoCtl_GetInfo( 0x%08x,  ) failed\n", __FUNCTION__, aCode );
         return ( - __LINE__ );
     }
 
-    ( * aInSizeMax_byte ) = lIoCtlInfo.mIn_MaxSize_byte ;
-    ( * aInSizeMin_byte ) = lIoCtlInfo.mIn_MinSize_byte ;
-    ( * aOutSize_byte   ) = lIoCtlInfo.mOut_MinSize_byte;
-
     return 0;
+}
+
+// aThis       [---;RW-]
+// aFileObject [---;---]
+void DeviceCpp_Release( void * aThis, void * aFileObject )
+{
+    // printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );
+
+    ASSERT( NULL != aThis       );
+    ASSERT( NULL != aFileObject );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    lThis->mAdapter.FileCleanup( aFileObject );
+}
+
+// aThis    [---;RW-]
+void DeviceCpp_ResetMemory( void * aThis )
+{
+    // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
+    ASSERT( NULL != aThis );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    lThis->mHardware.ResetMemory();
 }
 
 // aThis    [---;RW-]
@@ -193,7 +294,7 @@ int DeviceCpp_IoCtl_GetInfo( unsigned int aCode, unsigned int * aInSizeMax_byte,
 //  < 0  Error
 int DeviceCpp_SetMemory( void * aThis, unsigned int aIndex, void * aVirtual, unsigned int aSize_byte )
 {
-    printk( KERN_DEBUG "%s( , %u, , %u bytes )\n", __FUNCTION__, aIndex, aSize_byte );
+    // printk( KERN_DEBUG "%s( , %u, , %u bytes )\n", __FUNCTION__, aIndex, aSize_byte );
 
     ASSERT( NULL != aThis      );
     ASSERT( NULL != aVirtual   );
@@ -202,4 +303,16 @@ int DeviceCpp_SetMemory( void * aThis, unsigned int aIndex, void * aVirtual, uns
     DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
 
     return ( lThis->mHardware.SetMemory( aIndex, aVirtual, aSize_byte ) ? 0 : ( - __LINE__ ) );
+}
+
+// aThis [---;RW-]
+void DeviceCpp_Tick( void * aThis )
+{
+    // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
+
+    ASSERT( NULL != aThis );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    lThis->mHardware.Tick();
 }

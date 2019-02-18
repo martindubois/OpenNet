@@ -112,7 +112,7 @@ namespace OpenNet
 
     void Kernel_Forward::GenerateCode()
     {
-        Status lStatus = SetCode(CODE, static_cast<unsigned int>(strlen(CODE)));
+        Status lStatus = SetCode(CODE, static_cast<unsigned int>(strlen(CODE)), 1 );
         assert(STATUS_OK == lStatus);
         (void)(lStatus);
 

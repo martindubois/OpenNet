@@ -102,6 +102,8 @@ namespace TestLib
 
         unsigned int Run();
 
+        unsigned int StartStop();
+
         unsigned int Verify_Bandwidth ();
         unsigned int Verify_BufferQty ();
         unsigned int Verify_PacketSize();
@@ -142,7 +144,7 @@ namespace TestLib
         void                 DisplayAdapterStats     (unsigned int aIndex);
         virtual unsigned int Init            ();
         void                 InitAdapterConstraints  ();
-        virtual unsigned int Start           ();
+        virtual unsigned int Start                   (unsigned int aFlags);
         virtual unsigned int Stop            ();
         unsigned int         VerifyAdapterStats  (unsigned int aIndex);
 
@@ -174,7 +176,7 @@ namespace TestLib
 
         void DisplayAndWriteResult(const char * aNote);
 
-        unsigned int Execute();
+        unsigned int Execute( unsigned int aFlags );
 
         unsigned int InitAndPrepare();
 

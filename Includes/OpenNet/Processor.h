@@ -1,9 +1,10 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNet/Processor.h
-/// \brief   OpenNet::Processor
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNet/Processor.h
+/// \brief      OpenNet::Processor
 
 #pragma once
 
@@ -164,13 +165,14 @@ namespace OpenNet
 
         /// \cond en
         /// \brief   Retrieve the OpenCL device id
-        /// \return  This method returns a valid cl_device_id
+        /// \return  This method returns a valid cl_device_id or CUdevice
         /// \endcond
         /// \cond fr
         /// \brief   Obtenir l'indentificateur de device OpenCL
-        /// \return  Cette methode retourne un valeur cl_device_id valide
+        /// \return  Cette methode retourne un cl_device_id ou CUdevice
+        ///          valide
         /// \endcond
-        virtual void * GetDeviceId() = 0;
+        virtual void * GetDevice() = 0;
 
         /// \cond en
         /// \brief  Retrieve the Info
