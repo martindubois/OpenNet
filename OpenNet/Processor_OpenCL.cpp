@@ -156,7 +156,7 @@ cl_program Processor_OpenCL::Program_Create(OpenNet::Kernel * aKernel)
     //       "V:/OpenNet/Includes".
     try
     {
-        OCLW_BuildProgram(lResult, 1, &mDevice, "-I V:/OpenNet/Includes", NULL, NULL);
+        OCLW_BuildProgram(lResult, 1, &mDevice, "-D _OPEN_NET_OPEN_CL_ -I V:/OpenNet/Includes", NULL, NULL);
     }
     catch (...)
     {
@@ -205,7 +205,7 @@ void * Processor_OpenCL::GetContext()
     return mContext;
 }
 
-void * Processor_OpenCL::GetDeviceId()
+void * Processor_OpenCL::GetDevice()
 {
     assert(NULL != mDevice);
 

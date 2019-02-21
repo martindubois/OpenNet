@@ -190,8 +190,6 @@ void Thread::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
     {
         assert(NULL != mBuffers[i]);
 
-        printf( __CLASS__ "Stop_Wait - delete 0x%lx (mBuffers[ %u ])\n", reinterpret_cast< uint64_t >( mBuffers[ i ] ), i );
-
         delete mBuffers[i];
     }
 }

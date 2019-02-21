@@ -1,9 +1,10 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNetK/Adapter_WDF.h
-/// \brief   OpenNetK::Adapter_WDF
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/Adapter_WDF.h
+/// \brief      OpenNetK::Adapter_WDF
 
 #pragma once
 
@@ -11,8 +12,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes/OpenNetK ==================================================
-#include <OpenNetK/Interface.h>
-#include <OpenNetK/SpinLock_WDF.h>
+#include <OpenNetK/OSDep.h>
+#include <OpenNetK/SpinLock.h>
 
 namespace OpenNetK
 {
@@ -85,31 +86,29 @@ namespace OpenNetK
         /// \endcond
         void IoInCallerContext(WDFREQUEST aRequest);
 
+    // internal:
+
+        void SharedMemory_Release();
+
     private:
 
-        NTSTATUS Connect   (void * aIn, WDFFILEOBJECT aFileObject);
-        void     Disconnect();
-
-        void     Event_Release  ();
-        NTSTATUS Event_Translate(uint64_t * aEvent);
+        NTSTATUS Connect(void * aIn);
 
         void ProcessIoCtlResult(int aIoCtlResult);
 
         NTSTATUS SharedMemory_ProbeAndLock();
-        void     SharedMemory_Release     ();
         NTSTATUS SharedMemory_Translate   (void ** aSharedMemory);
 
         NTSTATUS ResultToStatus(WDFREQUEST aRequest, int aIoCtlResult);
 
         Adapter      * mAdapter         ;
         WDFDEVICE      mDevice          ;
-        KEVENT       * mEvent           ;
-        WDFFILEOBJECT  mFileObject      ;
         Hardware_WDF * mHardware_WDF    ;
+        OpenNetK_OSDep mOSDep           ;
         MDL          * mSharedMemory_MDL;
 
         // ===== Zone 0 =====================================================
-        SpinLock_WDF mZone0;
+        SpinLock mZone0;
 
     };
 

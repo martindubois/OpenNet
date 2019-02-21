@@ -2,7 +2,7 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \Copyright  Copyright (C) 2019 KMS. All rights reserved.
+/// \copyright  Copyright (C) 2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/IoCtl.h
 /// \brief      OpenNetK_IoCtl_Info, OpenNetK_IoCtl_Result
 

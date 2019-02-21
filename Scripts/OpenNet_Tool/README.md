@@ -15,8 +15,12 @@ The script in this folder are nammed
 	Computer
 
 		00			Memory			32 GB
-					Motherboard		ASUS X99
+					Motherboard		ASUS X99-A II
 					Processor		i7-5930K	3.5 GHz
+
+		01			Memory			16 GB
+					Motherboard		MSI Z97-G43
+					Processor		i7-4790		3.6 GHz
 
 	User
 
@@ -45,12 +49,18 @@ The script in this folder are nammed
 	GPU_State
 
 		A			Active
+
 		I			Inactive
+
 		U			Used as graphic card
 
 	GPU
 	
+		K620
+
 		WX5100
+
+		WX9100
 
 	OSVersion
 

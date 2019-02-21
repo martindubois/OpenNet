@@ -64,45 +64,6 @@ void Adapter_Windows::Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel
 
 // ===== Adapter_Internal ===================================================
 
-// aConnect [---;R--]
-//
-// Exception  KmsLib::Exception *  CODE_TIMEOUT
-//                                 See KmsLib::Windows::DriverHandle::Control
-// Threads    Apps
-void Adapter_Windows::Connect(IoCtl_Connect_In * aConnect)
-{
-    assert(NULL != aConnect);
-
-    assert(NULL != mDebugLog);
-    assert(NULL != mHandle  );
-
-    HANDLE lEvent = reinterpret_cast<HANDLE>(aConnect->mEvent);
-    assert(NULL != lEvent);
-
-    DWORD lRet = WaitForSingleObject(lEvent, 60000);
-    if (WAIT_OBJECT_0 != lRet)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        throw new KmsLib::Exception(KmsLib::Exception::CODE_TIMEOUT,
-            "WaitForSingleObject( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet);
-    }
-
-    try
-    {
-        mHandle->Control(IOCTL_CONNECT, aConnect, sizeof(IoCtl_Connect_In), NULL, 0);
-
-        SetEvent(lEvent);
-    }
-    catch (...)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-
-        SetEvent(lEvent);
- 
-        throw;
-    }
-}
-
 // aKernel [---;RW-]
 //
 // Return  This method returns the address of the newly created Thread
@@ -136,33 +97,6 @@ Adapter_Windows::~Adapter_Windows()
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
     }
-}
-
-OpenNet::Status Adapter_Windows::Packet_Send(const void * aData, unsigned int aSize_byte)
-{
-    assert(NULL != mDebugLog);
-
-    if (NULL == aData)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
-    }
-
-    if (0 >= aSize_byte)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_PACKET_TOO_SMALL;
-    }
-
-    if (mInfo.mPacketSize_byte < aSize_byte)
-    {
-        mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
-        return OpenNet::STATUS_PACKET_TOO_LARGE;
-    }
-
-    mStatistics[OpenNet::ADAPTER_STATS_PACKET_SEND] ++;
-
-    return Control(IOCTL_PACKET_SEND, aData, aSize_byte, NULL, 0);
 }
 
 // Protected

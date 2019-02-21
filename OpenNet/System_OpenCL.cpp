@@ -42,10 +42,6 @@ System_OpenCL::System_OpenCL()
         OCLW_Initialise(mPlatform);
     }
 
-    // CreateEvent ==> CloseHandle  See the destructor
-    mConnect.mEvent = reinterpret_cast<uint64_t>(CreateEvent(NULL, FALSE, TRUE, NULL));
-    assert(NULL != mConnect.mEvent);
-
     // VirtualAlloc ==> VirtualAlloc  See the destructor
     mConnect.mSharedMemory = VirtualAlloc(NULL, SHARED_MEMORY_SIZE_byte, MEM_COMMIT, PAGE_READWRITE);
     assert(NULL != mConnect.mSharedMemory);
@@ -55,11 +51,6 @@ System_OpenCL::System_OpenCL()
 
 System_OpenCL::~System_OpenCL()
 {
-    // CreateEvent ==> CloseHandle  See the default contructor
-    BOOL lRetB = CloseHandle(reinterpret_cast<HANDLE>(mConnect.mEvent));
-    assert(lRetB);
-    (void)(lRetB);
-
     // VirtualAlloc ==> VirtualAlloc  See the default constructor
     void * lRetVP = VirtualAlloc(mConnect.mSharedMemory, SHARED_MEMORY_SIZE_byte, MEM_RESET, 0);
     assert(NULL == lRetVP);

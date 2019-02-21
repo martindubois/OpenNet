@@ -2,7 +2,7 @@
 # Author     KMS - Martin Dubois, ing.
 # Copyright  (C) 2019 KMS. All right reserved.
 # Product    OpenNet
-# File       Scripts/OpenNet_Tool/A00DDC00000001A_WX5100_10.txt
+# File       Scripts/OpenNet_Tool/A00RRC00000001A_WX5100_10.txt
 
 # Successful executions
 #	0.0.8	2019-02-20
@@ -26,10 +26,10 @@ Test SetBufferQty 2
 Test SetPacketSize 9000
 Test Run A
 
-# A   NOTHING         FUNCTION          88
+# A   NOTHING         FUNCTION          72
 
 Test SetBufferQty 64
-Test SetPacketSize 88
+Test SetPacketSize 72
 Test Run A
 
 # A   NOTHING         KERNEL          9000
@@ -40,12 +40,12 @@ Test SetBufferQty 2
 Test SetPacketSize 9000
 Test Run A
 
-# A   NOTHING         KERNEL           340
+# A   NOTHING         KERNEL           360
 
 # Smaller packets cause dropped packets and can even cause too long DPC.
 
 Test SetBufferQty 64
-Test SetPacketSize 340
+Test SetPacketSize 360
 Test Run A
 
 # A   REPLY_ON_ERROR  FUNCTION        9000
@@ -57,26 +57,26 @@ Test SetBufferQty 3
 Test SetPacketSize 9000
 Test Run A
 
-# A   REPLY_ON_ERROR  FUNCTION          80
+# A   REPLY_ON_ERROR  FUNCTION          64
 
 Test SetBufferQty 64
-Test SetPacketSize 80
+Test SetPacketSize 64
 Test Run A
 
 # A   REPLY_ON_ERROR  KERNEL          9000
 
 Test SetMode KERNEL
 
-Test SetBufferQty 2
+Test SetBufferQty 3
 Test SetPacketSize 9000
 Test Run A
 
-# A   REPLY_ON_ERROR  KERNEL           380
+# A   REPLY_ON_ERROR  KERNEL           340
 
 # Smaller packets cause dropped packets and can even cause too long DPC.
 
 Test SetBufferQty 64
-Test SetPacketSize 380
+Test SetPacketSize 340
 Test Run A
 
 # B   REPLY           FUNCTION        9000
@@ -88,10 +88,10 @@ Test SetBufferQty 3
 Test SetPacketSize 9000
 Test Run B
 
-# B   REPLY           FUNCTION         160
+# B   REPLY           FUNCTION         136
 
 Test SetBufferQty 64
-Test SetPacketSize 160
+Test SetPacketSize 136
 Test Run B
 
 # B   REPLY           KERNEL          9000
@@ -102,10 +102,10 @@ Test SetBufferQty 3
 Test SetPacketSize 9000
 Test Run B
 
-# B   REPLY           KERNEL           350
+# B   REPLY           KERNEL           308
 
 # Smaller packets cause dropped packets and can even cause too long DPC.
 
 Test SetBufferQty 64
-Test SetPacketSize 350
+Test SetPacketSize 308
 Test Run B

@@ -52,7 +52,7 @@ namespace OpenNet
     //             System_Internal contructor raise an exception
     System * System::Create()
     {
-        System * lResult;
+        System * lResult = NULL; // Avoid the warning
 
         try
         {

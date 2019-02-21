@@ -11,6 +11,7 @@
 // ===== Includes ===========================================================
 #include <OpenNetK/Adapter.h>
 #include <OpenNetK/Adapter_WDF.h>
+#include <OpenNetK/Interface.h>
 
 // ===== ONDK_NDIS =======================================================
 #include "Queue.h"

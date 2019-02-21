@@ -262,8 +262,10 @@ unsigned int ValidateStats0( const unsigned int * aStats, unsigned int aSize_byt
             }
             break;
 
-        case  29 : // ADAPTER_STATS_PACKET_GENERATOR_REPEAT_COUNT
-        case  31 : // ADAPTER_STATS_IOCTL_STATISTICS_RESET
+        case 16 : // ADAPTER_STATS_RUNNING_TIME_ms
+        case 29 : // ADAPTER_STATS_PACKET_GENERATOR_REPEAT_COUNT
+        case 31 : // ADAPTER_STATS_IOCTL_STATISTICS_RESET
+        case 93 : // HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID
             break;
 
         case 36 : // HARDWARE_STATS_INTERRUPT_PROCESS
@@ -281,14 +283,6 @@ unsigned int ValidateStats0( const unsigned int * aStats, unsigned int aSize_byt
             if ( 996 != aStats[ i ] )
             {
                 printf( "ERROR  Counter %3u = %3u, Expected 996\n", i, aStats[ i ] );
-                lResult ++;
-            }
-            break;
-
-        case 93 : // HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID
-            if ( 47 != aStats[ i ] )
-            {
-                printf( "ERROR  Counter %3u = %3u, Expected  47\n", i, aStats[ i ] );
                 lResult ++;
             }
             break;
@@ -337,21 +331,15 @@ unsigned int ValidateStats1( const unsigned int * aStats, unsigned int aSize_byt
             }
             break;
 
-        case  31 : // ADAPTER_STATS_IOCTL_STATISTICS_RESET
+        case 16 : // ADAPTER_STATS_RUNNING_TIME_ms
+        case 31 : // ADAPTER_STATS_IOCTL_STATISTICS_RESET
+        case 93 : // HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID
             break;
 
         case 74 : // HARDWARE_STATS_TX_HOST_byte
             if ( 996 != aStats[ i ] )
             {
                 printf( "ERROR  Counter %3u = %3u, Expected 996\n", i, aStats[ i ] );
-                lResult ++;
-            }
-            break;
-
-        case 93 : // HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID
-            if ( 60 != aStats[ i ] )
-            {
-                printf( "ERROR  Counter %3u = %3u, Expected  60\n", i, aStats[ i ] );
                 lResult ++;
             }
             break;

@@ -1,11 +1,18 @@
 
-// Product / Produit  OpenNet
+// Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNetK/SpinLock.h
-/// \brief   OpenNetK::SpinLock
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/SpinLock.h
+/// \brief      OpenNetK::SpinLock
 
 #pragma once
+
+// Includes
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== Includes ===========================================================
+#include <OpenNetK/OSDep.h>
 
 namespace OpenNetK
 {
@@ -15,9 +22,13 @@ namespace OpenNetK
 
     /// \cond en
     /// \brief  SpinLock interface
+    /// \note   Kernel class - No constructor, no destructor, no virtual
+    ///         method
     /// \endcond
     /// \cond fr
     /// \brief  Interface d'un spinlock
+    /// \note   Classe noyau - Pas de constructeur, pas de destructor, pas de
+    ///         method virtuel
     /// \endcond
     class SpinLock
     {
@@ -25,17 +36,26 @@ namespace OpenNetK
     public:
 
         /// \cond en
-        /// \brief  new operator without allocation
-        /// \param  aSize_byte         The size
-        /// \param  aAddress [---;RW-] The address
+        /// \brief  Set the OS dependant lock instance
+        /// \param  aLock  The instance
         /// \endcond
         /// \cond fr
-        /// \brief  Operateur new sans allocation
-        /// \param  aSize_byte         La taille
-        /// \param  aAddress [---;RW-] L'adresse
+        /// \brief  Initialise l'instance de verou dependant du systeme
+        ///         d'exploitation
+        /// \param  aLock  L'instance
         /// \endcond
-        /// \note   Level = Thread, Thread = Initialisation
-        void * operator new(size_t aSize_byte, void * aAddress);
+        void SetLock(void * aLock);
+
+        /// \cond en
+        /// \brief  Set the OS dependant function table
+        /// \param  aOSDep  The function table
+        /// \endcond
+        /// \cond fr
+        /// \brief  Initialise la table de fonction dependant du systeme
+        ///         d'exploitation
+        /// \param  aOSDep  La table de fonctions
+        /// \endcond
+        void SetOSDep(OpenNetK_OSDep * aOSDep);
 
         /// \cond en
         /// \brief  Lock
@@ -43,7 +63,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Verouiller
         /// \endcond
-        virtual void Lock() = 0;
+        void Lock();
 
         /// \cond en
         /// \brief  Unlock
@@ -51,7 +71,12 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Deverouiller
         /// \endcond
-        virtual void Unlock() = 0;
+        void Unlock();
+
+    private:
+
+        void           * mLock ;
+        OpenNetK_OSDep * mOSDep;
 
     };
 }

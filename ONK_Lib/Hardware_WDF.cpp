@@ -23,16 +23,11 @@
 
 #include <OpenNetK/Hardware_WDF.h>
 
+// ===== ONK_Lib ============================================================
+#include "OSDep_WDF.h"
+
 // Data type
 /////////////////////////////////////////////////////////////////////////////
-
-typedef struct
-{
-    OpenNetK::Hardware_WDF * mHardware_WDF;
-}
-InterruptContext;
-
-WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(InterruptContext, GetInterruptContext)
 
 typedef struct
 {
@@ -68,12 +63,28 @@ namespace OpenNetK
         ASSERT(NULL != aDevice  );
         ASSERT(NULL != aHardware);
 
+        OSDep_Init(&mOSDep, NULL);
+
         mDevice   = aDevice  ;
         mHardware = aHardware;
 
         mMemCount = 0;
 
-        new (&mZone0) SpinLock_WDF(aDevice);
+        WDF_OBJECT_ATTRIBUTES lAttr;
+
+        WDF_OBJECT_ATTRIBUTES_INIT(&lAttr);
+
+        lAttr.ParentObject = aDevice;
+
+        WDFSPINLOCK lSpinLock;
+
+        NTSTATUS lStatus = WdfSpinLockCreate(&lAttr, &lSpinLock);
+        ASSERT(STATUS_SUCCESS == lStatus  );
+        ASSERT(NULL           != lSpinLock);
+        (void)(lStatus);
+
+        mZone0.SetLock (lSpinLock);
+        mZone0.SetOSDep(&mOSDep  );
 
         mHardware->Init(&mZone0);
 
@@ -184,10 +195,10 @@ namespace OpenNetK
 
         for (unsigned int i = 0; i < mMemCount; i++)
         {
-            ASSERT(NULL != mMemVirtual  [i]);
+            ASSERT(NULL != mMem_MA      [i]);
             ASSERT(   0 <  mMemSize_byte[i]);
 
-            MmUnmapIoSpace((PVOID)(mMemVirtual[i]), mMemSize_byte[i]); // volatile_cast
+            MmUnmapIoSpace((PVOID)(mMem_MA[i]), mMemSize_byte[i]); // volatile_cast
         }
 
         mMemCount = 0;
@@ -358,11 +369,11 @@ namespace OpenNetK
 
             WDF_OBJECT_ATTRIBUTES lAttr;
 
-            WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&lAttr, InterruptContext);
+            WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&lAttr, ChildContext);
 
             lResult = WdfInterruptCreate(mDevice, &lConfig, &lAttr, &mInterrupt);
 
-            InterruptContext * lContext = GetInterruptContext(mInterrupt);
+            ChildContext * lContext = GetChildContext(mInterrupt);
             ASSERT(NULL != lContext);
 
             lContext->mHardware_WDF = this;
@@ -390,14 +401,14 @@ namespace OpenNetK
         ASSERT(   0 <  aTranslated->u.Memory.Length);
 
         mMemSize_byte[mMemCount] = aTranslated->u.Memory.Length;
-        mMemVirtual  [mMemCount] = MmMapIoSpace(aTranslated->u.Memory.Start, aTranslated->u.Memory.Length, MmNonCached);
+        mMem_MA      [mMemCount] = MmMapIoSpace(aTranslated->u.Memory.Start, aTranslated->u.Memory.Length, MmNonCached);
 
-        if (NULL == mMemVirtual[mMemCount])
+        if (NULL == mMem_MA[mMemCount])
         {
             return STATUS_INSUFFICIENT_RESOURCES;
         }
 
-        if (!mHardware->SetMemory(mMemCount, mMemVirtual[mMemCount], mMemSize_byte[mMemCount]))
+        if (!mHardware->SetMemory(mMemCount, mMem_MA[mMemCount], mMemSize_byte[mMemCount]))
         {
             return STATUS_UNSUCCESSFUL;
         }
@@ -412,13 +423,15 @@ namespace OpenNetK
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
 
+// ===== Entry points =======================================================
+
 NTSTATUS InterruptDisable(WDFINTERRUPT aInterrupt, WDFDEVICE aAssociatedDevice)
 {
     ASSERT(NULL != aInterrupt);
 
     (void)(aAssociatedDevice);
 
-    InterruptContext * lContext = GetInterruptContext(aInterrupt);
+    ChildContext * lContext = GetChildContext(aInterrupt);
     ASSERT(NULL != lContext               );
     ASSERT(NULL != lContext->mHardware_WDF);
 
@@ -432,7 +445,7 @@ VOID InterruptDpc(WDFINTERRUPT aInterrupt, WDFOBJECT aAssociatedObject)
 
     (void)(aAssociatedObject);
 
-    InterruptContext * lContext = GetInterruptContext(aInterrupt);
+    ChildContext * lContext = GetChildContext(aInterrupt);
     ASSERT(NULL != lContext               );
     ASSERT(NULL != lContext->mHardware_WDF);
 
@@ -445,7 +458,7 @@ NTSTATUS InterruptEnable(WDFINTERRUPT aInterrupt, WDFDEVICE aAssociatedDevice)
 
     (void)(aAssociatedDevice);
 
-    InterruptContext * lContext = GetInterruptContext(aInterrupt);
+    ChildContext * lContext = GetChildContext(aInterrupt);
     ASSERT(NULL != lContext               );
     ASSERT(NULL != lContext->mHardware_WDF);
 
@@ -457,7 +470,7 @@ BOOLEAN InterruptIsr(WDFINTERRUPT aInterrupt, ULONG aMessageId)
 {
     ASSERT(NULL != aInterrupt);
 
-    InterruptContext * lContext = GetInterruptContext(aInterrupt);
+    ChildContext * lContext = GetChildContext(aInterrupt);
     ASSERT(NULL != lContext               );
     ASSERT(NULL != lContext->mHardware_WDF);
 

@@ -14,6 +14,11 @@
 #include <memory.h>
 #include <stdint.h>
 
+#ifdef _KMS_WINDOWS_
+    // ===== Windows ========================================================
+    #include <Windows.h>
+#endif
+
 // ===== Import/Includes ====================================================
 #include <KmsLib/ThreadBase.h>
 

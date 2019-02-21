@@ -24,3 +24,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #define SIZE_OF(S) sizeof( S )
+
+#define TRACE_DEBUG DbgPrintEx( DEBUG_ID, DEBUG_DEBUG, PREFIX
+#define TRACE_ERROR DbgPrintEx( DEBUG_ID, DEBUG_ERROR, PREFIX
+
+#define TRACE_END )

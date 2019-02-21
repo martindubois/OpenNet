@@ -53,6 +53,8 @@ public:
 
     void Buffers_Release ();
 
+    void Connect(IoCtl_Connect_In * aConnect);
+
     void Packet_Send_Ex(const IoCtl_Packet_Send_Ex_In * aIn);
 
     void PacketGenerator_GetConfig(OpenNetK::PacketGenerator_Config * aOut  );
@@ -67,8 +69,6 @@ public:
 
     virtual Thread * Thread_Prepare();
 
-    virtual void Connect(IoCtl_Connect_In * aConnect) = 0;
-
     // ===== OpenNet::Adapter ===============================================
 
     virtual OpenNet::Status GetAdapterNo    (unsigned int * aOut);
@@ -79,6 +79,7 @@ public:
     virtual OpenNet::Status GetStatistics   (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
     virtual bool            IsConnected     ();
     virtual bool            IsConnected     (const OpenNet::System & aSystem);
+    virtual OpenNet::Status Packet_Send     (const void * aData, unsigned int aSize_byte);
     virtual OpenNet::Status ResetInputFilter();
     virtual OpenNet::Status ResetProcessor  ();
     virtual OpenNet::Status ResetStatistics ();

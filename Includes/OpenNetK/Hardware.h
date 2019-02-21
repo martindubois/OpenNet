@@ -13,13 +13,13 @@
 
 // ===== Includes ===========================================================
 #include <OpenNetK/Adapter_Types.h>
-#include <OpenNetK/Packet.h>
 #include <OpenNetK/Types.h>
 
 namespace OpenNetK
 {
 
     class Adapter ;
+    class Packet  ;
     class SpinLock;
 
     // Class
@@ -83,7 +83,7 @@ namespace OpenNetK
         /// \param  aState [---;-W-] L'instance d'OpenNet_State
         /// \endcond
         /// \note   Level = SoftInt or Thread, Thread = Queue
-        virtual void GetState(Adapter_State * aState);
+        virtual void GetState(Adapter_State * aState) = 0;
 
         /// \cond en
         /// \brief  Reset all memory regions
@@ -107,20 +107,16 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Set the common buffer
-        /// \brief  aLogicalAddress           The logical address the
-        ///                                   hardware uses
-        /// \brief  aVirtualAddress [-K-;RW-] The virtual address the
-        ///                                   software uses
+        /// \brief  aCommon_PA  The logical address the hardware uses
+        /// \brief  aCommon_CA  The virtual address the software uses
         /// \endcond
         /// \cond fr
         /// \brief  Associe l'espace de memoire contigue
-        /// \brief  aLogicalAddress           L'adresse logique utilisee par
-        //                                    le materiel
-        /// \brief  aVirtualAddress [-K-;RW-] L'adresse virtuelle utilisee
-        ///                                   par le logiciel
+        /// \brief  aCommon_PA  L'adresse physique utilisee par le materiel
+        /// \brief  aCommon_CA  L'adresse virtuelle utilisee par le logiciel
         /// \endcond
         /// \note   Level = Thread, Thread = Initialisation
-        virtual void SetCommonBuffer(uint64_t aLogicalAddress, void * aVirtualAddress);
+        virtual void SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA);
 
         /// \cond en
         /// \brief  Set the configuation
@@ -135,21 +131,21 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Set a memory region
-        /// \param  aIndex             The index
-        /// \param  aVirtual [-K-;RW-] The virtual address
-        /// \param  aSize_byte         The size
+        /// \param  aIndex      The index
+        /// \param  aMemory_MA  The virtual address
+        /// \param  aSize_byte  The size
         /// \retval false Error
         /// \endcond
         /// \cond fr
         /// \brief  Indique un region de memoire
-        /// \param  aIndex             L'index
-        /// \param  aVirtual [-K-;RW-] L'adresse virtuelle
-        /// \param  aSize_byte         La taille
+        /// \param  aIndex      L'index
+        /// \param  aMemory_MA  L'adresse virtuelle
+        /// \param  aSize_byte  La taille
         /// \retval false Erreur
         /// \endcond
         /// \retval true  OK
         /// \note   Level = Thread, Thread = Initialisation
-        virtual bool SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize_byte);
+        virtual bool SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int aSize_byte);
 
         /// \cond en
         /// \brief  Enter the D0 state
@@ -267,7 +263,7 @@ namespace OpenNetK
         /// \param  aCounter    Le compteur a incrementer
         /// \param  aPacketQty  Le nombre de descripteurs programmes
         /// \endcond
-        virtual void Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty);
+        void Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty);
 
         /// \cond en
         /// \brief  Add a buffer to the receiving queue.
@@ -288,48 +284,48 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Add the buffer to the receiving queue.
-        /// \param  aLogicalAddress       The data
-        /// \param  aPacketData [-K-;RW-] The Packet
-        /// \param  aPacketInfo [-K-;-W-] The OpenNet_PacketInfo
-        /// \param  aCounter    [-K-;RW-] The operation counter
+        /// \param  aPacket_PA      The data
+        /// \param  aPacketData     The Packet
+        /// \param  aPacketInfo_XA  The OpenNet_PacketInfo (C or M)
+        /// \param  aCounter        The operation counter
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le buffer a la queue de reception
-        /// \param  aLogicalAddress       Les donnees
-        /// \param  aPacketData [-K-;RW-] Le Packet
-        /// \param  aPacketInfo [-K-;-W-] Le OpenNet_PacketInfo
-        /// \param  aCounter    [-K-;RW-] Le compteur d'operation
+        /// \param  aPacket_PA      Les donnees
+        /// \param  aPacketData     Le Packet
+        /// \param  aPacketInfo_XA  Le OpenNet_PacketInfo (C or M)
+        /// \param  aCounter        Le compteur d'operation
         /// \endcond
-        virtual void Packet_Receive_NoLock(uint64_t aLogicalAddress, Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter) = 0;
+        virtual void Packet_Receive_NoLock(uint64_t aPacket_PA, Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo_XA, volatile long * aCounter) = 0;
 
         /// \cond en
         /// \brief  Add the packet to the send queue.
-        /// \param  aLogicalAddress    The data
-        /// \param  aVirtualAddress    The data
-        /// \param  aSize_byte         The data size
-        /// \param  aCounter [-KO;RW-] The operation counter
+        /// \param  aPacket_PA  The data
+        /// \param  aPacket_XA  The data (C or M)
+        /// \param  aSize_byte  The data size
+        /// \param  aCounter    The operation counter
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le paquet a la queue de transmission
-        /// \param  aLogicalAddress    Les donnees
-        /// \param  aVirtualAddress    Les donnees
-        /// \param  aSize_byte         La taille des donnees
-        /// \param  aCounter [-KO;RW-] Le compteur d'operation
+        /// \param  aPacket_PA  Les donnees
+        /// \param  aPacket_XA  Les donnees (C or M)
+        /// \param  aSize_byte  La taille des donnees
+        /// \param  aCounter    Le compteur d'operation
         /// \endcond
-        virtual void Packet_Send_NoLock(uint64_t aLogicalAddress, const void * aVirtualAddress, unsigned int aSize_byte, volatile long * aCounter = NULL) = 0;
+        virtual void Packet_Send_NoLock(uint64_t aPacket_PA, const void * aPacket_XA, unsigned int aSize_byte, volatile long * aCounter = NULL) = 0;
 
         /// \cond en
         /// \brief  Add the packet to the send queue.
-        /// \param  aPacket  [---;R--] The packet
-        /// \param  aSize_byte         The packet size
-        /// \param  aRepeatCount       The repeat count
+        /// \param  aPacket       The packet
+        /// \param  aSize_byte    The packet size
+        /// \param  aRepeatCount  The repeat count
         /// \retval false  Error
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le paquet a la queue de transmission
-        /// \param  aPacket  [---;R--] Le paquet
-        /// \param  aSize_byte         La taille du paquet
-        /// \param  aRepeatCount       Le nombre de repetition
+        /// \param  aPacket       Le paquet
+        /// \param  aSize_byte    La taille du paquet
+        /// \param  aRepeatCount  Le nombre de repetition
         /// \retval false  Erreur
         /// \endcond
         /// \note   Thread = Queue
@@ -338,7 +334,7 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Retrieve statistics
-        /// \param  aOut [---;-W-] The output buffer
+        /// \param  aOut           The output buffer
         /// \param  aOutSize_byte  The output buffer size
         /// \param  aReset         Reset the statitics after getting them
         /// \return This method returns the size of statistics writen into
@@ -346,7 +342,7 @@ namespace OpenNetK
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir les statistiques
-        /// \param  aOut [---;-W-] L'espace de memoire de sortie
+        /// \param  aOut           L'espace de memoire de sortie
         /// \param  aOutSize_byte  La taille de l'espace memoire de sortie
         /// \param  aReset         Remettre les statistiques a zero apres les
         ///                        avoir obtenus
@@ -378,22 +374,22 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Skip the dangerous 64 KiB boundaries
-        /// \param  aLogical    [---;RW-]
-        /// \param  aVirtual    [---;RW-]
+        /// \param  aIn_PA
+        /// \param  aIn_XA      (C or M)
         /// \param  aSize_byte
-        /// \param  aOutLogical [---;-W-]
-        /// \param  aOutVirtual [---;-W-]
+        /// \param  aOut_PA
+        /// \param  aOut_XA     (C or M)
         /// \endcond
         /// \cond fr
         /// \brief  Passer les dangereuse barriere de 64 Kio
-        /// \param  aLogical    [---;RW-]
-        /// \param  aVirtual    [---;RW-]
+        /// \param  aIn_PA
+        /// \param  aIn_XA      (C ou M)
         /// \param  aSize_byte
-        /// \param  aOutLogical [---;-W-]
-        /// \param  aOutVirtual [---;-W-]
+        /// \param  aOut_PA
+        /// \param  aOut_XA     (C or M)
         /// \endcond
         /// \note   Thread = Initialisation
-        static void SkipDangerousBoundary(uint64_t * aLogical, uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, uint8_t ** aOutVirtual);
+        static void SkipDangerousBoundary(uint64_t * aIn_PA, uint8_t ** aIn_XA, unsigned int aSize_byte, uint64_t * aOut_PA, uint8_t ** aOut_XA);
 
         /// \cond en
         /// \brief  The default constructor
@@ -413,6 +409,22 @@ namespace OpenNetK
         /// \return Cette methode retourne l'adresse de l'instance d'Adapter.
         /// \endcond
         Adapter * GetAdapter();
+
+        /// \cond en
+        /// \brief  Hardware dependent part of the Unlock_AfterReceive
+        /// \endcond
+        /// \cond fr
+        /// \brief  La partie de Unlock_AfterReceive qui depend du materiel
+        /// \endcond
+        virtual void Unlock_AfterReceive_Internal() = 0;
+
+        /// \cond en
+        /// \brief  Hardware dependent part of the Unlock_AfterSend
+        /// \endcond
+        /// \cond fr
+        /// \brief  La partie de Unlock_AfterSend qui depend du materiel
+        /// \endcond
+        virtual void Unlock_AfterSend_Internal() = 0;
 
         /// \cond en
         /// \brief  The adapter configuration

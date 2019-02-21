@@ -12,7 +12,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
-#include <OpenNetK/SpinLock_WDF.h>
+#include <OpenNetK/OSDep.h>
+#include <OpenNetK/SpinLock.h>
 
 namespace OpenNetK
 {
@@ -38,13 +39,13 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Initialize the instance.
-        /// \param  aDevice   [-K-;RW-] The WDFDEVICE
-        /// \param  aHardware [-K-;RW-] The Hardware
+        /// \param  aDevice   ] The WDFDEVICE
+        /// \param  aHardware ] The Hardware
         /// \endcond
         /// \cond fr
         /// \brief  Initialise l'instance
-        /// \param  aDevice   [-K-;RW-] Le WDFDEVICE
-        /// \param  aHardware [-K-;RW-] L'Hardware
+        /// \param  aDevice   Le WDFDEVICE
+        /// \param  aHardware L'Hardware
         /// \endcond
         /// \retval STATUS_SUCCESS
         NTSTATUS Init(WDFDEVICE aDevice, Hardware * aHardware);
@@ -73,13 +74,13 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Prepare the hardware
-        /// \param  aRaw        [---;R--] The raw ressources
-        /// \param  aTranslated [---;RW-] The translated ressources
+        /// \param  aRaw         The raw ressources
+        /// \param  aTranslated  The translated ressources
         /// \endcond
         /// \cond fr
         /// \brief  Prepare le meteriel
-        /// \param  aRaw        [---;R--] Les ressources "raw"
-        /// \param  aTranslated [---;RW-] Les ressources "translated"
+        /// \param  aRaw         Les ressources "raw"
+        /// \param  aTranslated  Les ressources "translated"
         /// \endcond
         /// \retval STATUS_SUCCESS
         NTSTATUS PrepareHardware(WDFCMRESLIST aRaw, WDFCMRESLIST aTranslated);
@@ -120,20 +121,21 @@ namespace OpenNetK
         WDFDEVICE       mDevice      ;
         WDFDMAENABLER   mDmaEnabler  ;
         Hardware      * mHardware    ;
+        OpenNetK_OSDep  mOSDep       ;
 
         unsigned int mIntCount ;
         WDFINTERRUPT mInterrupt;
 
         unsigned int mMemCount;
         unsigned int mMemSize_byte[6];
-        void       * mMemVirtual  [6];
+        void       * mMem_MA      [6];
 
         WDFTIMER mTimer;
 
         WDFWORKITEM mWorkItem;
 
         // ===== Zone 0 =====================================================
-        SpinLock_WDF mZone0;
+        SpinLock mZone0;
 
     };
 

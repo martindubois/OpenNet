@@ -11,12 +11,10 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
-#include <OpenNetK/Debug.h>
 #include <OpenNetK/OS.h>
 #include <OpenNetK/StdInt.h>
 
 #include <OpenNetK/Adapter.h>
-#include <OpenNetK/Constants.h>
 #include <OpenNetK/Hardware_Statistics.h>
 #include <OpenNetK/SpinLock.h>
 
@@ -47,13 +45,6 @@ namespace OpenNetK
         return mConfig.mPacketSize_byte;
     }
 
-    void Hardware::GetState(Adapter_State * aState)
-    {
-        ASSERT(NULL != aState);
-
-        (void)(aState);
-    }
-
     void Hardware::ResetMemory()
     {
     }
@@ -70,12 +61,12 @@ namespace OpenNetK
     // NOT TESTED  ONK_Lib.Hardware
     //             The SetCommonBuffer is only there to fill the virtual
     //             table entry when the driver does not need a common buffer.
-    void Hardware::SetCommonBuffer(uint64_t aLogicalAddress, void * aVirtualAddress)
+    void Hardware::SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA)
     {
-        ASSERT(NULL != aVirtualAddress);
+        ASSERT(NULL != aCommon_CA);
 
-        (void)(aLogicalAddress);
-        (void)(aVirtualAddress);
+        (void)(aCommon_PA);
+        (void)(aCommon_CA);
 
         ASSERT(false);
     }
@@ -89,13 +80,13 @@ namespace OpenNetK
         mStatistics[HARDWARE_STATS_SET_CONFIG] ++;
     }
 
-    bool Hardware::SetMemory(unsigned int aIndex, void * aVirtual, unsigned int aSize_byte)
+    bool Hardware::SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int aSize_byte)
     {
-        ASSERT(NULL != aVirtual  );
+        ASSERT(NULL != aMemory_MA);
         ASSERT(   0 <  aSize_byte);
 
-        (void)(aVirtual  );
         (void)(aIndex    );
+        (void)(aMemory_MA);
         (void)(aSize_byte);
 
         return true;
@@ -190,6 +181,10 @@ namespace OpenNetK
             InterlockedAdd(aCounter, aPacketQty);
         #endif
 
+        Unlock_AfterReceive_Internal();
+
+        mStatistics[OpenNetK::HARDWARE_STATS_PACKET_RECEIVE] += aPacketQty;
+
         Unlock();
     }
 
@@ -198,15 +193,22 @@ namespace OpenNetK
     {
         // TRACE_DEBUG "Unlock_AfterSend( , %u packet )" DEBUG_EOL, aPacketQty TRACE_END;
 
-        if ((0 < aPacketQty) && (NULL != aCounter))
+        if (0 < aPacketQty)
         {
-            #ifdef _KMS_LINUX_
-                ( * aCounter ) += aPacketQty;
-            #endif
+            if (NULL != aCounter)
+            {
+                #ifdef _KMS_LINUX_
+                    ( * aCounter ) += aPacketQty;
+                #endif
 
-            #ifdef _KMS_WINDOWS_
-                InterlockedAdd(aCounter, aPacketQty);
-            #endif
+                #ifdef _KMS_WINDOWS_
+                    InterlockedAdd(aCounter, aPacketQty);
+                #endif
+            }
+
+            Unlock_AfterSend_Internal();
+
+            mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
         }
 
         Unlock();
@@ -290,33 +292,33 @@ namespace OpenNetK
     // Protected
     /////////////////////////////////////////////////////////////////////////
 
-    void Hardware::SkipDangerousBoundary(uint64_t * aLogical, uint8_t ** aVirtual, unsigned int aSize_byte, uint64_t * aOutLogical, uint8_t ** aOutVirtual)
+    void Hardware::SkipDangerousBoundary(uint64_t * aIn_PA, uint8_t ** aIn_XA, unsigned int aSize_byte, uint64_t * aOut_PA, uint8_t ** aOut_XA)
     {
-        ASSERT(NULL                                  !=   aLogical   );
-        ASSERT(NULL                                  !=   aVirtual   );
-        ASSERT(NULL                                  != (*aVirtual  ));
+        ASSERT(NULL                                  !=   aIn_PA     );
+        ASSERT(NULL                                  !=   aIn_XA     );
+        ASSERT(NULL                                  != (*aIn_XA    ));
         ASSERT(                                    0 <    aSize_byte );
         ASSERT(OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte >    aSize_byte );
-        ASSERT(NULL                                  !=   aOutLogical);
-        ASSERT(NULL                                  !=   aOutVirtual);
+        ASSERT(NULL                                  !=   aOut_PA    );
+        ASSERT(NULL                                  !=   aOut_XA    );
 
-        uint64_t lEnd = (*aLogical) + aSize_byte - 1;
+        uint64_t lEnd = (*aIn_PA) + aSize_byte - 1;
 
-        if (((*aLogical) & OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte) == (lEnd & OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte))
+        if (((*aIn_PA) & OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte) == (lEnd & OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte))
         {
-            (*aOutLogical) = (*aLogical);
-            (*aOutVirtual) = (*aVirtual);
+            (*aOut_PA) = (*aIn_PA);
+            (*aOut_XA) = (*aIn_XA);
         }
         else
         {
-            uint64_t lOffset_byte = OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte - ((*aLogical) % OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte);
+            uint64_t lOffset_byte = OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte - ((*aIn_PA) % OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte);
 
-            (*aOutLogical) = (*aLogical) + lOffset_byte;
-            (*aOutVirtual) = (*aVirtual) + lOffset_byte;
+            (*aOut_PA) = (*aIn_PA) + lOffset_byte;
+            (*aOut_XA) = (*aIn_XA) + lOffset_byte;
         }
 
-        (*aLogical) = (*aOutLogical) + aSize_byte;
-        (*aVirtual) = (*aOutVirtual) + aSize_byte;
+        (*aIn_PA) = (*aOut_PA) + aSize_byte;
+        (*aIn_XA) = (*aOut_XA) + aSize_byte;
     }
 
     Hardware::Hardware() : mAdapter(NULL), mZone0(NULL)

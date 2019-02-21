@@ -29,7 +29,7 @@
 #include "../Common/IoCtl.h"
 
 // ===== ONK_Lib ============================================================
-#include "IoCtl.h"
+#include "OSDep_WDF.h"
 
 namespace OpenNetK
 {
@@ -43,15 +43,30 @@ namespace OpenNetK
         ASSERT(NULL != aDevice      );
         ASSERT(NULL != aHardware_WDF);
 
+        OSDep_Init(&mOSDep, this);
+
         mAdapter      = aAdapter     ;
         mDevice       = aDevice      ;
-        mEvent        = NULL         ;
-        mFileObject   = NULL         ;
         mHardware_WDF = aHardware_WDF;
 
-        new (&mZone0) SpinLock_WDF(aDevice);
+        WDF_OBJECT_ATTRIBUTES lAttr;
 
-        mAdapter->Init(&mZone0);
+        WDF_OBJECT_ATTRIBUTES_INIT(&lAttr);
+
+        lAttr.ParentObject = aDevice;
+
+        WDFSPINLOCK lSpinLock;
+
+        NTSTATUS lStatus = WdfSpinLockCreate(&lAttr, &lSpinLock);
+        ASSERT(STATUS_SUCCESS == lStatus  );
+        ASSERT(NULL           != lSpinLock);
+        (void)(lStatus);
+
+        mZone0.SetLock (lSpinLock);
+        mZone0.SetOSDep(&mOSDep  );
+
+        mAdapter->Init    (&mZone0);
+        mAdapter->SetOSDep(&mOSDep);
     }
 
     void Adapter_WDF::FileCleanup(WDFFILEOBJECT aFileObject)
@@ -60,12 +75,7 @@ namespace OpenNetK
 
         ASSERT(NULL != mAdapter);
 
-        if (mFileObject == aFileObject)
-        {
-            mAdapter->Disconnect();
-
-            Disconnect();
-        }
+        mAdapter->FileCleanup( aFileObject );
     }
 
     void Adapter_WDF::IoDeviceControl(WDFREQUEST aRequest, size_t aOutSize_byte, size_t aInSize_byte, ULONG aCode)
@@ -76,7 +86,7 @@ namespace OpenNetK
 
         NTSTATUS lStatus = STATUS_NOT_SUPPORTED;
 
-        Adapter::IoCtl_Info lInfo;
+        OpenNetK_IoCtl_Info lInfo;
 
         if (mAdapter->IoCtl_GetInfo(aCode, &lInfo))
         {
@@ -96,7 +106,7 @@ namespace OpenNetK
                     lStatus = (0 < aOutSize_byte) ? WdfRequestRetrieveOutputBuffer(aRequest, lInfo.mOut_MinSize_byte, &lOut, NULL) : STATUS_SUCCESS;
                     if (STATUS_SUCCESS == lStatus)
                     {
-                        int lRet = mAdapter->IoCtl(aCode, lIn, static_cast<unsigned int>(aInSize_byte), lOut, static_cast<unsigned int>(aOutSize_byte));
+                        int lRet = mAdapter->IoCtl(WdfRequestGetFileObject( aRequest ), aCode, lIn, static_cast<unsigned int>(aInSize_byte), lOut, static_cast<unsigned int>(aOutSize_byte));
 
                         ProcessIoCtlResult(lRet);
 
@@ -126,23 +136,16 @@ namespace OpenNetK
         {
             NTSTATUS lStatus;
 
-            if (NULL == mFileObject)
-            {
-                IoCtl_Connect_In * lIn         ;
-                size_t             lInSize_byte;
+            IoCtl_Connect_In * lIn         ;
+            size_t             lInSize_byte;
 
-                lStatus = WdfRequestRetrieveInputBuffer(aRequest, sizeof(IoCtl_Connect_In), reinterpret_cast<PVOID *>(&lIn), &lInSize_byte);
-                if (STATUS_SUCCESS == lStatus)
-                {
-                    ASSERT(NULL                     != lIn         );
-                    ASSERT(sizeof(IoCtl_Connect_In) <= lInSize_byte);
-
-                    lStatus = Connect(lIn, WdfRequestGetFileObject(aRequest));
-                }
-            }
-            else
+            lStatus = WdfRequestRetrieveInputBuffer(aRequest, sizeof(IoCtl_Connect_In), reinterpret_cast<PVOID *>(&lIn), &lInSize_byte);
+            if (STATUS_SUCCESS == lStatus)
             {
-                lStatus = STATUS_INVALID_STATE_TRANSITION;
+                ASSERT(NULL                     != lIn         );
+                ASSERT(sizeof(IoCtl_Connect_In) <= lInSize_byte);
+
+                lStatus = Connect(lIn);
             }
 
             if (STATUS_SUCCESS != lStatus)
@@ -155,11 +158,31 @@ namespace OpenNetK
         WdfDeviceEnqueueRequest(mDevice, aRequest);
     }
 
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    // SharedMemory_Translate ==> SharedMemory_Release
+    //
+    // Level   PASSIVE
+    // Thread  Users
+    void Adapter_WDF::SharedMemory_Release()
+    {
+        ASSERT(NULL != mSharedMemory_MDL);
+
+        // MmProbeAndLockPages          ==> MmUnlockPages    See SharedMemory_Translate
+        // MmGetSystemAddressForMdlSafe ==> MmUnlockedPages  See SharedMemory_Translate
+        MmUnlockPages(mSharedMemory_MDL);
+
+        // IoAllocateMdl ==> IoFreeMdl  See SharedMemory_Translate
+        IoFreeMdl(mSharedMemory_MDL);
+
+        mSharedMemory_MDL = NULL;
+    }
+
     // Private
     /////////////////////////////////////////////////////////////////////////
 
     // aIn [---;RW-] The input data
-    // aFileObject   The file object
     //
     // Return  STATUS_SUCCESS
     //         See Event_Translate
@@ -167,91 +190,14 @@ namespace OpenNetK
     //
     // Level    PASSIVE
     // Threads  Users
-    NTSTATUS Adapter_WDF::Connect(void * aIn, WDFFILEOBJECT aFileObject)
+    NTSTATUS Adapter_WDF::Connect(void * aIn)
     {
         ASSERT(NULL != aIn        );
-        ASSERT(NULL != aFileObject);
 
         IoCtl_Connect_In * lIn = reinterpret_cast<IoCtl_Connect_In *>(aIn);
 
-        // Event_Translate ==> Event_Release  See FileCleanup
-        NTSTATUS lResult = Event_Translate(&lIn->mEvent);
-        if (STATUS_SUCCESS == lResult)
-        {
-            ASSERT(NULL != lIn->mEvent);
-
-            // SharedMemory_Translate ==> SharedMemory_Release  See FileCleanup
-            lResult = SharedMemory_Translate(&lIn->mSharedMemory);
-            if (STATUS_SUCCESS == lResult)
-            {
-                mFileObject = aFileObject;
-            }
-            else
-            {
-                Event_Release();
-            }
-        }
-
-        return lResult;
-    }
-
-    // Level   PASSIVE
-    // Thread  Users
-    void Adapter_WDF::Disconnect()
-    {
-        ASSERT(NULL != mFileObject);
-
-        // Event_Translate ==> Event_Release  See IoInCallerContext
-        Event_Release();
-
-        // SharedMemory_Translate ==> SharedMemory_Release  See IoInCallerContext
-        SharedMemory_Release();
-
-        mFileObject = NULL;
-    }
-
-    // Level   PASSIVE
-    // Thread  Users
-    void Adapter_WDF::Event_Release()
-    {
-        ASSERT(NULL != mEvent);
-
-        // ObReferenceObjectByHandle ==> ObDereferenceObject  See Event_Translate
-        ObDereferenceObject(mEvent);
-
-        mEvent = NULL;
-    }
-
-    // Event_Translate ==> Event_Release
-    //
-    // Level   PASSIVE
-    // Thread  Users
-    NTSTATUS Adapter_WDF::Event_Translate(uint64_t * aEvent)
-    {
-        ASSERT(NULL != aEvent);
-
-        ASSERT(NULL == mEvent);
-
-        if (NULL == (*aEvent))
-        {
-            return STATUS_INVALID_HANDLE;
-        }
-
-        if (NULL != mEvent)
-        {
-            return STATUS_INVALID_STATE_TRANSITION;
-        }
-
-        // ObReferenceObjectByHandle ==> ObDereferenceObject  See Event_Release
-        NTSTATUS lResult = ObReferenceObjectByHandle(reinterpret_cast<HANDLE>(*aEvent), SYNCHRONIZE, *ExEventObjectType, UserMode, reinterpret_cast<PVOID *>(&mEvent), NULL);
-        if (STATUS_SUCCESS == lResult)
-        {
-            ASSERT(NULL != mEvent);
-
-            (*aEvent) = reinterpret_cast<uint64_t>(mEvent);
-        }
-
-        return lResult;
+        // SharedMemory_Translate ==> SharedMemory_Release  See FileCleanup
+        return SharedMemory_Translate(&lIn->mSharedMemory);
     }
 
     // Level   DISPATCH
@@ -260,13 +206,14 @@ namespace OpenNetK
     {
         ASSERT(NULL != mHardware_WDF);
 
-        IoCtl_Result lIoCtlResult = static_cast<IoCtl_Result>(aIoCtlResult);
+        OpenNetK_IoCtl_Result lIoCtlResult = static_cast<OpenNetK_IoCtl_Result>(aIoCtlResult);
 
         switch (lIoCtlResult)
         {
         case IOCTL_RESULT_INVALID_SYSTEM_ID:
         case IOCTL_RESULT_TOO_MANY_ADAPTER :
-            Disconnect();
+            // SharedMemory_Translate ==> SharedMemory_Release  See IoInCallerContext
+            SharedMemory_Release();
             break;
 
         case IOCTL_RESULT_PROCESSING_NEEDED:
@@ -295,24 +242,6 @@ namespace OpenNetK
         }
 
         return lResult;
-    }
-
-    // SharedMemory_Translate ==> SharedMemory_Release
-    //
-    // Level   PASSIVE
-    // Thread  Users
-    void Adapter_WDF::SharedMemory_Release()
-    {
-        ASSERT(NULL != mSharedMemory_MDL);
-
-        // MmProbeAndLockPages          ==> MmUnlockPages    See SharedMemory_Translate
-        // MmGetSystemAddressForMdlSafe ==> MmUnlockedPages  See SharedMemory_Translate
-        MmUnlockPages(mSharedMemory_MDL);
-
-        // IoAllocateMdl ==> IoFreeMdl  See SharedMemory_Translate
-        IoFreeMdl(mSharedMemory_MDL);
-
-        mSharedMemory_MDL = NULL;
     }
 
     // aSharedMemory [DK-;RW-]
@@ -367,7 +296,7 @@ namespace OpenNetK
     {
         ASSERT(NULL != aRequest);
 
-        IoCtl_Result lIoCtlResult = static_cast<IoCtl_Result>(aIoCtlResult);
+        OpenNetK_IoCtl_Result lIoCtlResult = static_cast<OpenNetK_IoCtl_Result>(aIoCtlResult);
 
         NTSTATUS lResult;
 
@@ -378,11 +307,21 @@ namespace OpenNetK
             lResult = STATUS_SUCCESS;
             break;
 
-        case IOCTL_RESULT_ERROR           : lResult = STATUS_UNSUCCESSFUL      ; break;
-        case IOCTL_RESULT_TOO_MANY_ADAPTER: lResult = STATUS_TOO_MANY_NODES    ; break;
-        case IOCTL_RESULT_TOO_MANY_BUFFER : lResult = STATUS_TOO_MANY_ADDRESSES; break;
+        case IOCTL_RESULT_ALREADY_CONNECTED: lResult = STATUS_ALREADY_COMMITTED       ; break;
+        case IOCTL_RESULT_ERROR            : lResult = STATUS_UNSUCCESSFUL            ; break;
+        case IOCTL_RESULT_INVALID_PARAMETER: lResult = STATUS_INVALID_PARAMETER       ; break;
+        case IOCTL_RESULT_INVALID_SYSTEM_ID: lResult = STATUS_INVALID_SID             ; break;
+        case IOCTL_RESULT_NO_BUFFER        : lResult = STATUS_NO_MEMORY               ; break;
+        case IOCTL_RESULT_NOT_SET          : lResult = STATUS_NOT_COMMITTED           ; break;
+        case IOCTL_RESULT_RUNNING          : lResult = STATUS_INVALID_STATE_TRANSITION; break;
+        case IOCTL_RESULT_STOPPED          : lResult = STATUS_INVALID_STATE_TRANSITION; break;
+        case IOCTL_RESULT_SYSTEM_ERROR     : lResult = STATUS_UNSUCCESSFUL            ; break;
+        case IOCTL_RESULT_TOO_MANY_ADAPTER : lResult = STATUS_TOO_MANY_NODES          ; break;
+        case IOCTL_RESULT_TOO_MANY_BUFFER  : lResult = STATUS_TOO_MANY_ADDRESSES      ; break;
 
         default:
+            ASSERT(0 < lIoCtlResult);
+
             WdfRequestSetInformation(aRequest, lIoCtlResult);
             lResult = STATUS_SUCCESS;
         }

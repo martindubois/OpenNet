@@ -8,8 +8,7 @@
 // type used only to pass data in or out of IoCtl.
 
 // TODO  Common.IoCtl
-//       Low (Cleanup) - Retirer lee IOCTL_PACKET_SEND et
-//       IOCTL_STATISTICS_RESET
+//       Low (Cleanup) - Retirer IOCTL_STATISTICS_RESET
 
 #pragma once
 
@@ -25,6 +24,15 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #ifdef _KMS_LINUX_
+    // 3 2         1         0
+    // 10987654321098765432109876543210
+    // {}{--14 bits---}{8 bits}{8 bits}
+    //  |      |          |        |
+    //  |      |          |        +-- Function code (N)
+    //  |      |          +-- Type - Alwais 'O' (0x4f)
+    //  |      +-- Size in bytes (sizeof(S))
+    //  +-- Direction - 00 = _IOC_NONE, 01 = _IOC_WRITE, 10 = _IOC_READ
+
     #define IOCTL_CODE(N)      _IO('O',N)
     #define IOCTL_CODE_R(N,S)  _IOR('O',N,S)
     #define IOCTL_CODE_RW(N,S) _IOWR('O',N,S)
@@ -33,6 +41,16 @@
 #endif
 
 #ifdef _KMS_WINDOWS_
+    // 3 2         1         0
+    // 10987654321098765432109876543210
+    // |{---15 bits---}{}|{-11 bits-}{}
+    // |       |        ||     |      |
+    // |       |        ||     |      +-- Transfer type - 00 = METHOD_BUFFERED
+    // |       |        ||     +-- Function code (N)
+    // |       |        |+-- Custom - Always 1
+    // |       |        +-- Required access - 00 = FILE_ANY_ACCESS
+    // |       +-- Device type - 0
+    // +-- Common - Always 1
     #define IOCTL_CODE(N)      CTL_CODE( 0x8000, 0x800 + N, METHOD_BUFFERED, FILE_ANY_ACCESS)
     #define IOCTL_CODE_R(N,S)  CTL_CODE( 0x8000, 0x800 + N, METHOD_BUFFERED, FILE_ANY_ACCESS)
     #define IOCTL_CODE_RW(N,S) CTL_CODE( 0x8000, 0x800 + N, METHOD_BUFFERED, FILE_ANY_ACCESS)
@@ -60,10 +78,6 @@
 // Input   None
 // Output  OpenNetK::Adatper_Info
 #define IOCTL_INFO_GET          IOCTL_CODE_R(32, OpenNetK::Adapter_Info)
-
-// Input   The paquet
-// Output  None
-#define IOCTL_PACKET_SEND       IOCTL_CODE_W2(48, 16 * 1024)
 
 // Input   IoCtl_Packet_Send_Ex_In
 //         The packet

@@ -59,15 +59,15 @@ void VirtualHardware::Rx_IndicatePacket(const void * aData, unsigned int aSize_b
     }
     else
     {
-        ASSERT(NULL != mRx_Counter   [mRx_Out]);
-        ASSERT(NULL != mRx_PacketData[mRx_Out]);
-        ASSERT(NULL != mRx_PacketInfo[mRx_Out]);
+        ASSERT(NULL != mRx_Counter      [mRx_Out]);
+        ASSERT(NULL != mRx_PacketData   [mRx_Out]);
+        ASSERT(NULL != mRx_PacketInfo_MA[mRx_Out]);
 
         memcpy(mRx_PacketData[mRx_Out]->GetVirtualAddress(), aData, aSize_byte);
 
-        mRx_PacketData[mRx_Out]->IndicateRxCompleted();
-        mRx_PacketInfo[mRx_Out]->mSize_byte = aSize_byte; // Writing DirectGMA buffer !
-        mRx_PacketInfo[mRx_Out]->mSendTo    =          0; // Writing DirectGMA buffer !
+        mRx_PacketData   [mRx_Out]->IndicateRxCompleted();
+        mRx_PacketInfo_MA[mRx_Out]->mSize_byte = aSize_byte;
+        mRx_PacketInfo_MA[mRx_Out]->mSendTo    =          0;
 
         InterlockedDecrement(mRx_Counter[mRx_Out]);
 
@@ -94,18 +94,13 @@ void VirtualHardware::Tx_RegisterCallback(Tx_Callback * aCallback, void * aConte
     mTx_Context  = aContext ;
 }
 
-// Protected
-/////////////////////////////////////////////////////////////////////////////
-
-// ===== OpenNetK::Adapter ==================================================
+// ===== OpenNetK::Hardware =================================================
 
 void VirtualHardware::GetState(OpenNetK::Adapter_State * aState)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
     ASSERT(NULL != aState);
-
-    Hardware::GetState(aState);
 
     aState->mFlags.mFullDuplex = true ;
     aState->mFlags.mLinkUp     = true ;
@@ -129,19 +124,25 @@ void VirtualHardware::D0_Entry()
     Hardware::D0_Entry();
 }
 
+bool VirtualHardware::Packet_Drop()
+{
+    // TODO Dev
+    return false;
+}
+
 // CRITICAL PATH - Packet
-void VirtualHardware::Packet_Receive_NoLock(uint64_t aData, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter)
+void VirtualHardware::Packet_Receive_NoLock(uint64_t aData, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo_MA, volatile long * aCounter)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , , ,  )" DEBUG_EOL);
 
-    ASSERT(NULL != aPacketData);
-    ASSERT(NULL != aPacketInfo);
-    ASSERT(NULL != aCounter   );
+    ASSERT(NULL != aPacketData   );
+    ASSERT(NULL != aPacketInfo_MA);
+    ASSERT(NULL != aCounter      );
 
-    mRx_Counter   [mRx_In] = aCounter   ;
-    mRx_Data      [mRx_In] = aData      ;
-    mRx_PacketData[mRx_In] = aPacketData;
-    mRx_PacketInfo[mRx_In] = aPacketInfo;
+    mRx_Counter      [mRx_In] = aCounter      ;
+    mRx_Data         [mRx_In] = aData         ;
+    mRx_PacketData   [mRx_In] = aPacketData   ;
+    mRx_PacketInfo_MA[mRx_In] = aPacketInfo_MA;
 
     mRx_PacketData[mRx_In]->IndicateRxRunning();
 
@@ -215,4 +216,19 @@ bool VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte,
     }
 
     return true;
+}
+
+// Protected
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== OpenNetK::Hardware =================================================
+
+void VirtualHardware::Unlock_AfterReceive_Internal()
+{
+    // TODO  Dev
+}
+
+void VirtualHardware::Unlock_AfterSend_Internal()
+{
+    // TODO  Dev
 }

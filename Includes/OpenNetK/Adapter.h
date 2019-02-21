@@ -1,5 +1,5 @@
 
-// Product / Produit  OpenNet
+// Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
@@ -116,10 +116,10 @@ namespace OpenNetK
         {
             Buffer mBuffer;
 
-            uint8_t              * mBase  ;
-            OpenNet_BufferHeader * mHeader;
-            volatile uint32_t    * mMarker;
-            Packet               * mPackets;
+            uint8_t              * mBase_XA  ; // C or M
+            OpenNet_BufferHeader * mHeader_XA; // C or M
+            volatile uint32_t    * mMarker_MA;
+            Packet               * mPackets  ;
 
             struct
             {
@@ -156,7 +156,7 @@ namespace OpenNetK
 
     private:
 
-        void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader, const Buffer & aBuffer, Packet * aPackets);
+        void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader_XA, const Buffer & aBuffer, Packet * aPackets);
         void Buffer_Queue_Zone0      (const Buffer & aBuffer);
         void Buffer_Release_Zone0    ();
         void Buffer_Receive_Zone0    (BufferInfo * aBufferInfo);
@@ -178,7 +178,6 @@ namespace OpenNetK
         int IoCtl_Connect         (const void           * aIn , void * aFileObject );
         int IoCtl_Info_Get        (      Adapter_Info   * aOut) const;
         int IoCtl_Packet_Drop     ();
-        int IoCtl_Packet_Send     (const void           * aIn , unsigned int aInSize_byte );
         int IoCtl_Packet_Send_Ex  (const void           * aIn , unsigned int aInSize_byte );
         int IoCtl_PacketGenerator_Config_Get(      PacketGenerator_Config * aOut);
         int IoCtl_PacketGenerator_Config_Set(const PacketGenerator_Config * aIn , PacketGenerator_Config * aOut);
@@ -206,9 +205,7 @@ namespace OpenNetK
 
         OpenNetK_OSDep * mOSDep;
 
-        #ifdef _KMS_WINDOWS_
-            mutable LARGE_INTEGER mStatistics_Start;
-        #endif
+        mutable uint64_t mStatistics_Start_us;
 
         // ===== Zone 0 =====================================================
         SpinLock * mZone0;

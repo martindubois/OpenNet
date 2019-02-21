@@ -12,6 +12,7 @@
 #include <OpenNetK/Adapter.h>
 #include <OpenNetK/Adapter_WDF.h>
 #include <OpenNetK/Hardware_WDF.h>
+#include <OpenNetK/Interface.h>
 
 // ===== ONK_Pro1000 ========================================================
 #include "Queue.h"
@@ -211,7 +212,7 @@ NTSTATUS D0Exit(WDFDEVICE aDevice, WDF_POWER_DEVICE_STATE aTargetState)
 // Threads  Users
 void FileCleanup(WDFFILEOBJECT aFileObject)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
     ASSERT(NULL != aFileObject);
 
@@ -227,7 +228,7 @@ void FileCleanup(WDFFILEOBJECT aFileObject)
 // Threads  Users
 void FileClose(WDFFILEOBJECT aFileObject)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
 
     ASSERT(NULL != aFileObject);
 
@@ -237,7 +238,7 @@ void FileClose(WDFFILEOBJECT aFileObject)
 // Threads  Users
 void FileCreate(WDFDEVICE aDevice, WDFREQUEST aRequest, WDFFILEOBJECT aFileObject)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
+    // DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
 
     ASSERT(NULL != aDevice    );
     ASSERT(NULL != aRequest   );

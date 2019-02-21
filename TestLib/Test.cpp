@@ -905,6 +905,10 @@ namespace TestLib
             {
                 lKernel->Display(stdout);
             }
+            else
+            {
+                mKernels[0].Display(stdout);
+            }
 
             printf(__FUNCTION__ " - System::Start(  ) returned %u\n", lStatus);
             return __LINE__;
@@ -1366,7 +1370,7 @@ namespace TestLib
         assert(NULL != aKernel );
         assert(NULL != aCode   );
 
-        OpenNet::Status lStatus = aKernel->SetCode(aCode, static_cast<unsigned int>(strlen(aCode)));
+        OpenNet::Status lStatus = aKernel->SetCode(aCode, static_cast<unsigned int>(strlen(aCode)), 1);
         assert(OpenNet::STATUS_OK == lStatus);
 
         if (NULL != aIndex)

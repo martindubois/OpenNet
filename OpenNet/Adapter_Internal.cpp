@@ -99,8 +99,6 @@ Adapter_Internal::~Adapter_Internal()
 
     assert(NULL != mHandle);
 
-    // printf( __CLASS__ "~Adapter_Internal - delete 0x%lx (mHandle)\n", reinterpret_cast< uint64_t >( mHandle ) );
-
     // new ==> delete
     delete mHandle;
 }
@@ -165,6 +163,20 @@ void Adapter_Internal::Buffers_Release()
     assert(0 < mBufferCount);
 
     mBufferCount = 0;
+}
+
+// aConnect [---;R--]
+//
+// Exception  KmsLib::Exception *  CODE_TIMEOUT
+//                                 See KmsLib::Windows::DriverHandle::Control
+// Threads    Apps
+void Adapter_Internal::Connect(IoCtl_Connect_In * aConnect)
+{
+    assert(NULL != aConnect);
+
+    assert(NULL != mHandle);
+
+    mHandle->Control(IOCTL_CONNECT, aConnect, sizeof(IoCtl_Connect_In), NULL, 0);
 }
 
 // aIn [---;R--] The header and the packet to send. The header contain the
@@ -472,6 +484,59 @@ bool Adapter_Internal::IsConnected(const OpenNet::System & aSystem)
     return ((ADAPTER_NO_UNKNOWN != lState.mAdapterNo) && (lInfo.mSystemId == lState.mSystemId));
 }
 
+OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int aSize_byte)
+{
+    assert(NULL != mDebugLog);
+
+    if (NULL == aData)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Packet_Send", __LINE__);
+        return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
+    }
+
+    if (0 >= aSize_byte)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Packet_Send", __LINE__);
+        return OpenNet::STATUS_PACKET_TOO_SMALL;
+    }
+
+    if (mInfo.mPacketSize_byte < aSize_byte)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Packet_Send", __LINE__);
+        return OpenNet::STATUS_PACKET_TOO_LARGE;
+    }
+
+    mStatistics[OpenNet::ADAPTER_STATS_PACKET_SEND] ++;
+
+    unsigned char * lBuffer = new unsigned char[sizeof(IoCtl_Packet_Send_Ex_In) + aSize_byte];
+    assert(NULL != lBuffer);
+
+    IoCtl_Packet_Send_Ex_In * lIn = reinterpret_cast<IoCtl_Packet_Send_Ex_In *>(lBuffer);
+
+    memset(lIn, 0, sizeof(IoCtl_Packet_Send_Ex_In));
+    memcpy(lIn + 1, aData, aSize_byte);
+
+    lIn->mRepeatCount =          1;
+    lIn->mSize_byte   = aSize_byte;
+
+    OpenNet::Status lResult;
+
+    try
+    {
+        Packet_Send_Ex(lIn);
+        lResult = OpenNet::STATUS_OK;
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog->Log(eE);
+        lResult = ExceptionToStatus(eE);
+    }
+
+    delete[] lBuffer;
+
+    return lResult;
+}
+
 OpenNet::Status Adapter_Internal::ResetInputFilter()
 {
     // printf( __CLASS__ "ResetInputFilter()\n" );
@@ -688,9 +753,9 @@ OpenNet::Status Adapter_Internal::ExceptionToStatus(const KmsLib::Exception * aE
 
     switch (aE->GetCode())
     {
-    case KmsLib::Exception::CODE_IOCTL_ERROR: return OpenNet::STATUS_IOCTL_ERROR;
+    case KmsLib::Exception::CODE_IOCTL_ERROR      : return OpenNet::STATUS_IOCTL_ERROR    ;
     case KmsLib::Exception::CODE_NOT_ENOUGH_MEMORY: return OpenNet::STATUS_TOO_MANY_BUFFER;
-    case KmsLib::Exception::CODE_OPEN_CL_ERROR: return OpenNet::STATUS_OPEN_CL_ERROR;
+    case KmsLib::Exception::CODE_OPEN_CL_ERROR    : return OpenNet::STATUS_OPEN_CL_ERROR  ;
     }
 
     printf("%s ==> STATUS_EXCEPTION\n", KmsLib::Exception::GetCodeName(aE->GetCode()));

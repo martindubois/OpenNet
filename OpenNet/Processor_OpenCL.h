@@ -39,8 +39,8 @@ public:
 
     virtual ~Processor_OpenCL();
 
-    virtual void          * GetContext ();
-    virtual void          * GetDeviceId();
+    virtual void          * GetContext();
+    virtual void          * GetDevice ();
 
 private:
 

@@ -27,15 +27,9 @@ public:
 
     void Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers);
 
-    // ===== Adapter_Internal ===============================================
-    
-    virtual void Connect(IoCtl_Connect_In * aConnect);
-
     // ===== OpenNet::Adapter ===============================================
 
     virtual ~Adapter_Windows();
-
-    virtual OpenNet::Status Packet_Send(const void * aData, unsigned int aSize_byte);
 
 protected:
 

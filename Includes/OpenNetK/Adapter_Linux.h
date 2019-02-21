@@ -38,14 +38,14 @@ namespace OpenNetK
         /// \brief  Initialize the instance.
         /// \param  aAdapter  The Adapter
         /// \param  aOSDep    The operating system dependent function table
-        /// \param  aLock     The spinlock to use
+        /// \param  aZone0     The spinlock to use
         /// \endcond
         /// \cond fr
         /// \brief  Initialise l'instance
         /// \param  aAdapter  L'Adapter
         /// \param  aOSDep    La table de fonctions specifique au systeme
         ///                   d'exploitation
-        /// \param  aLock     Le spinlock a utiliser
+        /// \param  aZone0    Le spinlock a utiliser
         /// \endcond
         void Init( Adapter * aAdapter, OpenNetK_OSDep * aOSDep, void * aZone0 );
 

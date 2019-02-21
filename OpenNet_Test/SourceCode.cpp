@@ -39,7 +39,7 @@ KMS_TEST_BEGIN(SourceCode_Base)
 
     #ifdef _KMS_WINDOWS_
         KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSC0.SetCode    (NULL, 1 ));
-        KMS_TEST_COMPARE(OpenNet::STATUS_CANNOT_OPEN_INPUT_FILE   , lSC0.SetCode    ("DoesNotExist", 1 );
+        KMS_TEST_COMPARE(OpenNet::STATUS_CANNOT_OPEN_INPUT_FILE   , lSC0.SetCode    ("DoesNotExist", 1 ));
         KMS_TEST_COMPARE(OpenNet::STATUS_EMPTY_INPUT_FILE         , lSC0.SetCode    ("OpenNet_Test/Tests/Empty.txt", 1 ));
     #endif
 

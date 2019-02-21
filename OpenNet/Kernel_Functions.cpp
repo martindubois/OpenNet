@@ -31,17 +31,13 @@ static const char * CODE_KERNEL_C =
 "    }" EOL
 "}"     EOL;
 
-// TODO  OpenNet.Kernel_Functions
-//       Normal (Cleanup) - Always include Kernel.h, Define macro for the
-//       packet id.
+static const char * CODE_FILE_HEADER =
+"#include <OpenNetK/Kernel.h>" EOL;
+
+static const char * CODE_KERNEL_A =
+"OPEN_NET_KERNEL void Filter(" EOL;
 
 #ifdef _KMS_LINUX_
-
-    static const char * CODE_FILE_HEADER =
-    "#include <OpenNetK/Kernel_CUDA.h>" EOL;
-
-    static const char * CODE_KERNEL_A =
-    "extern \"C\" __global__ void Filter(" EOL;
 
     static const char * CODE_KERNEL_B =
     " )"                        EOL
@@ -52,12 +48,6 @@ static const char * CODE_KERNEL_C =
 #endif
 
 #ifdef _KMS_WINDOWS_
-
-    static const char * CODE_FILE_HEADER =
-    "#include <OpenNetK/Kernel_OpenCL.h>" EOL;
-
-    static const char * CODE_KERNEL_A =
-    "__kernel void Filter(" EOL;
 
     static const char * CODE_KERNEL_B =
     " )"                               EOL

@@ -61,88 +61,11 @@ void Adapter_Linux::Buffers_Allocate( Buffer_Data_Vector * aBuffers )
     }
 }
 
-// ===== Adapter_Internal ===================================================
-
-// aConnect [---;R--]
-//
-// Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
-// Threads    Apps
-void Adapter_Linux::Connect(IoCtl_Connect_In * aConnect)
-{
-    // printf( __CLASS__ "Connect( 0x%lx ) - 0x%lx\n", reinterpret_cast< uint64_t >( aConnect ), reinterpret_cast< uint64_t >( aConnect->mSharedMemory ) );
-
-    assert(NULL != aConnect);
-
-    assert(NULL != mHandle);
-
-    mHandle->Control(IOCTL_CONNECT, aConnect, sizeof(IoCtl_Connect_In), NULL, 0);
-}
-
 // ===== OpenNet::Adapter ===================================================
 
 Adapter_Linux::~Adapter_Linux()
 {
     // printf( __CLASS__ "~Adapter_Linux()\n" );
-}
-
-OpenNet::Status Adapter_Linux::Packet_Send(const void * aData, unsigned int aSize_byte)
-{
-    assert(NULL != mDebugLog);
-
-    if (NULL == aData)
-    {
-        mDebugLog->Log(__FILE__, __CLASS__ "Packet_Send", __LINE__);
-        return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
-    }
-
-    if (0 >= aSize_byte)
-    {
-        mDebugLog->Log(__FILE__, __CLASS__ "Packet_Send", __LINE__);
-        return OpenNet::STATUS_PACKET_TOO_SMALL;
-    }
-
-    if (mInfo.mPacketSize_byte < aSize_byte)
-    {
-        mDebugLog->Log(__FILE__, __CLASS__ "Packet_Send", __LINE__);
-        return OpenNet::STATUS_PACKET_TOO_LARGE;
-    }
-
-    mStatistics[OpenNet::ADAPTER_STATS_PACKET_SEND] ++;
-
-    // TODO  OpenNet.Adapter
-    //       Create Adapter_Internal::Packet_Send_Internal from there and
-    //       move the arguments verification into
-    //       Adapter_Internal::Packet_Send. Also move the exception
-    //       management into Adapter_Internal::Packet_Send.
-
-    unsigned char * lBuffer = new unsigned char [ sizeof( IoCtl_Packet_Send_Ex_In ) + aSize_byte ];
-    assert( NULL != lBuffer );
-
-    IoCtl_Packet_Send_Ex_In * lIn = reinterpret_cast< IoCtl_Packet_Send_Ex_In * >( lBuffer );
-
-    memset( lIn, 0, sizeof( IoCtl_Packet_Send_Ex_In ) );
-    memcpy( lIn + 1, aData, aSize_byte );
-
-    lIn->mRepeatCount =          1;
-    lIn->mSize_byte   = aSize_byte;
-
-    OpenNet::Status lResult;
-
-    try
-    {
-        Packet_Send_Ex( lIn );
-        lResult = OpenNet::STATUS_OK;
-    }
-    catch ( KmsLib::Exception * eE )
-    {
-        mDebugLog->Log( eE );
-        lResult = OpenNet::STATUS_EXCEPTION;
-    }
-
-    // printf( __CLASS__ "Packet_Send - delete [] 0x%lx (lBuffer)\n", reinterpret_cast< uint64_t >( lBuffer ) );
-    delete [] lBuffer;
-
-    return lResult;
 }
 
 // Protected
