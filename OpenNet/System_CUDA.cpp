@@ -32,8 +32,11 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
+// Threads  Apps
 System_CUDA::System_CUDA()
 {
+    // printf( __CLASS__ "System_CUDA()\n" );
+
     assert( NULL == mConnect.mSharedMemory );
 
     mInfo.mSystemId = getpid();
@@ -51,8 +54,12 @@ System_CUDA::System_CUDA()
     memset( mConnect.mSharedMemory, 0, SHARED_MEMORY_SIZE_byte );
 }
 
+// ===== OpenNet::~System ===================================================
+
 System_CUDA::~System_CUDA()
 {
+    // printf( __CLASS__ "~System_CUDA()\n" );
+
     assert( NULL != mConnect.mSharedMemory );
 
     // valloc ==> free  See the constructor
@@ -100,7 +107,7 @@ void System_CUDA::FindAdapters()
 }
 
 // Exception  KmsLib::Exception *  See OCLW_GetDeviceIDs
-// Threads  Apps
+// Threads    Apps
 void System_CUDA::FindProcessors()
 {
     mDebugLog.Log( "System_CUDA::FindProcessors()" );
@@ -123,6 +130,14 @@ void System_CUDA::FindProcessors()
 
     for ( int i = 0; i < lCount; i ++ )
     {
-        mProcessors.push_back( new Processor_CUDA( i, & mDebugLog ) );
+        try
+        {
+            mProcessors.push_back( new Processor_CUDA( i, & mDebugLog ) );
+        }
+        catch ( KmsLib::Exception * eE )
+        {
+            mDebugLog.Log( __FILE__, __CLASS__ "FindProcessors", __LINE__ );
+            mDebugLog.Log( eE );
+        }
     }
 }

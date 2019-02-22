@@ -50,6 +50,8 @@ protected:
 
     void Release(OpenNet::Kernel * aKernel);
 
+    void Run_Start(Processor_Internal * aProcessor);
+
     void   * * mArguments;
     CUfunction mFunction ;
     CUmodule   mModule   ;

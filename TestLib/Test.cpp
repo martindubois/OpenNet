@@ -4,6 +4,9 @@
 // Product    OpenNet
 // File       TestLib/Test.cpp
 
+#define __CLASS__     "Test::"
+#define __NAMESPACE__ "TestLib::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -34,6 +37,14 @@
 
 #define FLAG_DO_NOT_SLEEP           (0x00000001)
 #define FLAG_DO_NOT_START_GENERATOR (0x00000002)
+
+#ifdef _KMS_LINUX_
+    #define RESULT_FILE "/home/mdubois/Export/OpenNet/TestResults/f02.txt"
+#endif
+
+#ifdef _KMS_WINDOWS_
+    #define RESULT_FILE "K:\\Export\\OpenNet\\TestResults\\f02.txt"
+#endif
 
 // OpenCL / CUDA
 /////////////////////////////////////////////////////////////////////////////
@@ -273,7 +284,7 @@ namespace TestLib
             }
         }
 
-        printf(__FUNCTION__ " - %s is not a code name\n", aName);
+        printf( __NAMESPACE__ __CLASS__ "CodeFromName - %s is not a code name\n", aName);
         return __LINE__;
     }
 
@@ -297,7 +308,7 @@ namespace TestLib
             }
         }
 
-        printf(__FUNCTION__ " - %s is not a mode name\n", aName);
+        printf(__NAMESPACE__ __CLASS__ "ModeFromName - %s is not a mode name\n", aName);
         return __LINE__;
     }
 
@@ -860,14 +871,14 @@ namespace TestLib
         mAdapters[0] = mSystem->Adapter_Get(0);
         if (NULL == mSystem)
         {
-            printf(__FUNCTION__ " - No adapter\n");
+            printf(__NAMESPACE__ __CLASS__ "Init - No adapter\n");
             return __LINE__;
         }
 
         mProcessor = mSystem->Processor_Get(0);
         if (NULL == mProcessor)
         {
-            printf(__FUNCTION__ " - No processor\n");
+            printf(__NAMESPACE__ __CLASS__ "Init - No processor\n");
             return __LINE__;
         }
 
@@ -910,7 +921,7 @@ namespace TestLib
                 mKernels[0].Display(stdout);
             }
 
-            printf(__FUNCTION__ " - System::Start(  ) returned %u\n", lStatus);
+            printf(__NAMESPACE__ __CLASS__ "Start - System::Start(  ) returned %u\n", lStatus);
             return __LINE__;
         }
 
@@ -1041,7 +1052,7 @@ namespace TestLib
         unsigned int lRet = KmsLib::ValueVector::Constraint_Verify(mAdapterStats[aIndex], lAdapter->GetStatisticsQty(), mConstraints, stdout, reinterpret_cast<const KmsLib::ValueVector::Description *>(lAdapter->GetStatisticsDescriptions()));
         if (0 != lRet)
         {
-            printf(__FUNCTION__ " - ValueVector::Constrain_Verify( , , , ,  ) returned %u\n", lRet);
+            printf(__NAMESPACE__ __CLASS__ "VerifyAdapterStats - ValueVector::Constrain_Verify( , , , ,  ) returned %u\n", lRet);
             return __LINE__;
         }
 
@@ -1244,7 +1255,7 @@ namespace TestLib
 
     void Test::ResetStatistics()
     {
-        // printf(__FUNCTION__ "()\n");
+        // printf(__NAMESPACE__ __CLASS__ "ResetStatistics()\n");
 
         assert(          1 <= mAdapterCount1);
         assert(ADAPTER_QTY >= mAdapterCount1);
@@ -1315,7 +1326,7 @@ namespace TestLib
         OpenNet::Status lStatus = aFunction->SetCode(aCode, static_cast<unsigned int>(strlen(aCode)), 1 );
         if ( OpenNet::STATUS_OK != lStatus )
         {
-            printf( "%s - OpenNet::Function::SetCode( ,  ) failed - ", __FUNCTION__ );
+            printf( __NAMESPACE__ __CLASS__ "SetFunction - OpenNet::Function::SetCode( ,  ) failed - " );
             OpenNet::Status_Display( lStatus, stdout );
             printf( "\n" );
             return;
@@ -1419,7 +1430,7 @@ namespace TestLib
     {
         assert(NULL != aNote);
 
-        static const char * FILENAME = "K:\\Export\\OpenNet\\TestResults\\f02.txt";
+        static const char * FILENAME = RESULT_FILE;
 
         FILE * lFile;
 
@@ -1446,7 +1457,7 @@ namespace TestLib
         }
         else
         {
-            printf(__FUNCTION__ " - fopen_s( , ,  ) returned %d\n", lRet);
+            printf(__NAMESPACE__ __CLASS__ "WriteResult - fopen_s( , ,  ) returned %d\n", lRet);
         }
     }
 

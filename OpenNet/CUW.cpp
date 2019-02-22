@@ -48,6 +48,44 @@ void CUW_CtxDestroy( CUcontext aContext )
     }
 }
 
+void CUW_CtxPopCurrent( CUcontext * aContext )
+{
+    assert( NULL != aContext );
+
+    CUresult lRet = cuCtxPopCurrent( aContext );
+    if ( CUDA_SUCCESS != lRet )
+    {
+        throw new KmsLib::Exception( KmsLib::Exception::CODE_UNKNOWN,
+            "cuCtxPopCurrent(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
+    }
+
+    assert( NULL != ( * aContext ) );
+}
+
+void CUW_CtxPushCurrent( CUcontext aContext )
+{
+    assert( NULL != aContext );
+
+    CUresult lRet = cuCtxPushCurrent( aContext );
+    if ( CUDA_SUCCESS != lRet )
+    {
+        throw new KmsLib::Exception( KmsLib::Exception::CODE_UNKNOWN,
+            "cuCtxPushCurrent(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
+    }
+}
+
+void CUW_CtxSetCurrent( CUcontext aContext )
+{
+    assert( NULL != aContext );
+
+    CUresult lRet = cuCtxSetCurrent( aContext );
+    if ( CUDA_SUCCESS != lRet )
+    {
+        throw new KmsLib::Exception( KmsLib::Exception::CODE_UNKNOWN,
+            "cuCtxSetCurrent(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
+    }
+}
+
 void CUW_DeviceGet( CUdevice * aDevice, int aIndex )
 {
     assert( NULL != aDevice );

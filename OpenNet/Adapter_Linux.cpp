@@ -34,7 +34,7 @@
 // aHandle   [DK-;RW-] The handle to the driver
 // aDebugLog [-K-;RW-] The debug log
 //
-// Thread  Apps
+// Threads  Apps
 Adapter_Linux::Adapter_Linux(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog)
     : Adapter_Internal( aHandle, aDebugLog )
     , mModule( NULL )
@@ -51,6 +51,8 @@ void Adapter_Linux::Buffers_Allocate( Buffer_Data_Vector * aBuffers )
     assert( NULL != aBuffers );
 
     assert( 0 < mConfig.mBufferQty );
+
+    memset( & mBuffers, 0, sizeof( mBuffers ) );
 
     for ( unsigned int i = 0; i < mConfig.mBufferQty; i ++ )
     {
@@ -116,7 +118,7 @@ Thread * Adapter_Linux::Thread_Prepare_Internal( OpenNet::Kernel * aKernel )
 // Return  This method returns the address of the allocated buffer.
 //
 // Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
-//                                 See Process_Internal::Buffer_Allocate
+//                                 See Process_CUDA::Buffer_Allocate
 // Threads    Apps
 Buffer_Data * Adapter_Linux::Buffer_Allocate()
 {

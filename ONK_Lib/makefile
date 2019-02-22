@@ -16,8 +16,7 @@ SOURCES =	Adapter.cpp        \
 			Hardware_Linux.cpp \
 			Linux.cpp          \
 			Packet.cpp         \
-			SpinLock.cpp       \
-			SpinLock_Linux.cpp
+			SpinLock.cpp
 
 # ===== Rules / Regles ======================================================
 
@@ -39,14 +38,13 @@ depend:
 	
 # DO NOT DELETE
 
-Adapter.o: ../Includes/OpenNetK/OS.h ../Includes/OpenNetK/StdInt.h
-Adapter.o: ../Includes/OpenNetK/Constants.h ../Includes/OpenNetK/Debug.h
-Adapter.o: ../Includes/OpenNetK/Hardware.h
-Adapter.o: ../Includes/OpenNetK/Adapter_Types.h ../Includes/OpenNetK/Packet.h
-Adapter.o: ../Includes/OpenNetK/Types.h ../Includes/OpenNetK/IoCtl.h
-Adapter.o: ../Includes/OpenNetK/SpinLock.h ../Includes/OpenNetK/Adapter.h
-Adapter.o: ../Includes/OpenNetK/PacketGenerator_Types.h
-Adapter.o: ../Includes/OpenNetK/OSDep.h ../Common/Constants.h
+Adapter.o: Component.h ../Includes/OpenNetK/OS.h ../Includes/OpenNetK/Debug.h
+Adapter.o: ../Includes/OpenNetK/StdInt.h ../Includes/OpenNetK/Hardware.h
+Adapter.o: ../Includes/OpenNetK/Adapter_Types.h ../Includes/OpenNetK/Types.h
+Adapter.o: ../Includes/OpenNetK/Packet.h ../Includes/OpenNetK/SpinLock.h
+Adapter.o: ../Includes/OpenNetK/OSDep.h ../Includes/OpenNetK/Adapter.h
+Adapter.o: ../Includes/OpenNetK/Constants.h ../Includes/OpenNetK/IoCtl.h
+Adapter.o: ../Includes/OpenNetK/PacketGenerator_Types.h ../Common/Constants.h
 Adapter.o: ../Common/IoCtl.h ../Common/OpenNetK/Adapter_Statistics.h
 Adapter.o: ../Common/Version.h
 Adapter_Linux.o: ../Includes/OpenNetK/OS.h ../Includes/OpenNetK/StdInt.h
@@ -57,33 +55,24 @@ Adapter_Linux.o: ../Includes/OpenNetK/IoCtl.h
 Adapter_Linux.o: ../Includes/OpenNetK/PacketGenerator_Types.h
 Adapter_Linux.o: ../Includes/OpenNetK/Types.h ../Includes/OpenNetK/OSDep.h
 Adapter_Linux.o: ../Includes/OpenNetK/Hardware_Linux.h
-Adapter_Linux.o: ../Includes/OpenNetK/SpinLock_Linux.h
-Adapter_Linux.o: ../Includes/OpenNetK/SpinLock.h
 Adapter_Linux.o: ../Includes/OpenNetK/Adapter_Linux.h ../Common/Constants.h
 Adapter_Linux.o: ../Common/IoCtl.h
-Hardware.o: ../Includes/OpenNetK/Debug.h ../Includes/OpenNetK/OS.h
-Hardware.o: ../Includes/OpenNetK/StdInt.h ../Includes/OpenNetK/Adapter.h
+Hardware.o: ../Includes/OpenNetK/OS.h ../Includes/OpenNetK/StdInt.h
+Hardware.o: ../Includes/OpenNetK/Adapter.h
 Hardware.o: ../Includes/OpenNetK/Adapter_Types.h
 Hardware.o: ../Includes/OpenNetK/Constants.h ../Includes/OpenNetK/IoCtl.h
 Hardware.o: ../Includes/OpenNetK/PacketGenerator_Types.h
 Hardware.o: ../Includes/OpenNetK/Types.h ../Includes/OpenNetK/OSDep.h
 Hardware.o: ../Includes/OpenNetK/Hardware_Statistics.h
 Hardware.o: ../Includes/OpenNetK/SpinLock.h ../Includes/OpenNetK/Hardware.h
-Hardware.o: ../Includes/OpenNetK/Packet.h ../Common/Constants.h
-Hardware.o: ../Common/Version.h
+Hardware.o: ../Common/Constants.h ../Common/Version.h
 Hardware_Linux.o: ../Includes/OpenNetK/OS.h ../Includes/OpenNetK/StdInt.h
 Hardware_Linux.o: ../Includes/OpenNetK/Hardware.h
 Hardware_Linux.o: ../Includes/OpenNetK/Adapter_Types.h
-Hardware_Linux.o: ../Includes/OpenNetK/Packet.h ../Includes/OpenNetK/Types.h
+Hardware_Linux.o: ../Includes/OpenNetK/Types.h
 Hardware_Linux.o: ../Includes/OpenNetK/Hardware_Linux.h
-Hardware_Linux.o: ../Includes/OpenNetK/SpinLock_Linux.h
-Hardware_Linux.o: ../Includes/OpenNetK/OSDep.h
-Hardware_Linux.o: ../Includes/OpenNetK/SpinLock.h
 Packet.o: ../Includes/OpenNetK/OS.h ../Includes/OpenNetK/StdInt.h
 Packet.o: ../Includes/OpenNetK/Types.h ../Includes/OpenNetK/Packet.h
 SpinLock.o: ../Includes/OpenNetK/OS.h ../Includes/OpenNetK/StdInt.h
-SpinLock.o: ../Includes/OpenNetK/SpinLock.h
+SpinLock.o: ../Includes/OpenNetK/SpinLock.h ../Includes/OpenNetK/OSDep.h
 SpinLock_Linux.o: ../Includes/OpenNetK/OS.h ../Includes/OpenNetK/StdInt.h
-SpinLock_Linux.o: ../Includes/OpenNetK/SpinLock_Linux.h
-SpinLock_Linux.o: ../Includes/OpenNetK/OSDep.h
-SpinLock_Linux.o: ../Includes/OpenNetK/SpinLock.h

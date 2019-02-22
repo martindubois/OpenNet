@@ -101,6 +101,14 @@ void Thread_Kernel_CUDA::Processing_Wait(unsigned int aIndex)
     Thread_CUDA::Processing_Wait();
 }
 
+void Thread_Kernel_CUDA::Run_Start()
+{
+    assert( NULL != mProcessor );
+
+    Thread_CUDA  ::Run_Start( mProcessor );
+    Thread_Kernel::Run_Start();
+}
+
 void Thread_Kernel_CUDA::Release()
 {
     assert(NULL != mKernel);

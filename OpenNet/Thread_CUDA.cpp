@@ -164,6 +164,19 @@ void Thread_CUDA::Release(OpenNet::Kernel * aKernel)
     }
 }
 
+// aProcessor [---;RW-]
+//
+// Thread  Worker
+void Thread_CUDA::Run_Start( Processor_Internal * aProcessor )
+{
+    assert( NULL != aProcessor );
+
+    Processor_CUDA * lProcessor = dynamic_cast< Processor_CUDA * >( aProcessor );
+    assert( NULL != lProcessor );
+
+    lProcessor->SetContext();
+}
+
 // Private
 /////////////////////////////////////////////////////////////////////////////
 

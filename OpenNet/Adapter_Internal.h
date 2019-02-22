@@ -95,10 +95,19 @@ protected:
 
     OpenNet::Status Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte = NULL);
 
+    // Threads  Apps
+    //
     // SetInputFilter_Internal ==> ResetInputFilter_Internal
     virtual void ResetInputFilter_Internal() = 0;
+
+    // Threads  Apps
+    //
+    // SetInputFilter_Internal ==> ResetInputFilter_Internal
     virtual void SetInputFilter_Internal  (OpenNet::Kernel * aKernel) = 0;
 
+    // Threads  Apps
+    //
+    // Thread_Prepare_Internal == delete
     virtual Thread * Thread_Prepare_Internal(OpenNet::Kernel * aKernel) = 0;
 
 

@@ -32,11 +32,14 @@
 // aDevice
 // aDebugLog [-K-;RW-]
 //
-// Exception  KmsLib::Exception *  See InitInfo
-// Threads  Apps
+// Exception  KmsLib::Exception *  See Processor_CUDA::InitInfo
+// Threads    Apps
 Processor_CUDA::Processor_CUDA( int aDevice, KmsLib::DebugLog * aDebugLog )
     : Processor_Internal( aDebugLog )
+    , mContext( NULL )
 {
+    // printf( __CLASS__ "Processor_CUDA( %d,  )\n", aDevice );
+
     assert(    0 <= aDevice   );
     assert( NULL != aDebugLog );
 
@@ -44,6 +47,7 @@ Processor_CUDA::Processor_CUDA( int aDevice, KmsLib::DebugLog * aDebugLog )
 
     // CUW_CtxCreate ==> CUW_CtxDestroy  See the destructor
     CUW_CtxCreate( & mContext, 0, mDevice );
+    assert( NULL != mContext );
 
     InitInfo();
 }
@@ -52,6 +56,12 @@ Processor_CUDA::Processor_CUDA( int aDevice, KmsLib::DebugLog * aDebugLog )
 // aBuffer [---;RW-]
 //
 // Return  This function return the created instance
+//
+// Exception  KmsLib::Exception *  See CUW_DeviceGetAttribute, CUW_MemAlloc
+//                                 and CUW_PointerSetAttribute
+// Threads    Apps
+//
+// Processor_CUDA::Buffer_Allocate ==> delete
 Buffer_Data * Processor_CUDA::Buffer_Allocate(unsigned int aPacketSize_byte, OpenNetK::Buffer * aBuffer)
 {
     // printf( __CLASS__ "Buffer_Allocate( %u byte, 0x%p )\n", aPacketSize_byte, aBuffer );
@@ -106,6 +116,7 @@ Buffer_Data * Processor_CUDA::Buffer_Allocate(unsigned int aPacketSize_byte, Ope
 //                                 NVRTCW_GetPTXSize, NVRTCW_GetPTX,
 //                                 NVRTCW_DestroyProgram and
 //                                 NVRTCW_ModuleLoadDataEx
+// Threads    Apps
 //
 // Processor_CUDA::Module_Create ==> NVRTCW_ModuleUnload
 CUmodule Processor_CUDA::Module_Create( OpenNet::Kernel * aKernel )
@@ -169,6 +180,13 @@ CUmodule Processor_CUDA::Module_Create( OpenNet::Kernel * aKernel )
     return lResult;
 }
 
+void Processor_CUDA::SetContext()
+{
+    assert( NULL != mContext );
+
+    CUW_CtxSetCurrent( mContext );
+}
+
 // ===== Processor_Internal =================================================
 
 Thread_Functions * Processor_CUDA::Thread_Get()
@@ -189,12 +207,14 @@ Thread_Functions * Processor_CUDA::Thread_Get()
 
 Processor_CUDA::~Processor_CUDA()
 {
-    // printf( __CLASS__ "~Processor_CUDA()\n" );
+    printf( __CLASS__ "~Processor_CUDA() - mContext = %lx\n", reinterpret_cast< uint64_t >( mContext ) );
 
     assert( NULL != mContext );
 
     // CUW_CtxCreate ==> CUW_CtxDestroy  See the constructor
     CUW_CtxDestroy( mContext );
+
+    printf( __CLASS__ "~Processor_CUDA - End\n" );
 }
 
 void * Processor_CUDA::GetContext()

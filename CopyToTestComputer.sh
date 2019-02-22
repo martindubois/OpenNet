@@ -69,11 +69,18 @@ if [ 0 != $? ] ; then
     RESULT=7
 fi
 
-scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Pro1000/ONK_Pro1000.ko
+scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Pro1000
 
 if [ 0 != $? ] ; then
-    echo ERROR  scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Pro1000/ONK_Pro1000.ko  failed - $?
+    echo ERROR  scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Pro1000  failed - $?
     RESULT=8
+fi
+
+scp Scripts/OpenNet_Tool/A00RRU_K620_18.04.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool
+
+if [ 0 != $? ] ; then
+    echo ERROR  scp Scripts/OpenNet_Tool/A00RRU_K620_18.04.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool  failed - $?
+    RESULT=9
 fi
 
 # ===== End =================================================================

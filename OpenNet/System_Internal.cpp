@@ -655,7 +655,7 @@ OpenNet::Status System_Internal::Config_Validate(const Config & aConfig)
 
 void System_Internal::Threads_Release()
 {
-    // printf( __CLASS__ "Thread_Release()\n" );
+    // printf( __CLASS__ "Threads_Release()\n" );
 
     for (unsigned int i = 0; i < mThreads.size(); i++)
     {
@@ -666,7 +666,7 @@ void System_Internal::Threads_Release()
 
     mThreads.clear();
 
-    // printf( __CLASS__ "Thread_Release - End\n" );
+    // printf( __CLASS__ "Threads_Release - End\n" );
 }
 
 // Static functions

@@ -153,8 +153,10 @@ static void Work ( struct work_struct * aWork  );
 static void * AllocateMemory( unsigned int aSize_byte );
 static void   FreeMemory    ( void * aMemory );
 
-static void * MapBuffer  ( void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, unsigned int aSize_byte );
-static void   UnmapBuffer( void * aContext, void * aBuffer );
+static uint64_t GetTimeStamp( void );
+
+static void * MapBuffer  ( void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, unsigned int aSize_byte, uint64_t aMarker_PA, volatile void * * aMarker_MA );
+static void   UnmapBuffer( void * aContext, void * aBuffer, unsigned int aSize_byte, volatile void * aMarker_MA );
 
 static void * MapSharedMemory  ( void * aContext, void * aShared_UA, unsigned int aSize_byte );
 static void   UnmapSharedMemory( void * aContext );
@@ -854,6 +856,7 @@ void OSDep_Init( DeviceContext * aThis )
 
     aThis->mOSDep.AllocateMemory    = AllocateMemory   ;
     aThis->mOSDep.FreeMemory        = FreeMemory       ;
+    aThis->mOSDep.GetTimeStamp      = GetTimeStamp     ;
     aThis->mOSDep.MapBuffer         = MapBuffer        ;
     aThis->mOSDep.UnmapBuffer       = UnmapBuffer      ;
     aThis->mOSDep.MapSharedMemory   = MapSharedMemory  ;
@@ -1037,19 +1040,32 @@ void FreeMemory( void * aMemory )
     kfree( aMemory );
 }
 
+uint64_t GetTimeStamp()
+{
+    uint64_t lResult = jiffies;
+
+    lResult *= 1000000;
+    lResult /= HZ     ;
+
+    return lResult;
+}
+
 // MapBuffer ==> UnmapBuffer or FreeCallback
-void * MapBuffer( void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, unsigned int aSize_byte )
+void * MapBuffer( void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, unsigned int aSize_byte, uint64_t aMarker_PA, volatile void * * aMarker_MA )
 {
     unsigned int i;
 
     DeviceContext * lThis = aContext;
 
-    // printk( KERN_DEBUG "%s( 0x%px, 0x%px, 0x%llx, %u bytes )\n", __FUNCTION__, aContext, aBuffer_PA, aBuffer_DA, aSize_byte );
+    // printk( KERN_DEBUG "%s( 0x%px, 0x%px, 0x%llx, %u bytes, ,  )\n", __FUNCTION__, aContext, aBuffer_PA, aBuffer_DA, aSize_byte );
 
     ASSERT( NULL !=   aContext              );
     ASSERT(    0 !=   aBuffer_DA            );
     ASSERT(    0 == ( aBuffer_DA & 0xffff ) );
     ASSERT(    0 <    aSize_byte            );
+    ASSERT( NULL !=   aMarker_MA            );
+
+    ( * aMarker_MA ) = NULL;
 
     for ( i = 0; i < OPEN_NET_BUFFER_QTY; i ++ )
     {
@@ -1079,16 +1095,18 @@ void * MapBuffer( void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, u
 }
 
 // MapBuffer ==> UnmapBuffer
-void UnmapBuffer( void * aContext, void * aBuffer_MA )
+void UnmapBuffer( void * aContext, void * aBuffer_MA, unsigned int aSize_byte, volatile void * aMarker_MA )
 {
     unsigned int i;
 
     DeviceContext * lThis = aContext;
 
-    // printk( KERN_DEBUG "%s( 0x%px, 0x%px )\n", __FUNCTION__, aContext, aBuffer_MA );
+    // printk( KERN_DEBUG "%s( 0x%px, 0x%px, %u bytes,  )\n", __FUNCTION__, aContext, aBuffer_MA, aSize_byte );
 
     ASSERT( NULL != aContext   );
     ASSERT( NULL != aBuffer_MA );
+    ASSERT(    0 <  aSize_byte );
+    ASSERT( NULL == aMarker_MA );
 
     ASSERT( NULL != lThis->mPciDev );
 

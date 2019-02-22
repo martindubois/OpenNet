@@ -35,10 +35,7 @@ protected:
     virtual void Processing_Wait (unsigned int aIndex);
 
     virtual void Run_Start();
-    virtual void Run_Wait ();
 
-private:
-
-    void * * mArguments;
+    virtual void Release();
 
 };

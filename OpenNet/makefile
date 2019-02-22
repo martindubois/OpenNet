@@ -238,7 +238,7 @@ PacketGenerator_Internal.o: ../Common/IoCtl.h
 PacketGenerator_Internal.o: ../Common/OpenNet/Adapter_Statistics.h
 PacketGenerator_Internal.o: Buffer_Data.h Processor_Internal.h
 PacketGenerator_Internal.o: ../Includes/OpenNet/Kernel.h
-PacketGenerator_Internal.o: ../Includes/OpenNet/SourceCode.h
+PacketGenerator_Internal.o: ../Includes/OpenNet/SourceCode.h Constants.h
 PacketGenerator_Internal.o: PacketGenerator_Internal.h
 PacketGenerator_Internal.o: ../Includes/OpenNet/PacketGenerator.h
 Processor.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
@@ -368,7 +368,7 @@ System_Internal.o: ../Includes/OpenNetK/PacketGenerator_Types.h
 System_Internal.o: ../Common/IoCtl.h ../Common/OpenNet/Adapter_Statistics.h
 System_Internal.o: Buffer_Data.h Processor_Internal.h
 System_Internal.o: ../Includes/OpenNet/Kernel.h
-System_Internal.o: ../Includes/OpenNet/SourceCode.h Thread.h
+System_Internal.o: ../Includes/OpenNet/SourceCode.h Constants.h Thread.h
 System_Internal.o: ../Import/Includes/KmsLib/ThreadBase.h System_Internal.h
 Thread.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 Thread.o: ../Import/Includes/WindowsToLinux.h Thread.h

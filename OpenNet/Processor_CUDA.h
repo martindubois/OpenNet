@@ -30,6 +30,8 @@ public:
 
     CUmodule Module_Create(OpenNet::Kernel * aKernel);
 
+    void SetContext();
+
     // ====== Processor_Internal ============================================
 
     virtual Thread_Functions * Thread_Get();

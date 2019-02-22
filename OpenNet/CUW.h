@@ -17,6 +17,9 @@
 
 extern void CUW_CtxCreate          ( CUcontext * aContext, unsigned int aFlags, CUdevice aDevice );
 extern void CUW_CtxDestroy         ( CUcontext   aContext );
+extern void CUW_CtxPopCurrent      ( CUcontext * aContext );
+extern void CUW_CtrPushCurrent     ( CUcontext   aContext );
+extern void CUW_CtxSetCurrent      ( CUcontext   aContext );
 extern void CUW_DeviceGet          ( CUdevice * aDevice, int aIndex );
 extern void CUW_DeviceGetAttribute ( int * aValue, CUdevice_attribute aAttribute, CUdevice aDevice );
 extern void CUW_DeviceGetCount     ( int * aCount );

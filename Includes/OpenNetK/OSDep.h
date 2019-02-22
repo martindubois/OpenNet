@@ -15,13 +15,13 @@
 typedef void * ( * OpenNetK_OSDep_AllocateMemory )( unsigned int aSize_byte );
 typedef void   ( * OpenNetK_OSDep_FreeMemory     )( void * aMemory );
 
-typedef uint64_t ( * OpenNetK_OSDep_GetTimeStamp )();
+typedef uint64_t ( * OpenNetK_OSDep_GetTimeStamp )( void );
 
 typedef void   ( * OpenNetK_OSDep_LockSpinlock   )( void * aLock );
 typedef void   ( * OpenNetK_OSDep_UnlockSpinlock )( void * aLock );
 
-typedef void * ( * OpenNetK_OSDep_MapBuffer   )( void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, unsigned int aSize_byte, uint64_t aMarker_PA, volatile void * * aMarker );
-typedef void   ( * OpenNetK_OSDep_UnmapBuffer )( void * aContext, void * aBuffer_MA, unsigned int aSize_byte, volatile void * aMarker );
+typedef void * ( * OpenNetK_OSDep_MapBuffer   )( void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, unsigned int aSize_byte, uint64_t aMarker_PA, volatile void * * aMarker_MA );
+typedef void   ( * OpenNetK_OSDep_UnmapBuffer )( void * aContext, void * aBuffer_MA, unsigned int aSize_byte, volatile void * aMarker_MA );
 
 typedef void * ( * OpenNetK_OSDep_MapSharedMemory   )( void * aContext, void * aShared_UA, unsigned int aSize_byte );
 typedef void   ( * OpenNetK_OSDep_UnmapSharedMemory )( void * aContext );

@@ -34,7 +34,8 @@ namespace OpenNetK
         ASSERT( NULL != aOSDep   );
         ASSERT( NULL != aZone0   );
 
-        new ( & mZone0 ) SpinLock_Linux( aOSDep, aZone0 );
+        mZone0.SetLock ( aZone0 );
+        mZone0.SetOSDep( aOSDep );
 
         aAdapter->Init( & mZone0 );
     }

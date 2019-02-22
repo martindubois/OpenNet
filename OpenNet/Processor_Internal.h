@@ -34,11 +34,16 @@ public:
 
     Processor_Internal( KmsLib::DebugLog * aDebugLog );
 
-    ~Processor_Internal();
+    virtual ~Processor_Internal();
 
     Thread           * Thread_Prepare();
     void               Thread_Release();
 
+    // Return  The adresse of the newly created instance
+    //
+    // Threads  Apps
+    //
+    // Thread_Get ==> delete
     virtual Thread_Functions * Thread_Get() = 0;
 
     // ===== OpenNet::Processor =============================================

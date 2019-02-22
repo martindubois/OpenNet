@@ -54,11 +54,11 @@
 // Macros
 /////////////////////////////////////////////////////////////////////////////
 
-// TODO  OpenNetK.Linux
-//       High (Feature) - Different ASSERT definition in release than in
-//       debug
-
-#define ASSERT(C) if ( ! ( C ) ) { printk( "Assert failed at line %d of %s - %s\n", __LINE__, __FILE__, #C ); }
+#ifdef _KMS_DEBUG_
+    #define ASSERT(C) if ( ! ( C ) ) { printk( "Assert failed at line %d of %s - %s\n", __LINE__, __FILE__, #C ); }
+#else
+    #define ASSERT(C)
+#endif
 
 #ifdef __cplusplus
 

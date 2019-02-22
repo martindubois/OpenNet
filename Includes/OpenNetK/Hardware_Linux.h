@@ -12,7 +12,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
-#include <OpenNetK/SpinLock_Linux.h>
+#include <OpenNetK/SpinLock.h>
 
 namespace OpenNetK
 {
@@ -54,7 +54,7 @@ namespace OpenNetK
     private:
 
         // ===== Zone 0 =====================================================
-        SpinLock_Linux mZone0;
+        SpinLock mZone0;
 
     };
 

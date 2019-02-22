@@ -57,12 +57,21 @@ protected:
     //
     // Processing_Queue ==> Processing_Wait
     virtual void Processing_Queue(unsigned int aIndex) = 0;
+
+    // CRITICAL PATH  Buffer-
+    // Thread         Worker
+    //
+    // Processing_Queue ==> Processing_Wait
     virtual void Processing_Wait (unsigned int aIndex) = 0;
 
+    // CRITICAL PATH  Buffer-
+    // Thread         Worker
     void Run_Iteration(unsigned int aIndex);
 
+    // Threads  Apps
     virtual void Release() = 0;
 
+    // Thread  Worker
     virtual void Run_Loop () = 0;
     virtual void Run_Start() = 0;
     virtual void Run_Wait ();
@@ -76,7 +85,5 @@ protected:
     KmsLib::DebugLog   * mDebugLog    ;
     OpenNet::Kernel    * mKernel      ;
     Processor_Internal * mProcessor   ;
-
-private:
 
 };

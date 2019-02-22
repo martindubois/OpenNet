@@ -23,10 +23,10 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
+// Threads  Apps
 Thread_Functions_CUDA::Thread_Functions_CUDA(Processor_Internal * aProcessor, bool aProfilingEnabled, KmsLib::DebugLog * aDebugLog)
     : Thread_Functions( aProcessor, aProfilingEnabled, aDebugLog )
 {
-
 }
 
 // ===== Thread =============================================================
@@ -75,8 +75,6 @@ void Thread_Functions_CUDA::Processing_Wait(unsigned int aIndex)
 
 void Thread_Functions_CUDA::Run_Start()
 {
-    // printf( __CLASS__ "Run_Start()\n" );
-
     assert( NULL == mArguments );
 
     assert(0 < mBuffers.size());
@@ -100,14 +98,9 @@ void Thread_Functions_CUDA::Run_Start()
     Thread_Functions::Run_Start();
 }
 
-void Thread_Functions_CUDA::Run_Wait()
+void Thread_Functions_CUDA::Release()
 {
-    assert( NULL != mArguments );
+    assert( NULL != mKernel );
 
-    Thread_Functions::Run_Wait();
-
-    // printf( __CLASS__ "Run_Wait - delete [] 0x%lx (mArguments)\n", reinterpret_cast< uint64_t >( mArguments ) );
-
-    // new ==> delete  See Run_Start
-    delete [] mArguments;
+    Thread_CUDA::Release( mKernel );
 }

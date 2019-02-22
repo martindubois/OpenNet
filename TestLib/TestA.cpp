@@ -109,8 +109,10 @@ unsigned int TestA::Stop()
         // DisplayAdapterStats(1);
 
         unsigned int lBuffer_Max = 24100;
+        unsigned int lBuffer_Min =    76;
 
         unsigned int lPacket_Max = 1537000;
+        unsigned int lPacket_Min =    2700;
 
         unsigned int lRunningTime_Max_ms = 1100;
         unsigned int lRunningTime_Min_ms = 1000;
@@ -121,13 +123,16 @@ unsigned int TestA::Stop()
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =   250;
 
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = lBuffer_Max;
-        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin =         210;
+        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMin = lBuffer_Min;
 
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMax = lBuffer_Max;
-        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin =         210;
+        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND].mMin = lBuffer_Min;
 
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMax = lBuffer_Max;
-        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin =         210;
+        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_SEND_PACKETS].mMin = lBuffer_Min;
+
+        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_PACKET_GENERATOR_REPEAT_COUNT].mMax = 1;
+        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_PACKET_GENERATOR_REPEAT_COUNT].mMin = 1;
 
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = lRunningTime_Max_ms;
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = lRunningTime_Min_ms;
@@ -138,16 +143,18 @@ unsigned int TestA::Stop()
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =   870;
 
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMax = lPacket_Max;
-        mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin =       13690;
+        mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_RECEIVE].mMin = lPacket_Min;
 
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMax = lPacket_Max;
-        mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin =       13700;
+        mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_packet].mMin = lPacket_Min;
 
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMax = 140 * 1024 * 1024;
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_byte].mMin =   1 * 1024 * 1024;
 
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = lPacket_Max;
-        mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =       13700;
+        mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin = lPacket_Min;
+
+        mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID ].mMax = 47;
 
         lResult = VerifyAdapterStats(0);
 
@@ -165,7 +172,7 @@ unsigned int TestA::Stop()
             mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_PACKET_GENERATOR_ITERATION].mMin =  40;
 
             mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_PACKET_GENERATOR_REPEAT_COUNT].mMax = 3080;
-            mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_PACKET_GENERATOR_REPEAT_COUNT].mMin =  130;
+            mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_PACKET_GENERATOR_REPEAT_COUNT].mMin =    1;
 
             mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = lRunningTime_Max_ms;
             mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = lRunningTime_Min_ms;
@@ -175,17 +182,19 @@ unsigned int TestA::Stop()
             mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 11658;
             mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  1200;
 
-            mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax = 2126000;
-            mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin =   11000;
+            mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMax =     2126000;
+            mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_PACKET_SEND].mMin = lPacket_Min;
 
             mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMax = lPacket_Max;
-            mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin =   13700;
+            mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_packet].mMin = lPacket_Min;
 
             mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMax = 140 * 1024 * 1024;
             mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_byte].mMin =   1 * 1024 * 1024;
 
             mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMax = lPacket_Max;
-            mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin =       13700;
+            mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin = lPacket_Min;
+
+            mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID ].mMax = 60;
 
             lResult += VerifyAdapterStats(1);
             if (0 == lResult)
