@@ -16,7 +16,7 @@
 
 // ===== ONK_Pro1000 ========================================================
 #include "Queue.h"
-#include "Pro1000.h"
+#include "Intel_82576.h"
 
 #include "Device.h"
 
@@ -26,7 +26,7 @@
 typedef struct
 {
     OpenNetK::Adapter      mAdapter     ;
-    Pro1000                mHardware    ;
+    Intel_82576            mHardware    ;
     OpenNetK::Adapter_WDF  mAdapter_WDF ;
     OpenNetK::Hardware_WDF mHardware_WDF;
 }
@@ -61,7 +61,7 @@ extern "C"
 
 // Thread  PnP
 
-// NOT TESTED  ONK_Pro1000.Device.ErrorHandling
+// NOT TESTED  ONK_Intel.Device.ErrorHandling
 //             WdfDeviceCreate fail<br>
 //             WdfDeviceCreateDeviceInterface fail
 NTSTATUS Device_Create(PWDFDEVICE_INIT aDeviceInit)
@@ -118,7 +118,7 @@ NTSTATUS Device_Create(PWDFDEVICE_INIT aDeviceInit)
 //
 // Thread  PnP
 
-// NOT TESTED  ONK_Pro1000.Device.ErrorHandling
+// NOT TESTED  ONK_Intel.Device.ErrorHandling
 //             Hardware_WDF.Init fail
 NTSTATUS Init(DeviceContext * aThis, WDFDEVICE aDevice)
 {
@@ -127,7 +127,7 @@ NTSTATUS Init(DeviceContext * aThis, WDFDEVICE aDevice)
     ASSERT(NULL != aThis);
     ASSERT(NULL != aDevice);
 
-    new (&aThis->mHardware) Pro1000();
+    new (&aThis->mHardware) Intel_82576();
 
     NTSTATUS lResult = aThis->mHardware_WDF.Init(aDevice, &aThis->mHardware);
     if (STATUS_SUCCESS == lResult)

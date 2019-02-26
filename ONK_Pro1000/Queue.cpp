@@ -41,7 +41,7 @@ extern "C"
 
 // Thread  PnP
 
-// NOT TESTED  ONK_Pro1000.Queue.ErrorHandling
+// NOT TESTED  ONK_Intel.Queue.ErrorHandling
 //             WdfIoQueueCreate fail
 
 #pragma alloc_text (PAGE, Queue_Create)

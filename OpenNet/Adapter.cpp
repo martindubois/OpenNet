@@ -151,27 +151,35 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     VALUE_VECTOR_DESCRIPTION_RESERVED, // 90
 
     { "Hardware - RX - BMC_MANAGEMENT_DROPPED      ", "packet", 1 },
-    { "Hardware - RX - CIRCUIT_BREAKER_DROPPED     ", "packet", 1 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
     { "Hardware - RX - HOST                        ", "byte"  , 1 },
     { "Hardware - RX - HOST                        ", "packet", 1 },
     { "Hardware - RX - LENGTH_ERRORS               ", "packet", 1 }, //  95
     { "Hardware - RX - MANAGEMENT_DROPPED          ", "packet", 1 },
-    { "Hardware - RX - MISSED                      ", "packet", 1 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
     { "Hardware - RX - NO_BUFFER                   ", "packet", 0 },
     { "Hardware - RX - OVERSIZE                    ", "packet", 1 },
     { "Hardware - RX - QUEUE_DROPPED               ", "packet", 1 }, // 100
     { "Hardware - RX - UNDERSIZE                   ", "packet", 1 },
-    { "Hardware - RX - XOFF                        ", "packet", 0 },
-    { "Hardware - RX - XON                         ", "packet", 0 },
-    { "Hardware - TX - DEFER_EVENTS                ", ""      , 0 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
     { "Hardware - TX - DISCARDED                   ", "packet", 1 }, // 105
     { "Hardware - TX - HOST                        ", "byte"  , 1 },
     { "Hardware - TX - HOST                        ", "packet", 1 },
-    { "Hardware - TX - HOST_CIRCUIT_BREAKER_DROPPED", "packet", 1 },
-    { "Hardware - TX - NO_CRS                      ", "packet", 1 },
-    { "Hardware - TX - XOFF                        ", "packet", 0 }, // 110
-    { "Hardware - TX - XON                         ", "packet", 0 },
 
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
+    { "Hardware - TX - NO_CRS                      ", "packet", 1 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 110
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,

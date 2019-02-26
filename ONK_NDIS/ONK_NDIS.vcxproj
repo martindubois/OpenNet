@@ -28,8 +28,9 @@
     <DriverType>KMDF</DriverType>
     <DriverTargetPlatform>Universal</DriverTargetPlatform>
     <NETADAPTER_VERSION_MAJOR>1</NETADAPTER_VERSION_MAJOR>
-    <NETADAPTER_VERSION_MINOR>2</NETADAPTER_VERSION_MINOR>
+    <NETADAPTER_VERSION_MINOR>3</NETADAPTER_VERSION_MINOR>
     <NetAdapterDriver>true</NetAdapterDriver>
+    <SpectreMitigation>false</SpectreMitigation>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
@@ -39,8 +40,9 @@
     <DriverType>KMDF</DriverType>
     <DriverTargetPlatform>Universal</DriverTargetPlatform>
     <NETADAPTER_VERSION_MAJOR>1</NETADAPTER_VERSION_MAJOR>
-    <NETADAPTER_VERSION_MINOR>2</NETADAPTER_VERSION_MINOR>
+    <NETADAPTER_VERSION_MINOR>3</NETADAPTER_VERSION_MINOR>
     <NetAdapterDriver>true</NetAdapterDriver>
+    <SpectreMitigation>false</SpectreMitigation>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

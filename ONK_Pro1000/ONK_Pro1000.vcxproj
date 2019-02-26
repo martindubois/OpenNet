@@ -27,6 +27,7 @@
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>KMDF</DriverType>
     <DriverTargetPlatform>Universal</DriverTargetPlatform>
+    <SpectreMitigation>false</SpectreMitigation>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
@@ -35,6 +36,7 @@
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>KMDF</DriverType>
     <DriverTargetPlatform>Universal</DriverTargetPlatform>
+    <SpectreMitigation>false</SpectreMitigation>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -86,17 +88,23 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Pro1000.cpp" />
+    <ClCompile Include="Intel.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="Driver.cpp" />
+    <ClCompile Include="Intel_82576.cpp" />
     <ClCompile Include="Queue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component.h" />
     <ClInclude Include="Device.h" />
-    <ClInclude Include="Pro1000.h" />
-    <ClInclude Include="Pro1000_Regs.h" />
+    <ClInclude Include="Intel.h" />
+    <ClInclude Include="Intel_82576.h" />
+    <ClInclude Include="Intel_82576_Regs.h" />
+    <ClInclude Include="Intel_82599.h" />
+    <ClInclude Include="Intel_82599_Regs.h" />
+    <ClInclude Include="Intel_Regs.h" />
     <ClInclude Include="Queue.h" />
+    <ClInclude Include="Regs.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Common\Version.rc" />

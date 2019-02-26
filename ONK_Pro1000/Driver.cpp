@@ -31,7 +31,7 @@ extern "C"
 
 // Thread  PnP
 
-// NOT TESTED  ONK_Pro1000.Driver.ErrorHandling
+// NOT TESTED  ONK_Intel.Driver.ErrorHandling
 //             WdfDriverCreate fail
 
 #pragma alloc_text (INIT, DriverEntry)
@@ -83,7 +83,7 @@ VOID Cleanup(WDFOBJECT aDriverObject)
 
 // Thread  PnP
 
-// NOT TESTED  ONK_Pro1000.Driver.ErrorHandling
+// NOT TESTED  ONK_Intel.Driver.ErrorHandling
 //             Device_Create fail
 
 #pragma alloc_text (PAGE, DeviceAdd)

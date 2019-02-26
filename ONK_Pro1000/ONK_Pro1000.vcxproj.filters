@@ -36,7 +36,10 @@
     <ClCompile Include="Queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Pro1000.cpp">
+    <ClCompile Include="Intel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Intel_82576.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,10 +53,25 @@
     <ClInclude Include="Queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Pro1000.h">
+    <ClInclude Include="Intel_Regs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Pro1000_Regs.h">
+    <ClInclude Include="Intel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Intel_82576_Regs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Intel_82576.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Intel_82599_Regs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Intel_82599.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Regs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

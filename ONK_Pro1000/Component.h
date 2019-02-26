@@ -19,4 +19,4 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #define DEBUG_ID DPFLTR_IHVDRIVER_ID
-#define PREFIX   "ONK_Pro1000: "
+#define PREFIX   "ONK_Intel: "

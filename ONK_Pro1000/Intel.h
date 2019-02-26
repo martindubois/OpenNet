@@ -2,7 +2,7 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2018-2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       ONK_Pro1000/Pro1000.h
+// File       ONK_Pro1000/Intel.h
 
 #pragma once
 
@@ -15,17 +15,14 @@
 #include <OpenNetK/Types.h>
 
 // ===== ONK_Pro1000 ========================================================
-#include "Pro1000_Regs.h"
-
+#include "Intel_Regs.h"
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
-class Pro1000 : public OpenNetK::Hardware
+class Intel : public OpenNetK::Hardware
 {
 
 public:
-
-    Pro1000();
 
     // ===== OpenNetK::Hardware =============================================
     virtual void         GetState          (OpenNetK::Adapter_State * aStats);
@@ -35,7 +32,6 @@ public:
     virtual void         D0_Entry          ();
     virtual bool         D0_Exit           ();
     virtual void         Interrupt_Disable ();
-    virtual void         Interrupt_Enable  ();
     virtual bool         Interrupt_Process (unsigned int aMessageId, bool * aNeedMoreProcessing);
     virtual void         Interrupt_Process2(bool * aNeedMoreProcessing);
     virtual bool         Packet_Drop          ();
@@ -47,31 +43,41 @@ public:
 
 protected:
 
-    // ===== OpenNetK::Hardware =============================================
-    virtual void Unlock_AfterReceive_Internal();
-    virtual void Unlock_AfterSend_Internal   ();
+    enum
+    {
+        RX_DESCRIPTOR_QTY = 32 * 1024,
+        TX_DESCRIPTOR_QTY = 32 * 1024,
+    };
+
+    Intel();
+
+    void MulticastArray_Clear_Zone0();
+
+    virtual void Interrupt_Disable_Zone0() = 0;
+
+    virtual void Reset_Zone0();
+
+    virtual void Statistics_Update();
+
+    // ===== Zone 0 =========================================================
+
+    unsigned int mRx_In;
+    uint64_t     mRx_PA;
+
+    unsigned int mTx_In;
+    uint64_t     mTx_PA;
 
 private:
 
     enum
     {
-        PACKET_BUFFER_QTY =        64,
-        RX_DESCRIPTOR_QTY = 32 * 1024,
-        TX_DESCRIPTOR_QTY = 32 * 1024,
+        PACKET_BUFFER_QTY = 64,
     };
 
-    void Interrupt_Disable_Zone0();
-
-    void Reset_Zone0();
-
-    void Rx_Config_Zone0 ();
     void Rx_Process_Zone0();
 
     unsigned int Rx_GetAvailableDescriptor_Zone0();
 
-    void Statistics_Update();
-
-    void Tx_Config_Zone0 ();
     void Tx_Process_Zone0();
 
     unsigned int Tx_GetAvailableDescriptor_Zone0();
@@ -81,21 +87,17 @@ private:
 
     // ===== Zone 0 =========================================================
 
-    volatile Pro1000_BAR1 * mBAR1_MA;
+    volatile Intel_BAR1 * mBAR1_MA;
 
-    Pro1000_Rx_Descriptor * mRx_CA ;
+    Intel_Rx_Descriptor   * mRx_CA ;
     volatile long         * mRx_Counter      [RX_DESCRIPTOR_QTY];
-    unsigned int            mRx_In ;
     unsigned int            mRx_Out;
-    uint64_t                mRx_PA ;
     OpenNetK::Packet      * mRx_PacketData   [RX_DESCRIPTOR_QTY];
     OpenNet_PacketInfo    * mRx_PacketInfo_MA[RX_DESCRIPTOR_QTY];
 
-    Pro1000_Tx_Descriptor * mTx_CA ;
+    Intel_Tx_Descriptor   * mTx_CA ;
     volatile long         * mTx_Counter[TX_DESCRIPTOR_QTY];
-    unsigned int            mTx_In ;
     unsigned int            mTx_Out;
-    uint64_t                mTx_PA ;
 
     void        * mPacketBuffer_CA     [PACKET_BUFFER_QTY];
     volatile long mPacketBuffer_Counter[PACKET_BUFFER_QTY];
