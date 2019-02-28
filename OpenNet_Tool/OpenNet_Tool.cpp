@@ -166,7 +166,7 @@ static const KmsLib::ToolBase::CommandInfo TEST_COMMANDS[] =
     { "Search"       , NULL              , "Search ..."                                               , TEST_SEARCH_COMMANDS },
     { "SetBandwidth" , Test_SetBandwidth , "SetBandwidth {Bandwidth_MiB/s}"                           , NULL },
     { "SetBufferQty" , Test_SetBufferQty , "SetBufferQty {BufferQty}"                                 , NULL },
-    { "SetCode"      , Test_SetCode      , "SetCode DEFAULT|FORWARD|NONE|NOTHING|REPLY|REPLY_ON_ERROR", NULL },
+    { "SetCode"      , Test_SetCode      , "SetCode DEFAULT|FORWARD|NOTHING|REPLY|REPLY_ON_ERROR|... ", NULL },
     { "SetMode"      , Test_SetMode      , "SetMode DEFAULT|FUNCTION|KERNEL"                          , NULL },
     { "SetPacketSize", Test_SetPacketSize, "SetPacketSize {PacketSize_byte}"                          , NULL },
     { "SetProfiling" , Test_SetProfiling , "SetProfiling false|true"                                  , NULL },

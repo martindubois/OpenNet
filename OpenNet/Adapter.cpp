@@ -102,7 +102,9 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     { "OpenNetK::Adapter - TX                      ", "packet", 1 },
     // ===== 0.0.7 ==========================================================
     { "OpenNetK::Adapter - CORRUPTED               ", "buffer", 1 }, // 50
-    { "OpenNetK::Adapter - CORRUPTED - RELEASED    ", "buffer", 1 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
     { "OpenNetK::Adapter - PACKET_GEN. - BREAK     ", ""      , 1 },
     { "OpenNetK::ADapter - PACKET_GEN. - ITERATION ", ""      , 1 },
 

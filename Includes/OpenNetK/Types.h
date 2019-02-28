@@ -1,43 +1,22 @@
 
-// Product / Produit  OpenNet
+// Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNetK/Types.h
-/// \brief   OpenNet_BufferHeader, OpenNet_PacketInfo
-
-// TODO  OpenNetK.Types
-//       Normal (Cleanup) - Move state definition for this file. Also use
-//       enum for them.
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/Types.h
+/// \brief      OpenNet_BufferHeader, OpenNet_PacketInfo
 
 #pragma once
 
-// Constants / Constantes
+// Constants
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== Buffer state =======================================================
-
-//                  +--> STOPPED <-----------------------+<---------------+
-//                  |                                    |                |
-// --> INVALID --> TX_RUNNING <-- TX_PROGRAMMING <----- PX_COMPLETED <--+ |
-//                  |                                                   | |
-//                  +--> RX_PROGRAMMING --> RX_RUNNING --> PX_RUNNING --+ |
-//                                                                 |      |
-//                                                                 +------+
-#define OPEN_NET_BUFFER_STATE_INVALID        (0)
-#define OPEN_NET_BUFFER_STATE_PX_COMPLETED   (1)
-#define OPEN_NET_BUFFER_STATE_PX_RUNNING     (2)
-#define OPEN_NET_BUFFER_STATE_RX_PROGRAMMING (3)
-#define OPEN_NET_BUFFER_STATE_RX_RUNNING     (4)
-#define OPEN_NET_BUFFER_STATE_STOPPED        (5)
-#define OPEN_NET_BUFFER_STATE_TX_PROGRAMMING (6)
-#define OPEN_NET_BUFFER_STATE_TX_RUNNING     (7)
-#define OPEN_NET_BUFFER_STATE_QTY            (8)
-
-// ===== Packet state / Etat d'un paquet ====================================
+#define OPEN_NET_BUFFER_EVENT_PROCESSED (0x00000001)
+#define OPEN_NET_BUFFER_EVENT_RESERVED  (0xfffffffe)
 
 #define OPEN_NET_PACKET_PROCESSED (0x80000000)
 
-// Data type / Type de donnees
+// Data type
 /////////////////////////////////////////////////////////////////////////////
 
 /// \cond en
@@ -47,13 +26,14 @@
 /// \brief  Cette structure est utilise pour passer les informations au sujet
 ///         d'un espace memoire.
 /// \endcond
+/// \todo   Document members
 typedef struct
 {
     uint32_t mPacketQty            ;
     uint32_t mPacketInfoOffset_byte;
     uint32_t mPacketSize_byte      ;
 
-    volatile uint32_t mBufferState;
+    volatile uint32_t mEvents;
 
     uint8_t mReserved0[48];
 }
@@ -66,6 +46,7 @@ OpenNet_BufferHeader;
 /// \brief  Cette structure est utilise pour passer les informations au sujet
 ///         d'un paquet.
 /// \endcond
+/// \todo   Document members
 typedef struct
 {
     volatile uint32_t mSendTo;

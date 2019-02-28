@@ -40,12 +40,13 @@ namespace TestLib
 
         typedef enum
         {
-            CODE_DEFAULT       ,
-            CODE_FORWARD       ,
-            CODE_NONE          ,
-            CODE_NOTHING       ,
-            CODE_REPLY         ,
-            CODE_REPLY_ON_ERROR,
+            CODE_DEFAULT              ,
+            CODE_DO_NOT_REPLY_ON_ERROR,
+            CODE_FORWARD              ,
+            CODE_NONE                 ,
+            CODE_NOTHING              ,
+            CODE_REPLY                ,
+            CODE_REPLY_ON_ERROR       ,
 
             CODE_QTY
         }

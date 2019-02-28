@@ -134,7 +134,9 @@ namespace OpenNetK
             volatile long mRx_Counter ;
             volatile long mTx_Counter ;
 
-            uint8_t mReserved1[32];
+            uint32_t mState;
+
+            uint8_t mReserved1[28];
         }
         BufferInfo;
 
@@ -176,11 +178,10 @@ namespace OpenNetK
         void Stop_Zone0();
 
         // ===== Buffer_State ===============================================
-        void Buffer_Corrupted_Zone0  (unsigned int aIndex     );
-        void Buffer_PxCompleted_Zone0(BufferInfo * aBufferInfo);
-        void Buffer_PxRunning_Zone0  (BufferInfo * aBufferInfo);
-        void Buffer_RxRunning_Zone0  (BufferInfo * aBufferInfo);
-        void Buffer_TxRunning_Zone0  (BufferInfo * aBufferInfo);
+        void Buffer_Corrupted_Zone0(unsigned int aIndex     );
+        void Buffer_PxRunning_Zone0(BufferInfo * aBufferInfo);
+        void Buffer_RxRunning_Zone0(BufferInfo * aBufferInfo);
+        void Buffer_TxRunning_Zone0(BufferInfo * aBufferInfo);
 
         // ===== IoCtl ======================================================
         int IoCtl_Config_Get      (      Adapter_Config * aOut);

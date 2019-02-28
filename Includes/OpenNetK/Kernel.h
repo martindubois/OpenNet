@@ -39,7 +39,7 @@
 
 #define OPEN_NET_FUNCTION_BEGIN                                                                                                                     \
     OPEN_NET_GLOBAL_MEMORY_FENCE;                                                                                                                   \
-    if ( OPEN_NET_BUFFER_STATE_PX_RUNNING == aBufferHeader->mBufferState )                                                                          \
+    if ( 0 == ( OPEN_NET_BUFFER_EVENT_PROCESSED & aBufferHeader->mEvents ) )                                                                        \
     {                                                                                                                                               \
         OPEN_NET_GLOBAL unsigned char      * lBase       = (OPEN_NET_GLOBAL unsigned char      *)( aBufferHeader );                                 \
         OPEN_NET_GLOBAL OpenNet_PacketInfo * lPacketInfo = (OPEN_NET_GLOBAL OpenNet_PacketInfo *)( lBase + aBufferHeader->mPacketInfoOffset_byte ); \
@@ -47,14 +47,14 @@
         if ( 0 == lPacketInfo->mSendTo )                                                                                                            \
         {
 
-#define OPEN_NET_FUNCTION_END                                                 \
-        }                                                                     \
-        OPEN_NET_GLOBAL_MEMORY_FENCE;                                         \
-        if ( 0 == OPEN_NET_PACKET_INDEX )                                     \
-        {                                                                     \
-            aBufferHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_COMPLETED; \
-        }                                                                     \
-        OPEN_NET_GLOBAL_MEMORY_FENCE;                                         \
+#define OPEN_NET_FUNCTION_END                                         \
+        }                                                             \
+        OPEN_NET_GLOBAL_MEMORY_FENCE;                                 \
+        if ( 0 == OPEN_NET_PACKET_INDEX )                             \
+        {                                                             \
+            aBufferHeader->mEvents = OPEN_NET_BUFFER_EVENT_PROCESSED; \
+        }                                                             \
+        OPEN_NET_GLOBAL_MEMORY_FENCE;                                 \
     }
 
 // ===== Kernel =============================================================
@@ -64,7 +64,7 @@
 
 #define OPEN_NET_KERNEL_BEGIN                                                                                                                       \
     OPEN_NET_GLOBAL_MEMORY_FENCE;                                                                                                                   \
-    if ( OPEN_NET_BUFFER_STATE_PX_RUNNING == aBufferHeader->mBufferState )                                                                          \
+    if ( 0 == ( OPEN_NET_BUFFER_EVENT_PROCESSED & aBufferHeader->mEvents ) )                                                                        \
     {                                                                                                                                               \
         OPEN_NET_GLOBAL unsigned char      * lBase       = (OPEN_NET_GLOBAL unsigned char      *)( aBufferHeader );                                 \
         OPEN_NET_GLOBAL OpenNet_PacketInfo * lPacketInfo = (OPEN_NET_GLOBAL OpenNet_PacketInfo *)( lBase + aBufferHeader->mPacketInfoOffset_byte ); \
@@ -72,12 +72,12 @@
         if ( 0 == lPacketInfo->mSendTo )                                                                                                            \
         {
 
-#define OPEN_NET_KERNEL_END                                                   \
-        }                                                                     \
-        OPEN_NET_GLOBAL_MEMORY_FENCE;                                         \
-        if ( 0 == OPEN_NET_PACKET_INDEX )                                     \
-        {                                                                     \
-            aBufferHeader->mBufferState = OPEN_NET_BUFFER_STATE_PX_COMPLETED; \
-        }                                                                     \
-        OPEN_NET_GLOBAL_MEMORY_FENCE;                                         \
+#define OPEN_NET_KERNEL_END                                           \
+        }                                                             \
+        OPEN_NET_GLOBAL_MEMORY_FENCE;                                 \
+        if ( 0 == OPEN_NET_PACKET_INDEX )                             \
+        {                                                             \
+            aBufferHeader->mEvents = OPEN_NET_BUFFER_EVENT_PROCESSED; \
+        }                                                             \
+        OPEN_NET_GLOBAL_MEMORY_FENCE;                                 \
     }

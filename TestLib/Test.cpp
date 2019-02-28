@@ -51,6 +51,82 @@
 
 #define EOL "\n"
 
+static const char * FUNCTION_DO_NOT_REPLY_ON_ERROR_0 =
+"OPEN_NET_FUNCTION_DECLARE( DoNotReplyOnError0 )"                                                       EOL
+"{"                                                                                                     EOL
+"    OPEN_NET_FUNCTION_BEGIN"                                                                           EOL
+                                                                                                        EOL
+"        OPEN_NET_GLOBAL unsigned char * lData   = lBase + lPacketInfo->mOffset_byte;"                  EOL
+"        unsigned int                    lResult = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );" EOL
+"        unsigned int                    i;"                                                            EOL
+                                                                                                        EOL
+"        for ( i = 0; i < 6; i ++)"                                                                     EOL
+"        {"                                                                                             EOL
+"            if ( 0xff != lData[ i ] )"                                                                 EOL
+"            {"                                                                                         EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
+"            }"                                                                                         EOL
+"        }"                                                                                             EOL
+                                                                                                        EOL
+"        for ( i = 12; i < 14; i ++)"                                                                   EOL
+"        {"                                                                                             EOL
+"            if ( 0x0a != lData[ i ] )"                                                                 EOL
+"            {"                                                                                         EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
+"            }"                                                                                         EOL
+"        }"                                                                                             EOL
+                                                                                                        EOL
+"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                                              EOL
+"        {"                                                                                             EOL
+"            if ( 0x00 != lData[ i ] )"                                                                 EOL
+"            {"                                                                                         EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
+"            }"                                                                                         EOL
+"        }"                                                                                             EOL
+                                                                                                        EOL
+"        lPacketInfo->mSendTo = lResult;"                                                               EOL
+                                                                                                        EOL
+"    OPEN_NET_FUNCTION_END"                                                                             EOL
+"}"                                                                                                     EOL;
+
+static const char * FUNCTION_DO_NOT_REPLY_ON_ERROR_1 =
+"OPEN_NET_FUNCTION_DECLARE( DoNotReplyOnError1 )"                                                       EOL
+"{"                                                                                                     EOL
+"    OPEN_NET_FUNCTION_BEGIN"                                                                           EOL
+                                                                                                        EOL
+"        OPEN_NET_GLOBAL unsigned char * lData   = lBase + lPacketInfo->mOffset_byte;"                  EOL
+"        unsigned int                    lResult = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );" EOL
+"        unsigned int                    i;"                                                            EOL
+                                                                                                        EOL
+"        for ( i = 0; i < 6; i ++)"                                                                     EOL
+"        {"                                                                                             EOL
+"            if ( 0xff != lData[ i ] )"                                                                 EOL
+"            {"                                                                                         EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
+"            }"                                                                                         EOL
+"        }"                                                                                             EOL
+                                                                                                        EOL
+"        for ( i = 12; i < 14; i ++)"                                                                   EOL
+"        {"                                                                                             EOL
+"            if ( 0x0a != lData[ i ] )"                                                                 EOL
+"            {"                                                                                         EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
+"            }"                                                                                         EOL
+"        }"                                                                                             EOL
+                                                                                                        EOL
+"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                                              EOL
+"        {"                                                                                             EOL
+"            if ( 0x00 != lData[ i ] )"                                                                 EOL
+"            {"                                                                                         EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
+"            }"                                                                                         EOL
+"        }"                                                                                             EOL
+                                                                                                        EOL
+"        lPacketInfo->mSendTo = lResult;"                                                               EOL
+                                                                                                        EOL
+"    OPEN_NET_FUNCTION_END"                                                                             EOL
+"}"                                                                                                     EOL;
+
 static const char * FUNCTION_FORWARD_0 =
 "OPEN_NET_FUNCTION_DECLARE( Forward0 )"                                              EOL
 "{"                                                                                  EOL
@@ -167,6 +243,46 @@ static const char * FUNCTION_REPLY_ON_ERROR_1 =
 "    OPEN_NET_FUNCTION_END"                                                            EOL
 "}"                                                                                    EOL;
 
+static const char * KERNEL_DO_NOT_REPLY_ON_ERROR =
+"#include <OpenNetK/Kernel.h>"                                                                          EOL
+                                                                                                        EOL
+"OPEN_NET_KERNEL_DECLARE"                                                                               EOL
+"{"                                                                                                     EOL
+"    OPEN_NET_KERNEL_BEGIN"                                                                             EOL
+                                                                                                        EOL
+"        OPEN_NET_GLOBAL unsigned char * lData   = lBase + lPacketInfo->mOffset_byte;"                  EOL
+"        unsigned int                    lResult = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );" EOL
+"        unsigned int                    i;"                                                            EOL
+                                                                                                        EOL
+"        for ( i = 0; i < 6; i ++)"                                                                     EOL
+"        {"                                                                                             EOL
+"            if ( 0xff != lData[ i ] )"                                                                 EOL
+"            {"                                                                                         EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
+"            }"                                                                                         EOL
+"        }"                                                                                             EOL
+                                                                                                        EOL
+"        for ( i = 12; i < 14; i ++)"                                                                   EOL
+"        {"                                                                                             EOL
+"            if ( 0x0a != lData[ i ] )"                                                                 EOL
+"            {"                                                                                         EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
+"            }"                                                                                         EOL
+"        }"                                                                                             EOL
+                                                                                                        EOL
+"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                                              EOL
+"        {"                                                                                             EOL
+"            if ( 0x00 != lData[ i ] )"                                                                 EOL
+"            {"                                                                                         EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
+"            }"                                                                                         EOL
+"        }"                                                                                             EOL
+                                                                                                        EOL
+"        lPacketInfo->mSendTo = lResult;"                                                               EOL
+                                                                                                        EOL
+"    OPEN_NET_KERNEL_END"                                                                               EOL
+"}"                                                                                                     EOL;
+
 static const char * KERNEL_FORWARD =
 "#include <OpenNetK/Kernel.h>"                                                       EOL
                                                                                      EOL
@@ -255,7 +371,7 @@ namespace TestLib
     const unsigned int Test::BUFFER_QTY_MAX = OPEN_NET_BUFFER_QTY - 1;
     const unsigned int Test::BUFFER_QTY_MIN =                       1;
 
-    const char * Test::CODE_NAMES[CODE_QTY] = { "DEFAULT", "FORWARD", "NONE", "NOTHING", "REPLY", "REPLY_ON_ERROR" };
+    const char * Test::CODE_NAMES[CODE_QTY] = { "DEFAULT", "DO_NOT_REPLY_ON_ERROR", "FORWARD", "NONE", "NOTHING", "REPLY", "REPLY_ON_ERROR" };
     const char * Test::MODE_NAMES[MODE_QTY] = { "DEFAULT", "FUNCTION", "KERNEL" };
 
     const unsigned char Test::MASK_E[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe };
@@ -264,7 +380,7 @@ namespace TestLib
     const unsigned int Test::TEST_PACKET_SIZE_MAX_byte = 9000;
     const unsigned int Test::TEST_PACKET_SIZE_MIN_byte =   64;
 
-    // aName [---;R--] DEFAULT|FORWARD|NONE|NOTHING|REPLY|REPLY_ON_ERROR
+    // aName [---;R--]
     // aOut  [---;-W-] The method writes the enum value there
     //
     // Return
@@ -1307,14 +1423,16 @@ namespace TestLib
 
         OpenNet::Function * lF          = mFunctions + aAdapterIndex;
         unsigned int        lOtherIndex = (aAdapterIndex + 1) % mAdapterCount0;
+        bool                lZero       = (0 == aAdapterIndex);
 
         switch (mCodes[aAdapterIndex])
         {
-        case CODE_FORWARD       : SetFunction(lAdapter, lF, (0 == aAdapterIndex) ? FUNCTION_FORWARD_0        : FUNCTION_FORWARD_1       , (0 == aAdapterIndex) ? "Forward0"      : "Forward1"     , mNos[lOtherIndex  ]); break;
-        case CODE_NONE          :                                                                                                                                                                                         break;
-        case CODE_NOTHING       : SetFunction(lAdapter, lF, (0 == aAdapterIndex) ? FUNCTION_NOTHING_0        : FUNCTION_NOTHING_1       , (0 == aAdapterIndex) ? "Nothing0"      : "Nothing1"     , NULL               ); break;
-        case CODE_REPLY         : SetFunction(lAdapter, lF, (0 == aAdapterIndex) ? FUNCTION_FORWARD_0        : FUNCTION_FORWARD_1       , (0 == aAdapterIndex) ? "Forward0"      : "Forward1"     , mNos[aAdapterIndex]); break;
-        case CODE_REPLY_ON_ERROR: SetFunction(lAdapter, lF, (0 == aAdapterIndex) ? FUNCTION_REPLY_ON_ERROR_0 : FUNCTION_REPLY_ON_ERROR_1, (0 == aAdapterIndex) ? "ReplyOnError0" : "ReplyOnError1", mNos[aAdapterIndex]); break;
+        case CODE_DO_NOT_REPLY_ON_ERROR: SetFunction(lAdapter, lF, lZero ? FUNCTION_DO_NOT_REPLY_ON_ERROR_0 : FUNCTION_DO_NOT_REPLY_ON_ERROR_1, lZero ? "DoNotReplyOnError0" : "DoNotReplyOnError1", mNos[aAdapterIndex]); break;
+        case CODE_FORWARD              : SetFunction(lAdapter, lF, lZero ? FUNCTION_FORWARD_0               : FUNCTION_FORWARD_1              , lZero ? "Forward0"           : "Forward1"          , mNos[lOtherIndex  ]); break;
+        case CODE_NONE                 :                                                                                                                                                                                   break;
+        case CODE_NOTHING              : SetFunction(lAdapter, lF, lZero ? FUNCTION_NOTHING_0               : FUNCTION_NOTHING_1              , lZero ? "Nothing0"           : "Nothing1"          , NULL               ); break;
+        case CODE_REPLY                : SetFunction(lAdapter, lF, lZero ? FUNCTION_FORWARD_0               : FUNCTION_FORWARD_1              , lZero ? "Forward0"           : "Forward1"          , mNos[aAdapterIndex]); break;
+        case CODE_REPLY_ON_ERROR       : SetFunction(lAdapter, lF, lZero ? FUNCTION_REPLY_ON_ERROR_0        : FUNCTION_REPLY_ON_ERROR_1       , lZero ? "ReplyOnError0"      : "ReplyOnError1"     , mNos[aAdapterIndex]); break;
 
         default: assert(false);
         }
@@ -1370,11 +1488,12 @@ namespace TestLib
 
         switch (mCodes[aAdapterIndex])
         {
-        case CODE_FORWARD       : SetKernel(lAdapter, lK, KERNEL_FORWARD       , mNos[lOtherIndex  ]); break;
-        case CODE_NONE          :                                                                      break;
-        case CODE_NOTHING       : SetKernel(lAdapter, lK, KERNEL_NOTHING       , NULL               ); break;
-        case CODE_REPLY         : SetKernel(lAdapter, lK, KERNEL_FORWARD       , mNos[aAdapterIndex]); break;
-        case CODE_REPLY_ON_ERROR: SetKernel(lAdapter, lK, KERNEL_REPLY_ON_ERROR, mNos[aAdapterIndex]); break;
+        case CODE_DO_NOT_REPLY_ON_ERROR: SetKernel(lAdapter, lK, KERNEL_DO_NOT_REPLY_ON_ERROR, mNos[aAdapterIndex]); break;
+        case CODE_FORWARD              : SetKernel(lAdapter, lK, KERNEL_FORWARD              , mNos[lOtherIndex  ]); break;
+        case CODE_NONE                 :                                                                             break;
+        case CODE_NOTHING              : SetKernel(lAdapter, lK, KERNEL_NOTHING              , NULL               ); break;
+        case CODE_REPLY                : SetKernel(lAdapter, lK, KERNEL_FORWARD              , mNos[aAdapterIndex]); break;
+        case CODE_REPLY_ON_ERROR       : SetKernel(lAdapter, lK, KERNEL_REPLY_ON_ERROR       , mNos[aAdapterIndex]); break;
 
         default: assert(false);
         }
