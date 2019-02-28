@@ -246,7 +246,7 @@ namespace OpenNetK
                     break;
 
                 default:
-                    TRACE_ERROR "%s - aBufferInfo->mPackets[ i ].mState = %d\n", __FUNCTION__, aBufferInfo->mPackets[ i ].mState TRACE_END;
+                    TRACE_ERROR "%s - aBufferInfo->mPackets[ %u ].mState = %d, lPacketInfo_XA[ %u ].mSendTo = 0x%08x\n", __FUNCTION__, i, aBufferInfo->mPackets[ i ].mState, i, lPacketInfo_XA[i].mSendTo TRACE_END;
                     ASSERT(false);
                 }
             }
@@ -277,6 +277,73 @@ namespace OpenNetK
 
             ASSERT(OPEN_NET_BUFFER_QTY >= mBufferCount);
 
+            // TODO  BufferOrder
+            /* if ( mBufferCount > mPxRunning )
+            {
+                switch ( mBuffers[ mPxRunning ].mHeader_XA->mBufferState )
+                {
+                case OPEN_NET_BUFFER_STATE_PX_COMPLETED : Buffer_PxCompleted_Zone0( mBuffers + mPxRunning ); break;
+                case OPEN_NET_BUFFER_STATE_PX_RUNNING   : Buffer_PxRunning_Zone0  ( mBuffers + mPxRunning ); break;
+                case OPEN_NET_BUFFER_STATE_STOPPED      : Buffer_Stopped_Zone0    (            mPxRunning ); break;
+
+                case OPEN_NET_BUFFER_STATE_RX_PROGRAMMING :
+                case OPEN_NET_BUFFER_STATE_RX_RUNNING     :
+                case OPEN_NET_BUFFER_STATE_TX_PROGRAMMING :
+                case OPEN_NET_BUFFER_STATE_TX_RUNNING     :
+                    break;
+
+                default : Buffer_Corrupted_Zone0( mPxRunning );
+                }
+            }
+            else
+            {
+                mPxRunning = 0;
+            }
+
+            if ( mBufferCount > mRxRunning )
+            {
+                switch ( mBuffers[ mRxRunning ].mHeader_XA->mBufferState )
+                {
+                case OPEN_NET_BUFFER_STATE_RX_RUNNING : Buffer_RxRunning_Zone0( mBuffers + mRxRunning ); break;
+                case OPEN_NET_BUFFER_STATE_STOPPED    : Buffer_Stopped_Zone0  (            mPxRunning ); break;
+
+                case OPEN_NET_BUFFER_STATE_PX_COMPLETED   :
+                case OPEN_NET_BUFFER_STATE_PX_RUNNING     :
+                case OPEN_NET_BUFFER_STATE_RX_PROGRAMMING :
+                case OPEN_NET_BUFFER_STATE_TX_PROGRAMMING :
+                case OPEN_NET_BUFFER_STATE_TX_RUNNING     :
+                    break;
+
+                default : Buffer_Corrupted_Zone0( mPxRunning );
+                }
+            }
+            else
+            {
+                mRxRunning = 0;
+            }
+
+            if ( mBufferCount > mTxRunning )
+            {
+                switch ( mBuffers[ mTxRunning ].mHeader_XA->mBufferState )
+                {
+                case OPEN_NET_BUFFER_STATE_STOPPED    : Buffer_Stopped_Zone0  (            mPxRunning ); break;
+                case OPEN_NET_BUFFER_STATE_TX_RUNNING : Buffer_TxRunning_Zone0( mBuffers + mTxRunning ); break;
+
+                case OPEN_NET_BUFFER_STATE_PX_COMPLETED   :
+                case OPEN_NET_BUFFER_STATE_PX_RUNNING     :
+                case OPEN_NET_BUFFER_STATE_RX_PROGRAMMING :
+                case OPEN_NET_BUFFER_STATE_RX_RUNNING     :
+                case OPEN_NET_BUFFER_STATE_TX_PROGRAMMING :
+                    break;
+
+                default : Buffer_Corrupted_Zone0( mPxRunning );
+                }
+            }
+            else
+            {
+                mTxRunning = 0;
+            } */
+
             for (unsigned int i = 0; i < mBufferCount; i++)
             {
                 ASSERT(NULL != mBuffers[i].mHeader_XA);
@@ -285,28 +352,15 @@ namespace OpenNetK
                 {
                 case OPEN_NET_BUFFER_STATE_PX_COMPLETED  : Buffer_PxCompleted_Zone0(mBuffers + i); break;
                 case OPEN_NET_BUFFER_STATE_PX_RUNNING    : Buffer_PxRunning_Zone0  (mBuffers + i); break;
-                case OPEN_NET_BUFFER_STATE_RX_PROGRAMMING:                                         break;
                 case OPEN_NET_BUFFER_STATE_RX_RUNNING    : Buffer_RxRunning_Zone0  (mBuffers + i); break;
                 case OPEN_NET_BUFFER_STATE_STOPPED       : Buffer_Stopped_Zone0    (           i); break;
-                case OPEN_NET_BUFFER_STATE_TX_PROGRAMMING:                                         break;
                 case OPEN_NET_BUFFER_STATE_TX_RUNNING    : Buffer_TxRunning_Zone0  (mBuffers + i); break;
 
-                default:
-                    // The buffer is clearly corrupted! We don't write to it
-                    // and if possible we simply forget about it.
+                case OPEN_NET_BUFFER_STATE_RX_PROGRAMMING :
+                case OPEN_NET_BUFFER_STATE_TX_PROGRAMMING :
+                    break;
 
-                    TRACE_ERROR "%s - %u %u Corruptet" DEBUG_EOL, __FUNCTION__, mAdapterNo, i TRACE_END;
-
-                    mStatistics[ADAPTER_STATS_CORRUPTED_BUFFER]++;
-
-                    if (i == (mBufferCount - 1))
-                    {
-                        TRACE_ERROR "%s - %u %u Corrupted ==> Released" DEBUG_EOL, __FUNCTION__, mAdapterNo, i TRACE_END;
-
-                        mStatistics[ ADAPTER_STATS_CORRUPTED_BUFFER_RELEASED ] ++;
-
-                        Buffer_Release_Zone0();
-                    }
+                default : Buffer_Corrupted_Zone0( i );
                 }
             }
 
@@ -670,6 +724,28 @@ namespace OpenNetK
     //
     // Level   SoftInt
 
+    // aIndex
+    void Adapter::Buffer_Corrupted_Zone0( unsigned int aIndex )
+    {
+        ASSERT( mBufferCount > aIndex );
+
+        // The buffer is clearly corrupted! We don't write to it
+        // and if possible we simply forget about it.
+
+        TRACE_ERROR "%s - %u %u Corrupted" DEBUG_EOL, __FUNCTION__, mAdapterNo, aIndex TRACE_END;
+
+        mStatistics[ ADAPTER_STATS_CORRUPTED_BUFFER ] ++;
+
+        if ( aIndex == ( mBufferCount - 1 ) )
+        {
+            TRACE_ERROR "%s - %u %u Corrupted ==> Released" DEBUG_EOL, __FUNCTION__, mAdapterNo, aIndex TRACE_END;
+
+            mStatistics[ ADAPTER_STATS_CORRUPTED_BUFFER_RELEASED ] ++;
+
+            Buffer_Release_Zone0();
+        }
+    }
+
     // aBufferInfo [---;RW-]
     void Adapter::Buffer_PxCompleted_Zone0(BufferInfo * aBufferInfo)
     {
@@ -680,9 +756,13 @@ namespace OpenNetK
 
         ASSERT(OPEN_NET_BUFFER_STATE_PX_COMPLETED == aBufferInfo->mHeader_XA->mBufferState);
 
+        ASSERT( mBufferCount > mPxRunning );
+
+        mPxRunning = ( mPxRunning + 1 ) % mBufferCount;
+
         if (NULL == mAdapters)
         {
-            // TRACE_DEBUG "%s - %u %px PX_COMPLETED ==> STOPPED" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
+            // TRACE_DEBUG "%s - %u %p PX_COMPLETED ==> STOPPED" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
             aBufferInfo->mHeader_XA->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
 
             Buffer_WriteMarker_Zone0(aBufferInfo);
@@ -693,14 +773,14 @@ namespace OpenNetK
             // release the gate to avoid deadlock with the other adapter's
             // gates.
 
-            // TRACE_DEBUG "%u %px PX_COMPLETED ==> TX_PROGRAMMING" DEBUG_EOL, mAdapterNo, aBufferInfo TRACE_END;
+            // TRACE_DEBUG "%s - %u %p PX_COMPLETED ==> TX_PROGRAMMING" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
             aBufferInfo->mHeader_XA->mBufferState = OPEN_NET_BUFFER_STATE_TX_PROGRAMMING;
 
             Buffer_Send_Zone0(aBufferInfo);
 
             ASSERT(OPEN_NET_BUFFER_STATE_TX_PROGRAMMING == aBufferInfo->mHeader_XA->mBufferState);
 
-            // TRACE_DEBUG "%s - %u %px TX_PROGRAMMING ==> TX_RUNNING" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
+            // TRACE_DEBUG "%s - %u %p TX_PROGRAMMING ==> TX_RUNNING" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
             aBufferInfo->mHeader_XA->mBufferState = OPEN_NET_BUFFER_STATE_TX_RUNNING;
 
             Buffer_TxRunning_Zone0(aBufferInfo);
@@ -715,12 +795,16 @@ namespace OpenNetK
         ASSERT(NULL != aBufferInfo            );
         ASSERT(NULL != aBufferInfo->mHeader_XA);
 
+        ASSERT( mBufferCount > mPxRunning );
+
         // We do not put assert on the buffer state because the GPU may
         // change it at any time.
 
         if (aBufferInfo->mFlags.mStopRequested)
         {
-            // TRACE_DEBUG "%s - %u %px PX_RUNNING ==> STOPPED" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
+            mPxRunning = ( mPxRunning + 1 ) % mBufferCount;
+
+            // TRACE_DEBUG "%s - %u %p PX_RUNNING ==> STOPPED" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
             aBufferInfo->mHeader_XA->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
         }
     }
@@ -740,8 +824,12 @@ namespace OpenNetK
         ASSERT(NULL                             != aBufferInfo->mHeader_XA              );
         ASSERT(OPEN_NET_BUFFER_STATE_RX_RUNNING == aBufferInfo->mHeader_XA->mBufferState);
 
+        ASSERT( mBufferCount > mRxRunning );
+
         if (0 == aBufferInfo->mRx_Counter)
         {
+            mRxRunning = ( mRxRunning + 1 ) % mBufferCount;
+
             // TRACE_DEBUG "%s - %u %p RX_RUNNING ==> PX_RUNNING" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
             aBufferInfo->mHeader_XA->mBufferState = OPEN_NET_BUFFER_STATE_PX_RUNNING;
             Buffer_WriteMarker_Zone0(aBufferInfo);
@@ -774,11 +862,15 @@ namespace OpenNetK
         ASSERT(NULL                             != aBufferInfo->mHeader_XA              );
         ASSERT(OPEN_NET_BUFFER_STATE_TX_RUNNING == aBufferInfo->mHeader_XA->mBufferState);
 
+        ASSERT( mBufferCount > mTxRunning );
+
         if (0 == aBufferInfo->mTx_Counter)
         {
+            mTxRunning = ( mTxRunning + 1 ) % mBufferCount;
+
             if (aBufferInfo->mFlags.mStopRequested)
             {
-                // TRACE_DEBUG "%s - %u %px TX_RUNNING ==> STOPPED" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
+                // TRACE_DEBUG "%s - %u %p TX_RUNNING ==> STOPPED" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
                 aBufferInfo->mHeader_XA->mBufferState = OPEN_NET_BUFFER_STATE_STOPPED;
 
                 Buffer_WriteMarker_Zone0(aBufferInfo);
@@ -788,14 +880,14 @@ namespace OpenNetK
                 // Here, we use a temporary state because Buffer_Receivd_Zone
                 // release the gate to avoid deadlock with the Hardware's
                 // gates.
-                // TRACE_DEBUG "%s - %u %px TX_RUNNING ==> RX_PROGRAMMING" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
+                // TRACE_DEBUG "%s - %u %p TX_RUNNING ==> RX_PROGRAMMING" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
                 aBufferInfo->mHeader_XA->mBufferState = OPEN_NET_BUFFER_STATE_RX_PROGRAMMING;
 
                 Buffer_Receive_Zone0(aBufferInfo);
 
                 ASSERT(OPEN_NET_BUFFER_STATE_RX_PROGRAMMING == aBufferInfo->mHeader_XA->mBufferState);
 
-                // TRACE_DEBUG "%s - %u %px RX_PROGRAMMING ==> RX_RUNNING" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
+                // TRACE_DEBUG "%s - %u %p RX_PROGRAMMING ==> RX_RUNNING" DEBUG_EOL, __FUNCTION__, mAdapterNo, aBufferInfo TRACE_END;
                 aBufferInfo->mHeader_XA->mBufferState = OPEN_NET_BUFFER_STATE_RX_RUNNING;
             }
         }
@@ -1059,6 +1151,10 @@ namespace OpenNetK
             //       a descriptor overrun.
 
             ASSERT(OPEN_NET_BUFFER_QTY >= mBufferCount);
+
+            mPxRunning = 0;
+            mRxRunning = 0;
+            mTxRunning = 0;
 
             if (OPEN_NET_BUFFER_QTY >= (mBufferCount + lCount))
             {

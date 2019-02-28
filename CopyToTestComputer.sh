@@ -76,10 +76,10 @@ if [ 0 != $? ] ; then
     RESULT=8
 fi
 
-scp Scripts/OpenNet_Tool/A00RRU_K620_18.04.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool
+scp Scripts/OpenNet_Tool/A00DRU_*_18.04.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool
 
 if [ 0 != $? ] ; then
-    echo ERROR  scp Scripts/OpenNet_Tool/A00RRU_K620_18.04.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool  failed - $?
+    echo ERROR  scp Scripts/OpenNet_Tool/A00RRU_*_18.04.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool  failed - $?
     RESULT=9
 fi
 

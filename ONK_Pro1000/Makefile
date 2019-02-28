@@ -10,7 +10,7 @@ EXTRA_CFLAGS := -I$(src)/../Includes -I/home/mdubois/NVIDIA-Linux-x86_64-410.93/
 
 obj-m += ONK_Pro1000.o
 
-ONK_Pro1000-objs := Device_Linux.o DeviceCpp.o Driver_Linux.o NvBuffer.o Pro1000.o ../Libraries/ONK_Lib.a
+ONK_Pro1000-objs := Device_Linux.o DeviceCpp.o Driver_Linux.o Intel.o Intel_82576.o NvBuffer.o ../Libraries/ONK_Lib.a
 list-multi := ONK_Pro1000.o
 
 # ===== Rules ===============================================================
@@ -20,7 +20,7 @@ list-multi := ONK_Pro1000.o
 
 # ===== Targets =============================================================
 
-all: DeviceCpp.o Pro1000.o module
+all: DeviceCpp.o Intel.o Intel_82576.o module
 
 module:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules

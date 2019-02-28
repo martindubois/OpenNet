@@ -77,40 +77,6 @@ System_Internal::System_Internal()
 System_Internal::~System_Internal()
 {
     // printf( __CLASS__ "~System_Internal()\n" );
-
-    switch (mState)
-    {
-    case STATE_IDLE:
-        break;
-
-    case STATE_RUNNING :
-        Stop();
-        break;
-
-    default: assert(false);
-    }
-
-    Threads_Release();
-
-    unsigned int i;
-    
-    for (i = 0; i < mAdapters.size(); i++)
-    {
-        // printf( __CLASS__ "~System_Internal - delete 0x%lx (mAdapters[ %u ])\n", reinterpret_cast< uint64_t >( mAdapters[ i ] ), i );
-
-        // new ==> delete  See FindAdapters
-        delete mAdapters[i];
-    }
-
-    for (i = 0; i < mProcessors.size(); i++)
-    {
-        // printf( __CLASS__ "~System_Internal - delete 0x%lx (mProcessors[ %u ]\n", reinterpret_cast< uint64_t >( mProcessors[ i ] ), i );
-
-        // new ==> delete  See FindProcessors
-        delete mProcessors[i];
-    }
-
-    // printf( __CLASS__ "~System_Internal - End\n" );
 }
 
 // ===== OpenNet::System ====================================================
@@ -564,6 +530,40 @@ void System_Internal::SendLoopBackPackets(Adapter_Internal * aAdapter)
     }
 }
 
+// Protected
+/////////////////////////////////////////////////////////////////////////////
+
+void System_Internal::Cleanup()
+{
+    switch (mState)
+    {
+    case STATE_IDLE:
+        break;
+
+    case STATE_RUNNING :
+        Stop();
+        break;
+
+    default: assert(false);
+    }
+
+    Threads_Release();
+
+    unsigned int i;
+    
+    for (i = 0; i < mAdapters.size(); i++)
+    {
+        // new ==> delete  See FindAdapters
+        delete mAdapters[i];
+    }
+
+    for (i = 0; i < mProcessors.size(); i++)
+    {
+        // new ==> delete  See FindProcessors
+        delete mProcessors[i];
+    }
+}
+
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
@@ -665,8 +665,6 @@ void System_Internal::Threads_Release()
     }
 
     mThreads.clear();
-
-    // printf( __CLASS__ "Threads_Release - End\n" );
 }
 
 // Static functions

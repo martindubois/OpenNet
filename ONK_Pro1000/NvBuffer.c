@@ -34,7 +34,7 @@ static void Validate( NvBuffer * aThis );
 // Return  This method return the physical address
 uint64_t NvBuffer_GetPhysicalAddress( NvBuffer * aThis )
 {
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -50,7 +50,7 @@ uint64_t NvBuffer_GetPhysicalAddress( NvBuffer * aThis )
 // Return  This method return the mapped address
 void * NvBuffer_GetMappedAddress( NvBuffer * aThis )
 {
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -67,7 +67,7 @@ void * NvBuffer_GetMappedAddress( NvBuffer * aThis )
 //  1  Yes it is
 int NvBuffer_Is( NvBuffer * aThis, void * aAddress_MA )
 {
-    // printk( KERN_DEBUG "%s( 0x%px, 0x%px )\n", __FUNCTION__, aThis, aAddress_MA );
+    // printk( KERN_DEBUG "%s( 0x%p, 0x%p )\n", __FUNCTION__, aThis, aAddress_MA );
 
     ASSERT( NULL != aThis );
 
@@ -77,7 +77,7 @@ int NvBuffer_Is( NvBuffer * aThis, void * aAddress_MA )
 // aThis   [---;RW-]
 int NvBuffer_IsAvailable( NvBuffer * aThis )
 {
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -100,7 +100,7 @@ int NvBuffer_Map( NvBuffer * aThis, struct pci_dev * aPciDev, uint64_t aAddress_
 {
     int lRet;
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis         );
     ASSERT(    0 != aAddress_DA   );
@@ -116,7 +116,7 @@ int NvBuffer_Map( NvBuffer * aThis, struct pci_dev * aPciDev, uint64_t aAddress_
     lRet = nvidia_p2p_get_pages( 0, 0, aAddress_DA, aSize_byte, & aThis->mPageTable, aFreeCallback, aData );
     if ( 0 != lRet )
     {
-        printk( KERN_ERR "%s - nvidia_p2p_get_pages( , , %llx, %u bytes, , , 0x%px ) failed - %d\n", __FUNCTION__, aAddress_DA, aSize_byte, aData, lRet );
+        printk( KERN_ERR "%s - nvidia_p2p_get_pages( , , %llx, %u bytes, , , 0x%p ) failed - %d\n", __FUNCTION__, aAddress_DA, aSize_byte, aData, lRet );
         return ( - __LINE__ );
     }
 
@@ -128,7 +128,7 @@ int NvBuffer_Map( NvBuffer * aThis, struct pci_dev * aPciDev, uint64_t aAddress_
     lRet = nvidia_p2p_dma_map_pages( aPciDev, aThis->mPageTable, & aThis->mMapping );
     if ( 0 != lRet )
     {
-        printk( KERN_ERR "%s - nvidia_p2p_dma_map_pages( 0x%px, 0x%px,  ) failed - %d\n", __FUNCTION__, aPciDev, aThis->mPageTable, lRet );
+        printk( KERN_ERR "%s - nvidia_p2p_dma_map_pages( 0x%p, 0x%p,  ) failed - %d\n", __FUNCTION__, aPciDev, aThis->mPageTable, lRet );
         NvBuffer_Unmap( aThis, aPciDev, true );
         return ( - __LINE__ );
     }
@@ -155,7 +155,7 @@ int NvBuffer_Map( NvBuffer * aThis, struct pci_dev * aPciDev, uint64_t aAddress_
 // NbBuffer_Map ==> NvBuffer_Unmap
 void NvBuffer_Unmap( NvBuffer * aThis, struct pci_dev * aPciDev, bool aPutPage )
 {
-    // printk( KERN_DEBUG "%s( 0x%px, 0x%px )\n", __FUNCTION__, aThis, aPciDev );
+    // printk( KERN_DEBUG "%s( 0x%p, 0x%p )\n", __FUNCTION__, aThis, aPciDev );
 
     ASSERT( NULL != aThis   );
     ASSERT( NULL != aPciDev );
@@ -180,7 +180,7 @@ void NvBuffer_Unmap( NvBuffer * aThis, struct pci_dev * aPciDev, bool aPutPage )
             lRet = nvidia_p2p_dma_unmap_pages( aPciDev, aThis->mPageTable, aThis->mMapping );
             if ( 0 != lRet )
             {
-                printk( KERN_ERR "%s - nvidia_p2p_dma_unmap_pages( 0x%px, 0x%px, 0x%px ) failed - %d\n", __FUNCTION__, aPciDev, aThis->mPageTable, aThis->mMapping, lRet );
+                printk( KERN_ERR "%s - nvidia_p2p_dma_unmap_pages( 0x%p, 0x%p, 0x%p ) failed - %d\n", __FUNCTION__, aPciDev, aThis->mPageTable, aThis->mMapping, lRet );
             }
 
             aThis->mMapping = NULL;
@@ -192,7 +192,7 @@ void NvBuffer_Unmap( NvBuffer * aThis, struct pci_dev * aPciDev, bool aPutPage )
             lRet = nvidia_p2p_put_pages( 0, 0, aThis->mAddress_DA, aThis->mPageTable );
             if ( 0 != lRet )
             {
-                printk( KERN_ERR "%s - nvidia_p2p_put_pages( , , 0x%llx, 0x%px ) failed - %d\n", __FUNCTION__, aThis->mAddress_DA, aThis->mPageTable, lRet );
+                printk( KERN_ERR "%s - nvidia_p2p_put_pages( , , 0x%llx, 0x%p ) failed - %d\n", __FUNCTION__, aThis->mAddress_DA, aThis->mPageTable, lRet );
             }
         }
 
@@ -202,7 +202,7 @@ void NvBuffer_Unmap( NvBuffer * aThis, struct pci_dev * aPciDev, bool aPutPage )
         lRet = nvidia_p2p_free_page_table( aThis->mPageTable );
         if ( 0 != lRet )
         {
-            printk( KERN_ERR "%s - nvidia_p2p_free_page_table( 0x%px ) failed - %d\n", __FUNCTION__, aThis->mPageTable, lRet );
+            printk( KERN_ERR "%s - nvidia_p2p_free_page_table( 0x%p ) failed - %d\n", __FUNCTION__, aThis->mPageTable, lRet );
         }
 
         aThis->mPageTable = NULL;
@@ -216,7 +216,7 @@ void Validate( NvBuffer * aThis )
 {
     unsigned int i;
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 

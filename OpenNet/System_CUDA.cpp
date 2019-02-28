@@ -62,6 +62,8 @@ System_CUDA::~System_CUDA()
 
     assert( NULL != mConnect.mSharedMemory );
 
+    Cleanup();
+
     // valloc ==> free  See the constructor
     free( mConnect.mSharedMemory );
 }

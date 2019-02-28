@@ -37,8 +37,7 @@ public:
 
 protected:
 
-    Thread_CUDA();
-    Thread_CUDA( CUmodule aModule );
+    Thread_CUDA( Processor_Internal * aProcessor, CUmodule aModule = NULL );
 
     virtual ~Thread_CUDA();
 
@@ -48,14 +47,15 @@ protected:
     void Processing_Queue(OpenNet::Kernel * aKernel, const size_t * aGlobalSize, const size_t * aLocalSize, void * * aArguments );
     void Processing_Wait ();
 
-    void Release(OpenNet::Kernel * aKernel);
+    void Release( OpenNet::Kernel * aKernel);
 
-    void Run_Start(Processor_Internal * aProcessor);
+    void Run_Start();
 
-    void   * * mArguments;
-    CUfunction mFunction ;
-    CUmodule   mModule   ;
-    CUstream   mStream   ;
+    void         * * mArguments     ;
+    CUfunction       mFunction      ;
+    CUmodule         mModule        ;
+    Processor_CUDA * mProcessor_CUDA;
+    CUstream         mStream        ;
 
 private:
 

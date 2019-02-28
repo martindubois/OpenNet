@@ -21,7 +21,7 @@
 #include <OpenNetK/Hardware_Linux.h>
 
 // ===== ONK_Pro1000 ========================================================
-#include "Pro1000.h"
+#include "Intel_82576.h"
 
 extern "C"
 {
@@ -34,7 +34,7 @@ extern "C"
 typedef struct
 {
     OpenNetK::Adapter        mAdapter       ;
-    Pro1000                  mHardware      ;
+    Intel_82576              mHardware      ;
     OpenNetK::Adapter_Linux  mAdapter_Linux ;
     OpenNetK::Hardware_Linux mHardware_Linux;
 }
@@ -68,7 +68,7 @@ void DeviceCpp_Init( void * aThis, OpenNetK_OSDep * aOSDep, void * aAdapterLock,
 
     memset( lThis, 0, sizeof( DeviceCppContext ) );
 
-    new ( & lThis->mHardware ) Pro1000();
+    new ( & lThis->mHardware ) Intel_82576();
 
     lThis->mHardware_Linux.Init( & lThis->mHardware, aOSDep, aHardwareLock );
     lThis->mAdapter_Linux .Init( & lThis->mAdapter, aOSDep, aAdapterLock );
@@ -108,7 +108,7 @@ unsigned int DeviceCpp_CommonBuffer_GetSize( void * aThis )
 // aVirtual        The virtual address of the common buffer
 void DeviceCpp_CommonBuffer_Set( void * aThis, uint64_t aPhysical, void * aVirtual )
 {
-    // printk( KERN_DEBUG "%s( , 0x%llx, 0x%px )\n", __FUNCTION__, aPhysical, aVirtual );
+    // printk( KERN_DEBUG "%s( , 0x%llx,  )\n", __FUNCTION__, aPhysical );
 
     ASSERT( NULL != aThis );
 

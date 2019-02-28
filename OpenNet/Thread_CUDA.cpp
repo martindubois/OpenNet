@@ -39,21 +39,21 @@ void Thread_CUDA::KernelCompleted()
 // Protected
 /////////////////////////////////////////////////////////////////////////////
 
-Thread_CUDA::Thread_CUDA() : mArguments( NULL ), mFunction( NULL ), mModule( NULL ), mStream( NULL )
+// aProcessor [-K-;RW-]
+// aModule    [-KO;RW-]
+Thread_CUDA::Thread_CUDA( Processor_Internal * aProcessor, CUmodule aModule ) : mArguments( NULL ), mFunction( NULL ), mModule( aModule ), mProcessor_CUDA( dynamic_cast< Processor_CUDA * >( aProcessor ) ), mStream( NULL )
 {
-}
+    assert( NULL != aProcessor );
 
-Thread_CUDA::Thread_CUDA( CUmodule aModule ) : mArguments( NULL ), mFunction( NULL ), mModule( aModule ), mStream( NULL )
-{
-    assert( NULL != aModule );
+    assert( NULL != mProcessor_CUDA );
 }
 
 Thread_CUDA::~Thread_CUDA()
 {
 }
 
-// aAdapters  [---;RW-]
-// aBuffers   [---;RW-]
+// aAdapters [---;RW-]
+// aBuffers  [---;RW-]
 //
 // Exception  KmsLib::Exception *  See CUW_StreamCreate, CUW_ModuleFunction
 //                                 and Adapter_Linux::Buffers_Allocate
@@ -61,8 +61,8 @@ Thread_CUDA::~Thread_CUDA()
 // Thread_CUDA::Prepare ==> Thread_CUDA::Release
 void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers )
 {
-    assert( NULL != aAdapters );
-    assert( NULL != aBuffers  );
+    assert( NULL != aAdapters  );
+    assert( NULL != aBuffers   );
 
     Prepare_Internal( aAdapters, aBuffers );
 
@@ -73,8 +73,8 @@ void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuf
     assert( 0 == lRet );
 }
 
-// aAdapters  [---;RW-]
-// aBuffers   [---;RW-]
+// aAdapters   [---;RW-]
+// aBuffers    [---;RW-]
 // aQueueDepth
 //
 // Exception  KmsLib::Exception *  See CUW_StreamCreate, CUW_ModuleFunction
@@ -99,9 +99,10 @@ void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuf
 // aLocalSize  [--O;R--]
 // aArguments  [---;R--]
 //
+// CRITICAL PATH  Buffer-
 // Exception      KmsLib::Exception *  See CUW_LaunchKernel and
 //                                     CUW_LaunchHostFunction
-// CRITICAL PATH  Buffer-
+// Thread         Worker
 //
 // Processing_Queue ==> Processing_Wait
 void Thread_CUDA::Processing_Queue( OpenNet::Kernel * aKernel, const size_t * aGlobalSize, const size_t * aLocalSize, void * * aArguments )
@@ -115,14 +116,15 @@ void Thread_CUDA::Processing_Queue( OpenNet::Kernel * aKernel, const size_t * aG
     assert( NULL != mFunction );
     assert( NULL != mStream   );
 
-    usleep( 10000 );
+    // usleep( 10000 );
 
     CUW_LaunchKernel( mFunction, aGlobalSize[ 0 ], 1, 1, ( NULL == aLocalSize ) ? aGlobalSize[ 0 ] : aLocalSize[ 0 ], 1, 1, 0, mStream, aArguments, NULL );
     CUW_LaunchHostFunction( mStream, ::KernelCompleted, this );
 }
 
-// Exception      KmsLib::Exception *  CODE_SYSTEM_ERROR
 // CRITICAL PATH  Buffer-
+// Exception      KmsLib::Exception *  CODE_SYSTEM_ERROR
+// Thread         Worker
 //
 // Processing_Queue ==> Processing_Wait
 void Thread_CUDA::Processing_Wait()
@@ -135,17 +137,21 @@ void Thread_CUDA::Processing_Wait()
     }
 }
 
-// aKernel [---;RW-]
+// aKernel    [---;RW-]
 //
 // Exception  KmsLib::Exception *  See CUW_StreamDestroy
 //
 // Thread_CUDA::Prepare ==> Thread_CUDA::Release
-void Thread_CUDA::Release(OpenNet::Kernel * aKernel)
+void Thread_CUDA::Release( OpenNet::Kernel * aKernel)
 {
     assert(NULL != aKernel);
 
+    assert( NULL != mProcessor_CUDA );
+
     if ( NULL != mStream )
     {
+        mProcessor_CUDA->SetContext();
+
         if ( NULL != mArguments )
         {
             // sem_init ==> sem_destroy  See Prepare
@@ -164,30 +170,30 @@ void Thread_CUDA::Release(OpenNet::Kernel * aKernel)
     }
 }
 
-// aProcessor [---;RW-]
-//
 // Thread  Worker
-void Thread_CUDA::Run_Start( Processor_Internal * aProcessor )
+void Thread_CUDA::Run_Start()
 {
-    assert( NULL != aProcessor );
+    assert( NULL != mProcessor_CUDA );
 
-    Processor_CUDA * lProcessor = dynamic_cast< Processor_CUDA * >( aProcessor );
-    assert( NULL != lProcessor );
-
-    lProcessor->SetContext();
+    mProcessor_CUDA->SetContext();
 }
 
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
+// aAdapters [---;RW-]
+// aBuffers  [---;RW-]
 void Thread_CUDA::Prepare_Internal( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers )
 {
     assert( NULL != aAdapters         );
     assert(    0 <  aAdapters->size() );
     assert( NULL != aBuffers          );
 
-    assert( NULL != mModule );
-    assert( NULL == mStream );
+    assert( NULL != mModule         );
+    assert( NULL != mProcessor_CUDA );
+    assert( NULL == mStream         );
+
+    mProcessor_CUDA->SetContext();
 
     // CUDA_StreamCreate ==> CUDA_StreamDestroy  See Release
     CUW_StreamCreate( & mStream, CU_STREAM_NON_BLOCKING );

@@ -36,7 +36,6 @@
 // Threads    Apps
 Processor_CUDA::Processor_CUDA( int aDevice, KmsLib::DebugLog * aDebugLog )
     : Processor_Internal( aDebugLog )
-    , mContext( NULL )
 {
     // printf( __CLASS__ "Processor_CUDA( %d,  )\n", aDevice );
 
@@ -44,9 +43,10 @@ Processor_CUDA::Processor_CUDA( int aDevice, KmsLib::DebugLog * aDebugLog )
     assert( NULL != aDebugLog );
 
     CUW_DeviceGet( & mDevice, aDevice );
+    assert( 0 <= mDevice );
 
-    // CUW_CtxCreate ==> CUW_CtxDestroy  See the destructor
-    CUW_CtxCreate( & mContext, 0, mDevice );
+    // CUW_DevicePrimaryCtxRetain ==> CUW_DevicePrimaryCtxRelease  See the destructor
+    CUW_DevicePrimaryCtxRetain( & mContext, mDevice );
     assert( NULL != mContext );
 
     InitInfo();
@@ -69,9 +69,12 @@ Buffer_Data * Processor_CUDA::Buffer_Allocate(unsigned int aPacketSize_byte, Ope
     assert(    0 <  aPacketSize_byte );
     assert( NULL != aBuffer          );
 
-    assert( 0 <= mDevice );
+    assert( NULL != mContext );
+    assert(    0 <= mDevice  );
 
     int lPacketQty;
+
+    SetContext();
 
     CUW_DeviceGetAttribute( & lPacketQty, CU_DEVICE_ATTRIBUTE_WARP_SIZE, mDevice );
 
@@ -98,7 +101,7 @@ Buffer_Data * Processor_CUDA::Buffer_Allocate(unsigned int aPacketSize_byte, Ope
     CUW_PointerSetAttribute( & lFlag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS, reinterpret_cast< CUdeviceptr >( lMem_DA ) );
 
     // new ==> delete
-    Buffer_Data * lResult = new Buffer_Data_CUDA( lMem_DA, lPacketQty );
+    Buffer_Data * lResult = new Buffer_Data_CUDA( mContext, lMem_DA, lPacketQty );
 
     aBuffer->mBuffer_DA = lMem_DA;
     aBuffer->mBuffer_PA = 0;
@@ -125,6 +128,8 @@ CUmodule Processor_CUDA::Module_Create( OpenNet::Kernel * aKernel )
 
     assert(NULL != mDebugLog);
     assert(   0 <= mDevice  );
+
+    SetContext();
 
     nvrtcProgram lProgram = Program_CreateAndCompile( aKernel );
 
@@ -207,14 +212,13 @@ Thread_Functions * Processor_CUDA::Thread_Get()
 
 Processor_CUDA::~Processor_CUDA()
 {
-    printf( __CLASS__ "~Processor_CUDA() - mContext = %lx\n", reinterpret_cast< uint64_t >( mContext ) );
+    // printf( __CLASS__ "~Processor_CUDA() - mContext = %lx\n", reinterpret_cast< uint64_t >( mContext ) );
 
+    assert(    0 <= mDevice  );
     assert( NULL != mContext );
 
-    // CUW_CtxCreate ==> CUW_CtxDestroy  See the constructor
-    CUW_CtxDestroy( mContext );
-
-    printf( __CLASS__ "~Processor_CUDA - End\n" );
+    // CUW_DevicePrimaryCtxRetain ==> CUW_DevicePrimaryCtxRelease  See the constructor
+    CUW_DevicePrimaryCtxRelease( mDevice );
 }
 
 void * Processor_CUDA::GetContext()
@@ -302,10 +306,11 @@ nvrtcProgram Processor_CUDA::Program_CreateAndCompile( OpenNet::Kernel * aKernel
     NVRTCW_CreateProgram( & lResult, aKernel->GetCode(), NULL, 0, NULL, NULL );
     assert( NULL != lResult );
 
-    const char * lOptions[ 2 ];
+    const char * lOptions[ 3 ];
 
     lOptions[ 0 ] = "-I /home/mdubois/OpenNet/Includes";
     lOptions[ 1 ] = "-D_OPEN_NET_CUDA_";
+    lOptions[ 2 ] = "--gpu-architecture=compute_61";
 
     try
     {

@@ -23,12 +23,13 @@ class Buffer_Data_CUDA : public Buffer_Data
 
 public:
 
-    Buffer_Data_CUDA( CUdeviceptr aMem_DA, unsigned int aPacketQty );
+    Buffer_Data_CUDA( CUcontext aContext, CUdeviceptr aMem_DA, unsigned int aPacketQty );
 
     // ===== Buffer_Data ====================================================
 
     virtual ~Buffer_Data_CUDA();
 
+    CUcontext   mContext  ;
     CUdeviceptr mMemory_DA;
 
 };

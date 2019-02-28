@@ -81,6 +81,8 @@ public:
 
 protected:
 
+    void Cleanup();
+
     typedef std::vector<Processor_Internal *> ProcessorVector;
 
     Adapter_Vector   mAdapters  ;

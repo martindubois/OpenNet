@@ -24,7 +24,7 @@ void CUW_CtxCreate( CUcontext * aContext, unsigned int aFlags, CUdevice aDevice 
     assert( NULL != aContext );
     assert(    0 <= aDevice  );
 
-    // cuCtxCreate ==> cuCtxDestroy  See CUW_CtxDestroy
+    // cuCtxCreate ==> cuCtxDestroy
     CUresult lRet = cuCtxCreate( aContext, aFlags, aDevice );
     if ( CUDA_SUCCESS != lRet )
     {
@@ -39,7 +39,7 @@ void CUW_CtxDestroy( CUcontext aContext )
 {
     assert( NULL != aContext );
 
-    // cuCtxCreate ==> cuCtxDestroy  See CUW_CtxDestroy
+    // cuCtxCreate ==> cuCtxDestroy
     CUresult lRet = cuCtxDestroy( aContext );
     if ( CUDA_SUCCESS != lRet )
     {
@@ -52,6 +52,7 @@ void CUW_CtxPopCurrent( CUcontext * aContext )
 {
     assert( NULL != aContext );
 
+    // cuCtxPushCurrent ==> cuCtxPopCurrent
     CUresult lRet = cuCtxPopCurrent( aContext );
     if ( CUDA_SUCCESS != lRet )
     {
@@ -66,6 +67,7 @@ void CUW_CtxPushCurrent( CUcontext aContext )
 {
     assert( NULL != aContext );
 
+    // cuCtxPushCurrent ==> cuCtxPopCurrent
     CUresult lRet = cuCtxPushCurrent( aContext );
     if ( CUDA_SUCCESS != lRet )
     {
@@ -142,6 +144,35 @@ void CUW_DeviceGetName( char * aName, int aSize_byte, CUdevice aDevice )
     }
 }
 
+void CUW_DevicePrimaryCtxRelease( CUdevice aDevice )
+{
+    assert( 0 <= aDevice );
+
+    // cuDevicePrimaryCtxRetain ==> cuDevicePrimaryCtxRelease
+    CUresult lRet = cuDevicePrimaryCtxRelease( aDevice );
+    if ( CUDA_SUCCESS != lRet )
+    {
+        throw new KmsLib::Exception( KmsLib::Exception::CODE_UNKNOWN,
+            "cuDevicePrimaryCtxRelease(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
+    }
+}
+
+void CUW_DevicePrimaryCtxRetain ( CUcontext * aContext, CUdevice aDevice )
+{
+    assert( NULL != aContext );
+    assert(    0 <= aDevice  );
+
+    // cuDevicePrimaryCtxRetain ==> cuDevicePrimaryCtxRelease
+    CUresult lRet = cuDevicePrimaryCtxRetain( aContext, aDevice );
+    if ( CUDA_SUCCESS != lRet )
+    {
+        throw new KmsLib::Exception( KmsLib::Exception::CODE_UNKNOWN,
+            "cuDevicePrimaryCtxRetain(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
+    }
+
+    assert( NULL != ( * aContext ) );
+}
+
 void CUW_DeviceTotalMem( size_t * aSize_byte, CUdevice aDevice )
 {
     assert( NULL != aSize_byte );
@@ -201,13 +232,12 @@ void CUW_LaunchKernel( CUfunction aFunction, unsigned int aGridDimX, unsigned in
     }
 }
 
-// CUW_MemAlloc ==> CUW_MemFree
 void CUW_MemAlloc( CUdeviceptr * aPtr_DA, size_t aSize_byte )
 {
     assert( NULL != aPtr_DA    );
     assert(    0 <  aSize_byte );
 
-    // cuMemAlloc ==> cuMemFree  See CUW_MemFree
+    // cuMemAlloc ==> cuMemFree
     CUresult lRet = cuMemAlloc( aPtr_DA, aSize_byte );
     if ( CUDA_SUCCESS != lRet )
     {
@@ -218,12 +248,11 @@ void CUW_MemAlloc( CUdeviceptr * aPtr_DA, size_t aSize_byte )
     assert( 0 != aPtr_DA );
 }
 
-// CUW_MemAlloc ==> CUW_MemFree
 void CUW_MemFree( CUdeviceptr aPtr_DA )
 {
     assert( 0 != aPtr_DA );
 
-    // cuMemAlloc ==> cuMemFree  See CUW_MemAlloc
+    // cuMemAlloc ==> cuMemFree
     CUresult lRet = cuMemFree( aPtr_DA );
     if ( CUDA_SUCCESS != lRet )
     {
@@ -249,7 +278,6 @@ void CUW_ModuleGetFunction( CUfunction * aFunction, CUmodule aModule, const char
 
 }
 
-// CUW_ModuleLoadDataEx ==> CUW_ModuleUnload
 void CUW_ModuleLoadDataEx( CUmodule * aModule, const void * aImage, unsigned int aNumOptions, CUjit_option * aOptions, void * * aOptionValues )
 {
     assert( NULL != aModule );
@@ -266,7 +294,6 @@ void CUW_ModuleLoadDataEx( CUmodule * aModule, const void * aImage, unsigned int
     assert( NULL != ( * aModule ) );
 }
 
-// CUW_ModuleLoadDataEx ==> CUW_ModuleUnload
 void CUW_ModuleUnload( CUmodule aModule )
 {
     assert( NULL != aModule );
@@ -293,12 +320,11 @@ void CUW_PointerSetAttribute( const void * aValue, CUpointer_attribute aAttribut
     }
 }
 
-// CUW_StreamCreate ==> CUW_StreamDestroy
 void CUW_StreamCreate( CUstream * aStream, unsigned int aFlags )
 {
     assert( NULL != aStream );
 
-    // cuStreamCreate ==> cuStreamDestroy  See CUW_StreamDestroy
+    // cuStreamCreate ==> cuStreamDestroy
     CUresult lRet = cuStreamCreate( aStream, aFlags );
     if ( CUDA_SUCCESS != lRet )
     {
@@ -309,12 +335,11 @@ void CUW_StreamCreate( CUstream * aStream, unsigned int aFlags )
     assert( NULL != ( * aStream ) );
 }
 
-// CUW_StreamCreate ==> CUW_StreamDestroy
 void CUW_StreamDestroy( CUstream aStream )
 {
     assert( NULL != aStream );
 
-    // cuStreamCreate ==> cuStreamDestroy  See CUW_StreamCreate
+    // cuStreamCreate ==> cuStreamDestroy
     CUresult lRet = cuStreamDestroy( aStream );
     if ( CUDA_SUCCESS != lRet )
     {

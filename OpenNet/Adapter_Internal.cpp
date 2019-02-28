@@ -97,8 +97,6 @@ Adapter_Internal::~Adapter_Internal()
 {
     // printf( __CLASS__ "~AdapterInternal()\n" );
 
-    assert(NULL != mHandle);
-
     // new ==> delete
     delete mHandle;
 }
@@ -759,6 +757,8 @@ OpenNet::Status Adapter_Internal::ExceptionToStatus(const KmsLib::Exception * aE
     }
 
     printf("%s ==> STATUS_EXCEPTION\n", KmsLib::Exception::GetCodeName(aE->GetCode()));
+    aE->Write( stdout );
+
     return OpenNet::STATUS_EXCEPTION;
 }
 

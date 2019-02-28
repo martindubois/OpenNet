@@ -79,6 +79,13 @@ void Adapter_Linux::ResetInputFilter_Internal()
 {
     if ( NULL != mModule )
     {
+        assert( NULL != mProcessor );
+
+        Processor_CUDA * lProcessor = dynamic_cast< Processor_CUDA * >( mProcessor );
+        assert( NULL != lProcessor );
+
+        lProcessor->SetContext();
+
         // Processor_CUDA::Module_Create ==> CUW_ModuleUnload  See SetInputFilter_Internal
         CUW_ModuleUnload( mModule );
         mModule = NULL;

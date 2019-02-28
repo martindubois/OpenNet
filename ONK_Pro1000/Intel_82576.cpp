@@ -33,7 +33,7 @@ Intel_82576::Intel_82576() : mBAR1_82576_MA(NULL)
 //             Memory 0 too small
 bool Intel_82576::SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int aSize_byte)
 {
-    // TRACE_DEBUG "%s( %u, 0x%px, %u bytes )" DEBUG_EOL, __FUNCTION__, aIndex, aMemory_MA, aSize_byte TRACE_END;
+    // TRACE_DEBUG "%s( %u, 0x%p, %u bytes )" DEBUG_EOL, __FUNCTION__, aIndex, aMemory_MA, aSize_byte TRACE_END;
 
     ASSERT(NULL != aMemory_MA);
     ASSERT(   0 <  aSize_byte);
@@ -125,7 +125,7 @@ void Intel_82576::Interrupt_Enable()
 
 bool Intel_82576::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing)
 {
-    // TRACE_DEBUG "%s( %u, 0x%px )" DEBUG_EOL, __FUNCTION__, aMessageId, aNeedMoreProcessing TRACE_END;
+    // TRACE_DEBUG "%s( %u, 0x%p )" DEBUG_EOL, __FUNCTION__, aMessageId, aNeedMoreProcessing TRACE_END;
 
     ASSERT(NULL != aNeedMoreProcessing);
 

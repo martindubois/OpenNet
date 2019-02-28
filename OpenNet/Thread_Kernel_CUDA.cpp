@@ -30,7 +30,7 @@
 // aDebugLog  [-K-;EW-]
 Thread_Kernel_CUDA::Thread_Kernel_CUDA(Processor_Internal * aProcessor, Adapter_Internal * aAdapter, OpenNet::Kernel * aKernel, CUmodule aModule, KmsLib::DebugLog * aDebugLog)
     : Thread_Kernel( aProcessor, aAdapter, aKernel, aDebugLog )
-    , Thread_CUDA( aModule )
+    , Thread_CUDA  ( aProcessor, aModule )
 {
     assert(NULL != aProcessor);
     assert(NULL != aAdapter  );
@@ -103,15 +103,13 @@ void Thread_Kernel_CUDA::Processing_Wait(unsigned int aIndex)
 
 void Thread_Kernel_CUDA::Run_Start()
 {
-    assert( NULL != mProcessor );
-
-    Thread_CUDA  ::Run_Start( mProcessor );
+    Thread_CUDA  ::Run_Start();
     Thread_Kernel::Run_Start();
 }
 
 void Thread_Kernel_CUDA::Release()
 {
-    assert(NULL != mKernel);
+    assert(NULL != mKernel    );
 
     Thread_CUDA::Release( mKernel );
 }

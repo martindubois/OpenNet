@@ -201,7 +201,7 @@ void * Device_Create( struct pci_dev * aPciDev, unsigned char aMajor, unsigned c
     DeviceContext * lResult   ;
     unsigned int    lSize_byte;
 
-    // printk( KERN_DEBUG "%s( 0x%px, %u, %u, %u, 0x%px )\n", __FUNCTION__, aPciDev, aMajor, aMinor, aIndex, aClass );
+    // printk( KERN_DEBUG "%s( 0x%p, %u, %u, %u, 0x%p )\n", __FUNCTION__, aPciDev, aMajor, aMinor, aIndex, aClass );
 
     ASSERT( NULL != aPciDev );
     ASSERT( NULL != aClass  );
@@ -245,14 +245,14 @@ void * Device_Create( struct pci_dev * aPciDev, unsigned char aMajor, unsigned c
         lRet = pci_write_config_word( aPciDev, 6, 0x0800 );
         if ( 0 != lRet )
         {
-            printk( KERN_ERR "%s - pci_enable_device_mem( 0x%px, ,  ) failed - %d\n", __FUNCTION__, aPciDev, lRet );
+            printk( KERN_ERR "%s - pci_enable_device_mem( 0x%p, ,  ) failed - %d\n", __FUNCTION__, aPciDev, lRet );
         }
 
         // pci_enable_device_mem ==> pci_disable_device  See Device_Delete
         lRet = pci_enable_device_mem( aPciDev );
         if ( 0 != lRet )
         {
-            printk( KERN_ERR "%s - pci_enable_device_mem( 0x%px ) failed - %d\n", __FUNCTION__, aPciDev, lRet );
+            printk( KERN_ERR "%s - pci_enable_device_mem( 0x%p ) failed - %d\n", __FUNCTION__, aPciDev, lRet );
             goto Error0;
         }
 
@@ -298,7 +298,7 @@ void Device_Delete( void * aThis )
 {
     DeviceContext * lThis = aThis;
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -344,7 +344,7 @@ void Device_Delete( void * aThis )
 //  < 0  Error
 int CommonBuffer_Allocate( DeviceContext * aThis )
 {
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -362,7 +362,7 @@ int CommonBuffer_Allocate( DeviceContext * aThis )
         aThis->mCommon_CA = dma_alloc_coherent( & aThis->mPciDev->dev, aThis->mCommon_Size_byte, & aThis->mCommon_PA, GFP_KERNEL );
         if ( NULL == aThis->mCommon_CA )
         {
-            printk( KERN_ERR "%s - dma_alloc_coherent( 0x%px, %u bytes, 0x%px,  ) failed\n", __FUNCTION__, & aThis->mPciDev->dev, aThis->mCommon_Size_byte, & aThis->mCommon_PA );
+            printk( KERN_ERR "%s - dma_alloc_coherent( 0x%p, %u bytes, 0x%p,  ) failed\n", __FUNCTION__, & aThis->mPciDev->dev, aThis->mCommon_Size_byte, & aThis->mCommon_PA );
             return ( - __LINE__ );
         }
 
@@ -397,7 +397,7 @@ int Copy_FromUser( void * aOut, const void * aIn_UA, unsigned int aMax_byte, uns
         lSize_byte = copy_from_user( aOut, aIn_UA, aMax_byte );
         if ( ( aMax_byte - aMin_byte ) < lSize_byte )
         {
-            printk( KERN_ERR "%s - copy_from_user( 0x%px, 0x%px, %u bytes ) failed - %u\n", __FUNCTION__, aOut, aIn_UA, aMax_byte, lSize_byte );
+            printk( KERN_ERR "%s - copy_from_user( 0x%p, 0x%px, %u bytes ) failed - %u\n", __FUNCTION__, aOut, aIn_UA, aMax_byte, lSize_byte );
             return ( - __LINE__ );
         }
 
@@ -416,7 +416,7 @@ int Copy_FromUser( void * aOut, const void * aIn_UA, unsigned int aMax_byte, uns
 //  < 0  Error
 int Copy_ToUser( void * aOut_UA, const void * aIn, unsigned int aSize_byte )
 {
-    // printk( KERN_DEBUG "%s( 0x%px, 0x%px, %u byte )\n", __FUNCTION__, aOut_UA, aIn, aSize_byte );
+    // printk( KERN_DEBUG "%s( 0x%px, 0x%p, %u byte )\n", __FUNCTION__, aOut_UA, aIn, aSize_byte );
 
     ASSERT( NULL != aIn );
 
@@ -451,7 +451,7 @@ int Device_Init( DeviceContext * aThis, unsigned int aIndex )
     int lRet   ;
     int lResult;
 
-    // printk( KERN_DEBUG "%s( 0x%px, %u )\n", __FUNCTION__, aThis, aIndex );
+    // printk( KERN_DEBUG "%s( 0x%p, %u )\n", __FUNCTION__, aThis, aIndex );
 
     ASSERT( NULL != aThis );
 
@@ -479,7 +479,7 @@ int Device_Init( DeviceContext * aThis, unsigned int aIndex )
         aThis->mDevice = device_create( aThis->mClass, NULL, aThis->mDevId, NULL, "ONK_Pro1000_%u", aIndex );
         if ( NULL == aThis->mDevice )
         {
-            printk( KERN_ERR "%s - device_create( 0x%px, , , , , %u ) failed\n", __FUNCTION__, aThis->mClass, aIndex );
+            printk( KERN_ERR "%s - device_create( 0x%p, , , , , %u ) failed\n", __FUNCTION__, aThis->mClass, aIndex );
             lResult = ( - __LINE__ );
         }
         else
@@ -501,7 +501,7 @@ int Device_Init( DeviceContext * aThis, unsigned int aIndex )
     }
     else
     {
-        printk( KERN_ERR "%s - cdev_add( 0x%px, ,  ) failed - %d\n", __FUNCTION__, aThis->mCDev, lRet );
+        printk( KERN_ERR "%s - cdev_add( 0x%p, ,  ) failed - %d\n", __FUNCTION__, aThis->mCDev, lRet );
         lResult = ( - __LINE__ );
     }
 
@@ -518,7 +518,7 @@ int Device_Init( DeviceContext * aThis, unsigned int aIndex )
 // Device_Init ==> Device_Uninit
 void Device_Uninit( DeviceContext * aThis )
 {
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -552,7 +552,7 @@ int Dma_Init( DeviceContext * aThis )
 {
     int lRet;
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -562,18 +562,18 @@ int Dma_Init( DeviceContext * aThis )
     lRet = pci_enable_pcie_error_reporting( aThis->mPciDev );
     if ( 0 != lRet )
     {
-        printk( KERN_ERR "%s - pci_enable_pcie_error_reporting( 0x%px ) failed - %d\n", __FUNCTION__, aThis->mPciDev, lRet );
+        printk( KERN_ERR "%s - pci_enable_pcie_error_reporting( 0x%p ) failed - %d\n", __FUNCTION__, aThis->mPciDev, lRet );
         return ( - __LINE__ );
     }
 
     lRet = dma_set_mask_and_coherent( & aThis->mPciDev->dev, DMA_BIT_MASK( 64 ) );
     if ( 0 != lRet )
     {
-        printk( KERN_ERR "%s - dma_set_mask_and_coherent( 0x%px,  ) failed - %d\n", __FUNCTION__, & aThis->mPciDev->dev, lRet );
+        printk( KERN_ERR "%s - dma_set_mask_and_coherent( 0x%p,  ) failed - %d\n", __FUNCTION__, & aThis->mPciDev->dev, lRet );
         lRet = pci_disable_pcie_error_reporting( aThis->mPciDev );
         if ( 0 != lRet )
         {
-            printk( KERN_ERR "%s - pci_disable_pcie_error_reporting( 0x%px ) failed - %d\n", __FUNCTION__, aThis->mPciDev, lRet );
+            printk( KERN_ERR "%s - pci_disable_pcie_error_reporting( 0x%p ) failed - %d\n", __FUNCTION__, aThis->mPciDev, lRet );
             return ( - __LINE__ );
         }
 
@@ -593,7 +593,7 @@ void Dma_Uninit( DeviceContext * aThis )
 {
     int lRet;
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -606,7 +606,7 @@ void Dma_Uninit( DeviceContext * aThis )
     lRet = pci_disable_pcie_error_reporting( aThis->mPciDev );
     if ( 0 != lRet )
     {
-        printk( KERN_ERR "%s - pci_disable_pcie_error_reporting( 0x%px ) failed - %d\n", __FUNCTION__, aThis->mPciDev, lRet );
+        printk( KERN_ERR "%s - pci_disable_pcie_error_reporting( 0x%p ) failed - %d\n", __FUNCTION__, aThis->mPciDev, lRet );
     }
 }
 
@@ -621,7 +621,7 @@ int Interrupt_Init( DeviceContext * aThis )
 {
     int lRet;
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -633,7 +633,7 @@ int Interrupt_Init( DeviceContext * aThis )
     aThis->mVectorCount = pci_alloc_irq_vectors( aThis->mPciDev, VECTOR_MIN, VECTOR_MAX, PCI_IRQ_MSIX );
     if ( ( VECTOR_MIN > aThis->mVectorCount ) || ( VECTOR_MAX < aThis->mVectorCount ) )
     {
-        printk( KERN_ERR "%s - pci_alloc_irq_vector( 0x%px, , ,  ) failed - %d\n", __FUNCTION__, aThis->mPciDev, aThis->mVectorCount );
+        printk( KERN_ERR "%s - pci_alloc_irq_vector( 0x%p, , ,  ) failed - %d\n", __FUNCTION__, aThis->mPciDev, aThis->mVectorCount );
         return ( - __LINE__ );
     }
 
@@ -645,7 +645,7 @@ int Interrupt_Init( DeviceContext * aThis )
     lRet = request_irq( aThis->mIrq, ProcessIrq, 0, MODULE_NAME, aThis );
     if ( 0 != lRet )
     {
-        printk( KERN_ERR "%s - request_irq( %d, , , , 0x%px ) failed - %d\n", __FUNCTION__, aThis->mIrq, aThis, lRet );
+        printk( KERN_ERR "%s - request_irq( %d, , , , 0x%p ) failed - %d\n", __FUNCTION__, aThis->mIrq, aThis, lRet );
         pci_free_irq_vectors( aThis->mPciDev );
         return ( - __LINE__ );
     }
@@ -658,7 +658,7 @@ int Interrupt_Init( DeviceContext * aThis )
 // Interrupt_Init ==> Interrupt_Uninit
 void Interrupt_Uninit( DeviceContext * aThis )
 {
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -681,7 +681,7 @@ int IoCtl_ProcessResult( DeviceContext * aThis, int aIoCtlResult )
 {
     int lResult = aIoCtlResult;
 
-    // printk( KERN_DEBUG "%s( 0x%px, %d )\n", __FUNCTION__, aThis, aIoCtlResult );
+    // printk( KERN_DEBUG "%s( 0x%p, %d )\n", __FUNCTION__, aThis, aIoCtlResult );
 
     ASSERT( NULL != aThis );
 
@@ -721,7 +721,7 @@ int IoCtl_WithArgument( DeviceContext * aThis, struct file * aFile, unsigned int
     unsigned int lInSize_byte = 0; // Avoid the warning
     int          lResult;
 
-    // printk( KERN_DEBUG "%s( 0x%px, , 0x%lx, , , %u bytes )\n", __FUNCTION__, aThis, aArg_UA, aSize_byte );
+    // printk( KERN_DEBUG "%s( 0x%p, , 0x%lx, , , %u bytes )\n", __FUNCTION__, aThis, aArg_UA, aSize_byte );
 
     ASSERT(    0 <  aSize_byte );
     ASSERT( NULL != aFile      );
@@ -775,7 +775,7 @@ int IoMem_Init( DeviceContext * aThis )
 
     unsigned int i;
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -785,7 +785,7 @@ int IoMem_Init( DeviceContext * aThis )
     lRet = pci_request_mem_regions( aThis->mPciDev, MODULE_NAME );
     if ( 0 != lRet )
     {
-        printk( KERN_ERR "%s - pci_request_mem_regions( 0x%px,  ) failed - %d\n", __FUNCTION__, aThis, lRet );
+        printk( KERN_ERR "%s - pci_request_mem_regions( 0x%p,  ) failed - %d\n", __FUNCTION__, aThis, lRet );
         return ( - __LINE__ );
     }
 
@@ -825,7 +825,7 @@ void IoMem_Uninit( DeviceContext * aThis )
 {
     unsigned int i;
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -868,7 +868,7 @@ void OSDep_Init( DeviceContext * aThis )
 // aThis [---;RW-]
 void Timer_Start( DeviceContext * aThis )
 {
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aThis );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aThis );
 
     ASSERT( NULL != aThis );
 
@@ -886,7 +886,7 @@ long IoCtl( struct file * aFile, unsigned int aCode, unsigned long aArg_UA )
     int                 lResult;
     DeviceContext     * lThis  ;
 
-    // printk( KERN_DEBUG "%s( %px, 0x%08x, 0x%lx )\n", __FUNCTION__, aFile, aCode, aArg_UA );
+    // printk( KERN_DEBUG "%s( %p, 0x%08x, 0x%lx )\n", __FUNCTION__, aFile, aCode, aArg_UA );
 
     ASSERT( NULL != aFile );
 
@@ -916,7 +916,7 @@ long IoCtl( struct file * aFile, unsigned int aCode, unsigned long aArg_UA )
 
 int Open( struct inode * aINode, struct file * aFile )
 {
-    // printk( KERN_DEBUG "%s( 0x%px, 0x%px )\n", __FUNCTION__, aINode, aFile );
+    // printk( KERN_DEBUG "%s( 0x%p, 0x%p )\n", __FUNCTION__, aINode, aFile );
 
     ASSERT( NULL != aINode );
     ASSERT( NULL != aFile  );
@@ -932,7 +932,7 @@ int Release( struct inode * aINode, struct file * aFile )
 {
     DeviceContext * lThis;
 
-    // printk( KERN_DEBUG "%s( 0x%px, 0x%px )\n", __FUNCTION__, aINode, aFile );
+    // printk( KERN_DEBUG "%s( 0x%p, 0x%p )\n", __FUNCTION__, aINode, aFile );
 
     ASSERT( NULL != aFile );
 
@@ -951,7 +951,7 @@ irqreturn_t ProcessIrq( int aIrq, void * aDevId )
 {
     DeviceContext * lThis = aDevId;
 
-    // printk( KERN_DEBUG "%s( %d, 0x%px )\n", __FUNCTION__, aIrq, aDevId );
+    // printk( KERN_DEBUG "%s( %d, 0x%p )\n", __FUNCTION__, aIrq, aDevId );
 
     ASSERT( NULL != aDevId );
 
@@ -991,7 +991,7 @@ void Timer( struct timer_list * aTimer )
 {
     DeviceContext * lThis = container_of( aTimer, DeviceContext, mTimer );
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aTimer );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aTimer );
 
     ASSERT( NULL != aTimer );
 
@@ -1009,7 +1009,7 @@ void Work( struct work_struct * aWork )
 {
     DeviceContext * lThis = container_of( aWork, DeviceContext, mWork );
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aWork );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aWork );
 
     ASSERT( NULL != aWork );
 
@@ -1032,7 +1032,7 @@ void * AllocateMemory( unsigned int aSize_byte )
 // AllocateMemory ==> FreeMemory
 void FreeMemory( void * aMemory )
 {
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aMemory );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aMemory );
 
     ASSERT( NULL != aMemory );
 
@@ -1057,7 +1057,7 @@ void * MapBuffer( void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, u
 
     DeviceContext * lThis = aContext;
 
-    // printk( KERN_DEBUG "%s( 0x%px, 0x%px, 0x%llx, %u bytes, ,  )\n", __FUNCTION__, aContext, aBuffer_PA, aBuffer_DA, aSize_byte );
+    // printk( KERN_DEBUG "%s( 0x%p, 0x%p, 0x%llx, %u bytes, ,  )\n", __FUNCTION__, aContext, aBuffer_PA, aBuffer_DA, aSize_byte );
 
     ASSERT( NULL !=   aContext              );
     ASSERT(    0 !=   aBuffer_DA            );
@@ -1101,7 +1101,7 @@ void UnmapBuffer( void * aContext, void * aBuffer_MA, unsigned int aSize_byte, v
 
     DeviceContext * lThis = aContext;
 
-    // printk( KERN_DEBUG "%s( 0x%px, 0x%px, %u bytes,  )\n", __FUNCTION__, aContext, aBuffer_MA, aSize_byte );
+    // printk( KERN_DEBUG "%s( 0x%p, 0x%p, %u bytes,  )\n", __FUNCTION__, aContext, aBuffer_MA, aSize_byte );
 
     ASSERT( NULL != aContext   );
     ASSERT( NULL != aBuffer_MA );
@@ -1130,7 +1130,7 @@ void * MapSharedMemory( void * aContext, void * aShared_VA, unsigned int aSize_b
 
     DeviceContext * lThis = aContext;
 
-    // printk( KERN_DEBUG "%s( 0x%px, 0x%px, %u bytes )\n", __FUNCTION__, aContext, aShared_VA, aSize_byte );
+    // printk( KERN_DEBUG "%s( 0x%p, 0x%px, %u bytes )\n", __FUNCTION__, aContext, aShared_VA, aSize_byte );
 
     ASSERT( NULL != aContext   );
     ASSERT( NULL != aShared_VA );
@@ -1159,17 +1159,18 @@ void * MapSharedMemory( void * aContext, void * aShared_VA, unsigned int aSize_b
         {
             // vmap ==> vunmap  See UnmapSharedMemory
             lThis->mShared = vmap( lThis->mShared_Pages, lThis->mShared_PageCount, VM_MAP, PAGE_KERNEL );
+            ASSERT( NULL != lThis->mShared );
         }
         else
         {
-            printk( KERN_ERR "%s - get_user_pages( 0x%px, %u, , 0x%px,  ) failed - %d\n", __FUNCTION__, aShared_VA, lThis->mShared_PageCount, lThis->mShared_Pages, lRet );
+            printk( KERN_ERR "%s - get_user_pages( 0x%px, %u, , 0x%p,  ) failed - %d\n", __FUNCTION__, aShared_VA, lThis->mShared_PageCount, lThis->mShared_Pages, lRet );
         }
 
     up_write( & current->mm->mmap_sem );
 
     if ( NULL == lThis->mShared )
     {
-        printk( KERN_ERR "%s - vmap( 0x%px, %u, ,  ) failed\n", __FUNCTION__, lThis->mShared_Pages, lThis->mShared_PageCount );
+        printk( KERN_ERR "%s - vmap( 0x%p, %u, ,  ) failed\n", __FUNCTION__, lThis->mShared_Pages, lThis->mShared_PageCount );
         kfree( lThis->mShared_Pages );
         lThis->mShared_PageCount =    0;
         lThis->mShared_Pages     = NULL;
@@ -1185,7 +1186,7 @@ static void UnmapSharedMemory( void * aContext )
 
     DeviceContext * lThis = aContext;
 
-    // printk( KERN_DEBUG "%s( 0x%px )\n", __FUNCTION__, aContext );
+    // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aContext );
 
     ASSERT( NULL != aContext );
 

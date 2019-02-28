@@ -38,7 +38,7 @@
 
 void Intel::GetState(OpenNetK::Adapter_State * aState)
 {
-    // TRACE_DEBUG "%s( 0x%px )" DEBUG_EOL, __FUNCTION__, aState TRACE_END;
+    // TRACE_DEBUG "%s( 0x%p )" DEBUG_EOL, __FUNCTION__, aState TRACE_END;
 
     ASSERT(NULL != aState);
 
@@ -92,7 +92,7 @@ void Intel::ResetMemory()
 
 void Intel::SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA)
 {
-    // TRACE_DEBUG "%s( 0x%llx, 0x%px )" DEBUG_EOL, __FUNCTION__, aCommon_PA, aCommon_CA TRACE_END;
+    // TRACE_DEBUG "%s( 0x%llx, 0x%p )" DEBUG_EOL, __FUNCTION__, aCommon_PA, aCommon_CA TRACE_END;
 
     ASSERT(NULL != aCommon_CA);
 
@@ -138,7 +138,7 @@ void Intel::SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA)
 //             Memory 0 too small
 bool Intel::SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int aSize_byte)
 {
-    // TRACE_DEBUG "%s( %u, 0x%px, %u bytes )" DEBUG_EOL, __FUNCTION__, aIndex, aMemory_MA, aSize_byte TRACE_END;
+    // TRACE_DEBUG "%s( %u, 0x%p, %u bytes )" DEBUG_EOL, __FUNCTION__, aIndex, aMemory_MA, aSize_byte TRACE_END;
 
     ASSERT(NULL != aMemory_MA);
     ASSERT(   0 <  aSize_byte);
@@ -233,7 +233,7 @@ void Intel::Interrupt_Disable()
 // CRITICAL PATH
 bool Intel::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing)
 {
-    // TRACE_DEBUG "%s( %u, 0x%px )" DEBUG_EOL, __FUNCTION__, aMessageId, aNeedMoreProcessing TRACE_END;
+    // TRACE_DEBUG "%s( %u, 0x%p )" DEBUG_EOL, __FUNCTION__, aMessageId, aNeedMoreProcessing TRACE_END;
 
     ASSERT(NULL != aNeedMoreProcessing);
 
@@ -297,7 +297,7 @@ bool Intel::Packet_Drop()
 // CRITICAL PATH - Packet
 void Intel::Packet_Receive_NoLock(uint64_t aData_PA, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo_MA, volatile long * aCounter)
 {
-    // TRACE_DEBUG "%s( 0x%llx, 0x%px, 0x%px, 0x%px )" DEBUG_EOL, __FUNCTION__, aData_PA, aPacketData, aPacketInfo, aCounter TRACE_END;
+    // TRACE_DEBUG "%s( 0x%llx, 0x%p, 0x%p, 0x%p )" DEBUG_EOL, __FUNCTION__, aData_PA, aPacketData, aPacketInfo, aCounter TRACE_END;
 
     ASSERT(NULL != aPacketData   );
     ASSERT(NULL != aPacketInfo_MA);
@@ -322,7 +322,7 @@ void Intel::Packet_Receive_NoLock(uint64_t aData_PA, OpenNetK::Packet * aPacketD
 // CRITICAL PATH - Packet
 void Intel::Packet_Send_NoLock(uint64_t aData_PA, const void *, unsigned int aSize_byte, volatile long * aCounter)
 {
-    // TRACE_DEBUG "%s( 0x%llx, , %u bytes, 0x%px )" DEBUG_EOL, __FUNCTION__, aData_PA, aSize_byte, aCounter TRACE_END;
+    // TRACE_DEBUG "%s( 0x%llx, , %u bytes, 0x%p )" DEBUG_EOL, __FUNCTION__, aData_PA, aSize_byte, aCounter TRACE_END;
 
     ASSERT(0 != aData_PA  );
     ASSERT(0 <  aSize_byte);
@@ -342,7 +342,7 @@ void Intel::Packet_Send_NoLock(uint64_t aData_PA, const void *, unsigned int aSi
 // CRITICAL PATH
 bool Intel::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
 {
-    // TRACE_DEBUG "%s( 0x%px, %u bytes, %u )" DEBUG_EOL, __FUNCTION__, aPacket, aSize_byte, aRepeatCount TRACE_END;
+    // TRACE_DEBUG "%s( 0x%p, %u bytes, %u )" DEBUG_EOL, __FUNCTION__, aPacket, aSize_byte, aRepeatCount TRACE_END;
 
     ASSERT( NULL != aPacket      );
     ASSERT(    0 <  aSize_byte   );
@@ -387,7 +387,7 @@ bool Intel::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned 
 
 unsigned int Intel::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)
 {
-    // TRACE_DEBUG "%s( 0x%px, %u bytes, %s )" DEBUG_EOL, __FUNCTION__, aOut, aOutSize_byte, aReset ? "true" : "false" TRACE_END;
+    // TRACE_DEBUG "%s( 0x%p, %u bytes, %s )" DEBUG_EOL, __FUNCTION__, aOut, aOutSize_byte, aReset ? "true" : "false" TRACE_END;
 
     Statistics_Update();
 

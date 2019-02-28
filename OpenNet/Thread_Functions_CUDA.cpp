@@ -26,6 +26,7 @@
 // Threads  Apps
 Thread_Functions_CUDA::Thread_Functions_CUDA(Processor_Internal * aProcessor, bool aProfilingEnabled, KmsLib::DebugLog * aDebugLog)
     : Thread_Functions( aProcessor, aProfilingEnabled, aDebugLog )
+    , Thread_CUDA     ( aProcessor )
 {
 }
 

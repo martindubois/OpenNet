@@ -166,6 +166,7 @@ namespace OpenNetK
         void Stop_Zone0();
 
         // ===== Buffer_State ===============================================
+        void Buffer_Corrupted_Zone0  (unsigned int aIndex     );
         void Buffer_PxCompleted_Zone0(BufferInfo * aBufferInfo);
         void Buffer_PxRunning_Zone0  (BufferInfo * aBufferInfo);
         void Buffer_RxRunning_Zone0  (BufferInfo * aBufferInfo);
@@ -212,6 +213,10 @@ namespace OpenNetK
 
         unsigned int mBufferCount;
         BufferInfo   mBuffers[OPEN_NET_BUFFER_QTY];
+
+        unsigned int mPxRunning;
+        unsigned int mRxRunning;
+        unsigned int mTxRunning;
 
     };
 
