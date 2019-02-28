@@ -131,18 +131,15 @@ bool VirtualHardware::Packet_Drop()
 }
 
 // CRITICAL PATH - Packet
-void VirtualHardware::Packet_Receive_NoLock(uint64_t aData, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo_MA, volatile long * aCounter)
+void VirtualHardware::Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile long * aCounter)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , , ,  )" DEBUG_EOL);
+    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
 
-    ASSERT(NULL != aPacketData   );
-    ASSERT(NULL != aPacketInfo_MA);
-    ASSERT(NULL != aCounter      );
+    ASSERT(NULL != aPacket );
+    ASSERT(NULL != aCounter);
 
-    mRx_Counter      [mRx_In] = aCounter      ;
-    mRx_Data         [mRx_In] = aData         ;
-    mRx_PacketData   [mRx_In] = aPacketData   ;
-    mRx_PacketInfo_MA[mRx_In] = aPacketInfo_MA;
+    mRx_Counter   [mRx_In] = aCounter;
+    mRx_PacketData[mRx_In] = aPacket ;
 
     mRx_PacketData[mRx_In]->IndicateRxRunning();
 

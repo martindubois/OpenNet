@@ -26,10 +26,10 @@ Test SetBufferQty 2
 Test SetPacketSize 9000
 Test Run A
 
-# A   NOTHING         FUNCTION          72
+# A   NOTHING         FUNCTION          64
 
 Test SetBufferQty 64
-Test SetPacketSize 72
+Test SetPacketSize 64
 Test Run A
 
 # A   NOTHING         KERNEL          9000
@@ -40,11 +40,11 @@ Test SetBufferQty 2
 Test SetPacketSize 9000
 Test Run A
 
-# A   NOTHING         KERNEL           360
+# A   NOTHING         KERNEL           248
 # Smaller packets cause dropped packets and can even cause too long DPC.
 
 Test SetBufferQty 64
-Test SetPacketSize 360
+Test SetPacketSize 248
 Test Run A
 
 # A   REPLY_ON_ERROR  FUNCTION        9000
@@ -70,11 +70,11 @@ Test SetBufferQty 3
 Test SetPacketSize 9000
 Test Run A
 
-# A   REPLY_ON_ERROR  KERNEL           1276
+# A   REPLY_ON_ERROR  KERNEL           1296
 # Smaller packets cause dropped packets and can even cause too long DPC.
 
 Test SetBufferQty 64
-Test SetPacketSize 1276
+Test SetPacketSize 1296
 Test Run A
 
 # B   REPLY           FUNCTION        9000
@@ -86,10 +86,11 @@ Test SetBufferQty 3
 Test SetPacketSize 9000
 Test Run B
 
-# B   REPLY           FUNCTION         136
+# B   REPLY           FUNCTION          80
+# Smaller packets cause dropped packets
 
 Test SetBufferQty 64
-Test SetPacketSize 136
+Test SetPacketSize 80
 Test Run B
 
 # B   REPLY           KERNEL          9000
@@ -100,9 +101,9 @@ Test SetBufferQty 3
 Test SetPacketSize 9000
 Test Run B
 
-# B   REPLY           KERNEL           312
+# B   REPLY           KERNEL           168
 # Smaller packets cause dropped packets and can even cause too long DPC.
 
 Test SetBufferQty 64
-Test SetPacketSize 312
+Test SetPacketSize 168
 Test Run B

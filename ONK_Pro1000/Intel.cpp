@@ -280,7 +280,9 @@ bool Intel::Packet_Drop()
     {
         volatile long * lCounter = mPacketBuffer_Counter + mPacketBuffer_In;
 
-        Packet_Receive_NoLock( mPacketBuffer_PA[ mPacketBuffer_In ], & mPacketData, & mPacketInfo, lCounter );
+        mPacketData.Init(mPacketBuffer_PA[mPacketBuffer_In], mPacketBuffer_CA[mPacketBuffer_In], &mPacketInfo);
+
+        Packet_Receive_NoLock( & mPacketData, lCounter );
 
         mPacketBuffer_In = (mPacketBuffer_In + 1) % PACKET_BUFFER_QTY;
 
@@ -295,26 +297,24 @@ bool Intel::Packet_Drop()
 }
 
 // CRITICAL PATH - Packet
-void Intel::Packet_Receive_NoLock(uint64_t aData_PA, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo_MA, volatile long * aCounter)
+void Intel::Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile long * aCounter)
 {
-    // TRACE_DEBUG "%s( 0x%llx, 0x%p, 0x%p, 0x%p )" DEBUG_EOL, __FUNCTION__, aData_PA, aPacketData, aPacketInfo, aCounter TRACE_END;
+    // TRACE_DEBUG "%s( 0x%p, 0x%p )" DEBUG_EOL, __FUNCTION__, aPacketData, aCounter TRACE_END;
 
-    ASSERT(NULL != aPacketData   );
-    ASSERT(NULL != aPacketInfo_MA);
-    ASSERT(NULL != aCounter      );
+    ASSERT(NULL != aPacket );
+    ASSERT(NULL != aCounter);
 
     ASSERT(NULL              != mRx_CA);
     ASSERT(RX_DESCRIPTOR_QTY >  mRx_In);
 
-    mRx_Counter      [mRx_In] = aCounter      ;
-    mRx_PacketData   [mRx_In] = aPacketData   ;
-    mRx_PacketInfo_MA[mRx_In] = aPacketInfo_MA;
+    mRx_Counter   [mRx_In] = aCounter;
+    mRx_PacketData[mRx_In] = aPacket ;
 
     mRx_PacketData[mRx_In]->IndicateRxRunning();
 
     memset((Intel_Rx_Descriptor *)(mRx_CA) + mRx_In, 0, sizeof(Intel_Rx_Descriptor)); // volatile_cast
 
-    mRx_CA[mRx_In].mLogicalAddress = aData_PA;
+    mRx_CA[mRx_In].mLogicalAddress = aPacket->GetData_PA();
 
     mRx_In = (mRx_In + 1) % RX_DESCRIPTOR_QTY;
 }
@@ -495,13 +495,10 @@ void Intel::Rx_Process_Zone0()
             break;
         }
 
-        ASSERT(NULL != mRx_Counter      [mRx_Out]);
-        ASSERT(NULL != mRx_PacketData   [mRx_Out]);
-        ASSERT(NULL != mRx_PacketInfo_MA[mRx_Out]);
+        ASSERT(NULL != mRx_Counter   [mRx_Out]);
+        ASSERT(NULL != mRx_PacketData[mRx_Out]);
 
-        mRx_PacketData   [mRx_Out]->IndicateRxCompleted();
-        mRx_PacketInfo_MA[mRx_Out]->mSize_byte = mRx_CA[mRx_Out].mSize_byte;
-        mRx_PacketInfo_MA[mRx_Out]->mSendTo    =                          0;
+        mRx_PacketData   [mRx_Out]->IndicateRxCompleted(mRx_CA[mRx_Out].mSize_byte);
 
         ( * mRx_Counter[ mRx_Out ] ) --;
 

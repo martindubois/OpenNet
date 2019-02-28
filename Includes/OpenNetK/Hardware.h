@@ -284,19 +284,15 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Add the buffer to the receiving queue.
-        /// \param  aPacket_PA      The data
-        /// \param  aPacketData     The Packet
-        /// \param  aPacketInfo_XA  The OpenNet_PacketInfo (C or M)
-        /// \param  aCounter        The operation counter
+        /// \param  aPacket   The Packet
+        /// \param  aCounter  The operation counter
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le buffer a la queue de reception
-        /// \param  aPacket_PA      Les donnees
-        /// \param  aPacketData     Le Packet
-        /// \param  aPacketInfo_XA  Le OpenNet_PacketInfo (C or M)
-        /// \param  aCounter        Le compteur d'operation
+        /// \param  aPacket   Le Packet
+        /// \param  aCounter  Le compteur d'operation
         /// \endcond
-        virtual void Packet_Receive_NoLock(uint64_t aPacket_PA, Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo_XA, volatile long * aCounter) = 0;
+        virtual void Packet_Receive_NoLock(Packet * aPacket, volatile long * aCounter) = 0;
 
         /// \cond en
         /// \brief  Add the packet to the send queue.
@@ -312,7 +308,7 @@ namespace OpenNetK
         /// \param  aSize_byte  La taille des donnees
         /// \param  aCounter    Le compteur d'operation
         /// \endcond
-        virtual void Packet_Send_NoLock(uint64_t aPacket_PA, const void * aPacket_XA, unsigned int aSize_byte, volatile long * aCounter = NULL) = 0;
+        virtual void Packet_Send_NoLock(uint64_t aPacket_PA, const void * aPacket_XA, unsigned int aSize_byte, volatile long * aCounter) = 0;
 
         /// \cond en
         /// \brief  Add the packet to the send queue.

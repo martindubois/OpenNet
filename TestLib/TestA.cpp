@@ -111,7 +111,7 @@ unsigned int TestA::Stop()
         unsigned int lBuffer_Max = 24100;
         unsigned int lBuffer_Min =    76;
 
-        unsigned int lPacket_Max = 1537000;
+        unsigned int lPacket_Max = 1570000;
         unsigned int lPacket_Min =    2700;
 
         unsigned int lRunningTime_Max_ms = 1100;

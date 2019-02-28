@@ -235,9 +235,6 @@ namespace OpenNetK
                     // TODO  ONK_Lib.Adapter
                     //       Normal (Performance) - Use burst
 
-                    // TODO  ONK_Lib.Adapter
-                    //       Normal (Performance) - Also cache mSize_byte
-                    //       (and use burst too)
                     aBufferInfo->mPackets[i].mSendTo = lPacketInfo_XA[i].mSendTo;
 
                     // TODO  OpenNetK.Adapter.PartialBuffer
@@ -263,7 +260,7 @@ namespace OpenNetK
                         }
 
                         lPacketQty++;
-                        mHardware->Packet_Send_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].GetOffset(), aBufferInfo->mPackets[i].GetVirtualAddress(), lPacketInfo_XA[i].mSize_byte, &aBufferInfo->mTx_Counter);
+                        mHardware->Packet_Send_NoLock(aBufferInfo->mPackets[i].GetData_PA(), aBufferInfo->mPackets[i].GetData_XA(), aBufferInfo->mPackets[i].GetSize(), &aBufferInfo->mTx_Counter);
                     }
                     break;
 
@@ -327,7 +324,7 @@ namespace OpenNetK
 
         mZone0->Lock();
 
-            ASSERT(OPEN_NET_BUFFER_QTY >= mBufferCount);
+            ASSERT(OPEN_NET_BUFFER_QTY >= mBuffer.mCount);
 
             BufferCountAndIndex lBuffer;
 
@@ -466,33 +463,33 @@ namespace OpenNetK
     //
     // Levels   SoftInt or Thread
     // Threads  Queue
-    void Adapter::Buffer_InitHeader_Zone0(OpenNet_BufferHeader * aHeader_MA, const Buffer & aBuffer, Packet * aPackets)
+    void Adapter::Buffer_InitHeader_Zone0(OpenNet_BufferHeader * aHeader_XA, const Buffer & aBuffer, Packet * aPackets)
     {
         // TRACE_DEBUG "%s( , ,  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
-        ASSERT(NULL !=   aHeader_MA        );
+        ASSERT(NULL !=   aHeader_XA        );
         ASSERT(NULL != (&aBuffer)          );
         ASSERT(   0 <    aBuffer.mPacketQty);
         ASSERT(NULL !=   aPackets          );
 
         ASSERT(NULL != mHardware);
 
-        uint8_t                     * lBase_MA         = reinterpret_cast<uint8_t                     *>(aHeader_MA    );
-        volatile OpenNet_PacketInfo * lPacketInfo_MA   = reinterpret_cast<volatile OpenNet_PacketInfo *>(aHeader_MA + 1);
-        unsigned int                  lPacketQty       = aBuffer.mPacketQty;
-        unsigned int                  lPacketSize_byte = mHardware->GetPacketSize();
+        uint8_t            * lBase_XA         = reinterpret_cast<uint8_t            *>(aHeader_XA    );
+        OpenNet_PacketInfo * lPacketInfo_XA   = reinterpret_cast<OpenNet_PacketInfo *>(aHeader_XA + 1);
+        unsigned int         lPacketQty       = aBuffer.mPacketQty;
+        unsigned int         lPacketSize_byte = mHardware->GetPacketSize();
 
         ASSERT(PACKET_SIZE_MAX_byte >= lPacketSize_byte);
         ASSERT(PACKET_SIZE_MIN_byte <= lPacketSize_byte);
 
         unsigned int lPacketOffset_byte = sizeof(OpenNet_BufferHeader) + (sizeof(OpenNet_PacketInfo) * lPacketQty);
 
-        memset(aHeader_MA, 0, lPacketOffset_byte);
+        memset(aHeader_XA, 0, lPacketOffset_byte);
 
-        aHeader_MA->mBufferState           = OPEN_NET_BUFFER_STATE_TX_RUNNING;
-        aHeader_MA->mPacketInfoOffset_byte = sizeof(OpenNet_BufferHeader);
-        aHeader_MA->mPacketQty             = lPacketQty;
-        aHeader_MA->mPacketSize_byte       = lPacketSize_byte;
+        aHeader_XA->mBufferState           = OPEN_NET_BUFFER_STATE_TX_RUNNING;
+        aHeader_XA->mPacketInfoOffset_byte = sizeof(OpenNet_BufferHeader);
+        aHeader_XA->mPacketQty             = lPacketQty;
+        aHeader_XA->mPacketSize_byte       = lPacketSize_byte;
 
         for (unsigned int i = 0; i < lPacketQty; i++)
         {
@@ -500,10 +497,10 @@ namespace OpenNetK
 
             SkipDangerousBoundary(aBuffer.mBuffer_PA, &lPacketOffset_byte, lPacketSize_byte, &lOffset_byte);
 
-            aPackets[i].Init(lOffset_byte, lBase_MA + lOffset_byte);
+            aPackets[i].Init(aBuffer.mBuffer_PA + lOffset_byte, lBase_XA + lOffset_byte, lPacketInfo_XA + i);
 
-            lPacketInfo_MA[i].mOffset_byte = lOffset_byte             ;
-            lPacketInfo_MA[i].mSendTo      = OPEN_NET_PACKET_PROCESSED;
+            lPacketInfo_XA[i].mOffset_byte = lOffset_byte             ;
+            lPacketInfo_XA[i].mSendTo      = OPEN_NET_PACKET_PROCESSED;
         }
 
         mStatistics[ADAPTER_STATS_BUFFER_INIT_HEADER] ++;
@@ -522,7 +519,7 @@ namespace OpenNetK
         ASSERT( NULL != ( & aBuffer )      );
         ASSERT(    0 <  aBuffer.mPacketQty );
 
-        ASSERT( OPEN_NET_BUFFER_QTY >  mBufferCount           );
+        ASSERT( OPEN_NET_BUFFER_QTY >  mBuffer.mCount         );
         ASSERT( NULL                != mOSDep                 );
         ASSERT( NULL                != mOSDep->AllocateMemory );
         ASSERT( NULL                != mOSDep->FreeMemory     );
@@ -558,8 +555,8 @@ namespace OpenNetK
     {
         // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
-        ASSERT(                   0 <  mBufferCount        );
-        ASSERT( OPEN_NET_BUFFER_QTY >= mBufferCount        );
+        ASSERT(                   0 <  mBuffer.mCount      );
+        ASSERT( OPEN_NET_BUFFER_QTY >= mBuffer.mCount      );
         ASSERT( NULL                != mOSDep              );
         ASSERT( NULL                != mOSDep->FreeMemory  );
         ASSERT( NULL                != mOSDep->UnmapBuffer );
@@ -589,16 +586,11 @@ namespace OpenNetK
         // TRACE_DEBUG "%s(  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
         ASSERT(NULL != aBufferInfo                        );
-        ASSERT(NULL != aBufferInfo->mBase_XA              );
-        ASSERT(   0 <  aBufferInfo->mPacketInfoOffset_byte);
         ASSERT(NULL != aBufferInfo->mPackets              );
         ASSERT(NULL != aBufferInfo->mBuffer.mPacketQty    );
-        ASSERT(NULL != aBufferInfo->mHeader_XA            );
 
         ASSERT(NULL != mHardware);
         ASSERT(NULL != mZone0   );
-
-        OpenNet_PacketInfo * lPacketInfo_XA = reinterpret_cast<OpenNet_PacketInfo *>(aBufferInfo->mBase_XA + aBufferInfo->mPacketInfoOffset_byte);
 
         mZone0->Unlock();
 
@@ -606,7 +598,7 @@ namespace OpenNetK
 
                 for (unsigned int i = 0; i < aBufferInfo->mBuffer.mPacketQty; i++)
                 {
-                    mHardware->Packet_Receive_NoLock(aBufferInfo->mBuffer.mBuffer_PA + aBufferInfo->mPackets[i].GetOffset(), aBufferInfo->mPackets + i, lPacketInfo_XA + i, &aBufferInfo->mRx_Counter);
+                    mHardware->Packet_Receive_NoLock(aBufferInfo->mPackets + i, &aBufferInfo->mRx_Counter);
                 }
 
             mHardware->Unlock_AfterReceive(&aBufferInfo->mRx_Counter, aBufferInfo->mBuffer.mPacketQty);
@@ -756,7 +748,7 @@ namespace OpenNetK
     {
         // TRACE_DEBUG "%s(  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
-        ASSERT(0 < mBufferCount);
+        ASSERT(0 < mBuffer.mCount);
 
         for (unsigned int i = 0; i < mBuffer.mCount; i++)
         {
@@ -772,7 +764,7 @@ namespace OpenNetK
     // aIndex
     void Adapter::Buffer_Corrupted_Zone0( unsigned int aIndex )
     {
-        ASSERT( mBufferCount > aIndex );
+        ASSERT( mBuffer.mCount > aIndex );
 
         // The buffer is clearly corrupted! We don't write to it
         // and if possible we simply forget about it.
@@ -801,7 +793,7 @@ namespace OpenNetK
 
         ASSERT(OPEN_NET_BUFFER_STATE_PX_COMPLETED == aBufferInfo->mHeader_XA->mBufferState);
 
-        ASSERT( mBufferCount > mPxRunning );
+        ASSERT( mBuffer.mCount > mBuffer.mPx );
 
         if (NULL == mAdapters)
         {
@@ -843,7 +835,7 @@ namespace OpenNetK
         ASSERT(NULL != aBufferInfo            );
         ASSERT(NULL != aBufferInfo->mHeader_XA);
 
-        ASSERT( mBufferCount > mPxRunning );
+        ASSERT( mBuffer.mCount > mBuffer.mPx );
 
         // We do not put assert on the buffer state because the GPU may
         // change it at any time.
@@ -873,7 +865,7 @@ namespace OpenNetK
         ASSERT(NULL                             != aBufferInfo->mHeader_XA              );
         ASSERT(OPEN_NET_BUFFER_STATE_RX_RUNNING == aBufferInfo->mHeader_XA->mBufferState);
 
-        ASSERT( mBufferCount > mRxRunning );
+        ASSERT( mBuffer.mCount > mBuffer.mRx );
 
         if (0 == aBufferInfo->mRx_Counter)
         {
@@ -895,7 +887,7 @@ namespace OpenNetK
         ASSERT(NULL                             != aBufferInfo->mHeader_XA              );
         ASSERT(OPEN_NET_BUFFER_STATE_TX_RUNNING == aBufferInfo->mHeader_XA->mBufferState);
 
-        ASSERT( mBufferCount > mTxRunning );
+        ASSERT( mBuffer.mCount > mBuffer.mTx );
 
         if (0 == aBufferInfo->mTx_Counter)
         {
@@ -1187,7 +1179,7 @@ namespace OpenNetK
             //       High - Refuse to start if the number of buffer may cause
             //       a descriptor overrun.
 
-            ASSERT(OPEN_NET_BUFFER_QTY >= mBufferCount);
+            ASSERT(OPEN_NET_BUFFER_QTY >= mBuffer.mCount);
 
             mBuffer.mPx = 0;
             mBuffer.mRx = 0;

@@ -1,9 +1,10 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNetK/Packet.h
-/// \brief   OpenNetK::Packet
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/Packet.h
+/// \brief      OpenNetK::Packet
 
 #pragma once
 
@@ -29,6 +30,16 @@ namespace OpenNetK
     public:
 
         /// \cond en
+        /// \brief  Retrieve the physical address of data
+        /// \return This method returns a physica address of data
+        /// \endcond
+        /// \cond fr
+        /// \brief  Obtenir l'adresse physique des donnees
+        /// \return Cette methode retourne une adresse physique
+        /// \endcond
+        uint64_t GetData_PA();
+
+        /// \cond en
         /// \brief  Retrieve the virtual address of data
         /// \return This method returns a virtual address of the kernel
         ///         memory space.
@@ -38,16 +49,18 @@ namespace OpenNetK
         /// \return Cette methode retourne une adresse virtuel dans l'espace
         //          d'adressage dy system
         /// \endcond
-        void * GetVirtualAddress();
+        void * GetData_XA();
 
         /// \cond en
         /// \brief  Indicate that the packet now contains received data.
+        /// \param  aSize_byte  The size of the received packet
         /// \endcond
         /// \cond fr
         /// \brief  Indiquer que le paquet contient maintenant des donnees
         ///         recu.
+        /// \param  aSize_byte  La taille du paquet recu
         /// \endcond
-        void IndicateRxCompleted();
+        void IndicateRxCompleted(uint32_t aSize_byte);
 
         /// \cond en
         /// \brief  Indicate that the packet is now used to receive data.
@@ -79,28 +92,39 @@ namespace OpenNetK
         uint32_t mSendTo;
         State    mState ;
 
-        uint32_t GetOffset();
+        uint32_t GetSize();
 
-        void Init(uint32_t aOffset_byte, void * aVirtualAddress);
+        void Init(uint64_t aData_PA, void * aData_XA, OpenNet_PacketInfo * aInfo_XA);
 
     private:
 
-        uint32_t mOffset_byte   ;
-        void   * mVirtualAddress;
+        uint64_t             mData_PA  ;
+        void               * mData_XA  ;
+        OpenNet_PacketInfo * mInfo_XA  ;
+        uint32_t             mSize_byte;
 
     };
 
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    inline void * Packet::GetVirtualAddress()
+    inline uint64_t Packet::GetData_PA()
     {
-        return mVirtualAddress;
+        return mData_PA;
     }
 
-    inline void Packet::IndicateRxCompleted()
+    inline void * Packet::GetData_XA()
     {
-        mState = STATE_RX_COMPLETED;
+        return mData_XA;
+    }
+
+    inline void Packet::IndicateRxCompleted(uint32_t aSize_byte)
+    {
+        mInfo_XA->mSize_byte = aSize_byte;
+        mInfo_XA->mSendTo    =          0;
+
+        mSize_byte = aSize_byte;
+        mState     = STATE_RX_COMPLETED;
     }
 
     inline void Packet::IndicateRxRunning()
@@ -111,9 +135,9 @@ namespace OpenNetK
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
-    inline uint32_t Packet::GetOffset()
+    inline uint32_t Packet::GetSize()
     {
-        return mOffset_byte;
+        return mSize_byte;
     }
 
 }

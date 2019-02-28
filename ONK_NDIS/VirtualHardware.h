@@ -34,8 +34,8 @@ public:
     virtual void         GetState             (OpenNetK::Adapter_State * aStats);
     virtual void         D0_Entry             ();
     virtual bool         Packet_Drop          ();
-    virtual void         Packet_Receive_NoLock(uint64_t aLogicalAddress, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo, volatile long * aCounter);
-    virtual void         Packet_Send_NoLock   (uint64_t aLogicalAddress, const void * aVirtualAddress, unsigned int aSize_byte, volatile long * aCounter = NULL);
+    virtual void         Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile long * aCounter);
+    virtual void         Packet_Send_NoLock   (uint64_t aLogicalAddress, const void * aVirtualAddress, unsigned int aSize_byte, volatile long * aCounter);
     virtual bool         Packet_Send          (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);
 
 protected:
@@ -56,11 +56,10 @@ private:
 
     // ===== Zone 0 =========================================================
 
-    volatile long      * mRx_Counter      [RX_DESCRIPTOR_QTY];
-    uint64_t             mRx_Data         [RX_DESCRIPTOR_QTY];
-    unsigned int         mRx_In ;
-    unsigned int         mRx_Out;
-    OpenNetK::Packet   * mRx_PacketData   [RX_DESCRIPTOR_QTY];
-    OpenNet_PacketInfo * mRx_PacketInfo_MA[RX_DESCRIPTOR_QTY];
+    volatile long    * mRx_Counter   [RX_DESCRIPTOR_QTY];
+    uint64_t           mRx_Data      [RX_DESCRIPTOR_QTY];
+    unsigned int       mRx_In ;
+    unsigned int       mRx_Out;
+    OpenNetK::Packet * mRx_PacketData[RX_DESCRIPTOR_QTY];
 
 };

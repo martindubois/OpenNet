@@ -35,8 +35,8 @@ public:
     virtual bool         Interrupt_Process (unsigned int aMessageId, bool * aNeedMoreProcessing);
     virtual void         Interrupt_Process2(bool * aNeedMoreProcessing);
     virtual bool         Packet_Drop          ();
-    virtual void         Packet_Receive_NoLock(uint64_t aPacket_PA, OpenNetK::Packet * aPacketData, OpenNet_PacketInfo * aPacketInfo_XA, volatile long * aCounter);
-    virtual void         Packet_Send_NoLock   (uint64_t aPacket_PA, const void * aPacket_XA, unsigned int aSize_byte, volatile long * aCounter = NULL);
+    virtual void         Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile long * aCounter);
+    virtual void         Packet_Send_NoLock   (uint64_t aPacket_PA, const void * aPacket_XA, unsigned int aSize_byte, volatile long * aCounter);
     virtual bool         Packet_Send       (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);
     virtual unsigned int Statistics_Get    (uint32_t * aOut, unsigned int aOutSize_byte, bool aReset);
     virtual void         Statistics_Reset  ();
@@ -89,11 +89,10 @@ private:
 
     volatile Intel_BAR1 * mBAR1_MA;
 
-    Intel_Rx_Descriptor   * mRx_CA ;
-    volatile long         * mRx_Counter      [RX_DESCRIPTOR_QTY];
-    unsigned int            mRx_Out;
-    OpenNetK::Packet      * mRx_PacketData   [RX_DESCRIPTOR_QTY];
-    OpenNet_PacketInfo    * mRx_PacketInfo_MA[RX_DESCRIPTOR_QTY];
+    Intel_Rx_Descriptor * mRx_CA ;
+    volatile long       * mRx_Counter   [RX_DESCRIPTOR_QTY];
+    unsigned int          mRx_Out;
+    OpenNetK::Packet    * mRx_PacketData[RX_DESCRIPTOR_QTY];
 
     Intel_Tx_Descriptor   * mTx_CA ;
     volatile long         * mTx_Counter[TX_DESCRIPTOR_QTY];

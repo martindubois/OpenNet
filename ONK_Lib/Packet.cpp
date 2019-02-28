@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     ONK_Lib/Packet.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       ONK_Lib/Packet.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -19,18 +20,21 @@ namespace OpenNetK
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
-    // aOffset_byte              The offset from the begining of the buffer
-    // aVirtualAddress [-K-;RW-] The data's virtual address into the kernel
-    //                           address space
-    void Packet::Init(uint32_t aOffset_byte, void * aVirtualAddress)
+    // aData_PA [-K-;RW-] The physical address of the data
+    // aData_XA [-K-;RW-] The address of data into the kernel address space
+    //                    (C or M)
+    // aInfo_XA [-K-;RW-] The address of the OpenNet_PacketInfo structure
+    //                    into the kernel address space (C or M)
+    void Packet::Init(uint64_t aData_PA, void * aData_XA, OpenNet_PacketInfo * aInfo_XA)
     {
-        ASSERT(   0 <  aOffset_byte   );
-        ASSERT(NULL != aVirtualAddress);
+        ASSERT(NULL != aData_XA);
+        ASSERT(NULL != aInfo_XA);
 
-        mOffset_byte    = aOffset_byte             ;
-        mSendTo         = OPEN_NET_PACKET_PROCESSED;
-        mState          = STATE_TX_RUNNING         ;
-        mVirtualAddress = aVirtualAddress          ;
+        mData_PA = aData_PA                 ;
+        mData_XA = aData_XA                 ;
+        mInfo_XA = aInfo_XA                 ;
+        mSendTo  = OPEN_NET_PACKET_PROCESSED;
+        mState   = STATE_TX_RUNNING         ;
     }
 
 }
