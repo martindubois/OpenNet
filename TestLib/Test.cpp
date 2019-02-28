@@ -238,7 +238,6 @@ static const char * KERNEL_REPLY_ON_ERROR =
 "            }"                                                                        EOL
 "        }"                                                                            EOL
                                                                                        EOL
-"        lData[ 14 ] = 1;"                                                             EOL // TODO  Revert
 "        lPacketInfo->mSendTo = lResult;"                                              EOL
                                                                                        EOL
 "    OPEN_NET_KERNEL_END"                                                              EOL

@@ -140,7 +140,7 @@ namespace OpenNetK
 
         ASSERT(NULL != mAdapter);
 
-        mAdapter->Buffers_Process(aNeedMoreProcessing);
+        mAdapter->Interrupt_Process2(aNeedMoreProcessing);
     }
 
     void Hardware::Interrupt_Process3()

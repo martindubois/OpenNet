@@ -142,12 +142,9 @@ namespace OpenNetK
 
         void Buffer_SendPackets(BufferInfo * aBufferInfo);
 
-        // TODO  OpenNetK.Adapter
-        //       Renommer Buffers_Process en Interrupt_Process2
-        void Buffers_Process(bool * aNeedMoreProcessing);
-
         void Disconnect();
 
+        void Interrupt_Process2(bool * aNeedMoreProcessing);
         void Interrupt_Process3();
 
         int  IoCtl( void * aFileObject, unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte);
@@ -156,12 +153,25 @@ namespace OpenNetK
 
     private:
 
+        typedef struct
+        {
+            unsigned int mCount;
+            unsigned int mPx   ;
+            unsigned int mRx   ;
+            unsigned int mTx   ;
+        }
+        BufferCountAndIndex;
+
         void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader_XA, const Buffer & aBuffer, Packet * aPackets);
         void Buffer_Queue_Zone0      (const Buffer & aBuffer);
         void Buffer_Release_Zone0    ();
         void Buffer_Receive_Zone0    (BufferInfo * aBufferInfo);
         void Buffer_Send_Zone0       (BufferInfo * aBufferInfo);
         void Buffer_WriteMarker_Zone0(BufferInfo * aBufferInfo);
+
+        void Interrupt_Process2_Px_Zone0();
+        void Interrupt_Process2_Rx_Zone0();
+        void Interrupt_Process2_Tx_Zone0();
 
         void Stop_Zone0();
 
@@ -170,7 +180,6 @@ namespace OpenNetK
         void Buffer_PxCompleted_Zone0(BufferInfo * aBufferInfo);
         void Buffer_PxRunning_Zone0  (BufferInfo * aBufferInfo);
         void Buffer_RxRunning_Zone0  (BufferInfo * aBufferInfo);
-        void Buffer_Stopped_Zone0    (unsigned int aIndex     );
         void Buffer_TxRunning_Zone0  (BufferInfo * aBufferInfo);
 
         // ===== IoCtl ======================================================
@@ -211,12 +220,8 @@ namespace OpenNetK
         // ===== Zone 0 =====================================================
         SpinLock * mZone0;
 
-        unsigned int mBufferCount;
-        BufferInfo   mBuffers[OPEN_NET_BUFFER_QTY];
-
-        unsigned int mPxRunning;
-        unsigned int mRxRunning;
-        unsigned int mTxRunning;
+        BufferCountAndIndex mBuffer;
+        BufferInfo          mBuffers[OPEN_NET_BUFFER_QTY];
 
     };
 
