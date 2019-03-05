@@ -15,6 +15,8 @@
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
+extern void CUW_Check();
+
 extern void CUW_CtxCreate          ( CUcontext * aContext, unsigned int aFlags, CUdevice aDevice );
 extern void CUW_CtxDestroy         ( CUcontext   aContext );
 extern void CUW_CtxPopCurrent      ( CUcontext * aContext );
@@ -27,8 +29,13 @@ extern void CUW_DeviceGetName      ( char * aName, int aSize_byte, CUdevice aDev
 extern void CUW_DevicePrimaryCtxRelease( CUdevice aDevice );
 extern void CUW_DevicePrimaryCtxRetain ( CUcontext * aContext, CUdevice aDevice );
 extern void CUW_DeviceTotalMem     ( size_t * aSize_byte, CUdevice aDevice );
+extern void CUW_EventCreate        ( CUevent * aEvent, unsigned int aFlags );
+extern void CUW_EventDestroy       ( CUevent   aEvent );
+extern void CUW_EventElapsedTime   ( float * aElapsed_ms, CUevent aStart, CUevent aEnd );
+extern void CUW_EventRecord        ( CUevent   aEvent, CUstream aStream );
+extern void CUW_EventSynchronize   ( CUevent   aEvent );
 extern void CUW_Init               ( unsigned int aFlags );
-extern void CUW_LaunchHostFunction ( CUstream aStream, CUhostFn aFunction, void * aUserData );
+extern void CUW_LaunchHostFunc     ( CUstream aStream, CUhostFn aFunction, void * aUserData );
 extern void CUW_LaunchKernel       ( CUfunction aFunction, unsigned int aGridDimX, unsigned int aGridDimY, unsigned int aGridDimZ, unsigned int aBlockDimX, unsigned int aBlockDimY, unsigned int aBlockDimZ, unsigned int aSharedMemSize_byte, CUstream aStream, void * * aArguments, void * * aExtra );
 extern void CUW_MemAlloc           ( CUdeviceptr * aPtr_DA, size_t aSize_byte );
 extern void CUW_MemFree            ( CUdeviceptr   aPtr_DA );

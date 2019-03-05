@@ -61,6 +61,8 @@ void Thread_Kernel_OpenCL::Prepare()
     assert(NULL != mProcessor     );
 
     Thread_OpenCL::Prepare(dynamic_cast<Processor_OpenCL *>(mProcessor), &mAdapters, mKernel, &mBuffers);
+
+    mQueueDepth = mBuffers.size();
 }
 
 // Protected
@@ -95,22 +97,7 @@ void Thread_Kernel_OpenCL::Processing_Queue(unsigned int aIndex)
 
     assert(0 < lGS);
 
-    Thread_OpenCL::Processing_Queue(&lGS, NULL, &lBuffer->mEvent);
-}
-
-void Thread_Kernel_OpenCL::Processing_Wait(unsigned int aIndex)
-{
-    assert(OPEN_NET_BUFFER_QTY > aIndex);
-
-    assert(NULL != mBuffers[aIndex]);
-
-    Buffer_Data_OpenCL * lBuffer = dynamic_cast<Buffer_Data_OpenCL *>(mBuffers[aIndex]);
-    assert(NULL != lBuffer        );
-    assert(NULL != lBuffer->mEvent);
-
-    Thread_OpenCL::Processing_Wait(lBuffer->mEvent, mKernel);
-
-    lBuffer->mEvent = NULL;
+    Thread_OpenCL::Processing_Queue( lBuffer->GetEvent(), &lGS, NULL );
 }
 
 void Thread_Kernel_OpenCL::Release()

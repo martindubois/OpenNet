@@ -177,6 +177,7 @@ static const KmsLib::ToolBase::CommandInfo TEST_COMMANDS[] =
 };
 
 static void Display(KmsLib::ToolBase * aToolBase, const char * aArg);
+static void Exit   (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Start  (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Stop   (KmsLib::ToolBase * aToolBase, const char * aArg);
 
@@ -185,7 +186,7 @@ static const KmsLib::ToolBase::CommandInfo COMMANDS[] =
 	{ "Adapter"      , NULL                           , "Adapter ..."                                             , ADAPTER_COMMANDS   },
     { "Display"      , Display                        , "Display                       Display system information", NULL               },
 	{ "ExecuteScript", KmsLib::ToolBase::ExecuteScript, "ExecuteSript {Script}         Execute script"            , NULL               },
-	{ "Exit"         , KmsLib::ToolBase::Exit         , "Exit                          Exit"                      , NULL               },
+	{ "Exit"         , Exit                           , "Exit                          Exit"                      , NULL               },
     { "Kernel"       , NULL                           , "Kernel ..."                                              , KERNEL_COMMANDS    },
 	{ "Processor"    , NULL                           , "Processor ..."                                           , PROCESSOR_COMMANDS },
     { "Start"        , Start                          , "Start                         Start the system"          , NULL               },
@@ -383,6 +384,15 @@ void Display(KmsLib::ToolBase * aToolBase, const char * aArg)
 
     OpenNet::Status lStatus = sSystem->Display(stdout);
     assert(OpenNet::STATUS_OK == lStatus);
+}
+
+void Exit(KmsLib::ToolBase * aToolBase, const char * aArg)
+{
+    printf("Exit\n");
+
+    sSystem->Delete();
+
+    exit( 0 );
 }
 
 void Kernel_Forward_AddDestination(KmsLib::ToolBase * aToolBase, const char * aArg)

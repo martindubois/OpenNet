@@ -30,20 +30,24 @@ public:
 
     void AddDispatchCode();
 
+    // ===== Thread =========================================================
+
+    virtual void Prepare();
+
 protected:
 
     enum
     {
-        EVENT_QTY = 3,
+        QUEUE_DEPTH = 3,
     };
 
     // ===== Thread =========================================================
 
+    virtual void Processing_Wait( unsigned int aIndex );
+
     virtual void Release();
 
-    virtual void Run_Loop ();
-    virtual void Run_Start();
-
+    Event          * mEvents[ QUEUE_DEPTH ];
     Kernel_Functions mKernelFunctions;
 
 };

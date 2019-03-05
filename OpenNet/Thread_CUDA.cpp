@@ -18,23 +18,9 @@
 // ===== OpenNet ============================================================
 #include "Adapter_Linux.h"
 #include "CUW.h"
+#include "Event_CUDA.h"
 
 #include "Thread_CUDA.h"
-
-// Static function declaration
-/////////////////////////////////////////////////////////////////////////////
-
-// ===== Entry point ========================================================
-static void CUDA_CB KernelCompleted( void * aUserData );
-
-// Internal
-/////////////////////////////////////////////////////////////////////////////
-
-void Thread_CUDA::KernelCompleted()
-{
-    int lRet = sem_post( & mSemaphore );
-    assert( 0 == lRet );
-}
 
 // Protected
 /////////////////////////////////////////////////////////////////////////////
@@ -54,87 +40,81 @@ Thread_CUDA::~Thread_CUDA()
 
 // aAdapters [---;RW-]
 // aBuffers  [---;RW-]
+// aProfiling
 //
 // Exception  KmsLib::Exception *  See CUW_StreamCreate, CUW_ModuleFunction
 //                                 and Adapter_Linux::Buffers_Allocate
 //
 // Thread_CUDA::Prepare ==> Thread_CUDA::Release
-void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers )
+void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers, bool aProfiling )
 {
-    assert( NULL != aAdapters  );
-    assert( NULL != aBuffers   );
+    assert( NULL != aAdapters         );
+    assert(    0 <  aAdapters->size() );
+    assert( NULL != aBuffers          );
 
-    Prepare_Internal( aAdapters, aBuffers );
+    assert( NULL != mModule         );
+    assert( NULL != mProcessor_CUDA );
+    assert( NULL == mStream         );
+
+    mProcessor_CUDA->SetContext();
+
+    // CUDA_StreamCreate ==> CUDA_StreamDestroy  See Release
+    CUW_StreamCreate( & mStream, CU_STREAM_NON_BLOCKING );
+    assert( NULL != mStream );
+
+    CUW_ModuleGetFunction( & mFunction, mModule, "Filter" );
+    assert( NULL != mFunction );
+
+    unsigned int i;
+
+    for ( i = 0; i < aAdapters->size(); i++)
+    {
+        assert(NULL != (*aAdapters)[i]);
+
+        Adapter_Linux * lAdapter = dynamic_cast<Adapter_Linux *>((*aAdapters)[i]);
+        assert(NULL != lAdapter);
+
+        lAdapter->Buffers_Allocate( aProfiling, aBuffers );
+    }
 
     assert( 0 < aBuffers->size() );
-
-    // sem_init ==> sem_destroy  See Release
-    int lRet = sem_init( & mSemaphore, 0, aBuffers->size() );
-    assert( 0 == lRet );
-}
-
-// aAdapters   [---;RW-]
-// aBuffers    [---;RW-]
-// aQueueDepth
-//
-// Exception  KmsLib::Exception *  See CUW_StreamCreate, CUW_ModuleFunction
-//                                 and Adapter_Linux::Buffers_Allocate
-//
-// Thread_CUDA::Prepare ==> Thread_CUDA::Release
-void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers, unsigned int aQueueDepth )
-{
-    assert( NULL != aAdapters   );
-    assert( NULL != aBuffers    );
-    assert(    0 <  aQueueDepth );
-
-    Prepare_Internal( aAdapters, aBuffers );
-
-    // sem_init ==> sem_destroy  See Release
-    int lRet = sem_init( & mSemaphore, 0, aQueueDepth );
-    assert( 0 == lRet );
 }
 
 // aKernel     [---;RW-]
+// aEvent      [---;RW-]
 // aGlobalSize [---;R--]
 // aLocalSize  [--O;R--]
 // aArguments  [---;R--]
 //
-// CRITICAL PATH  Buffer-
-// Exception      KmsLib::Exception *  See CUW_LaunchKernel and
-//                                     CUW_LaunchHostFunction
-// Thread         Worker
+// Exception  KmsLib::Exception *  See CUW_LaunchKernel and
+//                                 CUW_LaunchHostFunction
+// Thread     Worker
 //
-// Processing_Queue ==> Processing_Wait
-void Thread_CUDA::Processing_Queue( OpenNet::Kernel * aKernel, const size_t * aGlobalSize, const size_t * aLocalSize, void * * aArguments )
-{
-    // printf( __CLASS__ "Processing_Queue( , , ,  )\n" );
+// Processing_Queue ==> Event_CUDA::Wait
 
+// CRITICAL PATH  Processing
+//                1 / iteration
+void Thread_CUDA::Processing_Queue( OpenNet::Kernel * aKernel, Event * aEvent, const size_t * aGlobalSize, const size_t * aLocalSize, void * * aArguments )
+{
     assert( NULL != aKernel     );
+    assert( NULL != aEvent      );
     assert( NULL != aGlobalSize );
     assert( NULL != aArguments  );
 
     assert( NULL != mFunction );
     assert( NULL != mStream   );
 
-    // usleep( 10000 );
+    Event_CUDA * lEvent = dynamic_cast< Event_CUDA * >( aEvent );
+    assert( NULL != lEvent );
+
+    if ( aKernel->IsProfilingEnabled() )
+    {
+        lEvent->RecordStart( mStream );
+    }
 
     CUW_LaunchKernel( mFunction, aGlobalSize[ 0 ], 1, 1, ( NULL == aLocalSize ) ? aGlobalSize[ 0 ] : aLocalSize[ 0 ], 1, 1, 0, mStream, aArguments, NULL );
-    CUW_LaunchHostFunction( mStream, ::KernelCompleted, this );
-}
 
-// CRITICAL PATH  Buffer-
-// Exception      KmsLib::Exception *  CODE_SYSTEM_ERROR
-// Thread         Worker
-//
-// Processing_Queue ==> Processing_Wait
-void Thread_CUDA::Processing_Wait()
-{
-    int lRet = sem_wait( & mSemaphore );
-    if ( 0 != lRet )
-    {
-        throw new KmsLib::Exception( KmsLib::Exception::CODE_SYSTEM_ERROR,
-            "sem_wait(  ) failed", NULL, __FILE__, __CLASS__ "Processing_Wait", __LINE__, lRet );
-    }
+    lEvent->RecordEnd( mStream );
 }
 
 // aKernel    [---;RW-]
@@ -154,10 +134,6 @@ void Thread_CUDA::Release( OpenNet::Kernel * aKernel)
 
         if ( NULL != mArguments )
         {
-            // sem_init ==> sem_destroy  See Prepare
-            int lRet = sem_destroy( & mSemaphore );
-            assert( 0 == lRet );
-
             // printf( __CLASS__ "Release - delete [] 0x%lx (mArguments)\n", reinterpret_cast< uint64_t >( mArguments ) );
 
             // new ==> delete  See Thread_Function_CUDA::Prepare or
@@ -176,53 +152,4 @@ void Thread_CUDA::Run_Start()
     assert( NULL != mProcessor_CUDA );
 
     mProcessor_CUDA->SetContext();
-}
-
-// Private
-/////////////////////////////////////////////////////////////////////////////
-
-// aAdapters [---;RW-]
-// aBuffers  [---;RW-]
-void Thread_CUDA::Prepare_Internal( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers )
-{
-    assert( NULL != aAdapters         );
-    assert(    0 <  aAdapters->size() );
-    assert( NULL != aBuffers          );
-
-    assert( NULL != mModule         );
-    assert( NULL != mProcessor_CUDA );
-    assert( NULL == mStream         );
-
-    mProcessor_CUDA->SetContext();
-
-    // CUDA_StreamCreate ==> CUDA_StreamDestroy  See Release
-    CUW_StreamCreate( & mStream, CU_STREAM_NON_BLOCKING );
-    assert( NULL != mStream );
-
-    CUW_ModuleGetFunction( & mFunction, mModule, "Filter" );
-    assert( NULL != mFunction );
-
-    for (unsigned int i = 0; i < aAdapters->size(); i++)
-    {
-        assert(NULL != (*aAdapters)[i]);
-
-        Adapter_Linux * lAdapter = dynamic_cast<Adapter_Linux *>((*aAdapters)[i]);
-        assert(NULL != lAdapter);
-
-        lAdapter->Buffers_Allocate( aBuffers );
-    }
-}
-
-// Static functions
-/////////////////////////////////////////////////////////////////////////////
-
-// ===== Entry point ========================================================
-
-void CUDA_CB KernelCompleted( void * aUserData )
-{
-    assert( NULL != aUserData );
-
-    Thread_CUDA * lThis = reinterpret_cast< Thread_CUDA * >( aUserData );
-
-    lThis->KernelCompleted();
 }

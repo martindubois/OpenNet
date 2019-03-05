@@ -4,6 +4,10 @@
 // Product    OpenNet
 // File       OpenNet/CUW.cpp
 
+// CONFIG  _CHECK_
+//         Basic leeak check
+#define _CHECK_
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -16,8 +20,51 @@
 // ===== OpenNet ============================================================
 #include "CUW.h"
 
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define CHECK_CTX_CREATE                (0)
+#define CHECK_DEVICE_PRIMARY_CTX_RETAIN (1)
+#define CHECK_EVENT_CREATE              (2)
+#define CHECK_MEM_ALLOC                 (3)
+#define CHECK_MODULE_LOAD_DATA_EX       (4)
+#define CHECK_STREAM_CREATE             (5)
+
+#define CHECK_QTY (6)
+
+// Static variable
+/////////////////////////////////////////////////////////////////////////////
+
+#ifdef _CHECK_
+    static unsigned int sCheck[ CHECK_QTY ][ 2 ];
+#endif
+
+// Macros
+/////////////////////////////////////////////////////////////////////////////
+
+#ifdef _CHECK_
+    #define CHECK(C,D) sCheck[(C)][(D)] ++;
+#else
+    #define CHECK(C,D)
+#endif
+
 // Functions
 /////////////////////////////////////////////////////////////////////////////
+
+void CUW_Check()
+{
+    #ifdef _CHECK_
+
+        for ( unsigned int i = 0; i < CHECK_QTY; i ++ )
+        {
+            if ( sCheck[ i ][ 0 ] != sCheck[ i ][ 1 ] )
+            {
+                printf( "Cheak %u failed - %u != %u\n", i, sCheck[ i ][ 0 ], sCheck[ i ][ 1 ] );
+            }
+        }
+
+    #endif
+}
 
 void CUW_CtxCreate( CUcontext * aContext, unsigned int aFlags, CUdevice aDevice )
 {
@@ -32,12 +79,16 @@ void CUW_CtxCreate( CUcontext * aContext, unsigned int aFlags, CUdevice aDevice 
             "cuCtxCreate( , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
     }
 
+    CHECK( CHECK_CTX_CREATE, 0 );
+
     assert( 0 != ( * aContext ) );
 }
 
 void CUW_CtxDestroy( CUcontext aContext )
 {
     assert( NULL != aContext );
+
+    CHECK( CHECK_CTX_CREATE, 1 );
 
     // cuCtxCreate ==> cuCtxDestroy
     CUresult lRet = cuCtxDestroy( aContext );
@@ -148,6 +199,8 @@ void CUW_DevicePrimaryCtxRelease( CUdevice aDevice )
 {
     assert( 0 <= aDevice );
 
+    CHECK( CHECK_DEVICE_PRIMARY_CTX_RETAIN, 1 );
+
     // cuDevicePrimaryCtxRetain ==> cuDevicePrimaryCtxRelease
     CUresult lRet = cuDevicePrimaryCtxRelease( aDevice );
     if ( CUDA_SUCCESS != lRet )
@@ -170,6 +223,8 @@ void CUW_DevicePrimaryCtxRetain ( CUcontext * aContext, CUdevice aDevice )
             "cuDevicePrimaryCtxRetain(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
     }
 
+    CHECK( CHECK_DEVICE_PRIMARY_CTX_RETAIN, 0 );
+
     assert( NULL != ( * aContext ) );
 }
 
@@ -188,6 +243,83 @@ void CUW_DeviceTotalMem( size_t * aSize_byte, CUdevice aDevice )
     assert( 0 < ( * aSize_byte ) );
 }
 
+void CUW_EventCreate( CUevent * aEvent, unsigned int aFlags )
+{
+    assert( NULL != aEvent );
+
+    // cuEventCreate ==> cuEventDestroy
+    CUresult lRet = cuEventCreate( aEvent, aFlags );
+    if ( CUDA_SUCCESS != lRet )
+    {
+        throw new KmsLib::Exception( KmsLib::Exception::CODE_UNKNOWN,
+            "cuEventCreate(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
+    }
+
+    CHECK( CHECK_EVENT_CREATE, 0 );
+
+    assert( NULL != ( * aEvent ) );
+}
+
+void CUW_EventDestroy( CUevent aEvent )
+{
+    assert( NULL != aEvent );
+
+    CHECK( CHECK_EVENT_CREATE, 1 );
+
+    // cuEventCreate ==> cuEventDestroy
+    CUresult lRet = cuEventDestroy( aEvent );
+    if ( CUDA_SUCCESS != lRet )
+    {
+        throw new KmsLib::Exception( KmsLib::Exception::CODE_UNKNOWN,
+            "cuEventDestroy(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
+    }
+}
+
+// CRITICAL PATH  Processing.Profiling
+//                1 / iteration
+void CUW_EventElapsedTime( float * aElapsed_ms, CUevent aStart, CUevent aEnd )
+{
+    assert( NULL != aElapsed_ms );
+    assert( NULL != aStart      );
+    assert( NULL != aEnd        );
+
+    CUresult lRet = cuEventElapsedTime( aElapsed_ms, aStart, aEnd );
+    if ( CUDA_SUCCESS != lRet )
+    {
+        throw new KmsLib::Exception( KmsLib::Exception::CODE_UNKNOWN,
+            "cuEventElapsedTime( , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
+    }
+}
+
+// CRITICAL PATH  Processing
+//                1 / iteration, 1 more when profiling is enabled
+void CUW_EventRecord( CUevent aEvent, CUstream aStream )
+{
+    assert( NULL != aEvent  );
+    assert( NULL != aStream );
+
+    CUresult lRet = cuEventRecord( aEvent, aStream );
+    if ( CUDA_SUCCESS != lRet )
+    {
+        throw new KmsLib::Exception( KmsLib::Exception::CODE_UNKNOWN,
+            "cuEventRecord( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
+    }
+}
+
+// CRITICAL PATH  Processing
+//                1 / iteration
+void CUW_EventSynchronize( CUevent aEvent )
+{
+    assert( NULL != aEvent );
+
+    CUresult lRet = cuEventSynchronize( aEvent );
+    if ( CUDA_SUCCESS != lRet )
+    {
+        throw new KmsLib::Exception( KmsLib::Exception::CODE_UNKNOWN,
+            "cuEventSynchronize(  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
+    }
+}
+
 void CUW_Init( unsigned int aFlags )
 {
     CUresult lRet = cuInit( aFlags );
@@ -198,7 +330,7 @@ void CUW_Init( unsigned int aFlags )
     }
 }
 
-void CUW_LaunchHostFunction ( CUstream aStream, CUhostFn aFunction, void * aUserData )
+void CUW_LaunchHostFunc( CUstream aStream, CUhostFn aFunction, void * aUserData )
 {
     assert( NULL != aStream   );
     assert( NULL != aFunction );
@@ -211,6 +343,8 @@ void CUW_LaunchHostFunction ( CUstream aStream, CUhostFn aFunction, void * aUser
     }
 }
 
+// CRITICAL PATH  Processing
+//                1 / iteration
 void CUW_LaunchKernel( CUfunction aFunction, unsigned int aGridDimX, unsigned int aGridDimY, unsigned int aGridDimZ, unsigned int aBlockDimX, unsigned int aBlockDimY, unsigned int aBlockDimZ, unsigned int aSharedMemSize_byte, CUstream aStream, void * * aArguments, void * * aExtra )
 {
     // printf( "CUW_LaunchKernel( %p, %u, %u, %u, %u, %u, %u, %u bytes, %p, %p, %p )\n", aFunction, aGridDimX, aGridDimY, aGridDimZ, aBlockDimX, aBlockDimY, aBlockDimZ, aSharedMemSize_byte, aStream, aArguments, aExtra );
@@ -245,12 +379,16 @@ void CUW_MemAlloc( CUdeviceptr * aPtr_DA, size_t aSize_byte )
             "cuMemAlloc( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
     }
 
+    CHECK( CHECK_MEM_ALLOC, 0 );
+
     assert( 0 != aPtr_DA );
 }
 
 void CUW_MemFree( CUdeviceptr aPtr_DA )
 {
     assert( 0 != aPtr_DA );
+
+    CHECK( CHECK_MEM_ALLOC, 1 );
 
     // cuMemAlloc ==> cuMemFree
     CUresult lRet = cuMemFree( aPtr_DA );
@@ -291,12 +429,16 @@ void CUW_ModuleLoadDataEx( CUmodule * aModule, const void * aImage, unsigned int
             "cuModuleLoadDataEx( , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
     }
 
+    CHECK( CHECK_MODULE_LOAD_DATA_EX, 0 );
+
     assert( NULL != ( * aModule ) );
 }
 
 void CUW_ModuleUnload( CUmodule aModule )
 {
     assert( NULL != aModule );
+
+    CHECK( CHECK_MODULE_LOAD_DATA_EX, 1 );
 
     // cuModuleLoadDataEx ==> cuModuleUnload
     CUresult lRet = cuModuleUnload( aModule );
@@ -332,12 +474,16 @@ void CUW_StreamCreate( CUstream * aStream, unsigned int aFlags )
             "cuStreamCreate( ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lRet );
     }
 
+    CHECK( CHECK_STREAM_CREATE, 0 );
+
     assert( NULL != ( * aStream ) );
 }
 
 void CUW_StreamDestroy( CUstream aStream )
 {
     assert( NULL != aStream );
+
+    CHECK( CHECK_STREAM_CREATE, 1 );
 
     // cuStreamCreate ==> cuStreamDestroy
     CUresult lRet = cuStreamDestroy( aStream );

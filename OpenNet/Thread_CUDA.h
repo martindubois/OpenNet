@@ -29,23 +29,15 @@
 class Thread_CUDA
 {
 
-public:
-
-// internal
-
-    void KernelCompleted();
-
 protected:
 
     Thread_CUDA( Processor_Internal * aProcessor, CUmodule aModule = NULL );
 
     virtual ~Thread_CUDA();
 
-    void Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers );
-    void Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers, unsigned int aQueueDepth );
+    void Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers, bool aProfiling = false );
 
-    void Processing_Queue(OpenNet::Kernel * aKernel, const size_t * aGlobalSize, const size_t * aLocalSize, void * * aArguments );
-    void Processing_Wait ();
+    void Processing_Queue(OpenNet::Kernel * aKernel, Event * aEvent, const size_t * aGlobalSize, const size_t * aLocalSize, void * * aArguments );
 
     void Release( OpenNet::Kernel * aKernel);
 
@@ -56,11 +48,5 @@ protected:
     CUmodule         mModule        ;
     Processor_CUDA * mProcessor_CUDA;
     CUstream         mStream        ;
-
-private:
-
-    void Prepare_Internal( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers );
-
-    sem_t mSemaphore;
 
 };

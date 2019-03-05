@@ -161,8 +161,10 @@ static void   UnmapBuffer( void * aContext, void * aBuffer, unsigned int aSize_b
 static void * MapSharedMemory  ( void * aContext, void * aShared_UA, unsigned int aSize_byte );
 static void   UnmapSharedMemory( void * aContext );
 
-static void   LockSpinlock  ( void * aLock );
-static void   UnlockSpinlock( void * aLock );
+static void     LockSpinlock            ( void * aLock );
+static uint32_t LockSpinlockFromThread  ( void * aLock );
+static void     UnlockSpinlock          ( void * aLock );
+static void     UnlockSpinlockFromThread( void * aLock, uint32_t aFlags );
 
 // ===== NVIDIA callback ====================================================
 
@@ -854,15 +856,17 @@ void OSDep_Init( DeviceContext * aThis )
 
     aThis->mOSDep.mContext = aThis;
 
-    aThis->mOSDep.AllocateMemory    = AllocateMemory   ;
-    aThis->mOSDep.FreeMemory        = FreeMemory       ;
-    aThis->mOSDep.GetTimeStamp      = GetTimeStamp     ;
-    aThis->mOSDep.MapBuffer         = MapBuffer        ;
-    aThis->mOSDep.UnmapBuffer       = UnmapBuffer      ;
-    aThis->mOSDep.MapSharedMemory   = MapSharedMemory  ;
-    aThis->mOSDep.UnmapSharedMemory = UnmapSharedMemory;
-    aThis->mOSDep.LockSpinlock      = LockSpinlock     ;
-    aThis->mOSDep.UnlockSpinlock    = UnlockSpinlock   ;
+    aThis->mOSDep.AllocateMemory           = AllocateMemory          ;
+    aThis->mOSDep.FreeMemory               = FreeMemory              ;
+    aThis->mOSDep.GetTimeStamp             = GetTimeStamp            ;
+    aThis->mOSDep.LockSpinlock             = LockSpinlock            ;
+    aThis->mOSDep.LockSpinlockFromThread   = LockSpinlockFromThread  ;
+    aThis->mOSDep.MapBuffer                = MapBuffer               ;
+    aThis->mOSDep.UnmapBuffer              = UnmapBuffer             ;
+    aThis->mOSDep.MapSharedMemory          = MapSharedMemory         ;
+    aThis->mOSDep.UnmapSharedMemory        = UnmapSharedMemory       ;
+    aThis->mOSDep.UnlockSpinlock           = UnlockSpinlock          ;
+    aThis->mOSDep.UnlockSpinlockFromThread = UnlockSpinlockFromThread;
 }
 
 // aThis [---;RW-]
@@ -947,6 +951,8 @@ int Release( struct inode * aINode, struct file * aFile )
     return 0;
 }
 
+// CRITICAL PATH  Interrupt
+//                1 / hardware interrupt
 irqreturn_t ProcessIrq( int aIrq, void * aDevId )
 {
     DeviceContext * lThis = aDevId;
@@ -968,6 +974,8 @@ irqreturn_t ProcessIrq( int aIrq, void * aDevId )
     return IRQ_HANDLED;
 }
 
+// CRITICAL PATH  Interrupt
+//                1 / hardware interrupt + 1 / tick
 void Tasklet( unsigned long aData )
 {
     DeviceContext * lThis = (DeviceContext *)( aData ); // reinterpret_cast
@@ -987,6 +995,8 @@ void Tasklet( unsigned long aData )
     }
 }
 
+// CRITICAL PATH  Interrupt
+//                1 / tick
 void Timer( struct timer_list * aTimer )
 {
     DeviceContext * lThis = container_of( aTimer, DeviceContext, mTimer );
@@ -1018,7 +1028,6 @@ void Work( struct work_struct * aWork )
 
 // ===== OSDep ==============================================================
 
-// AllocateMemory ==> FreeMemory
 void * AllocateMemory( unsigned int aSize_byte )
 {
     // printk( KERN_DEBUG "%s( %u bytes )", __FUNCTION__, aSize_byte );
@@ -1029,7 +1038,6 @@ void * AllocateMemory( unsigned int aSize_byte )
     return kmalloc( aSize_byte, GFP_KERNEL );
 }
 
-// AllocateMemory ==> FreeMemory
 void FreeMemory( void * aMemory )
 {
     // printk( KERN_DEBUG "%s( 0x%p )\n", __FUNCTION__, aMemory );
@@ -1050,7 +1058,6 @@ uint64_t GetTimeStamp()
     return lResult;
 }
 
-// MapBuffer ==> UnmapBuffer or FreeCallback
 void * MapBuffer( void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, unsigned int aSize_byte, uint64_t aMarker_PA, volatile void * * aMarker_MA )
 {
     unsigned int i;
@@ -1094,7 +1101,6 @@ void * MapBuffer( void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, u
     return NULL;
 }
 
-// MapBuffer ==> UnmapBuffer
 void UnmapBuffer( void * aContext, void * aBuffer_MA, unsigned int aSize_byte, volatile void * aMarker_MA )
 {
     unsigned int i;
@@ -1123,7 +1129,6 @@ void UnmapBuffer( void * aContext, void * aBuffer_MA, unsigned int aSize_byte, v
     printk( KERN_ERR "%s - Invalid buffer\n", __FUNCTION__ );
 }
 
-// MapSharedMemory ==> UnmapSharedMemory
 void * MapSharedMemory( void * aContext, void * aShared_VA, unsigned int aSize_byte )
 {
     int lRet;
@@ -1179,7 +1184,6 @@ void * MapSharedMemory( void * aContext, void * aShared_VA, unsigned int aSize_b
     return lThis->mShared;
 }
 
-// MapSharedMemory ==> UnmapSharedMemory
 static void UnmapSharedMemory( void * aContext )
 {
     unsigned int i;
@@ -1220,11 +1224,29 @@ void LockSpinlock( void * aLock )
     spin_lock( aLock );
 }
 
+uint32_t LockSpinlockFromThread( void * aLock )
+{
+    unsigned long lResult;
+
+    ASSERT( NULL != aLock );
+
+    spin_lock_irqsave( aLock, lResult );
+
+    return lResult;
+}
+
 void UnlockSpinlock( void * aLock )
 {
     ASSERT( NULL != aLock );
 
     spin_unlock( aLock );
+}
+
+void UnlockSpinlockFromThread( void * aLock, uint32_t aFlags )
+{
+    ASSERT( NULL != aLock );
+
+    spin_unlock_irqrestore( aLock, aFlags );
 }
 
 // ===== NVIDIA callback ====================================================

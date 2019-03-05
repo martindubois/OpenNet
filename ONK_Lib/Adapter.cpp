@@ -36,8 +36,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #ifdef _TRACE_BUFFER_STATE_CHANGE_
-    #define TRACE_BUFFER_STATE_CHANGE(B,F,T)
-#else
 
     #ifdef _KMS_LINUX_
         #define TRACE_BUFFER_STATE_CHANGE(B,F,T) printk( KERN_INFO "%s - A%u B%u - %s ==> %s" DEBUG_EOL, __FUNCTION__, mAdapterNo, (B), (F), (T))
@@ -47,6 +45,8 @@
         #define TRACE_BUFFER_STATE_CHANGE(B,F,T) DbgPrintEx( DEBUG_ID, DEBUG_STATE_CHANGE, __FUNCTION__ " - A%u B%u - %s ==> %s" DEBUG_EOL, mAdapterNo, (B), (F), (T))
     #endif
 
+#else
+    #define TRACE_BUFFER_STATE_CHANGE(B,F,T)
 #endif
 
 // Constants
@@ -222,10 +222,10 @@ namespace OpenNetK
 
     // aBuffer [-K-;RW-]
     //
-    // CRITICAL PATH - Buffer
-    //
-    // Level   SoftInt
-    // Thread  SoftInt
+    // Level  SoftInt
+
+    // CRITICAL PATH  Interrupt.Tx
+    //                1 to AdapterQty / buffer
     void Adapter::Buffer_SendPackets(BufferInfo * aBufferInfo)
     {
         // TRACE_DEBUG "%s(  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
@@ -312,14 +312,14 @@ namespace OpenNetK
         ASSERT(   0 != mSystemId          );
         ASSERT(NULL != mZone0             );
 
-        mZone0->Lock();
+        uint32_t lFlags = mZone0->LockFromThread();
 
             if (0 < mBuffer.mCount)
             {
                 Stop_Zone0();
             }
 
-        mZone0->Unlock();
+        mZone0->UnlockFromThread( lFlags );
 
         mAdapters[ mAdapterNo ] = NULL;
 
@@ -332,9 +332,10 @@ namespace OpenNetK
         mSystemId           =                  0;
     }
 
-    // CRITICAL PATH
-    //
-    // Level    SoftInt
+    // Level  SoftInt
+
+    // CRITICAL PATH  Interrupt
+    //                1 / hardware interrupt + 1 / tick
     void Adapter::Interrupt_Process2(bool * aNeedMoreProcessing)
     {
         // TRACE_DEBUG "%s(  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
@@ -596,10 +597,10 @@ namespace OpenNetK
 
     // aBufferInfo [-K-;R--]
     //
-    // CRITICAL PATH - Buffer
-    //
-    // Level    SoftInt
-    // Threads  Queue or SoftInt
+    // Level  SoftInt
+
+    // CRITICAL PATH  Interrupt.Rx
+    //                1 / buffer
     void Adapter::Buffer_Receive_Zone0(BufferInfo * aBufferInfo)
     {
         // TRACE_DEBUG "%s(  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
@@ -629,9 +630,10 @@ namespace OpenNetK
 
     // aBufferInfo [-K-;R--]
     //
-    // CRITICAL PATH - Buffer
-    //
-    // Level   SoftInt
+    // Level  SoftInt
+
+    // CRITICAL PATH  Interrupt.Tx
+    //                1 / buffer
     void Adapter::Buffer_Send_Zone0(BufferInfo * aBufferInfo)
     {
         // TRACE_DEBUG "%s(  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
@@ -661,8 +663,9 @@ namespace OpenNetK
     }
 
     // aBufferInfo [---;RW-]
-    //
-    // CRITICAL PATH - Buffer
+
+    // CRITICAL PATH  Interrupt.Rx
+    //                1 / buffer
     void Adapter::Buffer_WriteMarker_Zone0(BufferInfo * aBufferInfo)
     {
         // TRACE_DEBUG "%s(  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
@@ -773,9 +776,10 @@ namespace OpenNetK
     }
 
     // ===== Buffer_State ===================================================
-    // CRITICAL PATH - Buffer
-    //
-    // Level   SoftInt
+    // Level  SoftInt
+
+    // CRITICAL PATH  Interrupt
+    //                1 / buffer
 
     // aBufferInfo [---;R--]
     void Adapter::Buffer_PxRunning_Zone0(BufferInfo * aBufferInfo)
@@ -1179,7 +1183,7 @@ namespace OpenNetK
 
         OpenNetK_IoCtl_Result lResult;
 
-        mZone0->Lock();
+        uint32_t lFlags = mZone0->LockFromThread();
 
             // TODO  ONK_Lib.Adapter
             //       High - Refuse to start if the number of buffer may cause
@@ -1210,7 +1214,7 @@ namespace OpenNetK
                 lResult = IOCTL_RESULT_TOO_MANY_BUFFER;
             }
 
-        mZone0->Unlock();
+        mZone0->UnlockFromThread( lFlags );
 
         return lResult;
     }
@@ -1322,7 +1326,7 @@ namespace OpenNetK
 
         OpenNetK_IoCtl_Result lResult;
 
-        mZone0->Lock();
+        uint32_t lFlags = mZone0->LockFromThread();
 
             if (0 < mBuffer.mCount)
             {
@@ -1335,7 +1339,7 @@ namespace OpenNetK
                 lResult = IOCTL_RESULT_NO_BUFFER;
             }
 
-        mZone0->Unlock();
+        mZone0->UnlockFromThread( lFlags );
 
         mStatistics[ADAPTER_STATS_IOCTL_STOP] ++;
 

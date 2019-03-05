@@ -221,6 +221,10 @@ namespace OpenNet
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         virtual Status Display(FILE * aOut) const = 0;
 
+    // Internal
+
+        virtual ~Processor();
+
     protected:
 
         Processor();

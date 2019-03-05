@@ -3,7 +3,8 @@
 // Product  OpenNet
 // File     OpenNet/Kernel.cpp
 
-#define __CLASS__ "Kernel::"
+#define __CLASS__     "Kernel::"
+#define __NAMESPACE__ "OpenNet::"
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -26,6 +27,7 @@
 
 // ===== OpenNet ============================================================
 #include "Constants.h"
+#include "Event.h"
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
@@ -127,11 +129,6 @@ namespace OpenNet
         return mCommandQueue;
     }
 
-    bool Kernel::IsProfilingEnabled() const
-    {
-        return mProfilingEnabled;
-    }
-
     // ===== SourceCode =====================================================
 
     Kernel::~Kernel()
@@ -139,8 +136,6 @@ namespace OpenNet
         assert( NULL != mStatistics );
 
         Invalidate();
-
-        // printf( __CLASS__ "~Kernel - delete [] 0x%lx (mStatistics)\n", reinterpret_cast< uint64_t >( mStatistics ) );
 
         // new ==> delete  See the constructor
         delete [] mStatistics;
@@ -326,17 +321,17 @@ namespace OpenNet
         mCommandQueue = aCommandQueue;
     }
 
-    // aQueued
-    // aSubmit
-    // aStart
-    // aEnd
-    void Kernel::AddStatistics(uint64_t aQueued, uint64_t aSubmit, uint64_t aStart, uint64_t aEnd)
+    // aEvent [---;R--]
+
+    // CRITICAL PATH  Processing.Profiling
+    //                1 / iteration
+    void Kernel::AddStatistics( Event * aEvent )
     {
         uint64_t lLast[3];
 
-        lLast[0] = (aSubmit - aQueued) / 1000;
-        lLast[1] = (aStart  - aSubmit) / 1000;
-        lLast[2] = (aEnd    - aStart ) / 1000;
+        lLast[0] = aEvent->GetQueued   ();
+        lLast[1] = aEvent->GetSubmitted();
+        lLast[2] = aEvent->GetExecution();
 
         for (unsigned int i = 0; i < 3; i++)
         {
@@ -376,6 +371,7 @@ namespace OpenNet
         return mBuildLog;
     }
 
+    // Kernel::AllocateBuildLog ==> Kernel::Invalidate
     char * Kernel::AllocateBuildLog( size_t aSize_byte )
     {
         assert( 0 < aSize_byte );
@@ -507,8 +503,6 @@ namespace OpenNet
 
         if (NULL != mBuildLog)
         {
-            // printf( __CLASS__ "Invalidate - delete [] 0x%lx (mBuildLog)\n", reinterpret_cast< uint64_t >( mBuildLog ) );
-
             // new ==> delete  See AllocateBuildLog
             delete[] mBuildLog;
 
@@ -518,9 +512,6 @@ namespace OpenNet
         if (NULL != mCodeLines)
         {
             assert(NULL != mCodeLineBuffer);
-
-            // printf( __CLASS__ "Invalidate - delete 0x%lx (mCodeLineBuffer)\n", reinterpret_cast< uint64_t >( mCodeLineBuffer ) );
-            // printf( __CLASS__ "Invalidate - delete 0x%lx (mCodeLines)\n"     , reinterpret_cast< uint64_t >( mCodeLines      ) );
 
             // new ==> delete  See CodeLines_Generate
             delete[] mCodeLineBuffer;

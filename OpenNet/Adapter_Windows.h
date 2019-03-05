@@ -25,7 +25,7 @@ public:
 
     Adapter_Windows(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog);
 
-    void Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers);
+    void Buffers_Allocate( bool aProfiling, cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers);
 
     // ===== OpenNet::Adapter ===============================================
 

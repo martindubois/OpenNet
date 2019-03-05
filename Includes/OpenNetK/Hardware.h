@@ -191,6 +191,7 @@ namespace OpenNetK
         /// \param  aNeedMoreProcessing [---;-W-]
         /// \retval The adapter did not cause the interrupt.
         /// \retval The adapter caused the interrupt.
+        /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
         /// \brief  traiter une interruption
@@ -199,16 +200,19 @@ namespace OpenNetK
         /// \param  aNeedMoreProcessing [---;-W-]
         /// \retval false L'adaptateur n'a pas cause l'interruption.
         /// \retval true  L'adaptateur a cause l'interruption.
+        /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual bool Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing);
 
         /// \cond en
         /// \brief  Process an interrupt at seconde level
         /// \param  aNeedMoreProcessing [---;-W-]
+        /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
         /// \brief  Traiter une interruption au second niveau
         /// \param  aNeedMoreProcessing [---;-W-]
+        /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual void Interrupt_Process2(bool * aNeedMoreProcessing);
 
@@ -225,17 +229,21 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Lock the hardware
+        /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
         /// \brief  Verouiller l'acces au materiel
+        /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         void Lock();
 
         /// \cond en
         /// \brief  Unlock the hardware
+        /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
         /// \brief  Deverouiller l'acces au materiel
+        /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         void Unlock();
 
@@ -243,27 +251,31 @@ namespace OpenNetK
         /// \brief  Unlock the hardware after programming receive descriptors
         /// \param  aCounter    The counter to increment
         /// \param  aPacketQty  The number of descriptor programmed
+        /// \param  aFlags      Value to pass to SpinLock::UnlockFromThread
         /// \endcond
         /// \cond fr
         /// \brief  Deverouiller l'acces au materiel apres avoir programmer
         ///         des descripteurs de reception
         /// \param  aCounter    Le compteur a incrementer
         /// \param  aPacketQty  Le nombre de descripteurs programmes
+        /// \param  aFlags      La valeur a passer a SpinLock::UnlockFromThread
         /// \endcond
-        virtual void Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacketQty);
+        void Unlock_AfterReceive_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags );
 
         /// \cond en
         /// \brief  Unlock the hardware after programming transmit descriptors
         /// \param  aCounter    The counter to increment
         /// \param  aPacketQty  The number of descriptor programmed
+        /// \param  aFlags      Value to pass to SpinLock::UnlockFromThread
         /// \endcond
         /// \cond fr
         /// \brief  Deverouiller l'acces au materiel apres avoir programmer
         ///         des descripteurs de transmission
         /// \param  aCounter    Le compteur a incrementer
         /// \param  aPacketQty  Le nombre de descripteurs programmes
+        /// \param  aFlags      La valeur a passer a SpinLock::UnlockFromThread
         /// \endcond
-        void Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty);
+        void Unlock_AfterSend_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags );
 
         /// \cond en
         /// \brief  Add a buffer to the receiving queue.
@@ -286,11 +298,13 @@ namespace OpenNetK
         /// \brief  Add the buffer to the receiving queue.
         /// \param  aPacket   The Packet
         /// \param  aCounter  The operation counter
+        /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le buffer a la queue de reception
         /// \param  aPacket   Le Packet
         /// \param  aCounter  Le compteur d'operation
+        /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual void Packet_Receive_NoLock(Packet * aPacket, volatile long * aCounter) = 0;
 
@@ -300,6 +314,7 @@ namespace OpenNetK
         /// \param  aPacket_XA  The data (C or M)
         /// \param  aSize_byte  The data size
         /// \param  aCounter    The operation counter
+        /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
         /// \brief  Ajoute le paquet a la queue de transmission
@@ -307,6 +322,7 @@ namespace OpenNetK
         /// \param  aPacket_XA  Les donnees (C or M)
         /// \param  aSize_byte  La taille des donnees
         /// \param  aCounter    Le compteur d'operation
+        /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual void Packet_Send_NoLock(uint64_t aPacket_PA, const void * aPacket_XA, unsigned int aSize_byte, volatile long * aCounter) = 0;
 
@@ -366,6 +382,9 @@ namespace OpenNetK
 
         void Tick();
 
+        void Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacketQty);
+        void Unlock_AfterSend   (volatile long * aCounter, unsigned int aPacketQty);
+
     protected:
 
         /// \cond en
@@ -408,17 +427,21 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Hardware dependent part of the Unlock_AfterReceive
+        /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
         /// \brief  La partie de Unlock_AfterReceive qui depend du materiel
+        /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual void Unlock_AfterReceive_Internal() = 0;
 
         /// \cond en
         /// \brief  Hardware dependent part of the Unlock_AfterSend
+        /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
         /// \brief  La partie de Unlock_AfterSend qui depend du materiel
+        /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual void Unlock_AfterSend_Internal() = 0;
 

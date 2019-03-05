@@ -25,8 +25,10 @@ static void   FreeMemory(void * aMemory);
 
 static uint64_t GetTimeStamp();
 
-static void   LockSpinlock(void * aLock);
-static void   UnlockSpinlock(void * aLock);
+static void     LockSpinlock            (void * aLock);
+static uint32_t LockSpinlockFromThread  (void * aLock);
+static void     UnlockSpinlock          (void * aLock);
+static void     UnlockSpinlockFromThread(void * aLock);
 
 static void * MapBuffer(void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, unsigned int aSize_byte, uint64_t aMarker_PA, volatile void * * aMarker_MA );
 static void   UnmapBuffer(void * aContext, void * aBuffer_MA, unsigned int aSize_byte, volatile void * aMarker_MA);
@@ -47,15 +49,17 @@ void OSDep_Init(OpenNetK_OSDep * aOSDep, void * aContext)
 
     aOSDep->mContext = aContext;
 
-    aOSDep->AllocateMemory    = AllocateMemory   ;
-    aOSDep->FreeMemory        = FreeMemory       ;
-    aOSDep->GetTimeStamp      = GetTimeStamp     ;
-    aOSDep->LockSpinlock      = LockSpinlock     ;
-    aOSDep->MapBuffer         = MapBuffer        ;
-    aOSDep->MapSharedMemory   = MapSharedMemory  ;
-    aOSDep->UnlockSpinlock    = UnlockSpinlock   ;
-    aOSDep->UnmapBuffer       = UnmapBuffer      ;
-    aOSDep->UnmapSharedMemory = UnmapSharedMemory;
+    aOSDep->AllocateMemory           = AllocateMemory          ;
+    aOSDep->FreeMemory               = FreeMemory              ;
+    aOSDep->GetTimeStamp             = GetTimeStamp            ;
+    aOSDep->LockSpinlock             = LockSpinlock            ;
+    aOSDep->LockSpinlockFromThread   = LockSpinlockFromThread  ;
+    aOSDep->MapBuffer                = MapBuffer               ;
+    aOSDep->MapSharedMemory          = MapSharedMemory         ;
+    aOSDep->UnlockSpinlock           = UnlockSpinlock          ;
+    aOSDep->UnlockspinlockFromThread = UnlockspinlockFromThread;
+    aOSDep->UnmapBuffer              = UnmapBuffer             ;
+    aOSDep->UnmapSharedMemory        = UnmapSharedMemory       ;
 };
 
 // Static functions
@@ -93,9 +97,26 @@ void LockSpinlock(void * aLock)
     WdfSpinLockAcquire(reinterpret_cast<WDFSPINLOCK>(aLock));
 }
 
+uint32_t LockSpinlockFromThread(void * aLock)
+{
+    ASSERT(NULL != aLock);
+
+    WdfSpinLockAcquire(reinterpret_cast<WDFSPINLOCK>(aLock));
+
+    return 0;
+}
+
 void UnlockSpinlock(void * aLock)
 {
     ASSERT(NULL != aLock);
+
+    WdfSpinLockRelease(reinterpret_cast<WDFSPINLOCK>(aLock));
+}
+
+void UnlockSpinlock(void * aLock, uint32_t aFlags)
+{
+    ASSERT(NULL != aLock );
+    ASSERT(   0 == aFlags);
 
     WdfSpinLockRelease(reinterpret_cast<WDFSPINLOCK>(aLock));
 }

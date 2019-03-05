@@ -66,12 +66,32 @@ namespace OpenNetK
         void Lock();
 
         /// \cond en
+        /// \brief  Lock
+        /// \return Value to pass to UnlockFromThread
+        /// \endcond
+        /// \cond fr
+        /// \brief  Verouiller
+        /// \return La valeur a passer a UnlockFromThread
+        /// \endcond
+        uint32_t LockFromThread();
+
+        /// \cond en
         /// \brief  Unlock
         /// \endcond
         /// \cond fr
         /// \brief  Deverouiller
         /// \endcond
         void Unlock();
+
+        /// \cond en
+        /// \brief  Unlock
+        /// \param  aFlags  The value returned by LockFromThread
+        /// \endcond
+        /// \cond fr
+        /// \brief  Deverouiller
+        /// \param  aFlags  La valeur retourner par LockFromThread
+        /// \endcond
+        void UnlockFromThread( uint32_t aFlags );
 
     private:
 

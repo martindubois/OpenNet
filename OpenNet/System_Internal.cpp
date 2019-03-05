@@ -73,13 +73,11 @@ System_Internal::System_Internal()
     mDebugLog.Log( "System_Internal::System_Internal - OK" );
 }
 
-// Threads  Apps
+// ===== OpenNet::System ====================================================
+
 System_Internal::~System_Internal()
 {
-    // printf( __CLASS__ "~System_Internal()\n" );
 }
-
-// ===== OpenNet::System ====================================================
 
 OpenNet::Status System_Internal::GetConfig(Config * aOut) const
 {

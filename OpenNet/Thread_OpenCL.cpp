@@ -74,20 +74,18 @@ void Thread_OpenCL::Prepare(Processor_OpenCL * aProcessor, Adapter_Vector * aAda
     }
 }
 
+// aEvent      [---;RW-]
 // aGlobalSize [---;R--]
 // aLocalSize  [--O;R--]
-// aEvent      [---;-W-] This methode return a newly created cl_event here.
-//                       This event will be signaled at the end of
-//                       processing. This event must be passed to
-//                       Processing_Wait.
-//
-// CRITICAL PATH - Buffer
 //
 // Processing_Queue ==> Processing_Wait
-void Thread_OpenCL::Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalSize, cl_event * aEvent)
+
+// CRITICAL PATH  Processing
+//                1 / iteration
+void Thread_OpenCL::Processing_Queue( Event_OpenCL * aEvent, const size_t * aGlobalSize, const size_t * aLocalSize )
 {
-    assert(NULL != aGlobalSize);
     assert(NULL != aEvent     );
+    assert(NULL != aGlobalSize);
 
     assert(NULL != mCommandQueue);
     assert(NULL != mKernel_CL   );
@@ -95,35 +93,9 @@ void Thread_OpenCL::Processing_Queue(const size_t * aGlobalSize, const size_t * 
     size_t lGO = 0;
 
     // OCLW_EnqueueNDRangeKernel ==> OCLW_ReleaseEvent  See Processing_Wait
-    OCLW_EnqueueNDRangeKernel(mCommandQueue, mKernel_CL, 1, &lGO, aGlobalSize, aLocalSize, 0, NULL, aEvent);
+    OCLW_EnqueueNDRangeKernel(mCommandQueue, mKernel_CL, 1, &lGO, aGlobalSize, aLocalSize, 0, NULL, aEvent->mEvent);
 
     OCLW_Flush(mCommandQueue);
-}
-
-// aEvent  [D--;RW-] The cl_event Processing_Queue created
-// aKernel [---;RW-]
-//
-// CRITICAL PATH - Buffer
-//
-// Processing_Queue ==> Processing_Wait
-void Thread_OpenCL::Processing_Wait(cl_event aEvent, OpenNet::Kernel * aKernel)
-{
-    assert(NULL != aEvent );
-    assert(NULL != aKernel);
-
-    OCLW_WaitForEvents(1, &aEvent);
-
-    if (aKernel->IsProfilingEnabled())
-    {
-        uint64_t lQueued = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_QUEUED);
-        uint64_t lSubmit = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_SUBMIT);
-        uint64_t lStart  = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_START );
-        uint64_t lEnd    = GetEventProfilingInfo(aEvent, CL_PROFILING_COMMAND_END   );
-
-        aKernel->AddStatistics(lQueued, lSubmit, lStart, lEnd);
-    }
-
-    OCLW_ReleaseEvent(aEvent);
 }
 
 // aKernel [---;RW-]
@@ -164,10 +136,11 @@ void Thread_OpenCL::Release(OpenNet::Kernel * aKernel)
 //
 // Return  This method return the retrieved information
 //
-// CRITICAL PATH - Buffer
-//
 // Exception  KmsLib::Exception *  See OCLW_GetEventProfilingInfo
 // Thread     Worker
+
+// CRITICAL PATH  Processing.Profiling
+//                4 / iteration
 uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam)
 {
     assert(NULL != aEvent);

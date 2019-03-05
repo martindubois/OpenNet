@@ -44,7 +44,7 @@ void Intel::GetState(OpenNetK::Adapter_State * aState)
 
     ASSERT(NULL != mZone0);
 
-    mZone0->Lock();
+    uint32_t lFlags = mZone0->LockFromThread();
 
         ASSERT(NULL != mBAR1_MA);
 
@@ -74,7 +74,7 @@ void Intel::GetState(OpenNetK::Adapter_State * aState)
             ASSERT(false);
         }
 
-    mZone0->Unlock();
+    mZone0->UnlockFromThread( lFlags );
 }
 
 void Intel::ResetMemory()
@@ -83,11 +83,11 @@ void Intel::ResetMemory()
 
     Hardware::ResetMemory();
 
-    mZone0->Lock();
+    uint32_t lFlags = mZone0->LockFromThread();
 
         mBAR1_MA = NULL;
 
-    mZone0->Unlock();
+    mZone0->UnlockFromThread( lFlags );
 }
 
 void Intel::SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA)
@@ -98,7 +98,7 @@ void Intel::SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA)
 
     ASSERT(NULL != mZone0);
 
-    mZone0->Lock();
+    uint32_t lFlags = mZone0->LockFromThread();
 
         uint64_t  lCommon_PA = aCommon_PA;
         uint8_t * lCommon_CA = reinterpret_cast<uint8_t *>(aCommon_CA);
@@ -131,7 +131,7 @@ void Intel::SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA)
             mTx_CA[i].mFields.mReportStatus = true;
         }
 
-    mZone0->Unlock();
+    mZone0->UnlockFromThread( lFlags );
 }
 
 // NOT TESTED  ONK_Intel.Intel.ErrorHandling
@@ -153,7 +153,7 @@ bool Intel::SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int aSize
             return false;
         }
 
-        mZone0->Lock();
+        uint32_t lFlags = mZone0->LockFromThread();
 
             ASSERT(NULL == mBAR1_MA);
 
@@ -161,7 +161,7 @@ bool Intel::SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int aSize
 
             Interrupt_Disable_Zone0();
 
-        mZone0->Unlock();
+        mZone0->UnlockFromThread( lFlags );
         break;
     }
 
@@ -174,7 +174,7 @@ void Intel::D0_Entry()
 
     ASSERT(NULL != mZone0);
 
-    mZone0->Lock();
+    uint32_t lFlags = mZone0->LockFromThread();
 
         ASSERT(NULL != mBAR1_MA);
 
@@ -201,7 +201,7 @@ void Intel::D0_Entry()
 
         mBAR1_MA->mDeviceControl.mValue = lCTRL.mValue;
 
-    mZone0->Unlock();
+    mZone0->UnlockFromThread( lFlags );
 
     Hardware::D0_Entry();
 }
@@ -223,14 +223,13 @@ void Intel::Interrupt_Disable()
 
     Hardware::Interrupt_Disable();
 
-    mZone0->Lock();
+    uint32_t lFlags = mZone0->LockFromThread();
 
         Interrupt_Disable_Zone0();
 
-    mZone0->Unlock();
+    mZone0->UnlockFromThread( lFlags );
 }
 
-// CRITICAL PATH
 bool Intel::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing)
 {
     // TRACE_DEBUG "%s( %u, 0x%p )" DEBUG_EOL, __FUNCTION__, aMessageId, aNeedMoreProcessing TRACE_END;
@@ -246,7 +245,6 @@ bool Intel::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessin
     return true;
 }
 
-// CRITICAL PATH
 void Intel::Interrupt_Process2(bool * aNeedMoreProcessing)
 {
     // TRACE_DEBUG "%s( 0x%p )" DEBUG_EOL, __FUNCTION__, aNeedMoreProcessing TRACE_END;
@@ -273,7 +271,7 @@ bool Intel::Packet_Drop()
 
     bool lResult;
 
-    Lock();
+    uint32_t lFlags = mZone0->LockFromThread();
 
     lResult = ( ( 0 >= mPacketBuffer_Counter[ mPacketBuffer_In ] ) && ( Rx_GetAvailableDescriptor_Zone0() > 0 ) );
     if ( lResult )
@@ -286,17 +284,16 @@ bool Intel::Packet_Drop()
 
         mPacketBuffer_In = (mPacketBuffer_In + 1) % PACKET_BUFFER_QTY;
 
-        Unlock_AfterReceive( lCounter, 1 );
+        Unlock_AfterReceive_FromThread( lCounter, 1, lFlags );
     }
     else
     {
-        Unlock();
+        mZone0->UnlockFromThread( lFlags );
     }
 
     return lResult;
 }
 
-// CRITICAL PATH - Packet
 void Intel::Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile long * aCounter)
 {
     // TRACE_DEBUG "%s( 0x%p, 0x%p )" DEBUG_EOL, __FUNCTION__, aPacketData, aCounter TRACE_END;
@@ -319,7 +316,6 @@ void Intel::Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile long * aC
     mRx_In = (mRx_In + 1) % RX_DESCRIPTOR_QTY;
 }
 
-// CRITICAL PATH - Packet
 void Intel::Packet_Send_NoLock(uint64_t aData_PA, const void *, unsigned int aSize_byte, volatile long * aCounter)
 {
     // TRACE_DEBUG "%s( 0x%llx, , %u bytes, 0x%p )" DEBUG_EOL, __FUNCTION__, aData_PA, aSize_byte, aCounter TRACE_END;
@@ -339,7 +335,6 @@ void Intel::Packet_Send_NoLock(uint64_t aData_PA, const void *, unsigned int aSi
     mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
 }
 
-// CRITICAL PATH
 bool Intel::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
 {
     // TRACE_DEBUG "%s( 0x%p, %u bytes, %u )" DEBUG_EOL, __FUNCTION__, aPacket, aSize_byte, aRepeatCount TRACE_END;
@@ -349,11 +344,10 @@ bool Intel::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned 
     ASSERT(    0 <  aRepeatCount );
 
     ASSERT(NULL != mTx_CA);
-    ASSERT(NULL != mZone0);
 
     bool lResult;
 
-    Lock();
+    uint32_t lFlags = mZone0->LockFromThread();
 
     ASSERT(NULL != mBAR1_MA);
 
@@ -375,11 +369,11 @@ bool Intel::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned 
 
         mPacketBuffer_In = (mPacketBuffer_In + 1) % PACKET_BUFFER_QTY;
 
-        Unlock_AfterSend(lCounter, aRepeatCount);
+        Unlock_AfterSend_FromThread(lCounter, aRepeatCount, lFlags);
     }
     else
     {
-        Unlock_AfterSend(NULL, 0);
+        mZone0->UnlockFromThread( lFlags );
     }
 
     return lResult;
@@ -476,10 +470,10 @@ void Intel::Statistics_Update()
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
-// CRITICAL PATH
-//
 // Level   SoftInt
-// Thread  SoftInt
+
+// CRITICAL PATH  Interrupt.Rx
+//                1 / hardware interrupt + 1 / tick
 void Intel::Rx_Process_Zone0()
 {
     // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
@@ -518,10 +512,10 @@ unsigned int Intel::Rx_GetAvailableDescriptor_Zone0()
     return ((mRx_Out + RX_DESCRIPTOR_QTY - mRx_In - 1) % RX_DESCRIPTOR_QTY);
 }
 
-// CRITICAL PATH
-//
-// Level   SoftInt
-// Thread  SoftInt
+// Level  SoftInt
+
+// CRITICAL PATH  Interrupt.Tx
+//                1 / hardware interrupt + 1 / tick
 void Intel::Tx_Process_Zone0()
 {
     // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;

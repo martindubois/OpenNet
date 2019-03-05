@@ -17,6 +17,7 @@
 
 // ===== OpenNet ============================================================
 #include "Buffer_Data_CUDA.h"
+#include "CUW.h"
 
 #include "Thread_Functions_CUDA.h"
 
@@ -28,6 +29,10 @@ Thread_Functions_CUDA::Thread_Functions_CUDA(Processor_Internal * aProcessor, bo
     : Thread_Functions( aProcessor, aProfilingEnabled, aDebugLog )
     , Thread_CUDA     ( aProcessor )
 {
+    for ( unsigned int i = 0; i < QUEUE_DEPTH; i ++ )
+    {
+        mEvents[ i ] = mEvent_CUDA + i;
+    }
 }
 
 // ===== Thread =============================================================
@@ -35,15 +40,19 @@ Thread_Functions_CUDA::Thread_Functions_CUDA(Processor_Internal * aProcessor, bo
 void Thread_Functions_CUDA::Prepare()
 {
     assert(NULL != mKernel    );
+    assert(NULL == mModule    );
     assert(NULL != mProcessor );
 
     Processor_CUDA * lProcessor = dynamic_cast< Processor_CUDA * >( mProcessor );
     assert( NULL != lProcessor );
 
+    // Processor_CUDA::Module_Create ==> CUW_ModuleUnload  See Release
     mModule = lProcessor->Module_Create( & mKernelFunctions );
     assert( NULL != mModule );
 
-    Thread_CUDA::Prepare( & mAdapters, & mBuffers, EVENT_QTY );
+    Thread_CUDA::Prepare( & mAdapters, & mBuffers, QUEUE_DEPTH );
+
+    Thread_Functions::Prepare();
 }
 
 // Protected
@@ -55,10 +64,11 @@ void Thread_Functions_CUDA::Processing_Queue(unsigned int aIndex)
 {
     // printf( __CLASS__ "Processing_Queue( %u )\n", aIndex );
 
-    assert(EVENT_QTY > aIndex);
+    assert(QUEUE_DEPTH > aIndex);
 
     assert( NULL != mArguments  );
     assert( NULL != mBuffers[0] );
+    assert( NULL != mEvents[ aIndex ] );
     assert( NULL != mKernel     );
 
     size_t lLS = mBuffers[0]->GetPacketQty();
@@ -66,12 +76,7 @@ void Thread_Functions_CUDA::Processing_Queue(unsigned int aIndex)
 
     assert( 0 < lGS );
 
-    Thread_CUDA::Processing_Queue( mKernel, & lGS, & lLS, mArguments );
-}
-
-void Thread_Functions_CUDA::Processing_Wait(unsigned int aIndex)
-{
-    Thread_CUDA::Processing_Wait();
+    Thread_CUDA::Processing_Queue( mKernel, mEvents[ aIndex ], & lGS, & lLS, mArguments );
 }
 
 void Thread_Functions_CUDA::Run_Start()
@@ -102,6 +107,10 @@ void Thread_Functions_CUDA::Run_Start()
 void Thread_Functions_CUDA::Release()
 {
     assert( NULL != mKernel );
+    assert( NULL != mModule );
 
     Thread_CUDA::Release( mKernel );
+
+    // Processor_CUDA::Module_Create ==> CUW_ModuleUnload  See Prepare
+    CUW_ModuleUnload( mModule );
 }

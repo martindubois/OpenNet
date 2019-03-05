@@ -108,7 +108,7 @@ unsigned int TestA::Stop()
         // DisplayAdapterStats(0);
         // DisplayAdapterStats(1);
 
-        unsigned int lBuffer_Max = 24100;
+        unsigned int lBuffer_Max = 30800;
         unsigned int lBuffer_Min =    76;
 
         unsigned int lPacket_Max = 1570000;
@@ -119,7 +119,7 @@ unsigned int TestA::Stop()
 
         InitAdapterConstraints();
 
-        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
+        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10200;
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMin =   250;
 
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFER_RECEIVE].mMax = lBuffer_Max;

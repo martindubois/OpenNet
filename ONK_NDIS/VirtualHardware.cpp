@@ -41,8 +41,9 @@ VirtualHardware::VirtualHardware() : mTx_Callback(NULL), mTx_Context(NULL)
 
 // aData [---;R--] The data
 // aSize_byte      The size
-//
-// CRITICAL PATH - Packet
+
+// CRITICAL PATH  Interrupt.Rx
+//                1 / packet
 void VirtualHardware::Rx_IndicatePacket(const void * aData, unsigned int aSize_byte)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_CONSTRUCTOR, PREFIX __FUNCTION__ "( , %u bytes )" DEBUG_EOL, aSize_byte);
@@ -114,12 +115,12 @@ void VirtualHardware::D0_Entry()
 
     ASSERT(NULL != mZone0);
 
-    mZone0->Lock();
+    uint32_t mZone0->LockFromThread();
 
         mRx_In  = 0;
         mRx_Out = 0;
 
-    mZone0->Unlock();
+    mZone0->UnlockFromThread( lFlags );
 
     Hardware::D0_Entry();
 }
@@ -130,7 +131,8 @@ bool VirtualHardware::Packet_Drop()
     return false;
 }
 
-// CRITICAL PATH - Packet
+// CRITICAL PATH  Interrupt.Rx
+//                1 / packet
 void VirtualHardware::Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile long * aCounter)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
@@ -146,7 +148,8 @@ void VirtualHardware::Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile
     mRx_In = (mRx_In + 1) % RX_DESCRIPTOR_QTY;
 }
 
-// CRITICAL PATH - Packet
+// CRITICAL PATH  Interrupt.Tx
+//                1 / packet
 void VirtualHardware::Packet_Send_NoLock(uint64_t, const void * aVirtualAddress, unsigned int aSize_byte, volatile long * aCounter)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , , %u,  )" DEBUG_EOL, aSize_byte);
@@ -176,7 +179,6 @@ void VirtualHardware::Packet_Send_NoLock(uint64_t, const void * aVirtualAddress,
     InterlockedDecrement(aCounter);
 }
 
-// CRITICAL PATH
 bool VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
 {
     DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes, %u )" DEBUG_EOL, aSize_byte, aRepeatCount);
@@ -193,7 +195,7 @@ bool VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte,
     }
     else
     {
-        Lock();
+        uint32_t lFlags = mZone0->LockFromThread();
 
             for (unsigned int i = 0; i < aRepeatCount; i++)
             {
@@ -209,7 +211,7 @@ bool VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte,
                 }
             }
 
-        Unlock_AfterSend(NULL, aRepeatCount);
+        Unlock_AfterSend_FromThread(NULL, aRepeatCount, lFlags );
     }
 
     return true;

@@ -13,6 +13,7 @@
 
 // ===== C ==================================================================
 #include <assert.h>
+#include <stdint.h>
 
 #ifdef _KMS_WINDOWS_
     // ===== Windows ========================================================
@@ -20,6 +21,8 @@
 #endif
 
 // ===== OpenNet ============================================================
+#include "Event.h"
+
 #include "Thread_Functions.h"
 
 // Public
@@ -33,6 +36,8 @@ Thread_Functions::Thread_Functions(Processor_Internal * aProcessor, bool aProfil
 {
     assert(NULL != aProcessor);
     assert(NULL != aDebugLog );
+
+    mQueueDepth = QUEUE_DEPTH;
 
     if (aProfilingEnabled)
     {
@@ -80,8 +85,34 @@ void Thread_Functions::AddDispatchCode()
     delete[] lBufferQty;
 }
 
+// ===== Thread =============================================================
+
+void Thread_Functions::Prepare()
+{
+    assert( NULL != mKernel );
+
+    for ( unsigned int i = 0; i < QUEUE_DEPTH; i ++ )
+    {
+        assert( NULL != mEvents[ i ] );
+
+        mEvents[ i ]->Init( mKernel->IsProfilingEnabled() );
+    }
+
+    Thread::Prepare();
+}
+
 // Protected
 /////////////////////////////////////////////////////////////////////////////
+
+void Thread_Functions::Processing_Wait( unsigned int aIndex )
+{
+    assert( QUEUE_DEPTH >  aIndex  );
+
+    assert( NULL != mEvents[ aIndex ] );
+    assert( NULL != mKernel           );
+
+    Thread::Processing_Wait( mKernel, mEvents[ aIndex ] );
+}
 
 // ===== Thread =============================================================
 
@@ -90,46 +121,4 @@ void Thread_Functions::Release()
     assert(NULL != mProcessor);
 
     mProcessor->Thread_Release();
-}
-
-// CRITICAL PATH
-void Thread_Functions::Run_Loop()
-{
-    assert(NULL != mDebugLog);
-
-    try
-    {
-        unsigned lIndex = 0;
-
-        while (IsRunning())
-        {
-            Run_Iteration(lIndex);
-
-            lIndex = (lIndex + 1) % EVENT_QTY;
-        }
-
-        for (unsigned int i = 0; i < EVENT_QTY; i++)
-        {
-            Processing_Wait(lIndex);
-
-            lIndex = (lIndex + 1) % EVENT_QTY;
-        }
-    }
-    catch (KmsLib::Exception * eE)
-    {
-        mDebugLog->Log(__FILE__, __CLASS__ "Run_Loop", __LINE__);
-        mDebugLog->Log(eE);
-    }
-    catch (...)
-    {
-        mDebugLog->Log(__FILE__, __CLASS__ "Run_Loop", __LINE__);
-    }
-}
-
-void Thread_Functions::Run_Start()
-{
-    for (unsigned int i = 0; i < EVENT_QTY; i++)
-    {
-        Processing_Queue(i);
-    }
 }

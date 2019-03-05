@@ -48,19 +48,20 @@ void Thread_Kernel_CUDA::Prepare()
 
     Thread_CUDA::Prepare( & mAdapters, & mBuffers );
 
+    mQueueDepth = mBuffers.size();
+
     unsigned int lArgCount    = mKernel->GetArgumentCount();
-    unsigned int lBufferCount = mBuffers.size();
 
-    assert(                   1 <= lArgCount    );
-    assert(                   0 <  lBufferCount );
-    assert( OPEN_NET_BUFFER_QTY >= lBufferCount );
+    assert(                   1 <= lArgCount   );
+    assert(                   0 <  mQueueDepth );
+    assert( OPEN_NET_BUFFER_QTY >= mQueueDepth );
 
-    mArguments = new void * [ lBufferCount * lArgCount ];
+    mArguments = new void * [ mQueueDepth * lArgCount ];
     assert( NULL != mArguments );
 
-    memset( mArguments, 0, sizeof( void * ) * lBufferCount * lArgCount );
+    memset( mArguments, 0, sizeof( void * ) * mQueueDepth * lArgCount );
 
-    for ( unsigned int i = 0; i < lBufferCount; i ++ )
+    for ( unsigned int i = 0; i < mQueueDepth; i ++ )
     {
         Buffer_Data_CUDA * lBuffer = dynamic_cast< Buffer_Data_CUDA * >( mBuffers[ i ] );
         assert( NULL != lBuffer             );
@@ -93,12 +94,7 @@ void Thread_Kernel_CUDA::Processing_Queue( unsigned int aIndex )
 
     assert(0 < lGS);
 
-    Thread_CUDA::Processing_Queue( mKernel, & lGS, NULL, lArguments );
-}
-
-void Thread_Kernel_CUDA::Processing_Wait(unsigned int aIndex)
-{
-    Thread_CUDA::Processing_Wait();
+    Thread_CUDA::Processing_Queue( mKernel, mBuffers[ aIndex ]->GetEvent(), & lGS, NULL, lArguments );
 }
 
 void Thread_Kernel_CUDA::Run_Start()

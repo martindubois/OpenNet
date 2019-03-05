@@ -52,80 +52,80 @@
 #define EOL "\n"
 
 static const char * FUNCTION_DO_NOT_REPLY_ON_ERROR_0 =
-"OPEN_NET_FUNCTION_DECLARE( DoNotReplyOnError0 )"                                                       EOL
-"{"                                                                                                     EOL
-"    OPEN_NET_FUNCTION_BEGIN"                                                                           EOL
-                                                                                                        EOL
-"        OPEN_NET_GLOBAL unsigned char * lData   = lBase + lPacketInfo->mOffset_byte;"                  EOL
-"        unsigned int                    lResult = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );" EOL
-"        unsigned int                    i;"                                                            EOL
-                                                                                                        EOL
-"        for ( i = 0; i < 6; i ++)"                                                                     EOL
-"        {"                                                                                             EOL
-"            if ( 0xff != lData[ i ] )"                                                                 EOL
-"            {"                                                                                         EOL
-"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
-"            }"                                                                                         EOL
-"        }"                                                                                             EOL
-                                                                                                        EOL
-"        for ( i = 12; i < 14; i ++)"                                                                   EOL
-"        {"                                                                                             EOL
-"            if ( 0x0a != lData[ i ] )"                                                                 EOL
-"            {"                                                                                         EOL
-"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
-"            }"                                                                                         EOL
-"        }"                                                                                             EOL
-                                                                                                        EOL
-"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                                              EOL
-"        {"                                                                                             EOL
-"            if ( 0x00 != lData[ i ] )"                                                                 EOL
-"            {"                                                                                         EOL
-"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
-"            }"                                                                                         EOL
-"        }"                                                                                             EOL
-                                                                                                        EOL
-"        lPacketInfo->mSendTo = lResult;"                                                               EOL
-                                                                                                        EOL
-"    OPEN_NET_FUNCTION_END"                                                                             EOL
-"}"                                                                                                     EOL;
+"OPEN_NET_FUNCTION_DECLARE( DoNotReplyOnError0 )"                                          EOL
+"{"                                                                                        EOL
+"    OPEN_NET_FUNCTION_BEGIN"                                                              EOL
+                                                                                           EOL
+"        OPEN_NET_GLOBAL unsigned short * lData;"                                          EOL
+                                                                                           EOL
+"        unsigned int lResult = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );"       EOL
+"        unsigned int i;"                                                                  EOL
+                                                                                           EOL
+"        lData = (OPEN_NET_GLOBAL unsigned short *)( lBase + lPacketInfo->mOffset_byte );" EOL
+                                                                                           EOL
+"        for ( i = 0; i < 3; i ++)"                                                        EOL
+"        {"                                                                                EOL
+"            if ( 0xffff != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                     EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        if ( 0x0a0a != lData[ 6 ] )"                                                      EOL
+"        {"                                                                                EOL
+"            lResult = OPEN_NET_PACKET_PROCESSED;"                                         EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        for ( i = 7; i < ( lPacketInfo->mSize_byte / sizeof( unsigned short ) ); i ++)"   EOL
+"        {"                                                                                EOL
+"            if ( 0x0000 != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                     EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        lPacketInfo->mSendTo = lResult;"                                                  EOL
+                                                                                           EOL
+"    OPEN_NET_FUNCTION_END"                                                                EOL
+"}"                                                                                        EOL;
 
 static const char * FUNCTION_DO_NOT_REPLY_ON_ERROR_1 =
-"OPEN_NET_FUNCTION_DECLARE( DoNotReplyOnError1 )"                                                       EOL
-"{"                                                                                                     EOL
-"    OPEN_NET_FUNCTION_BEGIN"                                                                           EOL
-                                                                                                        EOL
-"        OPEN_NET_GLOBAL unsigned char * lData   = lBase + lPacketInfo->mOffset_byte;"                  EOL
-"        unsigned int                    lResult = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );" EOL
-"        unsigned int                    i;"                                                            EOL
-                                                                                                        EOL
-"        for ( i = 0; i < 6; i ++)"                                                                     EOL
-"        {"                                                                                             EOL
-"            if ( 0xff != lData[ i ] )"                                                                 EOL
-"            {"                                                                                         EOL
-"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
-"            }"                                                                                         EOL
-"        }"                                                                                             EOL
-                                                                                                        EOL
-"        for ( i = 12; i < 14; i ++)"                                                                   EOL
-"        {"                                                                                             EOL
-"            if ( 0x0a != lData[ i ] )"                                                                 EOL
-"            {"                                                                                         EOL
-"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
-"            }"                                                                                         EOL
-"        }"                                                                                             EOL
-                                                                                                        EOL
-"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                                              EOL
-"        {"                                                                                             EOL
-"            if ( 0x00 != lData[ i ] )"                                                                 EOL
-"            {"                                                                                         EOL
-"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
-"            }"                                                                                         EOL
-"        }"                                                                                             EOL
-                                                                                                        EOL
-"        lPacketInfo->mSendTo = lResult;"                                                               EOL
-                                                                                                        EOL
-"    OPEN_NET_FUNCTION_END"                                                                             EOL
-"}"                                                                                                     EOL;
+"OPEN_NET_FUNCTION_DECLARE( DoNotReplyOnError1 )"                                          EOL
+"{"                                                                                        EOL
+"    OPEN_NET_FUNCTION_BEGIN"                                                              EOL
+                                                                                           EOL
+"        OPEN_NET_GLOBAL unsigned short * lData;"                                          EOL
+                                                                                           EOL
+"        unsigned int lResult = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );"       EOL
+"        unsigned int i;"                                                                  EOL
+                                                                                           EOL
+"        lData = (OPEN_NET_GLOBAL unsigned short *)( lBase + lPacketInfo->mOffset_byte );" EOL
+                                                                                           EOL
+"        for ( i = 0; i < 3; i ++)"                                                        EOL
+"        {"                                                                                EOL
+"            if ( 0xffff != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                     EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        if ( 0x0a0a != lData[ 6 ] )"                                                      EOL
+"        {"                                                                                EOL
+"            lResult = OPEN_NET_PACKET_PROCESSED;"                                         EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        for ( i = 7; i < ( lPacketInfo->mSize_byte / sizeof( unsigned short ) ); i ++)"   EOL
+"        {"                                                                                EOL
+"            if ( 0x0000 != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                     EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        lPacketInfo->mSendTo = lResult;"                                                  EOL
+                                                                                           EOL
+"    OPEN_NET_FUNCTION_END"                                                                EOL
+"}"                                                                                        EOL;
 
 static const char * FUNCTION_FORWARD_0 =
 "OPEN_NET_FUNCTION_DECLARE( Forward0 )"                                              EOL
@@ -168,120 +168,118 @@ static const char * FUNCTION_NOTHING_1 =
 "}"                                                         EOL;
 
 static const char * FUNCTION_REPLY_ON_ERROR_0 =
-"OPEN_NET_FUNCTION_DECLARE( ReplyOnError0 )"                                           EOL
-"{"                                                                                    EOL
-"    OPEN_NET_FUNCTION_BEGIN"                                                          EOL
-                                                                                       EOL
-"        OPEN_NET_GLOBAL unsigned char * lData   = lBase + lPacketInfo->mOffset_byte;" EOL
-"        unsigned int                    lResult = OPEN_NET_PACKET_PROCESSED;"         EOL
-"        unsigned int                    i;"                                           EOL
-                                                                                       EOL
-"        for ( i = 0; i < 6; i ++)"                                                    EOL
-"        {"                                                                            EOL
-"            if ( 0xff != lData[ i ] )"                                                EOL
-"            {"                                                                        EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                       EOL
-"            }"                                                                        EOL
-"        }"                                                                            EOL
-                                                                                       EOL
-"        for ( i = 12; i < 14; i ++)"                                                  EOL
-"        {"                                                                            EOL
-"            if ( 0x0a != lData[ i ] )"                                                EOL
-"            {"                                                                        EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                       EOL
-"            }"                                                                        EOL
-"        }"                                                                            EOL
-                                                                                       EOL
-"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                             EOL
-"        {"                                                                            EOL
-"            if ( 0x00 != lData[ i ] )"                                                EOL
-"            {"                                                                        EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                       EOL
-"            }"                                                                        EOL
-"        }"                                                                            EOL
-                                                                                       EOL
-"        lPacketInfo->mSendTo = lResult;"                                              EOL
-                                                                                       EOL
-"    OPEN_NET_FUNCTION_END"                                                            EOL
-"}"                                                                                    EOL;
+"OPEN_NET_FUNCTION_DECLARE( ReplyOnError0 )"                                               EOL
+"{"                                                                                        EOL
+"    OPEN_NET_FUNCTION_BEGIN"                                                              EOL
+                                                                                           EOL
+"        OPEN_NET_GLOBAL unsigned short * lData;"                                          EOL
+"        unsigned int                     lResult = OPEN_NET_PACKET_PROCESSED;"            EOL
+"        unsigned int                     i;"                                              EOL
+                                                                                           EOL
+"        lData = (OPEN_NET_GLOBAL unsigned short *)( lBase + lPacketInfo->mOffset_byte );" EOL
+                                                                                           EOL
+"        for ( i = 0; i < 3; i ++)"                                                        EOL
+"        {"                                                                                EOL
+"            if ( 0xffff != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                           EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        if ( 0x0a0a != lData[ 6 ] )"                                                      EOL
+"        {"                                                                                EOL
+"            lResult |= 1 << ADAPTER_INDEX;"                                               EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        for ( i = 7; i < ( lPacketInfo->mSize_byte / sizeof( unsigned short ) ); i ++ )"  EOL
+"        {"                                                                                EOL
+"            if ( 0x0000 != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                           EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        lPacketInfo->mSendTo = lResult;"                                                  EOL
+                                                                                           EOL
+"    OPEN_NET_FUNCTION_END"                                                                EOL
+"}"                                                                                        EOL;
 
 static const char * FUNCTION_REPLY_ON_ERROR_1 =
-"OPEN_NET_FUNCTION_DECLARE( ReplyOnError1 )"                                           EOL
-"{"                                                                                    EOL
-"    OPEN_NET_FUNCTION_BEGIN"                                                          EOL
-                                                                                       EOL
-"        OPEN_NET_GLOBAL unsigned char * lData   = lBase + lPacketInfo->mOffset_byte;" EOL
-"        unsigned int                    lResult = OPEN_NET_PACKET_PROCESSED;"         EOL
-"        unsigned int                    i;"                                           EOL
-                                                                                       EOL
-"        for ( i = 0; i < 6; i ++)"                                                    EOL
-"        {"                                                                            EOL
-"            if ( 0xff != lData[ i ] )"                                                EOL
-"            {"                                                                        EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                       EOL
-"            }"                                                                        EOL
-"        }"                                                                            EOL
-                                                                                       EOL
-"        for ( i = 12; i < 14; i ++)"                                                  EOL
-"        {"                                                                            EOL
-"            if ( 0x0a != lData[ i ] )"                                                EOL
-"            {"                                                                        EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                       EOL
-"            }"                                                                        EOL
-"        }"                                                                            EOL
-                                                                                       EOL
-"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                             EOL
-"        {"                                                                            EOL
-"            if ( 0x00 != lData[ i ] )"                                                EOL
-"            {"                                                                        EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                       EOL
-"            }"                                                                        EOL
-"        }"                                                                            EOL
-                                                                                       EOL
-"        lPacketInfo->mSendTo = lResult;"                                              EOL
-                                                                                       EOL
-"    OPEN_NET_FUNCTION_END"                                                            EOL
-"}"                                                                                    EOL;
+"OPEN_NET_FUNCTION_DECLARE( ReplyOnError1 )"                                               EOL
+"{"                                                                                        EOL
+"    OPEN_NET_FUNCTION_BEGIN"                                                              EOL
+                                                                                           EOL
+"        OPEN_NET_GLOBAL unsigned short * lData;"                                          EOL
+"        unsigned int                     lResult = OPEN_NET_PACKET_PROCESSED;"            EOL
+"        unsigned int                     i;"                                              EOL
+                                                                                           EOL
+"        lData = (OPEN_NET_GLOBAL unsigned short *)( lBase + lPacketInfo->mOffset_byte );" EOL
+                                                                                           EOL
+"        for ( i = 0; i < 3; i ++)"                                                        EOL
+"        {"                                                                                EOL
+"            if ( 0xffff != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                           EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        if ( 0x0a0a != lData[ 6 ] )"                                                      EOL
+"        {"                                                                                EOL
+"            lResult |= 1 << ADAPTER_INDEX;"                                               EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        for ( i = 7; i < ( lPacketInfo->mSize_byte / sizeof( unsigned short ) ); i ++ )"  EOL
+"        {"                                                                                EOL
+"            if ( 0x0000 != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                           EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        lPacketInfo->mSendTo = lResult;"                                                  EOL
+                                                                                           EOL
+"    OPEN_NET_FUNCTION_END"                                                                EOL
+"}"                                                                                        EOL;
 
 static const char * KERNEL_DO_NOT_REPLY_ON_ERROR =
-"#include <OpenNetK/Kernel.h>"                                                                          EOL
-                                                                                                        EOL
-"OPEN_NET_KERNEL_DECLARE"                                                                               EOL
-"{"                                                                                                     EOL
-"    OPEN_NET_KERNEL_BEGIN"                                                                             EOL
-                                                                                                        EOL
-"        OPEN_NET_GLOBAL unsigned char * lData   = lBase + lPacketInfo->mOffset_byte;"                  EOL
-"        unsigned int                    lResult = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );" EOL
-"        unsigned int                    i;"                                                            EOL
-                                                                                                        EOL
-"        for ( i = 0; i < 6; i ++)"                                                                     EOL
-"        {"                                                                                             EOL
-"            if ( 0xff != lData[ i ] )"                                                                 EOL
-"            {"                                                                                         EOL
-"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
-"            }"                                                                                         EOL
-"        }"                                                                                             EOL
-                                                                                                        EOL
-"        for ( i = 12; i < 14; i ++)"                                                                   EOL
-"        {"                                                                                             EOL
-"            if ( 0x0a != lData[ i ] )"                                                                 EOL
-"            {"                                                                                         EOL
-"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
-"            }"                                                                                         EOL
-"        }"                                                                                             EOL
-                                                                                                        EOL
-"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                                              EOL
-"        {"                                                                                             EOL
-"            if ( 0x00 != lData[ i ] )"                                                                 EOL
-"            {"                                                                                         EOL
-"                lResult = OPEN_NET_PACKET_PROCESSED;"                                                  EOL
-"            }"                                                                                         EOL
-"        }"                                                                                             EOL
-                                                                                                        EOL
-"        lPacketInfo->mSendTo = lResult;"                                                               EOL
-                                                                                                        EOL
-"    OPEN_NET_KERNEL_END"                                                                               EOL
-"}"                                                                                                     EOL;
+"#include <OpenNetK/Kernel.h>"                                                             EOL
+                                                                                           EOL
+"OPEN_NET_KERNEL_DECLARE"                                                                  EOL
+"{"                                                                                        EOL
+"    OPEN_NET_KERNEL_BEGIN"                                                                EOL
+                                                                                           EOL
+"        OPEN_NET_GLOBAL unsigned short * lData;"                                          EOL
+                                                                                           EOL
+"        unsigned int lResult = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );"       EOL
+"        unsigned int i;"                                                                  EOL
+                                                                                           EOL
+"        lData = (OPEN_NET_GLOBAL unsigned short *)( lBase + lPacketInfo->mOffset_byte );" EOL
+                                                                                           EOL
+"        for ( i = 0; i < 3; i ++)"                                                        EOL
+"        {"                                                                                EOL
+"            if ( 0xffff != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                     EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        if ( 0x0a0a != lData[ 6 ] )"                                                      EOL
+"        {"                                                                                EOL
+"            lResult = OPEN_NET_PACKET_PROCESSED;"                                         EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        for ( i = 7; i < ( lPacketInfo->mSize_byte / sizeof( unsigned short ) ); i ++ )"  EOL
+"        {"                                                                                EOL
+"            if ( 0x0000 != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult = OPEN_NET_PACKET_PROCESSED;"                                     EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        lPacketInfo->mSendTo = lResult;"                                                  EOL
+                                                                                           EOL
+"    OPEN_NET_KERNEL_END"                                                                  EOL
+"}"                                                                                        EOL;
 
 static const char * KERNEL_FORWARD =
 "#include <OpenNetK/Kernel.h>"                                                       EOL
@@ -320,44 +318,43 @@ static const char * KERNEL_REPLY =
 "}"                                                                                  EOL;
 
 static const char * KERNEL_REPLY_ON_ERROR =
-"#include <OpenNetK/Kernel.h>"                                                         EOL
-                                                                                       EOL
-"OPEN_NET_KERNEL_DECLARE"                                                              EOL
-"{"                                                                                    EOL
-"    OPEN_NET_KERNEL_BEGIN"                                                            EOL
-                                                                                       EOL
-"        OPEN_NET_GLOBAL unsigned char * lData   = lBase + lPacketInfo->mOffset_byte;" EOL
-"        unsigned int                    lResult = OPEN_NET_PACKET_PROCESSED;"         EOL
-"        unsigned int                    i;"                                           EOL
-                                                                                       EOL
-"        for ( i = 0; i < 6; i ++)"                                                    EOL
-"        {"                                                                            EOL
-"            if ( 0xff != lData[ i ] )"                                                EOL
-"            {"                                                                        EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                       EOL
-"            }"                                                                        EOL
-"        }"                                                                            EOL
-                                                                                       EOL
-"        for ( i = 12; i < 14; i ++)"                                                  EOL
-"        {"                                                                            EOL
-"            if ( 0x0a != lData[ i ] )"                                                EOL
-"            {"                                                                        EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                       EOL
-"            }"                                                                        EOL
-"        }"                                                                            EOL
-                                                                                       EOL
-"        for ( i = 14; i < lPacketInfo->mSize_byte; i ++)"                             EOL
-"        {"                                                                            EOL
-"            if ( 0x00 != lData[ i ] )"                                                EOL
-"            {"                                                                        EOL
-"                lResult |= 1 << ADAPTER_INDEX;"                                       EOL
-"            }"                                                                        EOL
-"        }"                                                                            EOL
-                                                                                       EOL
-"        lPacketInfo->mSendTo = lResult;"                                              EOL
-                                                                                       EOL
-"    OPEN_NET_KERNEL_END"                                                              EOL
-"}"                                                                                    EOL;
+"#include <OpenNetK/Kernel.h>"                                                             EOL
+                                                                                           EOL
+"OPEN_NET_KERNEL_DECLARE"                                                                  EOL
+"{"                                                                                        EOL
+"    OPEN_NET_KERNEL_BEGIN"                                                                EOL
+                                                                                           EOL
+"        OPEN_NET_GLOBAL unsigned short * lData;"                                          EOL
+"        unsigned int                     lResult = OPEN_NET_PACKET_PROCESSED;"            EOL
+"        unsigned int                     i;"                                              EOL
+                                                                                           EOL
+"        lData = (OPEN_NET_GLOBAL unsigned short *)( lBase + lPacketInfo->mOffset_byte );" EOL
+                                                                                           EOL
+"        for ( i = 0; i < 3; i ++)"                                                        EOL
+"        {"                                                                                EOL
+"            if ( 0xffff != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                           EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        if ( 0x0a0a != lData[ 6 ] )"                                                      EOL
+"        {"                                                                                EOL
+"            lResult |= 1 << ADAPTER_INDEX;"                                               EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        for ( i = 7; i < ( lPacketInfo->mSize_byte / sizeof( unsigned short ) ); i ++ )"  EOL
+"        {"                                                                                EOL
+"            if ( 0x0000 != lData[ i ] )"                                                  EOL
+"            {"                                                                            EOL
+"                lResult |= 1 << ADAPTER_INDEX;"                                           EOL
+"            }"                                                                            EOL
+"        }"                                                                                EOL
+                                                                                           EOL
+"        lPacketInfo->mSendTo = lResult;"                                                  EOL
+                                                                                           EOL
+"    OPEN_NET_KERNEL_END"                                                                  EOL
+"}"                                                                                        EOL;
 
 namespace TestLib
 {

@@ -43,10 +43,11 @@ Adapter_Linux::Adapter_Linux(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * 
     assert( NULL != aDebugLog );
 }
 
+// aProfiling
 // aBuffers [---;RW-]
 //
 // Thread  Apps
-void Adapter_Linux::Buffers_Allocate( Buffer_Data_Vector * aBuffers )
+void Adapter_Linux::Buffers_Allocate( bool aProfiling, Buffer_Data_Vector * aBuffers )
 {
     assert( NULL != aBuffers );
 
@@ -56,7 +57,7 @@ void Adapter_Linux::Buffers_Allocate( Buffer_Data_Vector * aBuffers )
 
     for ( unsigned int i = 0; i < mConfig.mBufferQty; i ++ )
     {
-        Buffer_Data * lBD = Buffer_Allocate();
+        Buffer_Data * lBD = Buffer_Allocate( aProfiling );
         assert( NULL != lBD );
 
         aBuffers->push_back( lBD );
@@ -122,12 +123,14 @@ Thread * Adapter_Linux::Thread_Prepare_Internal( OpenNet::Kernel * aKernel )
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
+// aProfiling
+//
 // Return  This method returns the address of the allocated buffer.
 //
 // Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
 //                                 See Process_CUDA::Buffer_Allocate
 // Threads    Apps
-Buffer_Data * Adapter_Linux::Buffer_Allocate()
+Buffer_Data * Adapter_Linux::Buffer_Allocate( bool aProfiling )
 {
     assert( OPEN_NET_BUFFER_QTY >= mBufferCount );
     assert( NULL                != mProcessor   );
@@ -141,7 +144,7 @@ Buffer_Data * Adapter_Linux::Buffer_Allocate()
     Processor_CUDA * lProcessor = dynamic_cast< Processor_CUDA * >( mProcessor );
     assert( NULL != lProcessor );
 
-    Buffer_Data * lResult = lProcessor->Buffer_Allocate( mConfig.mPacketSize_byte, mBuffers + mBufferCount );
+    Buffer_Data * lResult = lProcessor->Buffer_Allocate( aProfiling, mConfig.mPacketSize_byte, mBuffers + mBufferCount );
     assert( NULL != lResult );
 
     mBufferCount ++;

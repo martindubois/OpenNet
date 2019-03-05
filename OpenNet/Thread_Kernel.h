@@ -25,11 +25,6 @@ public:
     // ===== Thread =========================================================
     virtual ~Thread_Kernel();
 
-protected:
-
-    // ===== Thread =========================================================
-
-    virtual void Run_Loop ();
-    virtual void Run_Start();
+    virtual void Processing_Wait( unsigned int aIndex );
 
 };

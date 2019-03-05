@@ -4,6 +4,9 @@
 // Product    OpenNet
 // File       OpenNet/Processor.cpp
 
+#define __CLASS__     "Processor::"
+#define __NAMESPACE__ "OpenNet::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -71,6 +74,13 @@ namespace OpenNet
         fprintf(aOut, "    Version                        = %s\n"              , aIn.mVersion                    );
 
         return STATUS_OK;
+    }
+
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    Processor::~Processor()
+    {
     }
 
     // Protected

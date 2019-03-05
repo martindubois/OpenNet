@@ -68,6 +68,7 @@ Processor_OpenCL::Processor_OpenCL(cl_platform_id aPlatform, cl_device_id aDevic
     assert(NULL != mContext);
 }
 
+// aProfiling              Set to true when profiling data must be captured
 // aPacketSize_byte
 // aCommandQueue [---;RW-]
 // aKernel       [---;R--]
@@ -81,7 +82,7 @@ Processor_OpenCL::Processor_OpenCL(cl_platform_id aPlatform, cl_device_id aDevic
 //                                 See GetKernelWorkGroupInfo
 //                                 See OCLW_CreateBuffer
 // Threads  Apps
-Buffer_Data * Processor_OpenCL::Buffer_Allocate(unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer)
+Buffer_Data * Processor_OpenCL::Buffer_Allocate( bool aProfiling, unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer)
 {
     assert(NULL                 != aCommandQueue   );
     assert(NULL                 != aKernel         );
@@ -107,7 +108,7 @@ Buffer_Data * Processor_OpenCL::Buffer_Allocate(unsigned int aPacketSize_byte, c
 
     OCLW_EnqueueMakeBufferResident(aCommandQueue, 1, &lMem, CL_TRUE, &lBusAddress, 0, NULL, NULL);
 
-    Buffer_Data * lResult = new Buffer_Data_OpenCL(lMem, static_cast<unsigned int>(lPacketQty));
+    Buffer_Data * lResult = new Buffer_Data_OpenCL( aProfiling, lMem, static_cast<unsigned int>(lPacketQty));
 
     aBuffer->mBuffer_DA =                               0;
     aBuffer->mBuffer_PA = lBusAddress.surface_bus_address;

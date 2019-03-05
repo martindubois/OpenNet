@@ -218,7 +218,8 @@ namespace OpenNetK
         return STATUS_SUCCESS;
     }
 
-    // CRITICAL PATH
+    // CRITICAL PATH  Interrupt
+    //                1 / hardware interrupt + 1 / tick
     void Hardware_WDF::Interrupt_Dpc()
     {
         ASSERT(NULL != mHardware);
@@ -243,7 +244,8 @@ namespace OpenNetK
         return STATUS_SUCCESS;
     }
 
-    // CRITICAL PATH
+    // CRITICAL PATH  Interrupt
+    //                1 / hardware interrupt
     BOOLEAN Hardware_WDF::Interrupt_Isr(ULONG aMessageId)
     {
         ASSERT(NULL != mHardware );
@@ -261,7 +263,8 @@ namespace OpenNetK
         return lResult;
     }
 
-    // CRITICAL PATH
+    // CRITICAL PATH  Interrupt
+    //                1 / hardware interrupt + 1 / tick
     void Hardware_WDF::TrigProcess2()
     {
         ASSERT(NULL != mInterrupt);
@@ -269,6 +272,8 @@ namespace OpenNetK
         WdfInterruptQueueDpcForIsr(mInterrupt);
     }
 
+    // CRITICAL PATH  Interrupt
+    //                1 / tick
     void Hardware_WDF::Tick()
     {
         ASSERT(NULL != mHardware);
@@ -438,7 +443,8 @@ NTSTATUS InterruptDisable(WDFINTERRUPT aInterrupt, WDFDEVICE aAssociatedDevice)
     return lContext->mHardware_WDF->Interrupt_Disable();
 }
 
-// CRITICAL PATH
+// CRITICAL PATH  Interrupt
+//                1 / hardware interrupt + 1 / tick
 VOID InterruptDpc(WDFINTERRUPT aInterrupt, WDFOBJECT aAssociatedObject)
 {
     ASSERT(NULL != aInterrupt);
@@ -465,7 +471,8 @@ NTSTATUS InterruptEnable(WDFINTERRUPT aInterrupt, WDFDEVICE aAssociatedDevice)
     return lContext->mHardware_WDF->Interrupt_Enable();
 }
 
-// CRITICAL PATH
+// CRITICAL PATH  Interrupt
+//                1 / hardware interrupt
 BOOLEAN InterruptIsr(WDFINTERRUPT aInterrupt, ULONG aMessageId)
 {
     ASSERT(NULL != aInterrupt);

@@ -48,7 +48,7 @@ bool Intel_82576::SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int
             return false;
         }
 
-        mZone0->Lock();
+        uint32_t lFlags = mZone0->LockFromThread();
 
             ASSERT(NULL == mBAR1_82576_MA);
 
@@ -61,7 +61,7 @@ bool Intel_82576::SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int
             mInfo.mEthernetAddress.mAddress[4] = mBAR1_82576_MA->mRx_AddressHigh0.mFields.mE;
             mInfo.mEthernetAddress.mAddress[5] = mBAR1_82576_MA->mRx_AddressHigh0.mFields.mF;
 
-        mZone0->Unlock();
+        mZone0->UnlockFromThread( lFlags );
         break;
     }
 
@@ -76,7 +76,7 @@ void Intel_82576::D0_Entry()
 
     Intel::D0_Entry();
 
-    mZone0->Lock();
+    uint32_t lFlags = mZone0->LockFromThread();
 
         ASSERT(NULL != mBAR1_82576_MA);
 
@@ -102,7 +102,7 @@ void Intel_82576::D0_Entry()
         Rx_Config_Zone0();
         Tx_Config_Zone0();
 
-    mZone0->Unlock();
+    mZone0->UnlockFromThread( lFlags );
 }
 
 void Intel_82576::Interrupt_Enable()
@@ -113,14 +113,14 @@ void Intel_82576::Interrupt_Enable()
 
     Intel::Interrupt_Enable();
 
-    mZone0->Lock();
+    uint32_t lFlags = mZone0->LockFromThread();
 
         ASSERT(NULL != mBAR1_82576_MA);
 
         mBAR1_82576_MA->mInterruptMaskSet.mFields.mTx_DescriptorWritten = true;
         mBAR1_82576_MA->mInterruptMaskSet.mFields.mRx_DescriptorWritten = true;
 
-    mZone0->Unlock();
+    mZone0->UnlockFromThread( lFlags );
 }
 
 bool Intel_82576::Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing)

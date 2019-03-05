@@ -9,11 +9,13 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== OpenNet ============================================================
-#include "Buffer_Data.h"
-
 // ===== OpenCL =============================================================
 #include <CL/opencl.h>
+
+// ===== OpenNet ============================================================
+#include "EVent_OpenCL.h"
+
+#include "Buffer_Data.h"
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
@@ -23,13 +25,14 @@ class Buffer_Data_OpenCL : public Buffer_Data
 
 public:
 
-    Buffer_Data_OpenCL(cl_mem aMem, unsigned int aPacketQty);
+    Buffer_Data_OpenCL( bool aProfiling, cl_mem aMem, unsigned int aPacketQty);
 
     // ===== Buffer_Data ====================================================
 
     virtual ~Buffer_Data_OpenCL();
 
-    cl_event mEvent;
+    Event_OpenCL mEvent_OpenCL;
+
     cl_mem   mMem  ;
 
 };

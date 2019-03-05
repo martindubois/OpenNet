@@ -32,10 +32,13 @@ protected:
     // ===== Thread =========================================================
 
     virtual void Processing_Queue(unsigned int aIndex);
-    virtual void Processing_Wait (unsigned int aIndex);
 
     virtual void Run_Start();
 
     virtual void Release();
+
+private:
+
+    Event_CUDA mEvent_CUDA[ QUEUE_DEPTH ];
 
 };

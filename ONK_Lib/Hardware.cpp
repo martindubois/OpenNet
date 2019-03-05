@@ -114,7 +114,8 @@ namespace OpenNetK
         mStatistics[HARDWARE_STATS_INTERRUPT_ENABLE] ++;
     }
 
-    // CRITICAL PATH
+    // CRITICAL PATH  Interrupt
+    //                1 / hardware interrupt
 
     // NOT TESTED  ONK_Lib.Hardware
     //             The Interrupt_Process is only there to fill the virtual
@@ -131,7 +132,8 @@ namespace OpenNetK
         return false;
     }
 
-    // CRITICAL PATH
+    // CRITICAL PATH  Interrupt
+    //                1 / hardware interrupt + 1 / tick
     void Hardware::Interrupt_Process2(bool * aNeedMoreProcessing)
     {
         // printk( KERN_DEBUG "%s(  )\n", __FUNCTION__ );
@@ -150,7 +152,8 @@ namespace OpenNetK
         mAdapter->Interrupt_Process3();
     }
 
-    // CRITICAL PATH - Buffer
+    // CRITICAL PATH  Interrupt
+    //                1 to ( AdapterQty + 1 ) / buffer
     void Hardware::Lock()
     {
         ASSERT(NULL != mZone0);
@@ -158,7 +161,8 @@ namespace OpenNetK
         mZone0->Lock();
     }
 
-    // CRITICAL PATH - Buffer
+    // CRITICAL PATH  Interrupt
+    //                1 to ( AdapterQty + 1 ) / buffer
     void Hardware::Unlock()
     {
         ASSERT(NULL != mZone0);
@@ -166,7 +170,7 @@ namespace OpenNetK
         mZone0->Unlock();
     }
 
-    void Hardware::Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacketQty)
+    void Hardware::Unlock_AfterReceive_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags )
     {
         // TRACE_DEBUG "Unlock_AfterReceive( , %u packet )" DEBUG_EOL, aPacketQty TRACE_END;
 
@@ -185,11 +189,10 @@ namespace OpenNetK
 
         mStatistics[OpenNetK::HARDWARE_STATS_PACKET_RECEIVE] += aPacketQty;
 
-        Unlock();
+        mZone0->UnlockFromThread( aFlags );
     }
 
-    // CRITICAL PATH - Buffer
-    void Hardware::Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty)
+    void Hardware::Unlock_AfterSend_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags )
     {
         // TRACE_DEBUG "Unlock_AfterSend( , %u packet )" DEBUG_EOL, aPacketQty TRACE_END;
 
@@ -211,7 +214,7 @@ namespace OpenNetK
             mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
         }
 
-        Unlock();
+        mZone0->UnlockFromThread( aFlags );
     }
 
     unsigned int Hardware::Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset)
@@ -287,6 +290,71 @@ namespace OpenNetK
         ASSERT(NULL != mAdapter);
 
         mAdapter->Tick();
+    }
+
+    // aCounter [---;RW-]
+    // aPacketQty         The number of packet programmed for receiving
+    //
+    // Level  SoftInt
+
+    // CRITICAL PATH  Interrupt.Rx
+    //                1 / buffer
+    void Hardware::Unlock_AfterReceive(volatile long * aCounter, unsigned int aPacketQty)
+    {
+        // TRACE_DEBUG "Unlock_AfterReceive( , %u packet )" DEBUG_EOL, aPacketQty TRACE_END;
+
+        ASSERT(NULL != aCounter );
+        ASSERT(0    < aPacketQty);
+
+        ASSERT( NULL != mZone0 );
+
+        #ifdef _KMS_LINUX_
+            ( * aCounter ) += aPacketQty;
+        #endif
+
+        #ifdef _KMS_WINDOWS_
+            InterlockedAdd(aCounter, aPacketQty);
+        #endif
+
+        Unlock_AfterReceive_Internal();
+
+        mStatistics[OpenNetK::HARDWARE_STATS_PACKET_RECEIVE] += aPacketQty;
+
+        mZone0->Unlock();
+    }
+
+    // aCounter [---;RW-]
+    // aPacketQty         The number of packet programmed for sending
+    //
+    // Level  SoftInt
+
+    // CRITICAL PATH  Interrupt.Tx
+    //                1 / buffer
+    void Hardware::Unlock_AfterSend(volatile long * aCounter, unsigned int aPacketQty)
+    {
+        // TRACE_DEBUG "Unlock_AfterSend( , %u packet )" DEBUG_EOL, aPacketQty TRACE_END;
+
+        ASSERT( NULL != mZone0 );
+
+        if (0 < aPacketQty)
+        {
+            if (NULL != aCounter)
+            {
+                #ifdef _KMS_LINUX_
+                    ( * aCounter ) += aPacketQty;
+                #endif
+
+                #ifdef _KMS_WINDOWS_
+                    InterlockedAdd(aCounter, aPacketQty);
+                #endif
+            }
+
+            Unlock_AfterSend_Internal();
+
+            mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
+        }
+
+        mZone0->Unlock();
     }
 
     // Protected

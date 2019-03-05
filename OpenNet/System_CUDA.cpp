@@ -29,6 +29,11 @@
 
 #include "System_CUDA.h"
 
+// Static variable
+/////////////////////////////////////////////////////////////////////////////
+
+static unsigned int sCounter;
+
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
@@ -45,6 +50,22 @@ System_CUDA::System_CUDA()
     mConnect.mSystemId = mInfo.mSystemId;
 
     FindAdapters  ();
+
+    if ( 0 == sCounter )
+    {
+        try
+        {
+            CUW_Init( 0 );
+        }
+        catch ( KmsLib::Exception * eE )
+        {
+            mDebugLog.Log( __FILE__, __CLASS__ "System_CUDA", __LINE__ );
+            mDebugLog.Log( eE );
+        }
+    }
+
+    sCounter ++;
+
     FindProcessors();
 
     // valloc ==> free  See the descructor
@@ -62,10 +83,19 @@ System_CUDA::~System_CUDA()
 
     assert( NULL != mConnect.mSharedMemory );
 
+    assert( 0 < sCounter );
+
     Cleanup();
 
     // valloc ==> free  See the constructor
     free( mConnect.mSharedMemory );
+
+    sCounter --;
+
+    if ( 0 == sCounter )
+    {
+        CUW_Check();
+    }
 }
 
 // Private
@@ -74,7 +104,7 @@ System_CUDA::~System_CUDA()
 // Threads  Apps
 void System_CUDA::FindAdapters()
 {
-    mDebugLog.Log( "System_CUDA::FindAdapters()" );
+    mDebugLog.Log( __CLASS__ "FindAdapters()" );
 
     for (unsigned int lIndex = 0;; lIndex++)
     {
@@ -112,23 +142,21 @@ void System_CUDA::FindAdapters()
 // Threads    Apps
 void System_CUDA::FindProcessors()
 {
-    mDebugLog.Log( "System_CUDA::FindProcessors()" );
-
-    try
-    {
-        CUW_Init( 0 );
-    }
-    catch ( KmsLib::Exception * eE )
-    {
-        mDebugLog.Log( __FILE__, __CLASS__ "FindProcessors", __LINE__ );
-        mDebugLog.Log( eE );
-
-        return;
-    }
+    mDebugLog.Log( __CLASS__ "FindProcessors()" );
 
     int lCount;
 
-    CUW_DeviceGetCount( & lCount );
+    try
+    {
+        CUW_DeviceGetCount( & lCount );
+    }
+    catch ( KmsLib::Exception * eE )
+    {
+            mDebugLog.Log( __FILE__, __CLASS__ "FindProcessors", __LINE__ );
+            mDebugLog.Log( eE );
+
+            return;
+    }
 
     for ( int i = 0; i < lCount; i ++ )
     {

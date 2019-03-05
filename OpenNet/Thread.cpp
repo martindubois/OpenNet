@@ -13,6 +13,7 @@
 
 // ===== C ==================================================================
 #include <assert.h>
+#include <stdint.h>
 
 #ifdef _KMS_WINDOWS_
     // ===== Windows ========================================================
@@ -20,6 +21,8 @@
 #endif
 
 // ===== OpenNet ============================================================
+#include "Event.h"
+
 #include "Thread.h"
 
 // Public
@@ -31,6 +34,7 @@ Thread::Thread(Processor_Internal * aProcessor, KmsLib::DebugLog * aDebugLog)
     : mDebugLog    (aDebugLog )
     , mKernel      (NULL      )
     , mProcessor   (aProcessor)
+    , mQueueDepth  (         0)
 {
     assert(NULL != aProcessor);
     assert(NULL != aDebugLog );
@@ -117,8 +121,7 @@ void Thread::Prepare()
 {
     // printf( __CLASS__ "Prepare()\n" );
 
-    assert(   0 <  mAdapters.size());
-    assert(   0 == mBuffers .size());
+    assert( 0 < mBuffers .size() );
 
     for (unsigned int i = 0; i < mBuffers.size(); i++)
     {
@@ -197,9 +200,10 @@ void Thread::Stop_Wait(TryToSolveHang aTryToSolveHang, void * aContext)
 // Internal
 /////////////////////////////////////////////////////////////////////////////
 
-// CRITICAL PATH
-//
 // Thread  Worker
+
+// CRITICAL PATH  Processing
+//                1
 unsigned int Thread::Run()
 {
     // printf( __CLASS__ "Run()\n" );
@@ -252,15 +256,87 @@ Thread::~Thread()
 {
 }
 
-// aIndex  The index passed to Processing_Queue and Processing_Wait
+// aKernel [---;RW-]
+// aEvent  [---;RW-]
 //
-// CRITICAL PATH - Buffer
+// Exception  KmsLib::Exception  See Event::Wait
+// Thread     Worker
+//
+// Processing_Queue ==> Processing_Wait
+
+// CRITICAL PATH  Processing
+//                1 / iteration
+void Thread::Processing_Wait( OpenNet::Kernel * aKernel, Event * aEvent )
+{
+    assert( NULL != aKernel );
+    assert( NULL != aEvent  );
+
+    aEvent->Wait();
+
+    if ( aKernel->IsProfilingEnabled() )
+    {
+        aKernel->AddStatistics( aEvent );
+    }
+}
+
+// aIndex  The index passed to Processing_Queue and Processing_Wait
+
+// CRITICAL PATH  Processing
+//                1 / iteration
 void Thread::Run_Iteration(unsigned int aIndex)
 {
     // printf( __CLASS__ "Run_Iteration( %u )\n", aIndex );
 
     Processing_Wait (aIndex);
     Processing_Queue(aIndex);
+}
+
+// CRITICAL PATH  Processing
+//                1 execution
+void Thread::Run_Loop()
+{
+    assert(NULL != mDebugLog  );
+    assert(   0 <  mQueueDepth);
+
+    try
+    {
+        unsigned lIndex = 0;
+
+        while (IsRunning())
+        {
+            Run_Iteration(lIndex);
+
+            lIndex = (lIndex + 1) % mQueueDepth;
+        }
+
+        for (unsigned int i = 0; i < mQueueDepth; i++)
+        {
+            Processing_Wait(lIndex);
+
+            lIndex = (lIndex + 1) % mQueueDepth;
+        }
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Run_Loop", __LINE__);
+        mDebugLog->Log(eE);
+    }
+    catch (...)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Run_Loop", __LINE__);
+    }
+}
+
+// CRITICAL PATH  Processing
+//                1
+void Thread::Run_Start()
+{
+    assert(0 < mQueueDepth);
+
+    for (unsigned int i = 0; i < mQueueDepth; i++)
+    {
+        Processing_Queue(i);
+    }
 }
 
 // Exception  KmsLib::Exception *  CODE_TIMEOUT

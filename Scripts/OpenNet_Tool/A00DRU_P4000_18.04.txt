@@ -14,95 +14,103 @@
 # PCIe x1	Empty
 # PCIe x16	Empty
 
-# Test Code           Mode     Packet Size
-# ==== ============== ======== ===========
-# A    NOTHING        FUNCTION        9000
+# Test Code                  Mode     Packet Size
+# ==== ===================== ======== ===========
+# A    NOTHING               FUNCTION        9000
+# Fewer buffer can cause computer hang
 
 Test SetBandwidth 120.0
-Test SetBufferQty 2
+Test SetBufferQty 3
 Test SetCode NOTHING
 Test SetMode FUNCTION
 Test SetPacketSize 9000
 
 Test Run A
 
-# A   NOTHING         FUNCTION        1680
-# Lower packet size cause dropped packet or computer hang
+# A   NOTHING                FUNCTION        1140
+# Smaller packet cause computer hang or dropped packet
 
-Test SetPacketSize 1680
-
-Test Run A
-
-# A   NOTHING         FUNCTION        1150
-# Lower packet size cause computer hang
-
-Test SetBufferQty 3
-Test SetPacketSize 1150
+Test SetPacketSize 1140
 
 Test Run A
 
-# A   NOTHING         FUNCTION         990
-# Lower packet size cause dropped packet
+# A   NOTHING                FUNCTION         168
+# Smaller packet cause computer hang
+
+#  4  990
+#  5  710
+#  6  700
+#  7  670
+#  8  600
+#  9  310
+
+Test SetBufferQty 56
+Test SetPacketSize 168
+
+Test Run A
+
+# A   NOTHING                FUNCTION         156
+
+Test SetBufferQty 112
+Test SetPacketSize 156
+
+Test Run A
+
+# A   NOTHING                KERNEL          9000
+# Fewer buffer can cause computer hang
 
 Test SetBufferQty 4
-Test SetPacketSize 990
-
-Test Run A
-
-# A   NOTHING         FUNCTION         700
-# Lower packet size cause computer hang
-
-Test SetBufferQty 5
-Test SetPacketSize 700
-
-Test Run A
-
-# A   NOTHING         FUNCTION         700
-# Lower packet size cause computer hang
-
-Test SetBufferQty 6
-Test SetPacketSize 700
-
-Test Run A
-
-# A   NOTHING         FUNCTION         670
-# Lower packet size cause computer hang
-
-Test SetBufferQty 7
-Test SetPacketSize 670
-
-Test Run A
-
-# A   NOTHING         FUNCTION         590
-
-Test SetBufferQty 8
-Test SetPacketSize 590
-
-Test Run A
-
-# A   NOTHING         KERNEL          9000
-
-Test SetBufferQty 2
 Test SetMode KERNEL
+
 Test SetPacketSize 9000
 
 Test Run A
 
-# A   NOTHING         KERNEL          2040
-# Lower packet size cause dropped packet or computer hang
+# A   NOTHING                KERNEL           570
 
-Test SetPacketSize 2040
-
-Test Run A
-
-# A   NOTHING         KERNEL          1480
-
-Test SetBufferQty 3
-Test SetPacketSize 1480
+Test SetPacketSize 570
 
 Test Run A
 
-# B   REPLY           FUNCTION        9000
+# A   NOTHING                KERNEL           460
+# 5 1100
+# 6  600
+# 7  600
+# 8  530
+
+Test SetBufferQty 10
+Test SetPacketSize 460
+
+Test Run A
+
+# A   REPLY_ON_ERROR         FUNCTION        9000
+# Fewer buffer cans cause computer hang
+
+Test SetBufferQty 14
+Test SetCode REPLY_ON_ERROR
+Test SetMode FUNCTION
+Test SetPacketSize 9000
+
+Test Run A
+
+# A   REPLAY_ON_ERROR        FUNCTION        1004
+
+Test SetBufferQty 56
+Test SetPacketSize 1004
+
+Test Run A
+
+# A   REPLAY_ON_ERROR        FUNCTION         904
+
+Test SetBufferQty 112
+Test SetPacketSize 904
+
+Test Run A
+
+# A   REPLY_ON_ERROR         KERNEL          9000
+# Processing time is longer than receive time
+
+# B   REPLY                  FUNCTION        9000
 
 Test SetBufferQty 3
 Test SetCode REPLY
@@ -111,55 +119,85 @@ Test SetPacketSize 9000
 
 Test Run B
 
-# B   REPLY           FUNCTION        4940
-# Lower packet size cause dropped packet or computer hang
+# B   REPLY                  FUNCTION        3910
+# Smaller packet cause dropped packet
 
-Test SetPacketSize 4940
-
-Test Run B
-
-# B   REPLY           FUNCTION        3400
-# Lower packet size cause computer hang
-
-Test SetBufferQty 4
-Test SetPacketSize 3400
+Test SetPacketSize 3910
 
 Test Run B
 
-# B   REPLY           FUNCTION        2610
-# Lower packet size cause dropped packet
+# B   REPLY                  FUNCTION         630
+# 7 800
+# 8 750
+
+Test SetBufferQty 10
+Test SetPacketSize 630
+
+Test Run B
+
+# B   REPLY                  KERNEL          9000
+# Fewer buffer cause dropped packets or computer hang
 
 Test SetBufferQty 5
-Test SetPacketSize 2610
-
-Test Run B
-
-# B   REPLY           KERNEL          9000
-
-Test SetBufferQty 3
 Test SetMode KERNEL
 Test SetPacketSize 9000
 
 Test Run B
 
-# B   REPLY           KERNEL          4980
-# Lower packet size cause dropped packet or computer hang
+# B   REPLY                  KERNEL          4410
+# Smaller packet can cause computer hang
 
-Test SetPacketSize 4980
-
-Test Run B
-
-# B   REPLY           KERNEL          1980
-# Lower packet size cause dropped packet
-
-Test SetBufferQty 4
-Test SetPacketSize 1980
+Test SetPacketSize 4410
 
 Test Run B
 
-# B   REPLY           KERNEL          1530
+# B   REPLY                  KERNEL           500
+#  4 1990
+#  5 1510
+#  6 1460
+#  7  600
+#  8  550
+# 10  520
 
-Test SetBufferQty 5
-Test SetPacketSize 1530
+Test SetBufferQty 16
+Test SetPacketSize 500
 
 Test Run B
+
+# B   DO_NOT_REPLY_ON_ERROR  FUNCTION        9000
+# Fewer buffer cause dropped packets
+
+Test SetBufferQty 6
+Test SetCode DO_NOT_REPLY_ON_ERROR
+Test SetMode FUNCTION
+Test SetPacketSize 9000
+
+Test Run B
+
+# B   DO_NOT_REPLY_ON_ERROR  FUNCTION        1800
+
+Test SetPacketSize 1800
+
+# B   DO_NOT_REPLY_ON_ERROR  FUNCTION        1700
+
+Test SetBufferQty 9
+Test SetPacketSize 1700
+
+Test Run B
+
+# B   DO_NOT_REPLY_ON_ERROR  FUNCTION        1000
+
+Test SetBufferQty 56
+Test SetPacketSize 1000
+
+Test Run B
+
+# B   DO_NOT_REPLY_ON_ERROR  FUNCTION         900
+
+Test SetBufferQty 112
+Test SetPacketSize 900
+
+Test Run B
+
+# B   DO_NOT_REPLY_ON_ERROR  KERNEL          9000
+# Processing time is longer than receive time

@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       OpenNet/Buffer_Data_CUDA.cpp
 
+#define __CLASS__ "Buffer_Data_CUDA::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -12,6 +14,7 @@
 // ===== C ==================================================================
 #include <assert.h>
 #include <stdint.h>
+#include <stdio.h>
 
 // ===== OpenNet ============================================================
 #include "CUW.h"
@@ -21,13 +24,15 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-// aContext [-K-;RW-]
+// aProfiling         Set to true when profiling data must be captured
+// aContext [-K-;RW-] The CUDA context
 // aMem_DA  [DK-;RW-] The pointer to the device memory
 // aPacketQty         The number of packet the buffer contains
-Buffer_Data_CUDA::Buffer_Data_CUDA( CUcontext aContext, CUdeviceptr aMem_DA, unsigned int aPacketQty )
-    : Buffer_Data( aPacketQty )
-    , mContext  ( aContext )
-    , mMemory_DA( aMem_DA  )
+Buffer_Data_CUDA::Buffer_Data_CUDA( bool aProfiling, CUcontext aContext, CUdeviceptr aMem_DA, unsigned int aPacketQty )
+    : Buffer_Data( aPacketQty, static_cast< Event * >( & mEvent_CUDA ) )
+    , mContext   ( aContext   )
+    , mEvent_CUDA( aProfiling )
+    , mMemory_DA ( aMem_DA    )
 {
     assert( NULL != aContext   );
     assert(    0 != aMem_DA    );

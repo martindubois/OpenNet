@@ -34,6 +34,11 @@ Thread_Functions_OpenCL::Thread_Functions_OpenCL(Processor_Internal * aProcessor
 {
     assert(NULL != aProcessor);
     assert(NULL != aDebugLog );
+
+    for ( unsigned int i = 0; i < QUEUE_DEPTH; i ++ )
+    {
+        mEvents[ i ] = mEvent_OpenCL + i;
+    }
 }
 
 // ===== Thread =============================================================
@@ -60,36 +65,20 @@ void Thread_Functions_OpenCL::Prepare()
 
 // ===== Thread =============================================================
 
-// CRITICAL PATH - Buffer
 void Thread_Functions_OpenCL::Processing_Queue(unsigned int aIndex)
 {
     assert(EVENT_QTY > aIndex);
 
-    assert(0 < mBuffers.size());
-    assert(NULL != mBuffers[0]);
+    assert(    0 <  mBuffers.size()    );
+    assert( NULL != mBuffers[      0 ] );
+    assert( NULL != mEVents [ aIndex ] );
 
     size_t lLS = mBuffers[0]->GetPacketQty();
     size_t lGS = lLS * mBuffers.size();
 
     assert(0 < lLS);
 
-    Thread_OpenCL::Processing_Queue(&lGS, &lLS, mEvents + aIndex);
-}
-
-// CRITICAL_PATH
-//
-// Thread  Worker
-//
-// Processing_Queue ==> Processing_Wait
-void Thread_Functions_OpenCL::Processing_Wait(unsigned int aIndex)
-{
-    assert(EVENT_QTY > aIndex);
-
-    assert(NULL != mEvents[aIndex]);
-
-    Thread_OpenCL::Processing_Wait(mEvents[aIndex], mKernel);
-
-    mEvents[aIndex] = NULL;
+    Thread_OpenCL::Processing_Queue( mEvents[ aIndex ], &lGS, &lLS );
 }
 
 void Thread_Functions_OpenCL::Release()

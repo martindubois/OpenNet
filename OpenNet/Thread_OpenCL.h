@@ -31,8 +31,7 @@ protected:
 
     void Prepare(Processor_OpenCL * aProcessor, Adapter_Vector * aAdapters, OpenNet::Kernel * aKernel, Buffer_Data_Vector * aBuffers);
 
-    void Processing_Queue(const size_t * aGlobalSize, const size_t * aLocalSize, cl_event * aEvent);
-    void Processing_Wait (cl_event aEvent, OpenNet::Kernel * aKernel);
+    void Processing_Queue(Event_OpenCL * aEvent, const size_t * aGlobalSize, const size_t * aLocalSize);
 
     void Release(OpenNet::Kernel * aKernel);
 

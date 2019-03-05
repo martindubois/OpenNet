@@ -34,7 +34,6 @@ protected:
     // ===== Thread =========================================================
 
     virtual void Processing_Queue(unsigned int aIndex);
-    virtual void Processing_Wait (unsigned int aIndex);
 
     virtual void Release();
 

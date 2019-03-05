@@ -34,8 +34,6 @@ public:
 
     Processor_Internal( KmsLib::DebugLog * aDebugLog );
 
-    virtual ~Processor_Internal();
-
     Thread           * Thread_Prepare();
     void               Thread_Release();
 
@@ -47,6 +45,9 @@ public:
     virtual Thread_Functions * Thread_Get() = 0;
 
     // ===== OpenNet::Processor =============================================
+
+    virtual ~Processor_Internal();
+
     virtual OpenNet::Status GetConfig(      Config * aOut   ) const;
     virtual OpenNet::Status GetInfo  (      Info   * aOut   ) const;
     virtual const char    * GetName  () const;

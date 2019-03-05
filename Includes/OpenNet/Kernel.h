@@ -15,6 +15,9 @@
 #include <OpenNet/SourceCode.h>
 #include <OpenNet/StatisticsProvider.h>
 
+// ===== OpenNet ============================================================
+class Event;
+
 namespace OpenNet
 {
 
@@ -104,9 +107,11 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Is the OpenCL profiling enabled?
+        /// \note   This method is part of the critical path.
         /// \endcond
         /// \cond fr
         /// \brief  Est-ce que le profiling OpenCL est active?
+        /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         /// \retval false
         /// \retval true
@@ -152,7 +157,7 @@ namespace OpenNet
 
         void SetCommandQueue(void * aCommandQueue);
 
-        void AddStatistics(uint64_t aQueued, uint64_t aSubmit, uint64_t aStart, uint64_t aEnd);
+        void AddStatistics( Event * aEvent );
 
         void * AllocateBuildLog();
         char * AllocateBuildLog( size_t aSize_byte );
@@ -182,5 +187,13 @@ namespace OpenNet
         uint64_t       mStatisticsSums[3];
 
     };
+
+    // Public
+    /////////////////////////////////////////////////////////////////////////
+
+    inline bool Kernel::IsProfilingEnabled() const
+    {
+        return mProfilingEnabled;
+    }
 
 }

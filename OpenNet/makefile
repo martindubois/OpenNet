@@ -4,7 +4,7 @@
 # Product    OpenNet
 # File       OpenNet/makefile
 
-CFLAGS = -fpic -g
+CFLAGS = -DNDEBUG -fpic -g
 
 INCLUDES = -I ../Includes -I ../Import/Includes -I /usr/local/cuda/include
 
@@ -19,6 +19,8 @@ SOURCES =	Adapter.cpp                  \
 			Buffer_Data_CUDA.cpp         \
 			CUDAW.cpp                    \
 			CUW.cpp                      \
+			Event.cpp                    \
+			Event_CUDA.cpp               \
 			Function.cpp                 \
 			Function_Forward.cpp         \
 			Kernel.cpp                   \

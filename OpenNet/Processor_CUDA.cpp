@@ -52,6 +52,7 @@ Processor_CUDA::Processor_CUDA( int aDevice, KmsLib::DebugLog * aDebugLog )
     InitInfo();
 }
 
+// aProfiling        Set to true when profiling data must be captured
 // aPacketSize_byte
 // aBuffer [---;RW-]
 //
@@ -62,10 +63,8 @@ Processor_CUDA::Processor_CUDA( int aDevice, KmsLib::DebugLog * aDebugLog )
 // Threads    Apps
 //
 // Processor_CUDA::Buffer_Allocate ==> delete
-Buffer_Data * Processor_CUDA::Buffer_Allocate(unsigned int aPacketSize_byte, OpenNetK::Buffer * aBuffer)
+Buffer_Data * Processor_CUDA::Buffer_Allocate( bool aProfiling, unsigned int aPacketSize_byte, OpenNetK::Buffer * aBuffer)
 {
-    // printf( __CLASS__ "Buffer_Allocate( %u byte, 0x%p )\n", aPacketSize_byte, aBuffer );
-
     assert(    0 <  aPacketSize_byte );
     assert( NULL != aBuffer          );
 
@@ -101,7 +100,7 @@ Buffer_Data * Processor_CUDA::Buffer_Allocate(unsigned int aPacketSize_byte, Ope
     CUW_PointerSetAttribute( & lFlag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS, reinterpret_cast< CUdeviceptr >( lMem_DA ) );
 
     // new ==> delete
-    Buffer_Data * lResult = new Buffer_Data_CUDA( mContext, lMem_DA, lPacketQty );
+    Buffer_Data * lResult = new Buffer_Data_CUDA( aProfiling, mContext, lMem_DA, lPacketQty );
 
     aBuffer->mBuffer_DA = lMem_DA;
     aBuffer->mBuffer_PA = 0;

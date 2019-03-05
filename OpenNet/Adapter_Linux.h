@@ -25,7 +25,7 @@ public:
 
     Adapter_Linux(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog);
 
-    void Buffers_Allocate( Buffer_Data_Vector * aBuffers );
+    void Buffers_Allocate( bool aProfiling, Buffer_Data_Vector * aBuffers );
 
     // ===== OpenNet::Adapter ==============================================
 
@@ -42,7 +42,7 @@ protected:
 
 private:
 
-    Buffer_Data * Buffer_Allocate();
+    Buffer_Data * Buffer_Allocate( bool aProfiling );
 
     CUmodule mModule;
 

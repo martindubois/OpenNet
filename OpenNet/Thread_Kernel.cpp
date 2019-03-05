@@ -48,57 +48,10 @@ Thread_Kernel::~Thread_Kernel()
 {
 }
 
-// Protected
-/////////////////////////////////////////////////////////////////////////////
-
-// ===== Thread =============================================================
-
-void Thread_Kernel::Run_Loop()
+void Thread_Kernel::Processing_Wait(unsigned int aIndex)
 {
-    // printf( __CLASS__ "Run_Loop()\n" );
+    assert( NULL != mBuffers[ aIndex ] );
+    assert( NULL != mKernel            );
 
-    assert(                  0 <  mBuffers.size());
-    assert(OPEN_NET_BUFFER_QTY >= mBuffers.size());
-    assert(NULL                != mDebugLog      );
-
-    try
-    {
-        unsigned lIndex = 0;
-
-        while (IsRunning())
-        {
-            Run_Iteration(lIndex);
-
-            lIndex = (lIndex + 1) % mBuffers.size();
-        }
-
-        for (unsigned int i = 0; i < mBuffers.size(); i++)
-        {
-            Processing_Wait(lIndex);
-
-            lIndex = (lIndex + 1) % mBuffers.size();
-        }
-    }
-    catch (KmsLib::Exception * eE)
-    {
-        mDebugLog->Log(__FILE__, __CLASS__ "Run_Loop", __LINE__);
-        mDebugLog->Log(eE);
-    }
-    catch (...)
-    {
-        mDebugLog->Log(__FILE__, __CLASS__ "Run_Loop", __LINE__);
-    }
-}
-
-void Thread_Kernel::Run_Start()
-{
-    // printf( __CLASS__ "Run_Start()\n" );
-
-    assert(                  0 <  mBuffers.size());
-    assert(OPEN_NET_BUFFER_QTY >= mBuffers.size());
-
-    for (unsigned int i = 0; i < mBuffers.size(); i++)
-    {
-        Processing_Queue(i);
-    }
+    Thread::Processing_Wait( mKernel, mBuffers[ aIndex ]->GetEvent() );
 }

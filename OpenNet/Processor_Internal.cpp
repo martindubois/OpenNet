@@ -42,13 +42,6 @@ Processor_Internal::Processor_Internal( KmsLib::DebugLog * aDebugLog )
     memset(&mInfo, 0, sizeof(mInfo));
 }
 
-// Exception  KmsLib::Exception *
-// Threads    Apps
-Processor_Internal::~Processor_Internal()
-{
-    // printf( __CLASS__ "~Processor_Internal()\n" );
-}
-
 // Return  This methode return the address of the internal thread instance.
 Thread * Processor_Internal::Thread_Prepare()
 {
@@ -70,6 +63,10 @@ void Processor_Internal::Thread_Release()
 }
 
 // ===== OpenNet::Processor =================================================
+
+Processor_Internal::~Processor_Internal()
+{
+}
 
 OpenNet::Status Processor_Internal::GetConfig(Config * aOut) const
 {

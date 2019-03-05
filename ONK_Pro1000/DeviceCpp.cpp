@@ -166,8 +166,9 @@ void DeviceCpp_Interrupt_Enable( void * aThis )
 // aMessageId
 //
 // Return  See PIR_...
-//
-// CRITICAL_PATH  Buffer+
+
+// CRITICAL PATH  Interrupt
+//                1 / hardware interrupt
 ProcessIrqResult DeviceCpp_Interrupt_Process( void * aThis, unsigned int aMessageId )
 {
     // printk( KERN_DEBUG "%s( , %u )\n", __FUNCTION__, aMessageId );
@@ -188,8 +189,9 @@ ProcessIrqResult DeviceCpp_Interrupt_Process( void * aThis, unsigned int aMessag
 
 // aThis               [---;RW-]
 // aNeedMoreProcessing [---;-W-]
-//
-// CRITICAL_PATH  Buffer+
+
+// CRITICAL PATH  Interrupt
+//                1 / hardware interrupt + 1 / tick
 void DeviceCpp_Interrupt_Process2( void * aThis, bool * aNeedMoreProcessing )
 {
     // printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );

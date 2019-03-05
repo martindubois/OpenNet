@@ -40,6 +40,7 @@ Adapter_Windows::Adapter_Windows(KmsLib::DriverHandle * aHandle, KmsLib::DebugLo
 {
 }
 
+// aProfiling
 // aCommandQueue [---;RW-]
 // aKernel       [---;R--]
 // aBuffers      [---;RW-] The caller is responsible to release the
@@ -48,7 +49,7 @@ Adapter_Windows::Adapter_Windows(KmsLib::DriverHandle * aHandle, KmsLib::DebugLo
 //
 // Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Allocate
 // Thread     Apps
-void Adapter_Windows::Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers)
+void Adapter_Windows::Buffers_Allocate( bool aProfiling, cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers)
 {
     assert(NULL != aCommandQueue);
     assert(NULL != aKernel      );
@@ -58,7 +59,7 @@ void Adapter_Windows::Buffers_Allocate(cl_command_queue aCommandQueue, cl_kernel
 
     for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
     {
-        aBuffers->push_back(Buffer_Allocate(aCommandQueue, aKernel));
+        aBuffers->push_back(Buffer_Allocate( aProfiling, aCommandQueue, aKernel));
     }
 }
 
@@ -129,6 +130,7 @@ void Adapter_Windows::SetInputFilter_Internal(OpenNet::Kernel * aKernel)
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
+// aProfiling
 // aCommandQueue [---;RW-]
 // aKernel       [---;R--]
 //
@@ -137,7 +139,7 @@ void Adapter_Windows::SetInputFilter_Internal(OpenNet::Kernel * aKernel)
 // Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
 //                                 See Process_Internal::Buffer_Allocate
 // Threads    Apps
-Buffer_Data * Adapter_Windows::Buffer_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel)
+Buffer_Data * Adapter_Windows::Buffer_Allocate( bool aProfiling, cl_command_queue aCommandQueue, cl_kernel aKernel)
 {
     assert(NULL != aCommandQueue);
     assert(NULL != aKernel      );
@@ -156,7 +158,7 @@ Buffer_Data * Adapter_Windows::Buffer_Allocate(cl_command_queue aCommandQueue, c
     Processor_OpenCL * lProcessor = dynamic_cast<Processor_OpenCL *>(mProcessor);
     assert(NULL != lProcessor);
 
-    Buffer_Data * lResult = lProcessor->Buffer_Allocate(mConfig.mPacketSize_byte, aCommandQueue, aKernel, mBuffers + mBufferCount);
+    Buffer_Data * lResult = lProcessor->Buffer_Allocate( aProfiling, mConfig.mPacketSize_byte, aCommandQueue, aKernel, mBuffers + mBufferCount);
 
     mBufferCount++;
 

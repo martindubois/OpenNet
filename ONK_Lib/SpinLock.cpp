@@ -42,6 +42,15 @@ namespace OpenNetK
         mOSDep->LockSpinlock(mLock);
     }
 
+    uint32_t SpinLock::LockFromThread()
+    {
+        ASSERT( NULL != mLock                          );
+        ASSERT( NULL != mOSDep                         );
+        ASSERT( NULL != mOSDep->LockSpinlockFromThread );
+
+        return mOSDep->LockSpinlockFromThread( mLock );
+    }
+
     void SpinLock::Unlock()
     {
         ASSERT(NULL != mLock                 );
@@ -49,6 +58,15 @@ namespace OpenNetK
         ASSERT(NULL != mOSDep->UnlockSpinlock);
 
         mOSDep->UnlockSpinlock(mLock);
+    }
+
+    void SpinLock::UnlockFromThread( uint32_t aFlags )
+    {
+        ASSERT( NULL != mLock                            );
+        ASSERT( NULL != mOSDep                           );
+        ASSERT( NULL != mOSDep->UnlockSpinlockFromThread );
+
+        mOSDep->UnlockSpinlockFromThread( mLock, aFlags );
     }
 
 }
