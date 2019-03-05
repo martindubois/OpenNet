@@ -36,7 +36,7 @@ KMS_TEST_BEGIN(Kernel_Forward_Display)
 
     printf("QUESTION  Is the output OK? (y/n)\n");
     char lLine[1024];
-    fgets(lLine, sizeof(lLine), stdin);
+    KMS_TEST_ASSERT( NULL != fgets(lLine, sizeof(lLine), stdin) );
     KMS_TEST_COMPARE(0, strncmp("y", lLine, 1));
 }
 KMS_TEST_END

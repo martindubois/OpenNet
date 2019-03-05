@@ -4,7 +4,7 @@
 # Product    OpenNet
 # File       OpenNet/makefile
 
-CFLAGS = -DNDEBUG -fpic -g
+include ../User_Release.mk
 
 INCLUDES = -I ../Includes -I ../Import/Includes -I /usr/local/cuda/include
 

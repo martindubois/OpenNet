@@ -1,0 +1,109 @@
+
+# Author     KMS - Martin Dubois, ing.
+# Copyright  (C) 2019 KMS. All right reserved.
+# Product    OpenNet
+# File       Scripts/OpenNet_Tool/A00RRI_P4000_18.04_cuda-memcheck.txt
+
+# Successful executions
+#	0.0.8	
+
+# PCIe x16  NVIDIA Quadro P4000 (x16, Gen3)
+# PCIe x1	Empty
+# PCIe x16	Empty
+# PCIe x16	Intel Dual 82576 (x4, Gen1)
+# PCIe x1	Empty
+# PCIe x16	Empty
+
+# Test Code                  Mode     Packet Size
+# ==== ===================== ======== ===========
+# A    NOTHING               FUNCTION        9000
+# Fewer buffer cause dropped Packet
+
+Test SetBandwidth 120.0
+Test SetBufferQty 14
+Test SetCode NOTHING
+Test SetMode FUNCTION
+Test SetPacketSize 9000
+
+Test Run A
+
+# A    NOTHING               FUNCTION        5650
+# Fewer buffer cause dropped Packet
+
+Test SetPacketSize 5650
+
+Test Run A
+
+# A    NOTHING               FUNCTION         570
+# Fewer buffer cause dropped Packet
+
+Test SetBufferQty 56
+Test SetPacketSize 570
+
+Test Run A
+
+# A    NOTHING               KERNEL          9000
+
+Test SetBufferQty 12
+Test SetPacketSize 9000
+Test SetMode KERNEL
+
+Test Run A
+
+# A    REPLY_ON_ERROR        FUNCTION        9000
+# Higher bandwidth cause dropped packet
+
+Test SetBandwidth 21.0
+Test SetBufferQty 56
+Test SetCode REPLY_ON_ERROR
+Test SetPacketSize 9000
+
+Test Run A
+
+# A    REPLY_ON_ERROR        KERNEL          9000
+# Higher bandwidth cause dropped packet
+
+Test SetBandwidth 19.0
+Test SetMode KERNEL
+Test SetPacketSize 9000
+
+Test Run A
+
+# B   REPLY                  FUNCTION        9000
+
+Test SetBandwidth 120.0
+Test SetBufferQty 10
+Test SetCode REPLY
+Test SetMode FUNCTION
+
+Test Run B
+
+# B   REPLY                  KERNEL          9000
+
+Test SetMode KERNEL
+
+Test Run B
+
+# B   DO_NOT_REPLY_ON_ERROR  FUNCTION        9000
+# Fewer buffer cause dropep packet
+
+Test SetBufferQty 26
+Test SetCode DO_NOT_REPLY_ON_ERROR
+Test SetMode FUNCTION
+
+Test Run B
+
+# B   DO_NOT_REPLY_ON_ERROR  FUNCTION        6900
+
+Test SetBufferQty 56
+Test SetPacketSize 6900
+
+Test Run B
+
+# B   DO_NOT_REPLY_ON_ERROR  KERNEL          9000
+# Higher bandwidth cause dropped packet
+
+Test SetBandwidth 18.0
+Test SetMode KERNEL
+
+Test Run B

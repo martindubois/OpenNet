@@ -1,0 +1,27 @@
+
+# Author     KMS - Martin Dubois, ing.
+# Copyright  (C) 2019 KMS. All right reserved.
+# Product    OpenNet
+# File       Scripts/OpenNet_Tool/A00RRU_K620_18.04.txt
+
+# Successful executions
+#	0.0.8	
+
+# PCIe x16  NVIDIA Quadro P4000 (x16, Gen1)
+# PCIe x1	Empty
+# PCIe x16	Empty
+# PCIe x16	Intel Dual 82576 (x4, Gen1)
+# PCIe x1	Empty
+# PCIe x16	Empty
+
+# Test Code                  Mode     Packet Size
+# ==== ===================== ======== ===========
+# A    NOTHING               FUNCTION        9000
+
+Test SetBandwidth 120.0
+Test SetBufferQty 2
+Test SetCode NOTHING
+Test SetMode FUNCTION
+Test SetPacketSize 9000
+
+Test Run A

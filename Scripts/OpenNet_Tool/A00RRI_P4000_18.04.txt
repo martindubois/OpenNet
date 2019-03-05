@@ -7,7 +7,7 @@
 # Successful executions
 #	0.0.8	
 
-# PCIe x16  NVIDIA Quadro P4000 (x16, Gen1)
+# PCIe x16  NVIDIA Quadro P4000 (x16, Gen3)
 # PCIe x1	Empty
 # PCIe x16	Empty
 # PCIe x16	Intel Dual 82576 (x4, Gen1)
@@ -26,29 +26,37 @@ Test SetPacketSize 9000
 
 Test Run A
 
-# A    NOTHING               FUNCTION         936
-# Smaller packet cause dropped packet
+# A    NOTHING               FUNCTION         940
 
-Test SetPacketSize 936
+Test SetPacketSize 940
 
 Test Run A
 
-# A    NOTHING               FUNCTION         108
+# A    NOTHING               FUNCTION         100
 
 Test SetBufferQty 28
-Test SetPacketSize 108
+Test SetPacketSize 100
 
 Test Run A
 
-# A    NOTHING               FUNCTION          84
+# A    NOTHING               FUNCTION          96
 # Smaller packet cause dropped packet
 
 Test SetBufferQty 29
-Test SetPacketSize 84
+Test SetPacketSize 96
 
 Test Run A
 
 # A    NOTHING               FUNCTION          80
+# Smaller packet cause dropped packet
+
+Test SetBufferQty 56
+Test SetPacketSize 80
+
+Test Run A
+
+# A    NOTHING               FUNCTION          80
+# Smaller packet cause dropped packet
 
 Test SetBufferQty 57
 Test SetPacketSize 80
@@ -58,14 +66,7 @@ Test Run A
 # A    NOTHING               FUNCTION          76
 # Smaller packet cause dropped packet
 
-Test SetBufferQty 56
-Test SetPacketSize 76
-
-Test Run A
-
-# A    NOTHING               FUNCTION          76
-
-Test SetBufferQty 84
+Test SetBufferQty 112
 Test SetPacketSize 76
 
 Test Run A
@@ -73,7 +74,36 @@ Test Run A
 # A    NOTHING               FUNCTION          76
 # Smaller packet cause dropped packet
 
-Test SetBufferQty 112
+Test SetBufferQty 84
 Test SetPacketSize 76
+
+Test Run A
+
+# A    NOTHING               KERNEL          9000
+
+Test SetBufferQty 2
+Test SetPacketSize 9000
+Test SetMode KERNEL
+
+Test Run A
+
+# A    NOTHING               KERNEL          1104
+# Smaller packet cause dropped packet
+
+Test SetPacketSize 1104
+
+Test Run A
+
+# A    REPLY_ON_ERROR        FUNCTION        9000
+
+Test SetCode REPLY_ON_ERROR
+Test SetPacketSize 9000
+
+Test Run A
+
+# A    REPLY_ON_ERROR        FUNCTION        2040
+# Smaller packet cause dropped packet
+
+Test SetPacketSize 2020
 
 Test Run A

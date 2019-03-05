@@ -4,7 +4,7 @@
 # Product    OpenNet
 # File       TestLib/makefile
 
-CFLAG = -g
+include ../User_Release.mk
 
 INCLUDES = -I ../Includes -I ../Import/Includes
 

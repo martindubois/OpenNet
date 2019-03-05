@@ -4,7 +4,7 @@
 # Product    OpenNet
 # File       OpenNet_Tool/makefile
 
-CFLAGS = -g
+include ../User_Release.mk
 
 INCLUDES = -I ../Includes -I ../Import/Includes
 

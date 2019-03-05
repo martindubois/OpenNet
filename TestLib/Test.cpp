@@ -494,7 +494,7 @@ namespace TestLib
             lResult = Execute( FLAG_DO_NOT_SLEEP | FLAG_DO_NOT_START_GENERATOR );
             if (0 == lResult)
             {
-                DisplayAndWriteResult("Run");
+                DisplayAndWriteResult("StartStop");
             }
 
             Uninit();

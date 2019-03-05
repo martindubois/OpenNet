@@ -22,6 +22,7 @@
 #endif
 
 // ===== Import/Includes ====================================================
+#include <KmsLib/Exception.h>
 #include <KmsLib/ToolBase.h>
 #include <KmsTool.h>
 
@@ -223,16 +224,28 @@ int main(int aCount, const char ** aVector)
 {
     KMS_TOOL_BANNER("OpenNet", "OpenNet_Tool", VERSION_STR, VERSION_TYPE);
 
-    System_Connect();
+    try
+    {
+        System_Connect();
 
-	KmsLib::ToolBase lToolBase(COMMANDS);
+	    KmsLib::ToolBase lToolBase(COMMANDS);
 
-	if (!lToolBase.ParseArguments(aCount, aVector))
-	{
-		lToolBase.ParseCommands();
-	}
+        if (!lToolBase.ParseArguments(aCount, aVector))
+	    {
+		    lToolBase.ParseCommands();
+	    }
 
-	sSystem->Delete();
+	    sSystem->Delete();
+    }
+    catch ( KmsLib::Exception * eE )
+    {
+        printf( "FATAL ERROR  Exception\n" );
+        eE->Write( stdout );
+    }
+    catch ( ... )
+    {
+        printf( "FATAL ERROR  Unknown exception\n" );
+    }
 
     return 0;
 }
