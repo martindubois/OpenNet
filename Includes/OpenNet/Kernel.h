@@ -2,7 +2,7 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNet/Kernel.h
 /// \brief      OpenNet::Kernel
 
@@ -47,7 +47,7 @@ namespace OpenNet
         /// \brief  Disable OpenCL profiling
         /// \endcond
         /// \cond fr
-        /// \brief  Desactiver le profiling OpenCL
+        /// \brief  D&eacute;sactiver le profiling OpenCL
         /// \endcond
         /// \retval STATUS_PROFILING_ALREADY_DISABLED
         OPEN_NET_PUBLIC Status DisableProfiling();
@@ -77,8 +77,8 @@ namespace OpenNet
         /// \return This method returns the code line cout.
         /// \endcond
         /// \cond fr
-        /// \brief  Obtenir le nombre de ligne de code
-        /// \retval Cette methode retourne le nombre de ligne de code.
+        /// \brief  Obtenir le nombre de lignes de code
+        /// \retval Cette methode retourne le nombre de lignes de code.
         /// \endcond
         OPEN_NET_PUBLIC unsigned int  GetCodeLineCount();
 
@@ -100,7 +100,7 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir la queue de command qui execute ce kernel
-        /// \retval NULL   La queue de command n'est pas assigne
+        /// \retval NULL   La queue de command n'est pas assign&eacute;
         /// \retval Other  Une valeur valide de cl_command_queue
         /// \endcond
         OPEN_NET_PUBLIC void * GetCommandQueue();
@@ -110,7 +110,7 @@ namespace OpenNet
         /// \note   This method is part of the critical path.
         /// \endcond
         /// \cond fr
-        /// \brief  Est-ce que le profiling OpenCL est active?
+        /// \brief  Est-ce que le profiling OpenCL est activ&eacute;?
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         /// \retval false
@@ -122,7 +122,7 @@ namespace OpenNet
         /// \param  aKernel  The cl_kernel instance
         /// \endcond
         /// \cond fr
-        /// \brief  Appele pour ajouter des arguments utilisateur au kernel.
+        /// \brief  Appel&eacute; pour ajouter des arguments utilisateur au kernel.
         /// \param  aKernel  L'instance de cl_kernel
         /// \endcond
         OPEN_NET_PUBLIC virtual void SetUserKernelArgs(void * aKernel);
@@ -132,7 +132,7 @@ namespace OpenNet
         /// \param  aArguments  Argument vector to fill
         /// \endcond
         /// \cond fr
-        /// \brief  Appele pour ajouter des arguments utilisateur au kernel.
+        /// \brief  Appel&eacute; pour ajouter des arguments utilisateur au kernel.
         /// \param  aArguments  Le tableau d'arguments a completer
         /// \endcond
         OPEN_NET_PUBLIC virtual void SetUserKernelArgs(void * * aArguments );
@@ -141,8 +141,8 @@ namespace OpenNet
         OPEN_NET_PUBLIC virtual              ~Kernel     ();
         OPEN_NET_PUBLIC virtual Status       AppendCode  (const char * aCode, unsigned int aCodeSize_byte);
         OPEN_NET_PUBLIC virtual Status       ResetCode   ();
-        OPEN_NET_PUBLIC virtual Status       SetCode     (const char * aFileName, unsigned int aArgCount );
-        OPEN_NET_PUBLIC virtual Status       SetCode     (const char * aCode, unsigned int aCodeSize_byte, unsigned aArgCount );
+        OPEN_NET_PUBLIC virtual Status       SetCode     (const char * aFileName);
+        OPEN_NET_PUBLIC virtual Status       SetCode     (const char * aCode, unsigned int aCodeSize_byte);
         OPEN_NET_PUBLIC virtual Status       Display     (FILE * aOut) const;
         OPEN_NET_PUBLIC virtual unsigned int Edit_Remove (const char * aSearch);
         OPEN_NET_PUBLIC virtual unsigned int Edit_Replace(const char * aSearch, const char * aReplace);

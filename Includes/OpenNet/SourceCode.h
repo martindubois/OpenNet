@@ -2,7 +2,7 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNet/SourceCode.h
 /// \brief      OpenNet::SourceCode
 
@@ -50,11 +50,11 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Append code using a source file
-        /// \param  aFileName [---;R--] The source file name
+        /// \param  aFileName  The source file name
         /// \endcond
         /// \cond fr
         /// \brief  Ajouter du code en utilisant un fichier source
-        /// \param  aFileName [---;R--] Le nom du fichier source
+        /// \param  aFileName  Le nom du fichier source
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_CANNOT_OPEN_INPUT_FILE
@@ -68,12 +68,12 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Appen code
-        /// \param  aCode [---;R--] The code
+        /// \param  aCode  The code
         /// \param  aCodeSize_byte  La taille du code
         /// \endcond
         /// \cond fr
         /// \brief  Ajouter du code
-        /// \param  aCode [---;R--] Le code
+        /// \param  aCode  Le code
         /// \param  aCodeSize_byte  La taille du code
         /// \endcond
         /// \retval STATUS_OK
@@ -83,11 +83,11 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Appen code
-        /// \param  aCode [---;R--] The code
+        /// \param  aCode  The code
         /// \endcond
         /// \cond fr
         /// \brief  Ajouter du code
-        /// \param  aCode [---;R--] Le code
+        /// \param  aCode  Le code
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_CODE_ALREADY_SET
@@ -116,31 +116,36 @@ namespace OpenNet
         OPEN_NET_PUBLIC const char * GetName() const;
 
         /// \cond en
-        /// \brief  Reset the code using a source file
+        /// \brief  Reset the code
         /// \endcond
         /// \cond fr
-        /// \brief  Reset le code en utilisant un fichier source
+        /// \brief  Reinitialiser le code
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_CODE_NOT_SET
         OPEN_NET_PUBLIC virtual Status ResetCode();
 
-        // TODO  OpenNet.SourceCode
-        //       Normal (Interface) - Remove the aArgCount of the SetCode
-        //       methods and add a SetArgumentCount method
+        /// \cond en
+        /// \brief  Set the number of argument for the function or kernel
+        /// \param  aArgCount  This argument indicates how many arguments
+        ///         must be passed to the code.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Assigner un nombre d'argument &agrave; passer &agrave; la
+        ///         fonction ou au kernel
+        /// \param  aArgCount  Cet argument indique le nombre d'argument qui
+        ///                    doit &ecirc;tre pass&eacute;es au code.
+        /// \endcond
+        /// \retval STATUS_OK
+        OPEN_NET_PUBLIC virtual Status SetArgumentCount(unsigned int aArgCount);
 
         /// \cond en
         /// \brief  Set the code using a source file
-        /// \param  aFileName [---;R--] The source file name
-        /// \param  aArgCount           This argument indicates how many
-        ///                             arguments must be passed to the code.
+        /// \param  aFileName  The source file name
         /// \endcond
         /// \cond fr
         /// \brief  Assigner le code en utilisant un fichier source
-        /// \param  aFileName [---;R--] Le nom du fichier source
-        /// \param  aArgCount           Cet argument indique le nombre
-        ///                             d'argument qui doit etre passes au
-        ///                             code.
+        /// \param  aFileName  Le nom du fichier source
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_CANNOT_OPEN_INPUT_FILE
@@ -150,35 +155,30 @@ namespace OpenNet
         /// \retval STATUS_ERROR_CLOSING_INPUT_FILE
         /// \retval STATUS_ERROR_READING_INPUT_FILE
         /// \retval STATUS_INPUT_FILE_TOO_LARGE
-        OPEN_NET_PUBLIC virtual Status SetCode(const char * aFileName, unsigned int aArgCount );
+        OPEN_NET_PUBLIC virtual Status SetCode(const char * aFileName);
 
         /// \cond en
         /// \brief  Set the code
-        /// \param  aCode [---;R--] The code
+        /// \param  aCode           The code
         /// \param  aCodeSize_byte  La taille du code
-        /// \param  aArgCount           This argument indicates how many
-        ///                             arguments must be passed to the code.
         /// \endcond
         /// \cond fr
         /// \brief  Assigner le code
-        /// \param  aCode [---;R--] Le code
+        /// \param  aCode           Le code
         /// \param  aCodeSize_byte  La taille du code
-        /// \param  aArgCount           Cet argument indique le nombre
-        ///                             d'argument qui doit etre passes au
-        ///                             code.
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_CODE_ALREADY_SET
         /// \retval STATUS_EMPTY_CODE
-        OPEN_NET_PUBLIC virtual Status SetCode(const char * aCode, unsigned int aCodeSize_byte, unsigned int aArgCount );
+        OPEN_NET_PUBLIC virtual Status SetCode(const char * aCode, unsigned int aCodeSize_byte);
 
         /// \cond en
         /// \brief  Set the instance's name
-        /// \param  aName [---;R--] The name
+        /// \param  aName  The name
         /// \endcond
         /// \cond fr
         /// \brief  Assigner le nom de l'instance
-        /// \param  aName [---;R--] Le nom
+        /// \param  aName  Le nom
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
@@ -186,40 +186,41 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Display
-        /// \param  aOut [---;RW-] The output stream
+        /// \param  aOut  The output stream
         /// \endcond
         /// \cond fr
-        /// \brief  Affiche
-        /// \retval aOut [---;RW-] Le fichier de sortie
+        /// \brief  Afficher
+        /// \retval aOut  Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
         OPEN_NET_PUBLIC virtual Status Display(FILE * aOut) const;
 
         /// \cond en
-        /// \brief  Replace strings in code
-        /// \param  aSearch  [---;R--] The string to search for and remove
+        /// \brief  Remove strings from code
+        /// \param  aSearch   The string to search for and remove
         /// \return This method returns the number of removed string.
         /// \endcond
         /// \cond fr
-        /// \brief  Remplacer des chaines dans le code
-        /// \param  aSearch  [---;R--] La chaine a chercher
-        /// \return Cette methode retourne le nombre de chaine retirees.
+        /// \brief  Retirer des chaines du code
+        /// \param  aSearch   La chaine &agrave; chercher et retirer
+        /// \return Cette methode retourne le nombre de chaine
+        ///         retir&eacute;es.
         /// \endcond
         OPEN_NET_PUBLIC virtual unsigned int Edit_Remove(const char * aSearch);
 
         /// \cond en
         /// \brief  Replace strings in code
-        /// \param  aSearch  [---;R--] The string to search for
-        /// \param  aReplace [---;R--] The string to use for replacing found
+        /// \param  aSearch   The string to search for
+        /// \param  aReplace  The string to use for replacing found
         ///                            strings
         /// \return This method returns the number of replacement.
         /// \endcond
         /// \cond fr
         /// \brief  Remplacer des chaines dans le code
-        /// \param  aSearch  [---;R--] La chaine a chercher
-        /// \param  aReplace [---;R--] La chaine a utiliser pour remplacer
-        ///                            les chaines trouvees
+        /// \param  aSearch   La chaine &agrave; chercher
+        /// \param  aReplace  La chaine &agrave; utiliser pour remplacer les
+        ///                   chaines trouvees
         /// \return Cette methode retourne le nombre de remplacements
         ///         effectues
         /// \endcond
@@ -227,13 +228,14 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Search string in code
-        /// \param  aSearch  [---;R--] The string to search for
+        /// \param  aSearch  The string to search for
         /// \return This method returns the number of fount occurence.
         /// \endcond
         /// \cond fr
         /// \brief  Rechercher une chaines dans le code
-        /// \param  aSearch  [---;R--] La chaine a chercher
-        /// \return Cette methode retourne le nombre d'instance trouvees.
+        /// \param  aSearch  La chaine &agrave; chercher
+        /// \return Cette methode retourne le nombre d'instance
+        ///         trouv&eacute;es.
         /// \endcond
         OPEN_NET_PUBLIC unsigned int Edit_Search(const char * aSearch);
 

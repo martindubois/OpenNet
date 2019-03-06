@@ -123,26 +123,31 @@ namespace OpenNet
         return STATUS_OK;
     }
 
+    Status SourceCode::SetArgumentCount(unsigned int aArgCount)
+    {
+        assert(1 <= mArgumentCount);
+
+        if (1 > aArgCount)
+        {
+            return STATUS_INVALID_ARGUMENT_COUNT;
+        }
+
+        mArgumentCount = aArgCount;
+
+        return STATUS_OK;
+    }
+
     // NOT TESTED  OpenNet.Filter.ErrorHandling
     //             CloseHandle fail<br>
     //             ReadInputFile fail
-    Status SourceCode::SetCode(const char * aFileName, unsigned int aArgCount )
+    Status SourceCode::SetCode(const char * aFileName)
     {
-        assert( 1 <= mArgumentCount );
-
         if (NULL != mCode)
         {
             return STATUS_CODE_ALREADY_SET;
         }
 
-        if ( 1 > aArgCount )
-        {
-            return STATUS_INVALID_ARGUMENT_COUNT;
-        }
-
         assert(0 == mCodeSize_byte);
-
-        mArgumentCount = aArgCount;
 
         #ifdef _KMS_LINUX_
 
@@ -185,10 +190,8 @@ namespace OpenNet
         #endif
     }
 
-    Status SourceCode::SetCode(const char * aCode, unsigned int aSize_byte, unsigned int aArgCount )
+    Status SourceCode::SetCode(const char * aCode, unsigned int aSize_byte)
     {
-        assert( 1 <= mArgumentCount );
-
         if (NULL == aCode)
         {
             return STATUS_NOT_ALLOWED_NULL_ARGUMENT;
@@ -199,19 +202,12 @@ namespace OpenNet
             return STATUS_EMPTY_CODE;
         }
 
-        if ( 1 > aArgCount )
-        {
-            return STATUS_INVALID_ARGUMENT_COUNT;
-        }
-
         if (NULL != mCode)
         {
             return STATUS_CODE_ALREADY_SET;
         }
 
         assert( 0 == mCodeSize_byte );
-
-        mArgumentCount = aArgCount;
 
         mCode = Allocate(aSize_byte + 1);
         assert(NULL != mCode);

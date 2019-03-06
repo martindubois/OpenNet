@@ -163,9 +163,9 @@ namespace OpenNet
         return lResult;
     }
 
-    Status Kernel::SetCode(const char * aFileName, unsigned int aArgCount )
+    Status Kernel::SetCode(const char * aFileName)
     {
-        Status lResult = SourceCode::SetCode(aFileName, aArgCount );
+        Status lResult = SourceCode::SetCode(aFileName);
         if (STATUS_OK == lResult)
         {
             Invalidate();
@@ -174,9 +174,9 @@ namespace OpenNet
         return lResult;
     }
 
-    Status Kernel::SetCode(const char * aCode, unsigned int aCodeSize_byte, unsigned int aArgCount )
+    Status Kernel::SetCode(const char * aCode, unsigned int aCodeSize_byte)
     {
-        Status lResult = SourceCode::SetCode(aCode, aCodeSize_byte, aArgCount );
+        Status lResult = SourceCode::SetCode(aCode, aCodeSize_byte);
         if (STATUS_OK == lResult)
         {
             Invalidate();

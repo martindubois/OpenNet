@@ -34,13 +34,13 @@ KMS_TEST_BEGIN(SourceCode_Base)
     KMS_TEST_COMPARE(OpenNet::STATUS_EMPTY_CODE               , lSC0.SetCode    (""  , 0));
 
     #ifdef _KMS_LINUX_
-        KMS_TEST_COMPARE(OpenNet::STATUS_NOT_IMPLEMENTED      , lSC0.SetCode    (NULL, 1 ));
+        KMS_TEST_COMPARE(OpenNet::STATUS_NOT_IMPLEMENTED      , lSC0.SetCode    (NULL ));
     #endif
 
     #ifdef _KMS_WINDOWS_
-        KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSC0.SetCode    (NULL, 1 ));
-        KMS_TEST_COMPARE(OpenNet::STATUS_CANNOT_OPEN_INPUT_FILE   , lSC0.SetCode    ("DoesNotExist", 1 ));
-        KMS_TEST_COMPARE(OpenNet::STATUS_EMPTY_INPUT_FILE         , lSC0.SetCode    ("OpenNet_Test/Tests/Empty.txt", 1 ));
+        KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSC0.SetCode    (NULL ));
+        KMS_TEST_COMPARE(OpenNet::STATUS_CANNOT_OPEN_INPUT_FILE   , lSC0.SetCode    ("DoesNotExist" ));
+        KMS_TEST_COMPARE(OpenNet::STATUS_EMPTY_INPUT_FILE         , lSC0.SetCode    ("OpenNet_Test/Tests/Empty.txt" ));
     #endif
 
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSC0.SetName    (NULL));
@@ -60,21 +60,21 @@ KMS_TEST_BEGIN(SourceCode_Base)
 
     #ifdef _KMS_WINDOWS_
 
-        KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.SetCode("OpenNet_Test/SourceCode.cpp", 1 ));
+        KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.SetCode("OpenNet_Test/SourceCode.cpp"));
 
-        KMS_TEST_COMPARE(5339, lSC0.GetCodeSize());
+        KMS_TEST_COMPARE(5378, lSC0.GetCodeSize());
 
-        KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET, lSC0.SetCode(" ", 1, 1));
-        KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET, lSC0.SetCode("OpenNet_Test/Kernel.cpp", 1 ));
+        KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET, lSC0.SetCode(" ", 1));
+        KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET, lSC0.SetCode("OpenNet_Test/Kernel.cpp"));
 
         KMS_TEST_COMPARE(   0, lSC0.Edit_Remove (""));
         KMS_TEST_COMPARE(   0, lSC0.Edit_Replace("", ""));
         KMS_TEST_COMPARE(   0, lSC0.Edit_Replace("A\tB", ""));
         KMS_TEST_COMPARE(   3, lSC0.Edit_Replace("Found", "FOUND"));
         KMS_TEST_COMPARE(   5, lSC0.Edit_Replace("FOUND", "FOUN"));
-        KMS_TEST_COMPARE(5334, lSC0.GetCodeSize ());
+        KMS_TEST_COMPARE(5373, lSC0.GetCodeSize ());
         KMS_TEST_COMPARE(   7, lSC0.Edit_Replace("FOUN", "Found"));
-        KMS_TEST_COMPARE(5341, lSC0.GetCodeSize ());
+        KMS_TEST_COMPARE(5380, lSC0.GetCodeSize ());
         KMS_TEST_COMPARE(   0, lSC0.Edit_Search (""));
         KMS_TEST_COMPARE(   7, lSC0.Edit_Search ("Found"));
 
@@ -84,7 +84,7 @@ KMS_TEST_BEGIN(SourceCode_Base)
 
     KMS_TEST_COMPARE(0, lSC0.GetCodeSize());
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.SetCode   ("A", 1, 1 ));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.SetCode   ("A", 1 ));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.AppendCode("B", 1 ));
 
     KMS_TEST_COMPARE(2, lSC0.GetCodeSize());
@@ -92,7 +92,7 @@ KMS_TEST_BEGIN(SourceCode_Base)
     KMS_TEST_COMPARE(1, lSC0.GetCodeSize());
 
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.ResetCode());
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.SetCode  ("ABC", 3, 1));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.SetCode  ("ABC", 3));
 
     KMS_TEST_COMPARE(3, lSC0.GetCodeSize ());
     KMS_TEST_COMPARE(1, lSC0.Edit_Remove ("B"));
@@ -107,7 +107,7 @@ KMS_TEST_BEGIN(SourceCode_Base)
     KMS_TEST_COMPARE(2, lSC0.GetCodeSize ());
 
     KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.ResetCode());
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.SetCode  ("A\nB\n\rC\rD\r\nE", 11, 1 ));
+    KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.SetCode  ("A\nB\n\rC\rD\r\nE", 11));
 
     KMS_TEST_COMPARE(11, lSC0.GetCodeSize());
 

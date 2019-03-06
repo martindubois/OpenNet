@@ -887,7 +887,7 @@ void Kernel_SetCode(KmsLib::ToolBase * aToolBase, const char * aArg)
             return;
         }
 
-        ReportStatus(sKernel->SetCode(lFileName, 1 ), "Code set");
+        ReportStatus(sKernel->SetCode(lFileName), "Code set");
         break;
 
     default:
