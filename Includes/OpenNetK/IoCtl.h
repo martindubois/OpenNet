@@ -2,7 +2,7 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2019 KMS. All rights reserved.
+/// \copyright  Copyright &copy; 2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/IoCtl.h
 /// \brief      OpenNetK_IoCtl_Info, OpenNetK_IoCtl_Result
 
@@ -16,7 +16,7 @@
 ///         IoCtl accepts.
 /// \endcond
 /// \cond fr
-/// \brief  Cette structure contient les tailles d'espace memoire
+/// \brief  Cette structure contient les tailles d'espace m&eacute;moire
 ///         qu'un IoCtl accepte.
 /// \endcond
 /// \todo   Document the members
@@ -28,15 +28,12 @@ typedef struct
 }
 OpenNetK_IoCtl_Info;
 
-// TODO  OpenNetK.IoCtl
-//       Normal (Feature) - Ajouter des codes
-
 /// \cond en
 /// \brief  This enumeration defines the value IoCtl can return.
 /// \endcond
 /// \cond fr
-/// \brief  Cette enumeration definit les valeurs que les IoCtl peuvent
-///         retourner.
+/// \brief  Cette enum&eacute;ration definit les valeurs que les IoCtl
+///         peuvent retourner.
 /// \endcond
 /// \todo   Document the values
 typedef enum
@@ -45,7 +42,9 @@ typedef enum
 
     IOCTL_RESULT_PROCESSING_NEEDED = 0xffffffe0,
 
-    IOCTL_RESULT_ALREADY_CONNECTED = 0xfffffff5,
+    IOCTL_RESULT_ALREADY_CONNECTED = 0xfffffff3,
+    IOCTL_RESULT_CANNOT_DROP       = 0xfffffff4,
+    IOCTL_RESULT_CANNOT_SEND       = 0xfffffff5,
     IOCTL_RESULT_ERROR             = 0xfffffff6,
     IOCTL_RESULT_INVALID_PARAMETER = 0xfffffff7,
     IOCTL_RESULT_INVALID_SYSTEM_ID = 0xfffffff8,

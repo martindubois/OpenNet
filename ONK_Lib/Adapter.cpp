@@ -468,6 +468,8 @@ namespace OpenNetK
         return lResult;
     }
 
+    // CRITICAL PATH  Interrupt
+    //                1 / tick
     void Adapter::Tick()
     {
         mPacketGenerator_Counter = 0;
@@ -680,6 +682,8 @@ namespace OpenNetK
         }
     }
 
+    // CRITICAL PATH  Interrupt
+    //                1 / buffer
     void Adapter::Interrupt_Process2_Px_Zone0()
     {
         if ( mBuffer.mCount > mBuffer.mPx )
@@ -707,6 +711,8 @@ namespace OpenNetK
         }
     }
 
+    // CRITICAL PATH  Interrupt
+    //                1 / buffer
     void Adapter::Interrupt_Process2_Rx_Zone0()
     {
         if ( mBuffer.mCount > mBuffer.mRx )
@@ -734,6 +740,8 @@ namespace OpenNetK
         }
     }
 
+    // CRITICAL PATH  Interrupt
+    //                1 / buffer
     void Adapter::Interrupt_Process2_Tx_Zone0()
     {
         if ( mBuffer.mCount > mBuffer.mTx )
@@ -1048,9 +1056,7 @@ namespace OpenNetK
         {
             TRACE_ERROR "%s - Hardware::Packet_Drop() failed\n", __FUNCTION__ TRACE_END;
 
-            // TODO  OpenNetK.Adapter
-            //       Create a specific result code
-            return IOCTL_RESULT_NO_BUFFER;
+            return IOCTL_RESULT_CANNOT_DROP;
         }
 
         return IOCTL_RESULT_OK;
@@ -1079,9 +1085,7 @@ namespace OpenNetK
 
         if (!mHardware->Packet_Send(lIn + 1, lSize_byte, lIn->mRepeatCount))
         {
-            // TODO  OpenNetK.Adapter
-            //       Create a specific result code
-            return IOCTL_RESULT_NO_BUFFER;
+            return IOCTL_RESULT_CANNOT_SEND;
         }
 
         mStatistics[ADAPTER_STATS_IOCTL_PACKET_SEND] += lIn->mRepeatCount;
