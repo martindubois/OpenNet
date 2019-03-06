@@ -2,7 +2,7 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Hardware.h
 /// \brief      OpenNetK::Hardware
 
@@ -12,15 +12,15 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
+#include <OpenNetK/Adapter.h>
 #include <OpenNetK/Adapter_Types.h>
+#include <OpenNetK/SpinLock.h>
 #include <OpenNetK/Types.h>
 
 namespace OpenNetK
 {
 
-    class Adapter ;
-    class Packet  ;
-    class SpinLock;
+    class Packet;
 
     // Class
     /////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ namespace OpenNetK
     /// \brief  This class defines the hardware interface.
     /// \endcond
     /// \cond fr
-    /// \brief  Cette classe defenit l'interface du materiel.
+    /// \brief  Cette classe d&eacute;clare l'interface du materiel.
     /// \endcond
     class Hardware
     {
@@ -38,13 +38,13 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  new operator without allocation
-        /// \param  aSize_byte         The size
-        /// \param  aAddress [---;RW-] The address
+        /// \param  aSize_byte  The size
+        /// \param  aAddress    The address
         /// \endcond
         /// \cond fr
         /// \brief  Operateur new sans allocation
-        /// \param  aSize_byte         La taille
-        /// \param  aAddress [---;RW-] L'adresse
+        /// \param  aSize_byte  La taille
+        /// \param  aAddress    L'adresse
         /// \endcond
         /// \note   Level = Thread, Thread = Initialisation
         void * operator new(size_t aSize_byte, void * aAddress);
@@ -55,10 +55,11 @@ namespace OpenNetK
         ///         bytes.
         /// \endcond
         /// \cond fr
-        /// \brief  Obtenir la taille de l'espace memoire partage avec le
-        ///         hardware.
-        /// \retval Cette methode retourne la taille necessaire de l'espace
-        ///         memoire partage entre le materiel et le logiciel.
+        /// \brief  Obtenir la taille de l'espace m&eacute;moire
+        ///         partag&eacute; avec le mat&eacute;riel.
+        /// \retval Cette methode retourne la taille n&eacute;cessaire pour
+        ///         l'espace m&eacute;moire partage entre le mat&eacute;riel
+        ///         et le logiciel.
         /// \endcond
         unsigned int GetCommonBufferSize() const;
 
@@ -68,19 +69,19 @@ namespace OpenNetK
         ///         bytes.
         /// \endcond
         /// \cond fr
-        /// \brief  Obtenir la taille maximum des paquets configure
-        /// \retval Cette methode retourne la taille maximum configure pour
-        ///         les paquets en octes.
+        /// \brief  Obtenir la taille maximum des paquets configur&eacute;
+        /// \retval Cette methode retourne la taille maximum configur&eacute;
+        ///         pour les paquets en octes.
         /// \endcond
         unsigned int GetPacketSize() const;
 
         /// \cond en
         /// \brief  Retrieve the current state
-        /// \param  aState [---;-W-] The OpenNet_State instance
+        /// \param  aState  The OpenNet_State instance
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir l'etat courant
-        /// \param  aState [---;-W-] L'instance d'OpenNet_State
+        /// \param  aState  L'instance d'OpenNet_State
         /// \endcond
         /// \note   Level = SoftInt or Thread, Thread = Queue
         virtual void GetState(Adapter_State * aState) = 0;
@@ -89,44 +90,46 @@ namespace OpenNetK
         /// \brief  Reset all memory regions
         /// \endcond
         /// \cond fr
-        /// \brief  Reset toutes les regions de memoire
+        /// \brief  R&eacute;initialiser toutes les regions de m&eacute;moire
         /// \endcond
         /// \note   Level = Thread, Thread = Uninitialisation
         virtual void ResetMemory();
 
         /// \cond en
         /// \brief  Connect the adapter
-        /// \param  aAdapter [-K-;RW-] The adapter
+        /// \param  aAdapter  The Adapter
         /// \endcond
         /// \cond fr
-        /// \brief  Connect l'Adaptateur
-        /// \param  aAdapter [-K-;RW-] L'adaptateur
+        /// \brief  Connecter l'Adaptateur
+        /// \param  aAdapter  L'Adaptateur
         /// \endcond
         /// \note   Level = Thread, Thread = Initialisation
         virtual void SetAdapter(Adapter * aAdapter);
 
         /// \cond en
         /// \brief  Set the common buffer
-        /// \brief  aCommon_PA  The logical address the hardware uses
+        /// \brief  aCommon_PA  The physical address the hardware uses
         /// \brief  aCommon_CA  The virtual address the software uses
         /// \endcond
         /// \cond fr
         /// \brief  Associe l'espace de memoire contigue
-        /// \brief  aCommon_PA  L'adresse physique utilisee par le materiel
-        /// \brief  aCommon_CA  L'adresse virtuelle utilisee par le logiciel
+        /// \brief  aCommon_PA  L'adresse physique utilis&eacute;e par le
+        ///                     mat&eacute;riel
+        /// \brief  aCommon_CA  L'adresse virtuelle utilis&eacute;e par le
+        ///                     logiciel
         /// \endcond
         /// \note   Level = Thread, Thread = Initialisation
         virtual void SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA);
 
         /// \cond en
         /// \brief  Set the configuation
-        /// \param  aConfig [---;R--] La configuration
+        /// \param  aConfig  The configuration
         /// \endcond
         /// \cond fr
-        /// \brief  Connect l'Adaptateur
-        /// \param  aConfig [---;R--] La configuration
+        /// \brief  Changer la configuration
+        /// \param  aConfig  La configuration
         /// \endcond
-        /// \note   Level = SoftInt, Thread = Queue
+        /// \note   Level = SoftInt or Thread, Thread = Users
         virtual void SetConfig(const Adapter_Config & aConfig);
 
         /// \cond en
@@ -137,7 +140,7 @@ namespace OpenNetK
         /// \retval false Error
         /// \endcond
         /// \cond fr
-        /// \brief  Indique un region de memoire
+        /// \brief  Indique une r&eacute;gion de m&eacute;moire
         /// \param  aIndex      L'index
         /// \param  aMemory_MA  L'adresse virtuelle
         /// \param  aSize_byte  La taille
@@ -151,7 +154,7 @@ namespace OpenNetK
         /// \brief  Enter the D0 state
         /// \endcond
         /// \cond fr
-        /// \brief  Entrer dans l'etat D0
+        /// \brief  Entrer dans l'&eacute;tat D0
         /// \endcond
         /// \note   Level = Thread, Thread = Initialisation
         virtual void D0_Entry();
@@ -161,7 +164,7 @@ namespace OpenNetK
         /// \retval false Error
         /// \endcond
         /// \cond fr
-        /// \brief  Sortir de l'etat D0
+        /// \brief  Sortir de l'&eacute;tat D0
         /// \retval false Erreur
         /// \endcond
         /// \retval true  OK
@@ -172,7 +175,7 @@ namespace OpenNetK
         /// \brief  Disable the interrupts
         /// \endcond
         /// \cond fr
-        /// \brief  Desactiver les interruption
+        /// \brief  D&eacute;sactiver les interruptions
         /// \endcond
         virtual void Interrupt_Disable();
 
@@ -186,32 +189,32 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Process an interrupt
-        /// \param  aMessageId                    The message associated to
-        ////                                      the interrupt
-        /// \param  aNeedMoreProcessing [---;-W-]
+        /// \param  aMessageId           The message associated to the
+        ///                              interrupt
+        /// \param  aNeedMoreProcessing
         /// \retval The adapter did not cause the interrupt.
         /// \retval The adapter caused the interrupt.
         /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
-        /// \brief  traiter une interruption
-        /// \param  aMessageId                    Le message attache a
-        ///                                       l'interruption
-        /// \param  aNeedMoreProcessing [---;-W-]
-        /// \retval false L'adaptateur n'a pas cause l'interruption.
-        /// \retval true  L'adaptateur a cause l'interruption.
+        /// \brief  Traiter une interruption
+        /// \param  aMessageId           Le message attach&eacute; a
+        ///                              l'interruption
+        /// \param  aNeedMoreProcessing
+        /// \retval false L'adaptateur n'a pas caus&eacute; l'interruption.
+        /// \retval true  L'adaptateur a caus&eacute; l'interruption.
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual bool Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing);
 
         /// \cond en
         /// \brief  Process an interrupt at seconde level
-        /// \param  aNeedMoreProcessing [---;-W-]
+        /// \param  aNeedMoreProcessing
         /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
         /// \brief  Traiter une interruption au second niveau
-        /// \param  aNeedMoreProcessing [---;-W-]
+        /// \param  aNeedMoreProcessing
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual void Interrupt_Process2(bool * aNeedMoreProcessing);
@@ -220,7 +223,7 @@ namespace OpenNetK
         /// \brief  Process an interrupt at third level
         /// \endcond
         /// \cond fr
-        /// \brief  Traiter une interruption au troisieme niveau
+        /// \brief  Traiter une interruption au troisi&egrave;me niveau
         /// \endcond
         virtual void Interrupt_Process3();
 
@@ -232,7 +235,7 @@ namespace OpenNetK
         /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
-        /// \brief  Verouiller l'acces au materiel
+        /// \brief  Verouiller l'acc&egrave;s au mat&eacute;riel
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         void Lock();
@@ -242,7 +245,7 @@ namespace OpenNetK
         /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
-        /// \brief  Deverouiller l'acces au materiel
+        /// \brief  D&eacuteverouiller l'acc&egrave;s au mat&eacute;riel
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         void Unlock();
@@ -254,11 +257,13 @@ namespace OpenNetK
         /// \param  aFlags      Value to pass to SpinLock::UnlockFromThread
         /// \endcond
         /// \cond fr
-        /// \brief  Deverouiller l'acces au materiel apres avoir programmer
-        ///         des descripteurs de reception
-        /// \param  aCounter    Le compteur a incrementer
-        /// \param  aPacketQty  Le nombre de descripteurs programmes
-        /// \param  aFlags      La valeur a passer a SpinLock::UnlockFromThread
+        /// \brief  D&eacute;verouiller l'acc&egrave;s au mat&eacute;riel
+        ///         apr&egrave;s avoir programm&eacute; des descripteurs de
+        ///         r&eacute;ception
+        /// \param  aCounter    Le compteur &agrave; incrementer
+        /// \param  aPacketQty  Le nombre de descripteurs programm&eacute;s
+        /// \param  aFlags      La valeur &agrave; passer &agrave;
+        ///                     SpinLock::UnlockFromThread
         /// \endcond
         void Unlock_AfterReceive_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags );
 
@@ -269,11 +274,13 @@ namespace OpenNetK
         /// \param  aFlags      Value to pass to SpinLock::UnlockFromThread
         /// \endcond
         /// \cond fr
-        /// \brief  Deverouiller l'acces au materiel apres avoir programmer
-        ///         des descripteurs de transmission
-        /// \param  aCounter    Le compteur a incrementer
-        /// \param  aPacketQty  Le nombre de descripteurs programmes
-        /// \param  aFlags      La valeur a passer a SpinLock::UnlockFromThread
+        /// \brief  D&eacute;verouiller l'acc&egrave;s au mat&eacute;riel
+        ///         apr&egrave;s avoir programm&eacute; des descripteurs de
+        ///         transmission
+        /// \param  aCounter    Le compteur &agrave; incrementer
+        /// \param  aPacketQty  Le nombre de descripteurs programm&eacute;s
+        /// \param  aFlags      La valeur &agrave; passer &agrave;
+        ///                     SpinLock::UnlockFromThread
         /// \endcond
         void Unlock_AfterSend_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags );
 
@@ -282,8 +289,9 @@ namespace OpenNetK
         /// \retval false  No available buffer
         /// \endcond
         /// \cond fr
-        /// \brief  Ajoute un buffer a la queue de reception
-        /// \retval false  Pas d'espace memoire disponible
+        /// \brief  Ajouter un espace m&eacute;moire &agrave; la queue de
+        ///         r&eacute;ception
+        /// \retval false  Pas d'espace m&eacute;moire disponible
         /// \endcond
         /// \retval true OK
         virtual bool Packet_Drop() = 0;
@@ -295,15 +303,15 @@ namespace OpenNetK
         //       counter.
 
         /// \cond en
-        /// \brief  Add the buffer to the receiving queue.
+        /// \brief  Add the packet to the receiving queue.
         /// \param  aPacket   The Packet
         /// \param  aCounter  The operation counter
         /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
-        /// \brief  Ajoute le buffer a la queue de reception
+        /// \brief  Ajouter le paquet &agrave; la queue de r&eacute;ception
         /// \param  aPacket   Le Packet
-        /// \param  aCounter  Le compteur d'operation
+        /// \param  aCounter  Le compteur d'op&acute;ration
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual void Packet_Receive_NoLock(Packet * aPacket, volatile long * aCounter) = 0;
@@ -317,11 +325,11 @@ namespace OpenNetK
         /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
-        /// \brief  Ajoute le paquet a la queue de transmission
-        /// \param  aPacket_PA  Les donnees
-        /// \param  aPacket_XA  Les donnees (C or M)
-        /// \param  aSize_byte  La taille des donnees
-        /// \param  aCounter    Le compteur d'operation
+        /// \brief  Ajouter le paquet &agrave la queue de transmission
+        /// \param  aPacket_PA  Les donn&eacute;es
+        /// \param  aPacket_XA  Les donn&eacute;es (C or M)
+        /// \param  aSize_byte  La taille des donne&eacute;s
+        /// \param  aCounter    Le compteur d'op&eacute;ration
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual void Packet_Send_NoLock(uint64_t aPacket_PA, const void * aPacket_XA, unsigned int aSize_byte, volatile long * aCounter) = 0;
@@ -334,13 +342,13 @@ namespace OpenNetK
         /// \retval false  Error
         /// \endcond
         /// \cond fr
-        /// \brief  Ajoute le paquet a la queue de transmission
+        /// \brief  Ajouter le paquet &agrave; la queue de transmission
         /// \param  aPacket       Le paquet
         /// \param  aSize_byte    La taille du paquet
-        /// \param  aRepeatCount  Le nombre de repetition
+        /// \param  aRepeatCount  Le nombre de r&eacute;p&eacute;tition
         /// \retval false  Erreur
         /// \endcond
-        /// \note   Thread = Queue
+        /// \note   Level = SoftInt or Thread, Thread = Users
         /// \retval true  OK
         virtual bool Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1) = 0;
 
@@ -354,14 +362,15 @@ namespace OpenNetK
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir les statistiques
-        /// \param  aOut           L'espace de memoire de sortie
-        /// \param  aOutSize_byte  La taille de l'espace memoire de sortie
-        /// \param  aReset         Remettre les statistiques a zero apres les
-        ///                        avoir obtenus
-        /// \return Cette methode retourne la taille des statistiques ecrites
-        ///         dans l'espace de memoire de sortie.
+        /// \param  aOut           L'espace m&eacute;moire de sortie
+        /// \param  aOutSize_byte  La taille de l'espace m&eacute;moire de
+        ///                        sortie
+        /// \param  aReset         Remettre les statistiques &agrave;
+        ///                        z&eacute;ro apr&egrave;s les avoir obtenus
+        /// \return Cette methode retourne la taille des statistiques
+        ///         &eacute;crites dans l'espace m&eacute;moire de sortie.
         /// \endcond
-        /// \note   Thread = Queue
+        /// \note   Level = SoftInt or Thread, Thread = Users
         virtual unsigned int Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset);
 
         /// \cond en
@@ -370,7 +379,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Remettre les statistiques a zero
         /// \endcond
-        /// \note   Thread = Queue
+        /// \note   Level = SoftInt or Thread, Thread = Users
         virtual void Statistics_Reset();
 
     // internal:
@@ -416,21 +425,12 @@ namespace OpenNetK
         Hardware();
 
         /// \cond en
-        /// \brief  Retrieve the Adapter
-        /// \return This method returns the Adapter instance address.
-        /// \endcond
-        /// \cond fr
-        /// \brief  Retrouver l'Adapter
-        /// \return Cette methode retourne l'adresse de l'instance d'Adapter.
-        /// \endcond
-        Adapter * GetAdapter();
-
-        /// \cond en
         /// \brief  Hardware dependent part of the Unlock_AfterReceive
         /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
-        /// \brief  La partie de Unlock_AfterReceive qui depend du materiel
+        /// \brief  La partie de Unlock_AfterReceive qui d&eacute;pend du
+        ///         mat&eacute;riel
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual void Unlock_AfterReceive_Internal() = 0;
@@ -440,7 +440,8 @@ namespace OpenNetK
         /// \note   This method is a part of the critical path.
         /// \endcond
         /// \cond fr
-        /// \brief  La partie de Unlock_AfterSend qui depend du materiel
+        /// \brief  La partie de Unlock_AfterSend qui d&eacute;pend du
+        ///         mat&eacute;riel
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
         virtual void Unlock_AfterSend_Internal() = 0;
@@ -475,7 +476,8 @@ namespace OpenNetK
         /// \brief  The SpinLock used to lock the hardware
         /// \endcond
         /// \cond fr
-        /// \brief  Le SpinLock utilise pour verouille l'access au materiel
+        /// \brief  Le SpinLock utilis&eacute; pour verouille l'acc&egrave;s
+        ///         au mat&eacute;riel
         /// \endcond
         SpinLock * mZone0;
 
@@ -488,5 +490,26 @@ namespace OpenNetK
         Adapter * mAdapter;
 
     };
+
+    // Public
+    /////////////////////////////////////////////////////////////////////////
+
+    inline void Hardware::Lock()
+    {
+        mZone0->Lock();
+    }
+
+    inline void Hardware::Unlock()
+    {
+        mZone0->Unlock();
+    }
+
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    inline void Hardware::Tick()
+    {
+        mAdapter->Tick();
+    }
 
 }

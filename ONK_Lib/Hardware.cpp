@@ -114,9 +114,6 @@ namespace OpenNetK
         mStatistics[HARDWARE_STATS_INTERRUPT_ENABLE] ++;
     }
 
-    // CRITICAL PATH  Interrupt
-    //                1 / hardware interrupt
-
     // NOT TESTED  ONK_Lib.Hardware
     //             The Interrupt_Process is only there to fill the virtual
     //             table entry when the driver does not need interrupt.
@@ -152,24 +149,6 @@ namespace OpenNetK
         mAdapter->Interrupt_Process3();
     }
 
-    // CRITICAL PATH  Interrupt
-    //                1 to ( AdapterQty + 1 ) / buffer
-    void Hardware::Lock()
-    {
-        ASSERT(NULL != mZone0);
-
-        mZone0->Lock();
-    }
-
-    // CRITICAL PATH  Interrupt
-    //                1 to ( AdapterQty + 1 ) / buffer
-    void Hardware::Unlock()
-    {
-        ASSERT(NULL != mZone0);
-
-        mZone0->Unlock();
-    }
-
     void Hardware::Unlock_AfterReceive_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags )
     {
         // TRACE_DEBUG "Unlock_AfterReceive( , %u packet )" DEBUG_EOL, aPacketQty TRACE_END;
@@ -177,13 +156,7 @@ namespace OpenNetK
         ASSERT(NULL != aCounter );
         ASSERT(0    < aPacketQty);
 
-        #ifdef _KMS_LINUX_
-            ( * aCounter ) += aPacketQty;
-        #endif 
-
-        #ifdef _KMS_WINDOWS_
-            InterlockedAdd(aCounter, aPacketQty);
-        #endif
+        ( * aCounter ) += aPacketQty;
 
         Unlock_AfterReceive_Internal();
 
@@ -194,25 +167,14 @@ namespace OpenNetK
 
     void Hardware::Unlock_AfterSend_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags )
     {
-        // TRACE_DEBUG "Unlock_AfterSend( , %u packet )" DEBUG_EOL, aPacketQty TRACE_END;
+        ASSERT(NULL != aCounter  );
+        ASSERT(   0 <  aPacketQty);
 
-        if (0 < aPacketQty)
-        {
-            if (NULL != aCounter)
-            {
-                #ifdef _KMS_LINUX_
-                    ( * aCounter ) += aPacketQty;
-                #endif
+        ( * aCounter ) += aPacketQty;
 
-                #ifdef _KMS_WINDOWS_
-                    InterlockedAdd(aCounter, aPacketQty);
-                #endif
-            }
+        Unlock_AfterSend_Internal();
 
-            Unlock_AfterSend_Internal();
-
-            mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
-        }
+        mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
 
         mZone0->UnlockFromThread( aFlags );
     }
@@ -285,13 +247,6 @@ namespace OpenNetK
         memcpy(aInfo, &mInfo, sizeof(mInfo));
     }
 
-    void Hardware::Tick()
-    {
-        ASSERT(NULL != mAdapter);
-
-        mAdapter->Tick();
-    }
-
     // aCounter [---;RW-]
     // aPacketQty         The number of packet programmed for receiving
     //
@@ -308,13 +263,7 @@ namespace OpenNetK
 
         ASSERT( NULL != mZone0 );
 
-        #ifdef _KMS_LINUX_
-            ( * aCounter ) += aPacketQty;
-        #endif
-
-        #ifdef _KMS_WINDOWS_
-            InterlockedAdd(aCounter, aPacketQty);
-        #endif
+        ( * aCounter ) += aPacketQty;
 
         Unlock_AfterReceive_Internal();
 
@@ -334,25 +283,16 @@ namespace OpenNetK
     {
         // TRACE_DEBUG "Unlock_AfterSend( , %u packet )" DEBUG_EOL, aPacketQty TRACE_END;
 
+        ASSERT(NULL != aCounter  );
+        ASSERT(   0 <  aPacketQty);
+
         ASSERT( NULL != mZone0 );
 
-        if (0 < aPacketQty)
-        {
-            if (NULL != aCounter)
-            {
-                #ifdef _KMS_LINUX_
-                    ( * aCounter ) += aPacketQty;
-                #endif
+        ( * aCounter ) += aPacketQty;
 
-                #ifdef _KMS_WINDOWS_
-                    InterlockedAdd(aCounter, aPacketQty);
-                #endif
-            }
+        Unlock_AfterSend_Internal();
 
-            Unlock_AfterSend_Internal();
-
-            mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
-        }
+        mStatistics[OpenNetK::HARDWARE_STATS_PACKET_SEND] += aPacketQty;
 
         mZone0->Unlock();
     }
@@ -412,13 +352,6 @@ namespace OpenNetK
         strcpy(mInfo.mVersion_Driver .mType   , VERSION_TYPE);
         strcpy(mInfo.mVersion_ONK_Lib.mComment, "ONK_Lib"   );
         strcpy(mInfo.mVersion_ONK_Lib.mType   , VERSION_TYPE);
-    }
-
-    Adapter * Hardware::GetAdapter()
-    {
-        ASSERT(NULL != mAdapter);
-
-        return mAdapter;
     }
 
 }

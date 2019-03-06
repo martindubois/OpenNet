@@ -2,7 +2,7 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/SpinLock.h
 /// \brief      OpenNetK::SpinLock
 
@@ -27,8 +27,8 @@ namespace OpenNetK
     /// \endcond
     /// \cond fr
     /// \brief  Interface d'un spinlock
-    /// \note   Classe noyau - Pas de constructeur, pas de destructor, pas de
-    ///         method virtuel
+    /// \note   Classe noyau - Pas de constructeur, pas de destructeur, pas
+    ///         de methode virtuelle
     /// \endcond
     class SpinLock
     {
@@ -40,8 +40,8 @@ namespace OpenNetK
         /// \param  aLock  The instance
         /// \endcond
         /// \cond fr
-        /// \brief  Initialise l'instance de verou dependant du systeme
-        ///         d'exploitation
+        /// \brief  Initialiser l'instance de verou d&eacute;pendant du
+        ///         systeme d'exploitation
         /// \param  aLock  L'instance
         /// \endcond
         void SetLock(void * aLock);
@@ -51,8 +51,8 @@ namespace OpenNetK
         /// \param  aOSDep  The function table
         /// \endcond
         /// \cond fr
-        /// \brief  Initialise la table de fonction dependant du systeme
-        ///         d'exploitation
+        /// \brief  Initialiser la table de fonctions d&eacute;pendantes du
+        ///         systeme d'exploitation
         /// \param  aOSDep  La table de fonctions
         /// \endcond
         void SetOSDep(OpenNetK_OSDep * aOSDep);
@@ -71,7 +71,7 @@ namespace OpenNetK
         /// \endcond
         /// \cond fr
         /// \brief  Verouiller
-        /// \return La valeur a passer a UnlockFromThread
+        /// \return La valeur &agrave; passer &agrave; UnlockFromThread
         /// \endcond
         uint32_t LockFromThread();
 
@@ -79,7 +79,7 @@ namespace OpenNetK
         /// \brief  Unlock
         /// \endcond
         /// \cond fr
-        /// \brief  Deverouiller
+        /// \brief  D&eacute;verouiller
         /// \endcond
         void Unlock();
 
@@ -88,8 +88,8 @@ namespace OpenNetK
         /// \param  aFlags  The value returned by LockFromThread
         /// \endcond
         /// \cond fr
-        /// \brief  Deverouiller
-        /// \param  aFlags  La valeur retourner par LockFromThread
+        /// \brief  D&eacute;verouiller
+        /// \param  aFlags  La valeur retourn&eacute; par LockFromThread
         /// \endcond
         void UnlockFromThread( uint32_t aFlags );
 
@@ -99,4 +99,18 @@ namespace OpenNetK
         OpenNetK_OSDep * mOSDep;
 
     };
+
+    // Public
+    /////////////////////////////////////////////////////////////////////////
+
+    inline void SpinLock::Lock()
+    {
+        mOSDep->LockSpinlock(mLock);
+    }
+
+    inline void SpinLock::Unlock()
+    {
+        mOSDep->UnlockSpinlock(mLock);
+    }
+
 }
