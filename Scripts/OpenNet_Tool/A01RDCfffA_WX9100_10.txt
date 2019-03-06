@@ -2,17 +2,17 @@
 # Author     KMS - Martin Dubois, ing.
 # Copyright  (C) 2019 KMS. All right reserved.
 # Product    OpenNet
-# File       Scripts/OpenNet_Tool/A00DDC00000001A_WX5100_10.txt
+# File       Scripts/OpenNet_Tool/A01RDCfffA_WX9100_10.txt
 
 # Successful executions
-#	0.0.8	2019-02-20
 
-# PCIe x16  AMD Radeo Pro WX5100 (x16, Gen3) - Driver 18.Q2.1
 # PCIe x1	Empty
-# PCIe x16	NVIDIA Quadro K520 (x1, Gen1)
+# PCIe x16  AMD Radeon Pro WX9100 (x16, Gen3) - Driver 17.Q4.1
+# PCIe x1	Empty
+# PCI		Empty
 # PCIe x16	Dual 82576 (x4, Gen1)
-# PCIe x1	Empty
-# PCIe x16	Empty
+# PCI		Empty
+# PCI		Empty
 
 # Test Code           Mode     Packet Size
 # ==== ============== ======== ===========
@@ -26,10 +26,10 @@ Test SetBufferQty 2
 Test SetPacketSize 9000
 Test Run A
 
-# A   NOTHING         FUNCTION          88
+# A   NOTHING         FUNCTION          90
 
 Test SetBufferQty 64
-Test SetPacketSize 88
+Test SetPacketSize 90
 Test Run A
 
 # A   NOTHING         KERNEL          9000
@@ -53,7 +53,7 @@ Test Run A
 Test SetCode REPLY_ON_ERROR
 Test SetMode FUNCTION
 
-Test SetBufferQty 3
+Test SetBufferQty 2
 Test SetPacketSize 9000
 Test Run A
 

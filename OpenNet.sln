@@ -48,6 +48,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC
 		Includes\OpenNetK\Kernel_CUDA.h = Includes\OpenNetK\Kernel_CUDA.h
 		Includes\OpenNetK\Kernel_OpenCL.h = Includes\OpenNetK\Kernel_OpenCL.h
 		Includes\OpenNetK\Linux.h = Includes\OpenNetK\Linux.h
+		Includes\OpenNetK\LinuxCpp.h = Includes\OpenNetK\LinuxCpp.h
 		Includes\OpenNetK\OS.h = Includes\OpenNetK\OS.h
 		Includes\OpenNetK\OSDep.h = Includes\OpenNetK\OSDep.h
 		Includes\OpenNetK\Packet.h = Includes\OpenNetK\Packet.h
@@ -146,13 +147,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{DDC8
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet_Tool", "OpenNet_Tool", "{7A086992-CDEA-4B24-96B1-404A882FE13A}"
 	ProjectSection(SolutionItems) = preProject
-		Scripts\OpenNet_Tool\A00DDC00000001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDC00000001A_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00DDC00000001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDC00000001I_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00DDN00000001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDN00000001A_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00DDN00000001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDN00000001I_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00RRC00000001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00RRC00000001A_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00RRC00000001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00RRC00000001I_WX5100_10.txt
-		Scripts\OpenNet_Tool\A01RDC00000fffA_WX9100_10.txt = Scripts\OpenNet_Tool\A01RDC00000fffA_WX9100_10.txt
+		Scripts\OpenNet_Tool\A00DDC001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDC001A_WX5100_10.txt
+		Scripts\OpenNet_Tool\A00DDC001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDC001I_WX5100_10.txt
+		Scripts\OpenNet_Tool\A00DDN001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDN001A_WX5100_10.txt
+		Scripts\OpenNet_Tool\A00DDN001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDN001I_WX5100_10.txt
+		Scripts\OpenNet_Tool\A00RRC001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00RRC001A_WX5100_10.txt
+		Scripts\OpenNet_Tool\A00RRC001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00RRC001I_WX5100_10.txt
+		Scripts\OpenNet_Tool\A00RRC001I_WX5100_10_Profiling.txt = Scripts\OpenNet_Tool\A00RRC001I_WX5100_10_Profiling.txt
+		Scripts\OpenNet_Tool\A01RDCfffA_WX9100_10.txt = Scripts\OpenNet_Tool\A01RDCfffA_WX9100_10.txt
 		Scripts\OpenNet_Tool\README.md = Scripts\OpenNet_Tool\README.md
 	EndProjectSection
 EndProject

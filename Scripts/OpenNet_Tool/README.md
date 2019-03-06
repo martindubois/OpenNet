@@ -1,8 +1,8 @@
 
-Author     KMS - Martin Dubois, ing.
-Copyright  (C) 2019 KMS. All right reserved.
-Product    OpenNet
-File       Scripts/OpenNet_Tool/README.md
+	Author     KMS - Martin Dubois, ing.
+	Copyright  (C) 2019 KMS. All right reserved.
+	Product    OpenNet
+	File       Scripts/OpenNet_Tool/README.md
 
 For Windows, the script in this folder are nammed
 
@@ -42,7 +42,7 @@ For Windows, the script in this folder are nammed
 
 	DebugFilter
 
-		00000000	The value of
+		000			The value of
 					HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Debug Print Filter\IHVDRIVER
 					in hex format
 
