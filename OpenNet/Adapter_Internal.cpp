@@ -77,10 +77,8 @@ Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::Debug
 
     Config_Update();
 
-    // TODO  OpenNet.Adapter
-    //       Normal - Ajouter un espace avant l'adresse MAC
-
     strncpy_s(mName, mInfo.mVersion_Hardware.mComment, sizeof(mName) - 1);
+    strcat_s (mName, " ");
 
     unsigned int lOffset_byte = static_cast<unsigned int>(strlen(mName));
 

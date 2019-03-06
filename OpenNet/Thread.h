@@ -74,8 +74,6 @@ protected:
     //                1 / iteration
     virtual void Processing_Wait(unsigned int aIndex) = 0;
 
-    void Run_Iteration(unsigned int aIndex);
-
     // Threads  Apps
     virtual void Release() = 0;
 

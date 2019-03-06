@@ -2,7 +2,7 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNet/OpenNet.h
 
 #pragma once
@@ -17,5 +17,7 @@
         #define OPEN_NET_PUBLIC __declspec( dllimport )
     #endif
 #else
+    // TODO  OpenNet
+    //       Normal - On Linux, Do not export all symbols
     #define OPEN_NET_PUBLIC
 #endif

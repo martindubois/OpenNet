@@ -48,11 +48,12 @@ Includes/OpenNetK
     Interface.h
 	IPv4.h
 	Kernel.h
+	Kernel_OpenCL.h
 	OS.h
+	OSDep.h
 	Packet.h
 	PacketGenerator_Types.h
 	SpinLock.h
-	Spinlock_WDF.h
 	StdInt.h
 	Types.h
 	Windows.h
@@ -76,7 +77,6 @@ Scripts .
 	Package_RunTime.txt
 	Package_SDK.txt
 	Package_SDK_DDK.txt
-	Package_SDK_Headers.txt
 
 x64/Debug Binaries/Debug_64
     OpenNet.dll
@@ -89,11 +89,6 @@ x64/Debug Libraries/Debug_64
 x64/Debug Tests/Debug_64
     ONK_Test.exe
     OpenNet_Test.exe
-
-x64/Debug/ONK_NDIS Drivers/Debug_64/ONK_NDIS
-    onk_ndis.cat
-    ONK_NDIS.inf
-    ONK_NDIS.sys
 
 x64/Debug/ONK_Pro1000 Drivers/Debug_64/ONK_Pro1000
     onk_pro1000.cat
@@ -111,11 +106,6 @@ x64/Release Libraries/Release_64
 x64/Release Tests/Release_64
     ONK_Test.exe
     OpenNet_Test.exe
-
-x64/Release/ONK_NDIS Drivers/Release_64/ONK_NDIS
-    onk_ndis.cat
-    ONK_NDIS.inf
-    ONK_NDIS.sys
 
 x64/Release/ONK_Pro1000 Drivers/Release_64/ONK_Pro1000
     onk_pro1000.cat

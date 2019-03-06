@@ -95,7 +95,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocDev", "_DocDev", "{2347
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Procedures", "Procedures", "{F6D48D20-B04B-47E1-AB5E-C84AF52E70C4}"
 	ProjectSection(SolutionItems) = preProject
-		_DocDev\Procedures\Build_fr.txt = _DocDev\Procedures\Build_fr.txt
+		_DocDev\Procedures\Build.txt = _DocDev\Procedures\Build.txt
 		_DocDev\Procedures\Test.txt = _DocDev\Procedures\Test.txt
 	EndProjectSection
 EndProject
@@ -142,7 +142,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{DDC8
 		Scripts\Package_RunTime.txt = Scripts\Package_RunTime.txt
 		Scripts\Package_SDK.txt = Scripts\Package_SDK.txt
 		Scripts\Package_SDK_DDK.txt = Scripts\Package_SDK_DDK.txt
-		Scripts\Package_SDK_Headers.txt = Scripts\Package_SDK_Headers.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet_Tool", "OpenNet_Tool", "{7A086992-CDEA-4B24-96B1-404A882FE13A}"

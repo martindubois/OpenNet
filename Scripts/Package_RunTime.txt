@@ -6,12 +6,15 @@
 
 ADD Binaries/Release_64/OpenNet.dll
 ADD Binaries/Release_64/OpenNet_Tool.exe
-ADD Drivers/Release_64/ONK_NDIS/ONK_NDIS.cat
-ADD Drivers/Release_64/ONK_NDIS/ONK_NDIS.inf
-ADD Drivers/Release_64/ONK_NDIS/ONK_NDIS.sys
 ADD Drivers/Release_64/ONK_Pro1000/ONK_Pro1000.cat
 ADD Drivers/Release_64/ONK_Pro1000/ONK_Pro1000.inf
 ADD Drivers/Release_64/ONK_Pro1000/ONK_Pro1000.sys
+ADD Includes/OpenNetK/ARP.h
+ADD Includes/OpenNetK/Ethernet.h
+ADD Includes/OpenNetK/IPv4.h
+ADD Includes/OpenNetK/Kernel.h
+ADD Includes/OpenNetK/Kernel_OpenCL.h
+ADD Includes/OpenNetK/Types.h
 ADD ONK_Pro1000/ReadMe.txt
 ADD OpenNet/ReadMe.txt
 ADD OpenNet_Tool/ReadMe.txt

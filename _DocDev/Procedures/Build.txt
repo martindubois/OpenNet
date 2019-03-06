@@ -1,0 +1,38 @@
+
+Author     KMS - Martin Dubois, ing.
+Copyright  (C) 2019 KMS. All rights reserved.
+Product    OpenNet
+File       _DocDev/Procedures/Build.txt
+
+Name               __________________________________________________________
+
+Date and time     20 ______ - ______ - ______                ______ : ______
+
+Version            _____ . _____ . _____ . _____ - __________________________
+
+[ ] Tool "Visual Studio 2017"
+    - Open the solution
+    - File "Common/Version.h" - Edit the version
+	- File "_DocUser/ReadMe.txt"
+	- File "ONK_Lib/_DocUser/ReadMe.txt"
+	- File "ONK_Pro1000/_DocUser/ReadMe.txt"
+	- File "OpenNet/_DocUser/ReadMe.txt"
+	- File "OpenNet_Tool/_DocUser/ReadMe.txt"
+    - Project ONK_NDIS - Edit the property "Stampinf - General - Driver
+      Version Number"
+    - Project ONK_Pro1000 - Edit the property  "Stampinf - General - Driver
+      Version Number"
+    - Close the solution
+
+[ ] Tool "PowerShell" - In the product folder
+		RunDoxygen.cmd
+		Build.cmd
+
+[ ] Tool "Git"
+	- Commetre les fichiers modifies
+	- Ajouter le tag {Major}.{Minor}.{Build}_{Type}_{Ubuntu|Windows}
+	- Pousser les sourses sur le serveur
+
+Heure et duree      _____ : ______            ______ heures et ______ minutes
+
+Signature          __________________________________________________________

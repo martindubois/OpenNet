@@ -1,9 +1,10 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     Common/Constants.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       Common/Constants.h
 //
-// This file contains general constants use at user and kernel level.
+// This file contains general constants used at user and kernel level.
 
 #pragma once
 
@@ -25,8 +26,3 @@
 // to send packet as fast it could. At 3072, the PacketGenerator can fill a
 // 1 Gb/s link even with 64 bytes packets.
 #define REPEAT_COUNT_MAX (3072)
-
-// TODO  ONK_X.TxOverflowDetection
-//       High - A network adapter's device driver simply ignore transmit
-//       request when the tx queue or ring is full. It then increment a
-//       statistic counter. Make this TODO a requirement after!

@@ -2,7 +2,7 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Adapter.h
 /// \brief      OpenNetK::Adapter
 
@@ -23,12 +23,11 @@ extern "C"
     #include <OpenNetK/OSDep.h>
 }
 
-class Packet;
-
 namespace OpenNetK
 {
 
     class Hardware;
+    class Packet  ;
     class SpinLock;
 
     // Class
@@ -41,10 +40,10 @@ namespace OpenNetK
     ///         method
     /// \endcond
     /// \cond fr
-    /// \brief  Cette classe maintien les information concernant un
+    /// \brief  Cette classe maintien les informations concernant un
     ///         adaptateur sur le reseau interne OpenNet.
     /// \note   Classe noyau - Pas de constructeur, pas de destructor, pas de
-    ///         method virtuel
+    ///         methodes virtuelle
     /// \endcond
     class Adapter
     {
@@ -71,7 +70,7 @@ namespace OpenNetK
         /// \param  aFileObject  The closing file
         /// \endcond
         /// \cond fr
-        /// \brief  Nettoyer a la fermeture d'un fichier
+        /// \brief  Nettoyer &agrave; la fermeture d'un fichier
         /// \param  aFileObject  Le fichier en fermeture
         /// \endcond
         void FileCleanup( void * aFileObject );
@@ -108,9 +107,9 @@ namespace OpenNetK
         ///         documented and may change or disapear in futur version.
         /// \endcond
         /// \cond fr
-        /// \brief  L'information au sujet d'un espace memoire DirectGMA.
-        ///         Cette structure n'est pas documente. Elle peut changer
-        ///         ou disparaitre dans une version future.
+        /// \brief  L'information au sujet d'un espace memoire.
+        ///         Cette structure n'est pas document&eacute;. Elle peut
+        ///         changer ou disparaitre dans une version future.
         /// \endcond
         typedef struct
         {
@@ -119,7 +118,7 @@ namespace OpenNetK
             uint8_t              * mBase_XA  ; // C or M
             OpenNet_BufferHeader * mHeader_XA; // C or M
             volatile uint32_t    * mMarker_MA;
-            Packet               * mPackets  ;
+            OpenNetK::Packet     * mPackets  ;
 
             struct
             {

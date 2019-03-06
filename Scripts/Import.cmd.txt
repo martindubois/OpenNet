@@ -65,6 +65,7 @@ Includes/OpenNetK
 	Ethernet.h
 	IPv4.h
 	Kernel.h
+	Kernel_OpenCL.h
 	StdInt.h
 	Types.h
 

@@ -279,18 +279,6 @@ void Thread::Processing_Wait( OpenNet::Kernel * aKernel, Event * aEvent )
     }
 }
 
-// aIndex  The index passed to Processing_Queue and Processing_Wait
-
-// CRITICAL PATH  Processing
-//                1 / iteration
-void Thread::Run_Iteration(unsigned int aIndex)
-{
-    // printf( __CLASS__ "Run_Iteration( %u )\n", aIndex );
-
-    Processing_Wait (aIndex);
-    Processing_Queue(aIndex);
-}
-
 // CRITICAL PATH  Processing
 //                1 execution
 void Thread::Run_Loop()
@@ -304,7 +292,8 @@ void Thread::Run_Loop()
 
         while (IsRunning())
         {
-            Run_Iteration(lIndex);
+            Processing_Wait (lIndex);
+            Processing_Queue(lIndex);
 
             lIndex = (lIndex + 1) % mQueueDepth;
         }

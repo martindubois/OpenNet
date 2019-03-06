@@ -7,6 +7,10 @@
 // REQUIREMENT  ONK_X.InterruptRateLimitation
 //              The adapter driver limit the interruption rate.
 
+// REQUIREMENT  ONK_X.Tx.OverflowDetection
+//              The adapter driver fail transmit request when the tx queue or
+//              or the descriptor ring is full.
+
 #define __CLASS__     "Intel::"
 #define __NAMESPACE__ ""
 
@@ -56,7 +60,7 @@ void Intel::GetState(OpenNetK::Adapter_State * aState)
         aState->mFlags.mLinkUp     = lDeviceStatus.mFields.mLinkUp    ;
         aState->mFlags.mTx_Off     = lDeviceStatus.mFields.mTx_Off    ;
 
-        // TODO  ONK_Intel,Intel
+        // TODO  ONK_Intel.Intel
         //       High (Feature) - Comprendre pourquoi la vitesse n'est pas
         //       indique correctement.
 
