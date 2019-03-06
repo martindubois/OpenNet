@@ -58,6 +58,8 @@ void Thread_Functions_OpenCL::Prepare()
     assert(NULL != mProgram);
 
     Thread_OpenCL::Prepare(dynamic_cast<Processor_OpenCL *>(mProcessor), &mAdapters, mKernel, &mBuffers);
+
+    Thread_Functions::Prepare();
 }
 
 // Protected
@@ -67,18 +69,17 @@ void Thread_Functions_OpenCL::Prepare()
 
 void Thread_Functions_OpenCL::Processing_Queue(unsigned int aIndex)
 {
-    assert(EVENT_QTY > aIndex);
+    assert(QUEUE_DEPTH > aIndex);
 
-    assert(    0 <  mBuffers.size()    );
-    assert( NULL != mBuffers[      0 ] );
-    assert( NULL != mEVents [ aIndex ] );
+    assert(    0 <  mBuffers.size() );
+    assert( NULL != mBuffers[ 0 ]   );
 
     size_t lLS = mBuffers[0]->GetPacketQty();
     size_t lGS = lLS * mBuffers.size();
 
     assert(0 < lLS);
 
-    Thread_OpenCL::Processing_Queue( mEvents[ aIndex ], &lGS, &lLS );
+    Thread_OpenCL::Processing_Queue( mEvent_OpenCL + aIndex, &lGS, &lLS );
 }
 
 void Thread_Functions_OpenCL::Release()

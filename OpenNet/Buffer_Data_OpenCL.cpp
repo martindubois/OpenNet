@@ -11,6 +11,7 @@
 
 // ===== C ==================================================================
 #include <assert.h>
+#include <stdint.h>
 
 // ===== OpenNet ============================================================
 #include "OCLW.h"
@@ -23,9 +24,9 @@
 // aProfiling     Set to true when profiling data must be captured
 // aMem [DK-;RW-] The cl_mem instance describing the buffer
 // aPacketQty     The number of packet the buffer contains
-Buffer_Data_OpenCL::Buffer_Data_OpenCL( bool, aProfiling, cl_mem aMem, unsigned int aPacketQty)
+Buffer_Data_OpenCL::Buffer_Data_OpenCL( bool aProfiling, cl_mem aMem, unsigned int aPacketQty)
     : Buffer_Data( aPacketQty, static_cast< Event * >( & mEvent_OpenCL ) )
-    , mEvent_OpenCL( aProfiling );
+    , mEvent_OpenCL( aProfiling )
     , mMem         ( aMem       )
 {
     assert(NULL != aMem      );

@@ -18,14 +18,10 @@
 
 // ===== OpenNet ============================================================
 #include "Adapter_Windows.h"
+#include "Event_OpenCL.h"
 #include "OCLW.h"
 
 #include "Thread_OpenCL.h"
-
-// Static functions declaration
-/////////////////////////////////////////////////////////////////////////////
-
-static uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam);
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
@@ -70,7 +66,7 @@ void Thread_OpenCL::Prepare(Processor_OpenCL * aProcessor, Adapter_Vector * aAda
         Adapter_Windows * lAdapter = dynamic_cast<Adapter_Windows *>((*aAdapters)[i]);
         assert(NULL != lAdapter);
 
-        lAdapter->Buffers_Allocate(mCommandQueue, mKernel_CL, aBuffers);
+        lAdapter->Buffers_Allocate( aKernel->IsProfilingEnabled(), mCommandQueue, mKernel_CL, aBuffers);
     }
 }
 
@@ -93,7 +89,7 @@ void Thread_OpenCL::Processing_Queue( Event_OpenCL * aEvent, const size_t * aGlo
     size_t lGO = 0;
 
     // OCLW_EnqueueNDRangeKernel ==> OCLW_ReleaseEvent  See Processing_Wait
-    OCLW_EnqueueNDRangeKernel(mCommandQueue, mKernel_CL, 1, &lGO, aGlobalSize, aLocalSize, 0, NULL, aEvent->mEvent);
+    OCLW_EnqueueNDRangeKernel(mCommandQueue, mKernel_CL, 1, &lGO, aGlobalSize, aLocalSize, 0, NULL, & aEvent->mEvent);
 
     OCLW_Flush(mCommandQueue);
 }
@@ -126,28 +122,4 @@ void Thread_OpenCL::Release(OpenNet::Kernel * aKernel)
             }
         }
     }
-}
-
-// Static functions
-/////////////////////////////////////////////////////////////////////////////
-
-// aEvent [---;R--]
-// aParam
-//
-// Return  This method return the retrieved information
-//
-// Exception  KmsLib::Exception *  See OCLW_GetEventProfilingInfo
-// Thread     Worker
-
-// CRITICAL PATH  Processing.Profiling
-//                4 / iteration
-uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam)
-{
-    assert(NULL != aEvent);
-
-    uint64_t lResult;
-
-    OCLW_GetEventProfilingInfo(aEvent, aParam, sizeof(lResult), &lResult);
-
-    return lResult;
 }

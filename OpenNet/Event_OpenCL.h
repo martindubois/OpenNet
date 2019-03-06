@@ -9,6 +9,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+// ===== OpenCL =============================================================
+#include <CL/opencl.h>
+
 // ===== OpenNet ============================================================
 #include "Event.h"
 
@@ -20,11 +23,13 @@ class Event_OpenCL : public Event
 
 public:
 
-    Event_OpenCL( bool aProfiling = false );
+    Event_OpenCL();
+
+    Event_OpenCL( bool aProfiling );
 
     // ===== Event ==========================================================
     virtual void Wait();
 
     cl_event mEvent;
 
-}
+};

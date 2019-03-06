@@ -7,11 +7,26 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+// ===== C ==================================================================
+#include <assert.h>
+#include <stdint.h>
+
 // ===== OpenNet ============================================================
+#include "OCLW.h"
+
 #include "Event_OpenCL.h"
+
+// Static functions declaration
+/////////////////////////////////////////////////////////////////////////////
+
+static uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam);
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
+
+Event_OpenCL::Event_OpenCL()
+{
+}
 
 // aProfiling  Stored in the base class and used to know if profiling
 //             information must be retrieved after waiting.
@@ -40,4 +55,28 @@ void Event_OpenCL::Wait()
     }
 
     OCLW_ReleaseEvent( mEvent );
+}
+
+// Static functions
+/////////////////////////////////////////////////////////////////////////////
+
+// aEvent [---;R--]
+// aParam
+//
+// Return  This method return the retrieved information
+//
+// Exception  KmsLib::Exception *  See OCLW_GetEventProfilingInfo
+// Thread     Worker
+
+// CRITICAL PATH  Processing.Profiling
+//                4 / iteration
+uint64_t GetEventProfilingInfo(cl_event aEvent, cl_profiling_info aParam)
+{
+    assert(NULL != aEvent);
+
+    uint64_t lResult;
+
+    OCLW_GetEventProfilingInfo(aEvent, aParam, sizeof(lResult), &lResult);
+
+    return lResult;
 }

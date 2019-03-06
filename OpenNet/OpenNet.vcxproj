@@ -102,6 +102,12 @@
     <ClCompile Include="Buffer_Data.cpp" />
     <ClCompile Include="Buffer_Data_OpenCL.cpp" />
     <ClCompile Include="EthernetAddress.cpp" />
+    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="Event_CUDA.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Event_OpenCL.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="Function_Forward.cpp" />
     <ClCompile Include="Kernel_Forward.cpp" />
@@ -145,6 +151,8 @@
     <ClInclude Include="Buffer_Data.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="EthernetAddress.h" />
+    <ClInclude Include="Event_CUDA.h" />
+    <ClInclude Include="Event_OpenCL.h" />
     <ClInclude Include="PacketGenerator_Internal.h" />
     <ClInclude Include="Processor_CUDA.h" />
     <ClInclude Include="Processor_OpenCL.h" />

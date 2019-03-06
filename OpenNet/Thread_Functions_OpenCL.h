@@ -10,6 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== OpenNet ============================================================
+#include "Event_OpenCL.h"
 #include "Thread_Functions.h"
 #include "Thread_OpenCL.h"
 
@@ -39,6 +40,6 @@ protected:
 
 private:
 
-    cl_event         mEvents[EVENT_QTY];
+    Event_OpenCL mEvent_OpenCL[QUEUE_DEPTH];
 
 };

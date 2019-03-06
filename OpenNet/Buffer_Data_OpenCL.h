@@ -13,7 +13,7 @@
 #include <CL/opencl.h>
 
 // ===== OpenNet ============================================================
-#include "EVent_OpenCL.h"
+#include "Event_OpenCL.h"
 
 #include "Buffer_Data.h"
 

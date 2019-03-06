@@ -42,7 +42,7 @@ protected:
 
 private:
 
-    Buffer_Data * Buffer_Allocate(cl_command_queue aCommandQueue, cl_kernel aKernel);
+    Buffer_Data * Buffer_Allocate(bool aProfiling, cl_command_queue aCommandQueue, cl_kernel aKernel);
 
     cl_program mProgram;
 

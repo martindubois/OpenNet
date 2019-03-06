@@ -28,7 +28,7 @@ static uint64_t GetTimeStamp();
 static void     LockSpinlock            (void * aLock);
 static uint32_t LockSpinlockFromThread  (void * aLock);
 static void     UnlockSpinlock          (void * aLock);
-static void     UnlockSpinlockFromThread(void * aLock);
+static void     UnlockSpinlockFromThread(void * aLock, uint32_t aFlags);
 
 static void * MapBuffer(void * aContext, uint64_t * aBuffer_PA, uint64_t aBuffer_DA, unsigned int aSize_byte, uint64_t aMarker_PA, volatile void * * aMarker_MA );
 static void   UnmapBuffer(void * aContext, void * aBuffer_MA, unsigned int aSize_byte, volatile void * aMarker_MA);
@@ -57,7 +57,7 @@ void OSDep_Init(OpenNetK_OSDep * aOSDep, void * aContext)
     aOSDep->MapBuffer                = MapBuffer               ;
     aOSDep->MapSharedMemory          = MapSharedMemory         ;
     aOSDep->UnlockSpinlock           = UnlockSpinlock          ;
-    aOSDep->UnlockspinlockFromThread = UnlockspinlockFromThread;
+    aOSDep->UnlockSpinlockFromThread = UnlockSpinlockFromThread;
     aOSDep->UnmapBuffer              = UnmapBuffer             ;
     aOSDep->UnmapSharedMemory        = UnmapSharedMemory       ;
 };
@@ -113,10 +113,12 @@ void UnlockSpinlock(void * aLock)
     WdfSpinLockRelease(reinterpret_cast<WDFSPINLOCK>(aLock));
 }
 
-void UnlockSpinlock(void * aLock, uint32_t aFlags)
+void UnlockSpinlockFromThread(void * aLock, uint32_t aFlags)
 {
     ASSERT(NULL != aLock );
     ASSERT(   0 == aFlags);
+
+    (void)(aFlags);
 
     WdfSpinLockRelease(reinterpret_cast<WDFSPINLOCK>(aLock));
 }

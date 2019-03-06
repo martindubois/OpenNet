@@ -62,7 +62,7 @@ void Thread_Kernel_OpenCL::Prepare()
 
     Thread_OpenCL::Prepare(dynamic_cast<Processor_OpenCL *>(mProcessor), &mAdapters, mKernel, &mBuffers);
 
-    mQueueDepth = mBuffers.size();
+    mQueueDepth = static_cast< unsigned int >( mBuffers.size() );
 }
 
 // Protected
@@ -81,7 +81,6 @@ void Thread_Kernel_OpenCL::Processing_Queue(unsigned int aIndex)
 
     Buffer_Data_OpenCL * lBuffer = dynamic_cast< Buffer_Data_OpenCL * >(mBuffers[aIndex]);
     assert(NULL != lBuffer        );
-    assert(NULL == lBuffer->mEvent);
     assert(NULL != lBuffer->mMem  );
 
     OCLW_SetKernelArg(mKernel_CL, 0, sizeof(lBuffer->mMem), &lBuffer->mMem);
@@ -97,7 +96,7 @@ void Thread_Kernel_OpenCL::Processing_Queue(unsigned int aIndex)
 
     assert(0 < lGS);
 
-    Thread_OpenCL::Processing_Queue( lBuffer->GetEvent(), &lGS, NULL );
+    Thread_OpenCL::Processing_Queue( & lBuffer->mEvent_OpenCL, &lGS, NULL );
 }
 
 void Thread_Kernel_OpenCL::Release()
