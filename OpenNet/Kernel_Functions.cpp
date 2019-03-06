@@ -37,25 +37,11 @@ static const char * CODE_FILE_HEADER =
 static const char * CODE_KERNEL_A =
 "OPEN_NET_KERNEL void Filter(" EOL;
 
-#ifdef _KMS_LINUX_
-
-    static const char * CODE_KERNEL_B =
-    " )"                        EOL
-    "{"                         EOL
-    "    switch ( blockIdx.x )" EOL
-    "    {"                     EOL;
-
-#endif
-
-#ifdef _KMS_WINDOWS_
-
-    static const char * CODE_KERNEL_B =
-    " )"                               EOL
-    "{"                                EOL
-    "    switch ( get_group_id( 0 ) )" EOL
-    "    {"                            EOL;
-
-#endif
+static const char * CODE_KERNEL_B =
+" )"                               EOL
+"{"                                EOL
+"    switch ( OPEN_NET_GROUP_ID )" EOL
+"    {"                            EOL;
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
@@ -63,7 +49,7 @@ static const char * CODE_KERNEL_A =
 // Exception  KmsLib::Exception *  CODE_ERROR
 Kernel_Functions::Kernel_Functions()
 {
-    OpenNet::Status lStatus = SetCode(CODE_FILE_HEADER, static_cast<unsigned int>(strlen(CODE_FILE_HEADER)), 1 );
+    OpenNet::Status lStatus = SetCode(CODE_FILE_HEADER, static_cast<unsigned int>(strlen(CODE_FILE_HEADER)));
     if (OpenNet::STATUS_OK != lStatus)
     {
         throw new KmsLib::Exception(KmsLib::Exception::CODE_ERROR,
@@ -98,13 +84,7 @@ void Kernel_Functions::AddDispatchCode(const unsigned int * aBufferQty)
 
         for (j = 0; j < aBufferQty[i]; j++)
         {
-            #ifdef _KMS_LINUX_
-                sprintf_s(lCode, "    OpenNet_BufferHeader * aBH_%u_%u", i, j);
-            #endif
-
-            #ifdef _KMS_WINDOWS_
-                sprintf_s(lCode, "    __global OpenNet_BufferHeader * aBH_%u_%u", i, j);
-            #endif
+            sprintf_s(lCode, "    OPEN_NET_GLOBAL OpenNet_BufferHeader * aBH_%u_%u", i, j);
 
             AppendCode(lCode);
 

@@ -25,6 +25,9 @@
     #include <Windows.h>
 #endif
 
+// ===== Import/Includes ====================================================
+#include <KmsLib/ThreadBase.h>
+
 // ===== Includes ===========================================================
 #include <OpenNetK/Constants.h>
 
@@ -1040,14 +1043,7 @@ namespace TestLib
             return __LINE__;
         }
 
-        #ifdef _KMS_LINUX_
-            int lRet = usleep(100000);
-            assert(0 == lRet);
-        #endif
-        
-        #ifdef _KMS_WINDOWS_
-            Sleep(100);
-        #endif
+        KmsLib::ThreadBase::Sleep_ms(100);
 
         if ( 0 == ( aFlags && FLAG_DO_NOT_START_GENERATOR ) )
         {
@@ -1060,14 +1056,7 @@ namespace TestLib
             }
         }
 
-        #ifdef _KMS_LINUX_
-            lRet = usleep(100000);
-            assert(0 == lRet);
-        #endif
-        
-        #ifdef _KMS_WINDOWS_
-            Sleep(100);
-        #endif
+        KmsLib::ThreadBase::Sleep_ms(100);
 
         ResetStatistics();
 
@@ -1204,6 +1193,11 @@ namespace TestLib
 
             lStatus = lAdapter->SetConfig(lConfig);
             assert(OpenNet::STATUS_OK == lStatus);
+
+            if (mConfig.mProfiling)
+            {
+                mKernels[i].EnableProfiling();
+            }
         }
     }
 
@@ -1284,14 +1278,7 @@ namespace TestLib
         {
             if ( 0 == ( aFlags & FLAG_DO_NOT_SLEEP ) )
             {
-                #ifdef _KMS_LINUX_
-                    int lRet = sleep(1);
-                    assert(0 == lRet);
-                #endif
-            
-                #ifdef _KMS_WINDOWS_
-                    Sleep(1000);
-                #endif
+                KmsLib::ThreadBase::Sleep_s(1);
             }
 
             lResult = Stop();
@@ -1447,7 +1434,7 @@ namespace TestLib
         assert(NULL != aCode    );
         assert(NULL != aName    );
 
-        OpenNet::Status lStatus = aFunction->SetCode(aCode, static_cast<unsigned int>(strlen(aCode)), 1 );
+        OpenNet::Status lStatus = aFunction->SetCode(aCode, static_cast<unsigned int>(strlen(aCode)));
         if ( OpenNet::STATUS_OK != lStatus )
         {
             printf( __NAMESPACE__ __CLASS__ "SetFunction - OpenNet::Function::SetCode( ,  ) failed - " );
@@ -1506,7 +1493,7 @@ namespace TestLib
         assert(NULL != aKernel );
         assert(NULL != aCode   );
 
-        OpenNet::Status lStatus = aKernel->SetCode(aCode, static_cast<unsigned int>(strlen(aCode)), 1);
+        OpenNet::Status lStatus = aKernel->SetCode(aCode, static_cast<unsigned int>(strlen(aCode)));
         assert(OpenNet::STATUS_OK == lStatus);
 
         if (NULL != aIndex)
