@@ -10,17 +10,17 @@ echo Excuting  CopyToTestComputer.sh  ...
 
 # ===== Configuration =======================================================
 
-TEST_COMPUTER=192.168.0.197
+TEST_COMPUTER=192.168.0.199
 
 # ===== Initialisation ======================================================
 
 DST_FOLDER=~/OpenNet
 
+RESULT=0
+
 # ===== Execution ===========================================================
 
 scp Binaries/ONK_Test $TEST_COMPUTER:$DST_FOLDER/Binaries/ONK_Test
-
-RESULT=0
 
 if [ 0 != $? ] ; then
     echo ERROR  scp Binaries/ONK_Test $TEST_COMPUTER:$DST_FOLDER/Binaries/ONK_Test  failed - $?
@@ -76,11 +76,18 @@ if [ 0 != $? ] ; then
     RESULT=8
 fi
 
+scp Scripts/Start.sh $TEST_COMPUTER:~
+
+if [ 0 != $? ] ; then
+    echo ERROR  scp Scripts/Start.sh $TEST_COMPUTER:~  failed - $?
+    RESULT=9
+fi
+
 scp Scripts/OpenNet_Tool/*.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool
 
 if [ 0 != $? ] ; then
     echo ERROR  scp Scripts/OpenNet_Tool/A00RRU_*_18.04.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool  failed - $?
-    RESULT=9
+    RESULT=10
 fi
 
 # ===== End =================================================================
