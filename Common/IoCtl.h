@@ -8,6 +8,13 @@
 // type used only to pass data in or out of IoCtl.
 
 // TODO  Common.IoCtl
+//       Normal (Feature) - Ajouter un IoCtl pour attendre sur un evennment
+//       du pilote comme un buffer pret a traiter. Il faut aussi que ce IoCtl
+//       retourne le nombre de fois que l'evenement est survenu depuis le
+//       dernier appel. Cet IoCtl pourra etre utiliser pour le mode KERNEL de
+//       CUDA.
+
+// TODO  Common.IoCtl
 //       Low (Cleanup) - Retirer IOCTL_STATISTICS_RESET
 
 #pragma once

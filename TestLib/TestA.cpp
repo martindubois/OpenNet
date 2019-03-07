@@ -108,7 +108,7 @@ unsigned int TestA::Stop()
         // DisplayAdapterStats(0);
         // DisplayAdapterStats(1);
 
-        unsigned int lBuffer_Max = 40800;
+        unsigned int lBuffer_Max = 42600;
         unsigned int lBuffer_Min =    32;
 
         unsigned int lPacket_Max = 1570000;

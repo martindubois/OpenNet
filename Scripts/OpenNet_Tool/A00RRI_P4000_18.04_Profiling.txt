@@ -1,0 +1,188 @@
+
+# Author     KMS - Martin Dubois, ing.
+# Copyright  (C) 2019 KMS. All right reserved.
+# Product    OpenNet
+# File       Scripts/OpenNet_Tool/A00RRI_P4000_18.04_Profiling.txt
+
+# Successful execution
+#
+# Date       Version Nom
+# ========== ======= =============
+# 2019-03-07 0.0.10  Martin Dubois
+
+# PCIe x16  NVIDIA Quadro P4000 (x16, Gen3)
+# PCIe x1	Empty
+# PCIe x16  Empty
+# PCIe x16	Dual 82576 (x4, Gen1)
+# PCIe x1	Empty
+# PCIe x16	Empty
+
+Test SetProfiling true
+
+# Test Code                  Mode     Packet Size
+# ==== ===================== ======== ===========
+# A    NOTHING               FUNCTION        9000
+
+Test SetBufferQty 2
+Test SetBandwidth 120.0
+Test SetCode NOTHING
+Test SetMode FUNCTION
+Test SetPacketSize 9000
+
+Test Run A
+
+# A    NOTHING               FUNCTION         840
+# Shorter packet cause dropped packet
+
+Test SetPacketSize 840
+
+Test Run A
+
+# A    NOTHING               FUNCTION          76
+# Shorter packet create dropped packet
+
+Test SetBufferQty 56
+Test SetPacketSize 76
+
+Test Run A
+
+# A    NOTHING               KERNEL          9000
+
+Test SetBufferQty 2
+Test SetMode KERNEL
+Test SetPacketSize 9000
+
+Test Run A
+
+# A    NOTHING               KERNEL           760
+# Shorter packet cause dropped packet
+
+Test SetPacketSize 760
+
+Test Run A
+
+# A    NOTHING               KERNEL           114
+
+Test SetBufferQty 56
+Test SetPacketSize 114
+
+Test Run A
+
+# A    REPLY_ON_ERROR        FUNCTION        9000
+
+Test SetBufferQty 2
+Test SetCode REPLY_ON_ERROR
+Test SetMode FUNCTION
+Test SetPacketSize 9000
+
+Test Run A
+
+# A    REPLY_ON_ERROR        FUNCTION        1748
+# Shorter packet cause dropped packet
+
+Test SetPacketSize 1748
+
+Test Run A
+
+# A    REPLY_ON_ERROR        FUNCTION         200
+
+Test SetBufferQty 56
+Test SetPacketSize 200
+
+Test Run A
+
+# A    REPLY_ON_ERROR        KERNEL          9000
+# Fewer buffer cause dropped packet
+
+Test SetBufferQty 4
+Test SetMode KERNEL
+Test SetPacketSize 9000
+
+Test Run A
+
+# A    REPLY_ON_ERROR        KERNEL          1604
+# Shorter packet cause dropped packet
+
+Test SetPacketSize 1604
+
+Test Run A
+
+# B    REPLY                 FUNCTION        9000
+
+Test SetBufferQty 3
+Test SetCode REPLY
+Test SetMode FUNCTION
+Test SetPacketSize 9000
+
+Test Run B
+
+# B    REPLY                 FUNCTION         768
+# Shorter packet cause dropped packet
+
+Test SetPacketSize 768
+
+Test Run B
+
+# B    REPLY                 FUNCTION          76
+# Shorter packet cause dropped packet
+
+Test SetBufferQty 56
+Test SetPacketSize 76
+
+Test Run B
+
+# B    REPLY                 KERNEL          9000
+
+Test SetMode KERNEL
+Test SetBufferQty 3
+Test SetPacketSize 9000
+
+Test Run B
+
+# B    REPLY                 KERNEL           112
+# Shorter packet cause dropped packet
+
+Test SetBufferQty 56
+Test SetPacketSize 112
+
+Test Run B
+
+# B    DO_NOT_REPLY_ON_ERROR FUNCTION        9000
+
+Test SetBufferQty 3
+Test SetCode DO_NOT_REPLY_ON_ERROR
+Test SetMode FUNCTION
+Test SetPacketSize 9000
+
+Test Run B
+
+# B    DO_NOT_REPLY_ON_ERROR FUNCTION        1608
+# Shorter packet cause dropped packet
+
+Test SetPacketSize 1608
+
+Test Run B
+
+# B    DO_NOT_REPLY_ON_ERROR FUNCTION         120
+
+Test SetBufferQty 56
+Test SetPacketSize 120
+
+Test Run B
+
+# B    DO_NOT_REPLY_ON_ERROR KERNEL          9000
+
+Test SetBufferQty 3
+Test SetMode KERNEL
+Test SetPacketSize 9000
+
+Test Run B
+
+# B    DO_NOT_REPLY_ON_ERROR KERNEL           200
+
+Test SetBufferQty 56
+Test SetPacketSize 200
+
+Test Run B
+
+Test Summary

@@ -107,7 +107,7 @@ unsigned int TestB::Stop()
     {
         InitAdapterConstraints();
 
-        unsigned int lBuffer_Max = 22300;
+        unsigned int lBuffer_Max = 42600;
         unsigned int lBuffer_Min =    40;
 
         unsigned int lPacket_Max = 1430000;
