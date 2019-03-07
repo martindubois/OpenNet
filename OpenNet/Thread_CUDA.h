@@ -35,7 +35,7 @@ protected:
 
     virtual ~Thread_CUDA();
 
-    void Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers, bool aProfiling = false );
+    void Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers, bool aProfiling );
 
     void Processing_Queue(OpenNet::Kernel * aKernel, Event * aEvent, const size_t * aGlobalSize, const size_t * aLocalSize, void * * aArguments );
 

@@ -46,7 +46,7 @@ void Thread_Kernel_CUDA::Prepare()
     assert( NULL == mArguments );
     assert( NULL != mKernel    );
 
-    Thread_CUDA::Prepare( & mAdapters, & mBuffers );
+    Thread_CUDA::Prepare( & mAdapters, & mBuffers, mKernel->IsProfilingEnabled() );
 
     mQueueDepth = mBuffers.size();
 
