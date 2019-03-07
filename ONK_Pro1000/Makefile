@@ -4,7 +4,7 @@
 # Product    OpenNet
 # File       ONK_Pro1000/makefile
 
--include ../KernelCppFlags.mk
+-include ../Kernel.mk
 
 EXTRA_CFLAGS := -I$(src)/../Includes -I/home/mdubois/NVIDIA-Linux-x86_64-410.93/kernel/nvidia
 
