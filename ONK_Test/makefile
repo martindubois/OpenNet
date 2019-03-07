@@ -4,11 +4,11 @@
 # Product    OpenNet
 # File       ONK_Test/makefile
 
-CFLAGS = -g
+include ../User.mk
 
-INCLUDES = -I ../Includes -I ../Import/Includes
+INCLUDES = -I ../Includes $(INCLUDE_IMPORT)
 
-LIBRARIES = ../Import/Libraries/KmsLib.a
+LIBRARIES = $(KMS_LIB_A)
 
 OUTPUT = ../Binaries/ONK_Test
 
@@ -18,7 +18,7 @@ SOURCES =	Device.cpp   \
 # ===== Rules / Regles ======================================================
 
 .cpp.o:
-	g++ -c $(CFLAGS) -o $@ $(INCLUDES) $<
+	g++ -c $(COMPILE_FLAGS) -o $@ $(INCLUDES) $<
 
 # ===== Macros ==============================================================
 

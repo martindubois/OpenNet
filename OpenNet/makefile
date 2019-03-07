@@ -4,11 +4,11 @@
 # Product    OpenNet
 # File       OpenNet/makefile
 
-include ../User_Release.mk
+include ../User.mk
 
-INCLUDES = -I ../Includes -I ../Import/Includes -I /usr/local/cuda/include
+INCLUDES = -I ../Includes $(INCLUDE_IMPORT) -I $(CUDA_FOLDER)/include
 
-LIBRARIES = ../Import/Libraries/KmsLib.a
+LIBRARIES = $(KMS_LIB_A)
 
 OUTPUT = ../Binaries/OpenNet.so
 
@@ -51,7 +51,7 @@ SOURCES =	Adapter.cpp                  \
 # ===== Rules / Regles ======================================================
 
 .cpp.o:
-	g++ -c $(CFLAGS) -o $@ $(INCLUDES) $<
+	g++ -c $(COMPILE_FLAGS) -o $@ $(INCLUDES) $<
 
 # ===== Macros ==============================================================
 
@@ -60,7 +60,7 @@ OBJECTS = $(SOURCES:.cpp=.o)
 # ===== Targets ==============================================================
 
 $(OUTPUT) : $(OBJECTS) $(LIBRARIES)
-	g++ -L /usr/local/cuda/lib64 -l cudart -shared -o $@ $^
+	g++ -L $(CUDA_FOLDER)/lib64 -l cudart -shared -o $@ $^
 
 depend:
 	makedepend -Y $(INCLUDES) $(SOURCES)
@@ -106,7 +106,7 @@ Adapter_Linux.o: ../Import/Includes/WindowsToLinux.h
 Adapter_Linux.o: ../Includes/OpenNet/Function.h
 Adapter_Linux.o: ../Includes/OpenNet/SourceCode.h
 Adapter_Linux.o: ../Includes/OpenNet/OpenNet.h ../Includes/OpenNet/Status.h
-Adapter_Linux.o: ../Common/IoCtl.h CUW.h /usr/local/cuda/include/cuda.h
+Adapter_Linux.o: ../Common/IoCtl.h CUW.h /usr/local/cuda-10.0/include/cuda.h
 Adapter_Linux.o: Thread_Functions.h Kernel_Functions.h
 Adapter_Linux.o: ../Includes/OpenNet/Kernel.h
 Adapter_Linux.o: ../Includes/OpenNet/StatisticsProvider.h Thread.h
@@ -124,33 +124,35 @@ Adapter_Linux.o: ../Includes/OpenNetK/Constants.h
 Adapter_Linux.o: ../Includes/OpenNetK/PacketGenerator_Types.h
 Adapter_Linux.o: ../Common/OpenNet/Adapter_Statistics.h Buffer_Data.h
 Adapter_Linux.o: Processor_Internal.h Thread_Kernel_CUDA.h Thread_CUDA.h
-Adapter_Linux.o: Processor_CUDA.h /usr/local/cuda/include/nvrtc.h
+Adapter_Linux.o: Processor_CUDA.h /usr/local/cuda-10.0/include/nvrtc.h
 Adapter_Linux.o: Thread_Kernel.h Adapter_Linux.h
 Buffer_Data.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 Buffer_Data.o: ../Import/Includes/WindowsToLinux.h Buffer_Data.h
 Buffer_Data_CUDA.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 Buffer_Data_CUDA.o: ../Import/Includes/WindowsToLinux.h CUW.h
-Buffer_Data_CUDA.o: /usr/local/cuda/include/cuda.h Buffer_Data_CUDA.h
-Buffer_Data_CUDA.o: Buffer_Data.h
+Buffer_Data_CUDA.o: /usr/local/cuda-10.0/include/cuda.h Buffer_Data_CUDA.h
+Buffer_Data_CUDA.o: Event_CUDA.h Event.h Buffer_Data.h
 CUDAW.o: ../Import/Includes/KmsLib/Exception.h CUDAW.h
-CUDAW.o: /usr/local/cuda/include/cuda_runtime.h
-CUDAW.o: /usr/local/cuda/include/crt/host_config.h
-CUDAW.o: /usr/local/cuda/include/builtin_types.h
-CUDAW.o: /usr/local/cuda/include/device_types.h
-CUDAW.o: /usr/local/cuda/include/crt/host_defines.h
-CUDAW.o: /usr/local/cuda/include/driver_types.h
-CUDAW.o: /usr/local/cuda/include/vector_types.h
-CUDAW.o: /usr/local/cuda/include/surface_types.h
-CUDAW.o: /usr/local/cuda/include/texture_types.h
-CUDAW.o: /usr/local/cuda/include/library_types.h
-CUDAW.o: /usr/local/cuda/include/channel_descriptor.h
-CUDAW.o: /usr/local/cuda/include/cuda_runtime_api.h
-CUDAW.o: /usr/local/cuda/include/cuda_device_runtime_api.h
-CUDAW.o: /usr/local/cuda/include/driver_functions.h
-CUDAW.o: /usr/local/cuda/include/vector_functions.h
-CUDAW.o: /usr/local/cuda/include/vector_functions.hpp
+CUDAW.o: /usr/local/cuda-10.0/include/cuda_runtime.h
+CUDAW.o: /usr/local/cuda-10.0/include/crt/host_config.h
+CUDAW.o: /usr/local/cuda-10.0/include/builtin_types.h
+CUDAW.o: /usr/local/cuda-10.0/include/device_types.h
+CUDAW.o: /usr/local/cuda-10.0/include/crt/host_defines.h
+CUDAW.o: /usr/local/cuda-10.0/include/driver_types.h
+CUDAW.o: /usr/local/cuda-10.0/include/vector_types.h
+CUDAW.o: /usr/local/cuda-10.0/include/surface_types.h
+CUDAW.o: /usr/local/cuda-10.0/include/texture_types.h
+CUDAW.o: /usr/local/cuda-10.0/include/library_types.h
+CUDAW.o: /usr/local/cuda-10.0/include/channel_descriptor.h
+CUDAW.o: /usr/local/cuda-10.0/include/cuda_runtime_api.h
+CUDAW.o: /usr/local/cuda-10.0/include/cuda_device_runtime_api.h
+CUDAW.o: /usr/local/cuda-10.0/include/driver_functions.h
+CUDAW.o: /usr/local/cuda-10.0/include/vector_functions.h
+CUDAW.o: /usr/local/cuda-10.0/include/vector_functions.hpp
 CUW.o: ../Import/Includes/KmsLib/Exception.h CUW.h
-CUW.o: /usr/local/cuda/include/cuda.h
+CUW.o: /usr/local/cuda-10.0/include/cuda.h
+Event.o: Event.h
+Event_CUDA.o: CUW.h /usr/local/cuda-10.0/include/cuda.h Event_CUDA.h Event.h
 Function.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 Function.o: ../Import/Includes/WindowsToLinux.h
 Function.o: ../Includes/OpenNet/Function.h ../Includes/OpenNet/SourceCode.h
@@ -170,7 +172,7 @@ Kernel.o: ../Import/Includes/KmsLib/ValueVector.h
 Kernel.o: ../Includes/OpenNet/Kernel.h ../Includes/OpenNet/SourceCode.h
 Kernel.o: ../Includes/OpenNet/OpenNet.h ../Includes/OpenNet/Status.h
 Kernel.o: ../Includes/OpenNet/StatisticsProvider.h
-Kernel.o: ../Common/OpenNet/Kernel_Statistics.h Constants.h
+Kernel.o: ../Common/OpenNet/Kernel_Statistics.h Constants.h Event.h
 Kernel_Forward.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 Kernel_Forward.o: ../Import/Includes/WindowsToLinux.h
 Kernel_Forward.o: ../Includes/OpenNet/Adapter.h
@@ -195,7 +197,7 @@ EthernetAddress.o: ../Common/OpenNet/EthernetAddress.h
 EthernetAddress.o: ../Includes/OpenNet/OpenNet.h ../Includes/OpenNet/Status.h
 EthernetAddress.o: ../Includes/OpenNetK/Adapter_Types.h
 NVRTCW.o: ../Import/Includes/KmsLib/Exception.h NVRTCW.h
-NVRTCW.o: /usr/local/cuda/include/nvrtc.h
+NVRTCW.o: /usr/local/cuda-10.0/include/nvrtc.h
 PacketGenerator.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 PacketGenerator.o: ../Import/Includes/WindowsToLinux.h
 PacketGenerator.o: ../Import/Includes/KmsLib/ValueVector.h
@@ -250,9 +252,11 @@ Processor.o: ../Includes/OpenNet/Status.h
 Processor_CUDA.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 Processor_CUDA.o: ../Import/Includes/WindowsToLinux.h
 Processor_CUDA.o: ../Includes/OpenNetK/Types.h Buffer_Data_CUDA.h
-Processor_CUDA.o: /usr/local/cuda/include/cuda.h Buffer_Data.h CUW.h NVRTCW.h
-Processor_CUDA.o: /usr/local/cuda/include/nvrtc.h Thread_Functions_CUDA.h
-Processor_CUDA.o: Thread_CUDA.h ../Includes/OpenNet/Kernel.h
+Processor_CUDA.o: /usr/local/cuda-10.0/include/cuda.h Event_CUDA.h Event.h
+Processor_CUDA.o: Buffer_Data.h CUW.h NVRTCW.h
+Processor_CUDA.o: /usr/local/cuda-10.0/include/nvrtc.h
+Processor_CUDA.o: Thread_Functions_CUDA.h Thread_CUDA.h
+Processor_CUDA.o: ../Includes/OpenNet/Kernel.h
 Processor_CUDA.o: ../Includes/OpenNet/SourceCode.h
 Processor_CUDA.o: ../Includes/OpenNet/OpenNet.h ../Includes/OpenNet/Status.h
 Processor_CUDA.o: ../Includes/OpenNet/StatisticsProvider.h Adapter_Internal.h
@@ -334,7 +338,7 @@ System.o: Processor_Internal.h ../Includes/OpenNet/Kernel.h
 System.o: ../Includes/OpenNet/SourceCode.h System_CUDA.h System_Internal.h
 System_CUDA.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 System_CUDA.o: ../Import/Includes/WindowsToLinux.h ../Common/Constants.h
-System_CUDA.o: Adapter_Linux.h /usr/local/cuda/include/cuda.h
+System_CUDA.o: Adapter_Linux.h /usr/local/cuda-10.0/include/cuda.h
 System_CUDA.o: Adapter_Internal.h ../Import/Includes/KmsLib/DebugLog.h
 System_CUDA.o: ../Import/Includes/KmsLib/Exception.h
 System_CUDA.o: ../Import/Includes/KmsLib/TextFile.h
@@ -349,7 +353,7 @@ System_CUDA.o: ../Includes/OpenNetK/PacketGenerator_Types.h ../Common/IoCtl.h
 System_CUDA.o: ../Common/OpenNet/Adapter_Statistics.h Buffer_Data.h
 System_CUDA.o: Processor_Internal.h ../Includes/OpenNet/Kernel.h
 System_CUDA.o: ../Includes/OpenNet/SourceCode.h CUW.h Processor_CUDA.h
-System_CUDA.o: /usr/local/cuda/include/nvrtc.h System_CUDA.h
+System_CUDA.o: /usr/local/cuda-10.0/include/nvrtc.h System_CUDA.h
 System_CUDA.o: System_Internal.h
 System_Internal.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 System_Internal.o: ../Import/Includes/WindowsToLinux.h
@@ -373,7 +377,7 @@ System_Internal.o: ../Includes/OpenNet/Kernel.h
 System_Internal.o: ../Includes/OpenNet/SourceCode.h Constants.h Thread.h
 System_Internal.o: ../Import/Includes/KmsLib/ThreadBase.h System_Internal.h
 Thread.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
-Thread.o: ../Import/Includes/WindowsToLinux.h Thread.h
+Thread.o: ../Import/Includes/WindowsToLinux.h Event.h Thread.h
 Thread.o: ../Import/Includes/KmsLib/ThreadBase.h Adapter_Internal.h
 Thread.o: ../Import/Includes/KmsLib/DebugLog.h
 Thread.o: ../Import/Includes/KmsLib/Exception.h
@@ -391,7 +395,7 @@ Thread.o: Processor_Internal.h ../Includes/OpenNet/Kernel.h
 Thread.o: ../Includes/OpenNet/SourceCode.h
 Thread_CUDA.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 Thread_CUDA.o: ../Import/Includes/WindowsToLinux.h Adapter_Linux.h
-Thread_CUDA.o: /usr/local/cuda/include/cuda.h Adapter_Internal.h
+Thread_CUDA.o: /usr/local/cuda-10.0/include/cuda.h Adapter_Internal.h
 Thread_CUDA.o: ../Import/Includes/KmsLib/DebugLog.h
 Thread_CUDA.o: ../Import/Includes/KmsLib/Exception.h
 Thread_CUDA.o: ../Import/Includes/KmsLib/TextFile.h
@@ -405,11 +409,12 @@ Thread_CUDA.o: ../Includes/OpenNet/System.h ../Includes/OpenNetK/Constants.h
 Thread_CUDA.o: ../Includes/OpenNetK/PacketGenerator_Types.h ../Common/IoCtl.h
 Thread_CUDA.o: ../Common/OpenNet/Adapter_Statistics.h Buffer_Data.h
 Thread_CUDA.o: Processor_Internal.h ../Includes/OpenNet/Kernel.h
-Thread_CUDA.o: ../Includes/OpenNet/SourceCode.h CUW.h Thread_CUDA.h
-Thread_CUDA.o: Processor_CUDA.h /usr/local/cuda/include/nvrtc.h
+Thread_CUDA.o: ../Includes/OpenNet/SourceCode.h CUW.h Event_CUDA.h Event.h
+Thread_CUDA.o: Thread_CUDA.h Processor_CUDA.h
+Thread_CUDA.o: /usr/local/cuda-10.0/include/nvrtc.h
 Thread_Functions.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
-Thread_Functions.o: ../Import/Includes/WindowsToLinux.h Thread_Functions.h
-Thread_Functions.o: ../Includes/OpenNet/Function.h
+Thread_Functions.o: ../Import/Includes/WindowsToLinux.h Event.h
+Thread_Functions.o: Thread_Functions.h ../Includes/OpenNet/Function.h
 Thread_Functions.o: ../Includes/OpenNet/SourceCode.h
 Thread_Functions.o: ../Includes/OpenNet/OpenNet.h
 Thread_Functions.o: ../Includes/OpenNet/Status.h Kernel_Functions.h
@@ -432,9 +437,10 @@ Thread_Functions.o: Buffer_Data.h Processor_Internal.h
 Thread_Functions_CUDA.o: ../Import/Includes/KmsBase.h
 Thread_Functions_CUDA.o: ../Import/Includes/SafeAPI.h
 Thread_Functions_CUDA.o: ../Import/Includes/WindowsToLinux.h
-Thread_Functions_CUDA.o: Buffer_Data_CUDA.h /usr/local/cuda/include/cuda.h
-Thread_Functions_CUDA.o: Buffer_Data.h Thread_Functions_CUDA.h Thread_CUDA.h
-Thread_Functions_CUDA.o: ../Includes/OpenNet/Kernel.h
+Thread_Functions_CUDA.o: Buffer_Data_CUDA.h
+Thread_Functions_CUDA.o: /usr/local/cuda-10.0/include/cuda.h Event_CUDA.h
+Thread_Functions_CUDA.o: Event.h Buffer_Data.h CUW.h Thread_Functions_CUDA.h
+Thread_Functions_CUDA.o: Thread_CUDA.h ../Includes/OpenNet/Kernel.h
 Thread_Functions_CUDA.o: ../Includes/OpenNet/SourceCode.h
 Thread_Functions_CUDA.o: ../Includes/OpenNet/OpenNet.h
 Thread_Functions_CUDA.o: ../Includes/OpenNet/Status.h
@@ -454,9 +460,10 @@ Thread_Functions_CUDA.o: ../Includes/OpenNetK/PacketGenerator_Types.h
 Thread_Functions_CUDA.o: ../Common/IoCtl.h
 Thread_Functions_CUDA.o: ../Common/OpenNet/Adapter_Statistics.h
 Thread_Functions_CUDA.o: Processor_Internal.h Processor_CUDA.h
-Thread_Functions_CUDA.o: /usr/local/cuda/include/nvrtc.h Thread_Functions.h
-Thread_Functions_CUDA.o: ../Includes/OpenNet/Function.h Kernel_Functions.h
-Thread_Functions_CUDA.o: Thread.h ../Import/Includes/KmsLib/ThreadBase.h
+Thread_Functions_CUDA.o: /usr/local/cuda-10.0/include/nvrtc.h
+Thread_Functions_CUDA.o: Thread_Functions.h ../Includes/OpenNet/Function.h
+Thread_Functions_CUDA.o: Kernel_Functions.h Thread.h
+Thread_Functions_CUDA.o: ../Import/Includes/KmsLib/ThreadBase.h
 Thread_Kernel.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 Thread_Kernel.o: ../Import/Includes/WindowsToLinux.h Thread_Kernel.h Thread.h
 Thread_Kernel.o: ../Import/Includes/KmsLib/ThreadBase.h Adapter_Internal.h
@@ -480,13 +487,13 @@ Thread_Kernel.o: ../Includes/OpenNet/SourceCode.h
 Thread_Kernel_CUDA.o: ../Import/Includes/KmsBase.h
 Thread_Kernel_CUDA.o: ../Import/Includes/SafeAPI.h
 Thread_Kernel_CUDA.o: ../Import/Includes/WindowsToLinux.h Adapter_Windows.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/CL/opencl.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/CL/cl.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/CL/cl_platform.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/CL/cl_gl.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/CL/cl_gl_ext.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/CL/cl_ext.h Adapter_Internal.h
-Thread_Kernel_CUDA.o: ../Import/Includes/KmsLib/DebugLog.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/CL/opencl.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/CL/cl.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/CL/cl_platform.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/CL/cl_gl.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/CL/cl_gl_ext.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/CL/cl_ext.h
+Thread_Kernel_CUDA.o: Adapter_Internal.h ../Import/Includes/KmsLib/DebugLog.h
 Thread_Kernel_CUDA.o: ../Import/Includes/KmsLib/Exception.h
 Thread_Kernel_CUDA.o: ../Import/Includes/KmsLib/TextFile.h
 Thread_Kernel_CUDA.o: ../Import/Includes/KmsLib/DriverHandle.h
@@ -504,24 +511,25 @@ Thread_Kernel_CUDA.o: ../Common/IoCtl.h
 Thread_Kernel_CUDA.o: ../Common/OpenNet/Adapter_Statistics.h Buffer_Data.h
 Thread_Kernel_CUDA.o: Processor_Internal.h ../Includes/OpenNet/Kernel.h
 Thread_Kernel_CUDA.o: ../Includes/OpenNet/SourceCode.h Buffer_Data_CUDA.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/cuda.h CUDAW.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/cuda_runtime.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/crt/host_config.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/builtin_types.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/device_types.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/crt/host_defines.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/driver_types.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/vector_types.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/surface_types.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/texture_types.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/library_types.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/channel_descriptor.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/cuda_runtime_api.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/cuda_device_runtime_api.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/driver_functions.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/vector_functions.h
-Thread_Kernel_CUDA.o: /usr/local/cuda/include/vector_functions.hpp
-Thread_Kernel_CUDA.o: Processor_CUDA.h /usr/local/cuda/include/nvrtc.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/cuda.h Event_CUDA.h
+Thread_Kernel_CUDA.o: Event.h CUDAW.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/cuda_runtime.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/crt/host_config.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/builtin_types.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/device_types.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/crt/host_defines.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/driver_types.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/vector_types.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/surface_types.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/texture_types.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/library_types.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/channel_descriptor.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/cuda_runtime_api.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/cuda_device_runtime_api.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/driver_functions.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/vector_functions.h
+Thread_Kernel_CUDA.o: /usr/local/cuda-10.0/include/vector_functions.hpp
+Thread_Kernel_CUDA.o: Processor_CUDA.h /usr/local/cuda-10.0/include/nvrtc.h
 Thread_Kernel_CUDA.o: Thread_Kernel_CUDA.h Thread_CUDA.h Thread_Kernel.h
 Thread_Kernel_CUDA.o: Thread.h ../Import/Includes/KmsLib/ThreadBase.h
 VersionInfo.o: VersionInfo.h ../Includes/OpenNet/Status.h

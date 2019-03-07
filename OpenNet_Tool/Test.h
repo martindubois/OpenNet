@@ -1,18 +1,12 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Tool/Test.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Tool/Test.h
 
 #pragma once
 
-// Includes
+// Constants
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== Common =============================================================
-#include "../Common/TestLib/Tester.h"
-
-// Functions
-/////////////////////////////////////////////////////////////////////////////
-
-extern void Test(char aTest, TestLib::Tester::Mode aMode, unsigned int aBufferQty, unsigned int aPacketSize_byte);
-extern void Test(char aTest, TestLib::Tester::Mode aMode, unsigned int aBufferQty, unsigned int aPacketSize_byte, double aBandwidth_MiB_s);
+extern const KmsLib::ToolBase::CommandInfo TEST_COMMANDS[];

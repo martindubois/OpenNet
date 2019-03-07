@@ -4,9 +4,9 @@
 # Product    OpenNet
 # File       TestLib/makefile
 
-include ../User_Release.mk
+include ../User.mk
 
-INCLUDES = -I ../Includes -I ../Import/Includes
+INCLUDES = -I ../Includes $(INCLUDE_IMPORT)
 
 OUTPUT = ../Libraries/TestLib.a
 
@@ -22,7 +22,7 @@ SOURCES =	Test.cpp        \
 # ===== Rules / Regles ======================================================
 
 .cpp.o:
-	g++ -c $(CFLAGS) -o $@ $(INCLUDES) $<
+	g++ -c $(COMPILE_FLAGS) -o $@ $(INCLUDES) $<
 
 # ===== Macros ==============================================================
 
@@ -40,11 +40,13 @@ depend:
 # DO NOT DELETE
 
 Test.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
-Test.o: ../Import/Includes/WindowsToLinux.h ../Includes/OpenNetK/Constants.h
-Test.o: ../Common/Constants.h ../Common/TestLib/Test.h
-Test.o: ../Import/Includes/KmsLib/ValueVector.h ../Includes/OpenNet/Adapter.h
-Test.o: ../Includes/OpenNet/Processor.h ../Includes/OpenNet/OpenNet.h
-Test.o: ../Includes/OpenNet/Status.h ../Includes/OpenNet/StatisticsProvider.h
+Test.o: ../Import/Includes/WindowsToLinux.h
+Test.o: ../Import/Includes/KmsLib/ThreadBase.h
+Test.o: ../Includes/OpenNetK/Constants.h ../Common/Constants.h
+Test.o: ../Common/TestLib/Test.h ../Import/Includes/KmsLib/ValueVector.h
+Test.o: ../Includes/OpenNet/Adapter.h ../Includes/OpenNet/Processor.h
+Test.o: ../Includes/OpenNet/OpenNet.h ../Includes/OpenNet/Status.h
+Test.o: ../Includes/OpenNet/StatisticsProvider.h
 Test.o: ../Includes/OpenNetK/Adapter_Types.h
 Test.o: ../Includes/OpenNet/Function_Forward.h ../Includes/OpenNet/Function.h
 Test.o: ../Includes/OpenNet/SourceCode.h ../Includes/OpenNet/Kernel_Forward.h

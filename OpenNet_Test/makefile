@@ -4,11 +4,11 @@
 # Product    OpenNet
 # File       OpenNet_Test/makefile
 
-include ../User_Release.mk
+include ../User.mk
 
-INCLUDES = -I ../Includes -I ../Import/Includes
+INCLUDES = -I ../Includes $(INCLUDE_IMPORT)
 
-LIBRARIES = ../Binaries/OpenNet.so ../Import/Libraries/KmsLib.a
+LIBRARIES = ../Binaries/OpenNet.so $(KMS_LIB_A)
 
 OUTPUT = ../Binaries/OpenNet_Test
 
@@ -28,7 +28,7 @@ SOURCES =	Adapter.cpp         \
 # ===== Rules / Regles ======================================================
 
 .cpp.o:
-	g++ -c $(CFLAGS) -o $@ $(INCLUDES) $<
+	g++ -c $(COMPILE_FLAGS) -o $@ $(INCLUDES) $<
 
 # ===== Macros ==============================================================
 
@@ -37,7 +37,7 @@ OBJECTS = $(SOURCES:.cpp=.o)
 # ===== Targets / Cibles ====================================================
 
 $(OUTPUT) : $(OBJECTS) $(LIBRARIES)
-	g++ -pthread -o $@ $^ -L /usr/local/cuda/lib64 -L /usr/local/cuda/lib64/stubs -l cudart -l cuda -l nvrtc
+	g++ -pthread -o $@ $^ -L $(CUDA_FOLDER)/lib64 -L $(CUDA_FOLDER)/lib64/stubs -l cudart -l cuda -l nvrtc
 
 depend:
 	makedepend -Y $(INCLUDES) $(SOURCES)
