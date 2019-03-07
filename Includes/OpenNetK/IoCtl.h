@@ -42,8 +42,9 @@ typedef enum
 
     IOCTL_RESULT_PROCESSING_NEEDED = 0xffffffe0,
 
-    IOCTL_RESULT_ALREADY_CONNECTED = 0xfffffff3,
-    IOCTL_RESULT_CANNOT_DROP       = 0xfffffff4,
+    IOCTL_RESULT_ALREADY_CONNECTED = 0xfffffff2,
+    IOCTL_RESULT_CANNOT_DROP       = 0xfffffff3,
+    IOCTL_RESULT_CANNOT_MAP_BUFFER = 0xfffffff4,
     IOCTL_RESULT_CANNOT_SEND       = 0xfffffff5,
     IOCTL_RESULT_ERROR             = 0xfffffff6,
     IOCTL_RESULT_INVALID_PARAMETER = 0xfffffff7,

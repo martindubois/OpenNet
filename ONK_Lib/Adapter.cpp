@@ -529,11 +529,15 @@ namespace OpenNetK
 
     // aBuffer [---;R--]
     //
+    // Return
+    //  false  Error
+    //  true   OK
+    //
     // Level   SoftInt or Thread
     // Thread  Queue
     //
     // Buffer_Queue_Zone0 ==> Buffer_Release_Zone0
-    void Adapter::Buffer_Queue_Zone0(const Buffer & aBuffer)
+    bool Adapter::Buffer_Queue_Zone0(const Buffer & aBuffer)
     {
         // TRACE_DEBUG "%s(  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
@@ -555,21 +559,25 @@ namespace OpenNetK
 
         // MapBuffer ==> UnmapBuffer  See Buffer_Release_Zone0
         lB->mBase_XA = reinterpret_cast< uint8_t * >( mOSDep->MapBuffer( mOSDep->mContext, & lB->mBuffer.mBuffer_PA, lB->mBuffer.mBuffer_DA, lB->mBuffer.mSize_byte, lB->mBuffer.mMarker_PA, reinterpret_cast< volatile void * * >( & lB->mMarker_MA ) ) );
-        if ( NULL != lB->mBase_XA )
+        if ( NULL == lB->mBase_XA )
         {
-            lB->mHeader_XA = reinterpret_cast< OpenNet_BufferHeader * >( lB->mBase_XA );
-            lB->mState     = BUFFER_STATE_TX_RUNNING;
-
-            // AllocateMemory ==> FreeMemory  See Buffer_Release_Zone0
-            lB->mPackets = reinterpret_cast< Packet * >( mOSDep->AllocateMemory( sizeof(Packet) * lB->mBuffer.mPacketQty ) );
-            ASSERT( NULL != lB->mPackets );
-
-            Buffer_InitHeader_Zone0( lB->mHeader_XA, lB->mBuffer, lB->mPackets );
-        
-            mBuffer.mCount++;
-
-            mStatistics[ADAPTER_STATS_BUFFER_QUEUE] ++;
+            return false;
         }
+
+        lB->mHeader_XA = reinterpret_cast< OpenNet_BufferHeader * >( lB->mBase_XA );
+        lB->mState     = BUFFER_STATE_TX_RUNNING;
+
+        // AllocateMemory ==> FreeMemory  See Buffer_Release_Zone0
+        lB->mPackets = reinterpret_cast< Packet * >( mOSDep->AllocateMemory( sizeof(Packet) * lB->mBuffer.mPacketQty ) );
+        ASSERT( NULL != lB->mPackets );
+
+        Buffer_InitHeader_Zone0( lB->mHeader_XA, lB->mBuffer, lB->mPackets );
+        
+        mBuffer.mCount++;
+
+        mStatistics[ADAPTER_STATS_BUFFER_QUEUE] ++;
+
+        return true;
     }
 
     // Buffer_Queue_Zone0 ==> Buffer_Release_Zone0
@@ -987,16 +995,19 @@ namespace OpenNetK
 
         if ( NULL == lIn->mSharedMemory )
         {
+            TRACE_ERROR "%s - IOCTL_RESULT_INVALID_PARAMETER\n", __FUNCTION__ TRACE_END;
             return IOCTL_RESULT_INVALID_PARAMETER;
         }
 
         if (0 == lIn->mSystemId)
         {
+            TRACE_ERROR "%s - IOCTL_RESULT_INVALID_SYSTEM_ID\n", __FUNCTION__ TRACE_END;
             return IOCTL_RESULT_INVALID_SYSTEM_ID;
         }
 
         if ( NULL != mAdapters )
         {
+            TRACE_ERROR "%s - IOCTL_RESULT_ALREADY_CONNECTED\n", __FUNCTION__ TRACE_END;
             return IOCTL_RESULT_ALREADY_CONNECTED;
         }
 
@@ -1028,6 +1039,7 @@ namespace OpenNetK
 
         Disconnect();
 
+        TRACE_ERROR "%s - IOCTL_RESULT_TOO_MANY_ADAPTER\n", __FUNCTION__ TRACE_END;
         return IOCTL_RESULT_TOO_MANY_ADAPTER;
     }
 
@@ -1055,7 +1067,6 @@ namespace OpenNetK
         if ( ! mHardware->Packet_Drop() )
         {
             TRACE_ERROR "%s - Hardware::Packet_Drop() failed\n", __FUNCTION__ TRACE_END;
-
             return IOCTL_RESULT_CANNOT_DROP;
         }
 
@@ -1074,6 +1085,7 @@ namespace OpenNetK
         if (   (               0 >= lIn->mRepeatCount )
             || (REPEAT_COUNT_MAX <  lIn->mRepeatCount ) )
         {
+            TRACE_ERROR "%s - IOCTL_RESULT_INVALID_PARAMETER\n", __FUNCTION__ TRACE_END;
             return IOCTL_RESULT_INVALID_PARAMETER;
         }
 
@@ -1085,6 +1097,7 @@ namespace OpenNetK
 
         if (!mHardware->Packet_Send(lIn + 1, lSize_byte, lIn->mRepeatCount))
         {
+            TRACE_ERROR "%s - Hardware::PacketSend( , %u byte, %u )\n", __FUNCTION__, lSize_byte, lIn->mRepeatCount TRACE_END;
             return IOCTL_RESULT_CANNOT_SEND;
         }
 
@@ -1140,6 +1153,7 @@ namespace OpenNetK
 
         if ( NULL != mPacketGenerator_FileObject )
         {
+            TRACE_ERROR "%s - IOCTL_RESULT_RUNNING\n", __FUNCTION__ TRACE_END;
             return IOCTL_RESULT_RUNNING;
         }
 
@@ -1164,6 +1178,7 @@ namespace OpenNetK
 
         if ( NULL == mPacketGenerator_FileObject )
         {
+            TRACE_ERROR "%s - IOCTL_RESULT_STOPPED\n", __FUNCTION__ TRACE_END;
             return IOCTL_RESULT_STOPPED;
         }
 
@@ -1208,13 +1223,32 @@ namespace OpenNetK
                         break;
                     }
 
-                    Buffer_Queue_Zone0(aIn[i]);
+                    if ( ! Buffer_Queue_Zone0(aIn[i]) )
+                    {
+                        while ( 0 < mBuffer.mCount )
+                        {
+                            Buffer_Release_Zone0();
+                        }
+
+                        TRACE_ERROR "%s - IOCTL_RESULT_CANNOT_MAP_BUFFER\n", __FUNCTION__ TRACE_END;
+                        lResult = IOCTL_RESULT_CANNOT_MAP_BUFFER;
+                        break;
+                    }
                 }
 
-                lResult = IOCTL_RESULT_PROCESSING_NEEDED;
+                if ( 0 < mBuffer.mCount )
+                {
+                    lResult = IOCTL_RESULT_PROCESSING_NEEDED;
+                }
+                else
+                {
+                    TRACE_ERROR "%s - IOCTL_RESULT_NO_BUFFER\n", __FUNCTION__ TRACE_END;
+                    lResult = IOCTL_RESULT_NO_BUFFER;
+                }
             }
             else
             {
+                TRACE_ERROR "%s - IOCTL_RESULT_TOO_MANY_BUFFER\n", __FUNCTION__ TRACE_END;
                 lResult = IOCTL_RESULT_TOO_MANY_BUFFER;
             }
 
@@ -1340,6 +1374,7 @@ namespace OpenNetK
             }
             else
             {
+                TRACE_ERROR "%s - IOCTL_RESULT_NO_BUFFER\n", __FUNCTION__ TRACE_END;
                 lResult = IOCTL_RESULT_NO_BUFFER;
             }
 

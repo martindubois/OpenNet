@@ -309,6 +309,7 @@ namespace OpenNetK
 
         case IOCTL_RESULT_ALREADY_CONNECTED: lResult = STATUS_ALREADY_COMMITTED       ; break;
         case IOCTL_RESULT_CANNOT_DROP      : lResult = STATUS_NO_MEMORY               ; break;
+        case IOCTL_RESULT_CANNOT_MAP_BUFFER: lResult = STATUS_NO_MEMORY               ; break;
         case IOCTL_RESULT_CANNOT_SEND      : lResult = STATUS_NO_MEMORY               ; break;
         case IOCTL_RESULT_ERROR            : lResult = STATUS_UNSUCCESSFUL            ; break;
         case IOCTL_RESULT_INVALID_PARAMETER: lResult = STATUS_INVALID_PARAMETER       ; break;

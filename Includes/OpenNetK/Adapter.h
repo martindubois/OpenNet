@@ -164,7 +164,7 @@ namespace OpenNetK
         BufferCountAndIndex;
 
         void Buffer_InitHeader_Zone0 (OpenNet_BufferHeader * aHeader_XA, const Buffer & aBuffer, Packet * aPackets);
-        void Buffer_Queue_Zone0      (const Buffer & aBuffer);
+        bool Buffer_Queue_Zone0      (const Buffer & aBuffer);
         void Buffer_Release_Zone0    ();
         void Buffer_Receive_Zone0    (BufferInfo * aBufferInfo);
         void Buffer_Send_Zone0       (BufferInfo * aBufferInfo);
