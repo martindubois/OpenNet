@@ -109,7 +109,6 @@ int NvBuffer_Map( NvBuffer * aThis, struct pci_dev * aPciDev, uint64_t aAddress_
 
     ASSERT(    0 == aThis->mAddress_DA );
     ASSERT( NULL == aThis->mAddress_MA );
-    ASSERT( NULL == aThis->mMapping    );
     ASSERT( NULL == aThis->mPageTable  );
 
     // nvidia_p2p_get_pages ==> Pages_Releases  See NvBuffer_Unmap
@@ -123,17 +122,6 @@ int NvBuffer_Map( NvBuffer * aThis, struct pci_dev * aPciDev, uint64_t aAddress_
     ASSERT( NULL != aThis->mPageTable );
 
     aThis->mAddress_DA = aAddress_DA;
-
-    // nvidia_p2p_dma_map_pages ==> nvidia_p2p_dma_unmap_pages  See NvBuffer_Unmap
-    lRet = nvidia_p2p_dma_map_pages( aPciDev, aThis->mPageTable, & aThis->mMapping );
-    if ( 0 != lRet )
-    {
-        printk( KERN_ERR "%s - nvidia_p2p_dma_map_pages( 0x%p, 0x%p,  ) failed - %d\n", __FUNCTION__, aPciDev, aThis->mPageTable, lRet );
-        NvBuffer_Unmap( aThis, aPciDev, true );
-        return ( - __LINE__ );
-    }
-
-    ASSERT( NULL != aThis->mMapping );
 
     Validate( aThis );
 
@@ -166,28 +154,18 @@ void NvBuffer_Unmap( NvBuffer * aThis, struct pci_dev * aPciDev, bool aPutPage )
 
         ASSERT( 0 != aThis->mAddress_DA );
 
-        if ( NULL != aThis->mMapping )
+        if ( NULL != aThis->mAddress_MA )
         {
-            if ( NULL != aThis->mAddress_MA )
-            {
-                // ioremap_nocache ==> iounmap  See NvBuffer_Map
-                iounmap( aThis->mAddress_MA );
+            // ioremap_nocache ==> iounmap  See NvBuffer_Map
+            iounmap( aThis->mAddress_MA );
 
-                aThis->mAddress_MA = NULL;
-            }
-
-            // nvidia_p2p_dma_map_pages ==> nvidia_p2p_dma_map_pages  See NvBuffer_Map
-            lRet = nvidia_p2p_dma_unmap_pages( aPciDev, aThis->mPageTable, aThis->mMapping );
-            if ( 0 != lRet )
-            {
-                printk( KERN_ERR "%s - nvidia_p2p_dma_unmap_pages( 0x%p, 0x%p, 0x%p ) failed - %d\n", __FUNCTION__, aPciDev, aThis->mPageTable, aThis->mMapping, lRet );
-            }
-
-            aThis->mMapping = NULL;
+            aThis->mAddress_MA = NULL;
         }
 
         if ( aPutPage )
         {
+            // printk( KERN_DEBUG "%s - Calling nvidia_p2p_put_pages( , , 0x%llx, 0x%p )\n", __FUNCTION__, aThis->mAddress_DA, aThis->mPageTable );
+
             // nvidia_p2p_get_pages ==> nvidia_p2p_put_pages  See NvBuffer_Map
             lRet = nvidia_p2p_put_pages( 0, 0, aThis->mAddress_DA, aThis->mPageTable );
             if ( 0 != lRet )
@@ -195,16 +173,19 @@ void NvBuffer_Unmap( NvBuffer * aThis, struct pci_dev * aPciDev, bool aPutPage )
                 printk( KERN_ERR "%s - nvidia_p2p_put_pages( , , 0x%llx, 0x%p ) failed - %d\n", __FUNCTION__, aThis->mAddress_DA, aThis->mPageTable, lRet );
             }
         }
-
-        aThis->mAddress_DA = 0;
-
-        // nvidia_p2p_get_pages ==> nvidia_p2p_free_page_table  See NvBuffer_Map
-        lRet = nvidia_p2p_free_page_table( aThis->mPageTable );
-        if ( 0 != lRet )
+        else
         {
-            printk( KERN_ERR "%s - nvidia_p2p_free_page_table( 0x%p ) failed - %d\n", __FUNCTION__, aThis->mPageTable, lRet );
+            // printk( KERN_DEBUG "%s - Calling nvidia_p2p_free_page_table( 0x%p )\n", __FUNCTION__, aThis->mPageTable );
+
+            // nvidia_p2p_get_pages ==> nvidia_p2p_free_page_table  See NvBuffer_Map
+            lRet = nvidia_p2p_free_page_table( aThis->mPageTable );
+            if ( 0 != lRet )
+            {
+                printk( KERN_ERR "%s - nvidia_p2p_free_page_table( 0x%p ) failed - %d\n", __FUNCTION__, aThis->mPageTable, lRet );
+            }
         }
 
+        aThis->mAddress_DA = 0;
         aThis->mPageTable = NULL;
     }
 }
@@ -220,24 +201,15 @@ void Validate( NvBuffer * aThis )
 
     ASSERT( NULL != aThis );
 
-    ASSERT( NULL != aThis->mMapping   );
     ASSERT( NULL != aThis->mPageTable );
 
-    ASSERT(                         0 <  aThis->mMapping->entries        );
-    ASSERT( NVIDIA_P2P_PAGE_SIZE_64KB == aThis->mMapping->page_size_type );
-
-    ASSERT( aThis->mMapping->entries  == aThis->mPageTable->entries    );
     ASSERT( NVIDIA_P2P_PAGE_SIZE_64KB == aThis->mPageTable->page_size  );
     ASSERT( NULL                      != aThis->mPageTable->pages      );
     ASSERT( NULL                      != aThis->mPageTable->pages[ 0 ] );
 
-    ASSERT( aThis->mMapping->dma_addresses[ 0 ] == aThis->mPageTable->pages[ 0 ]->physical_address );
-
     for ( i = 1; i < aThis->mPageTable->entries; i ++ )
     {
         ASSERT( NULL != aThis->mPageTable->pages[ i ] );
-
-        ASSERT( aThis->mMapping->dma_addresses[ i ] == aThis->mPageTable->pages[ i ]->physical_address );
 
         ASSERT( aThis->mPageTable->pages[ i - 1 ]->physical_address + 0x10000 == aThis->mPageTable->pages[ i ]->physical_address );
     }

@@ -16,7 +16,6 @@ typedef struct
 
     uint64_t                   mAddress_DA;
     void                     * mAddress_MA;
-    nvidia_p2p_dma_mapping_t * mMapping   ;
     nvidia_p2p_page_table_t  * mPageTable ;
 
 }
