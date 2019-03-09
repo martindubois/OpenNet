@@ -90,11 +90,12 @@ namespace OpenNet
         STATUS_THREAD_TERMINATE_ERROR    ,
         STATUS_TOO_MANY_BUFFER           ,
 
-        // ===== 0.0.7 ======================================================
         STATUS_ADAPTER_NOT_SET       ,
         STATUS_INVALID_ARGUMENT_COUNT,
-        STATUS_INVALID_OFFSET        ,
-        STATUS_INVALID_PROTOCOL      , // 60
+        STATUS_INVALID_INDEX         ,
+        STATUS_INVALID_OFFSET        , // 60
+        STATUS_INVALID_PROTOCOL      ,
+        STATUS_INVALID_SIZE          ,
 
         STATUS_QTY
     }
@@ -108,7 +109,8 @@ namespace OpenNet
     /// \return The address of a constant
     /// \endcond
     /// \cond fr
-    /// \brief  Cette methode retourne la descritption d'un code de status.
+    /// \brief  Cette m&eacute;thode retourne la descritption d'un code de
+    ///         status.
     /// \return Un pointeur sur une constantes.
     /// \endcond
     extern OPEN_NET_PUBLIC const char * Status_GetDescription(Status aStatus);
@@ -118,7 +120,7 @@ namespace OpenNet
     /// \return The address of a constant
     /// \endcond
     /// \cond fr
-    /// \brief  Cette methode retourne le nom d'un code de status.
+    /// \brief  Cette m&eacute;thode retourne le nom d'un code de status.
     /// \return Un pointeur sur une constantes.
     /// \endcond
     extern OPEN_NET_PUBLIC const char * Status_GetName(Status aStatus);
@@ -129,8 +131,8 @@ namespace OpenNet
     /// \param  aOut [---;RW-] The output stream
     /// \endcond
     /// \cond fr
-    /// \brief  Affiche  Le Status
-    /// \param  aStatus        Le Status a afficher
+    /// \brief  Afficher le Status
+    /// \param  aStatus        Le Status &agarave; afficher
     /// \param  aOut [---;RW-] Le fichier de sortie
     /// \endcond
     /// \retval STATUS_OK

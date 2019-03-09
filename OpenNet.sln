@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{6D01
 		Includes\OpenNet\StatisticsProvider.h = Includes\OpenNet\StatisticsProvider.h
 		Includes\OpenNet\Status.h = Includes\OpenNet\Status.h
 		Includes\OpenNet\System.h = Includes\OpenNet\System.h
+		Includes\OpenNet\UserBuffer.h = Includes\OpenNet\UserBuffer.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC513D0F-734D-4F5A-816A-911BAA9F2061}"
@@ -127,9 +128,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{2C
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestLib", "TestLib\TestLib.vcxproj", "{1EEE4967-EAE8-4799-A368-E5495B1021F1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2F3A6ADE-B691-467A-A358-4DA35BCB9918} = {2F3A6ADE-B691-467A-A358-4DA35BCB9918}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestLib", "TestLib", "{F717FA89-DD40-4CFC-BDA0-FE69C6D37B01}"
 	ProjectSection(SolutionItems) = preProject
+		Common\TestLib\Code.h = Common\TestLib\Code.h
 		Common\TestLib\Test.h = Common\TestLib\Test.h
 		Common\TestLib\TestFactory.h = Common\TestLib\TestFactory.h
 	EndProjectSection

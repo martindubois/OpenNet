@@ -118,6 +118,32 @@ OpenNet::Status Processor_Internal::SetConfig(const Config & aConfig)
     return OpenNet::STATUS_OK;
 }
 
+OpenNet::UserBuffer * Processor_Internal::AllocateUserBuffer(unsigned int aSize_byte)
+{
+    if (0 >= aSize_byte)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "AllocateUserBuffer", __LINE__);
+        return NULL;
+    }
+
+    OpenNet::UserBuffer * lResult;
+
+    try
+    {
+        lResult = AllocateUserBuffer_Internal(aSize_byte);
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "AllocateUserBuffer", __LINE__);
+        mDebugLog->Log(eE);
+
+        lResult = NULL;
+    }
+
+    return lResult;
+}
+
+
 OpenNet::Status Processor_Internal::Display(FILE * aOut) const
 {
     if (NULL == aOut)

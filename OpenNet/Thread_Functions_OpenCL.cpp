@@ -15,6 +15,9 @@
 // ===== Windows ============================================================
 #include <Windows.h>
 
+// ===== Common =============================================================
+#include "../Common/Constants.h"
+
 // ===== OpenNet ============================================================
 #include "Adapter_Windows.h"
 #include "Buffer_Data_OpenCL.h"
@@ -54,7 +57,7 @@ void Thread_Functions_OpenCL::Prepare()
     Processor_OpenCL * lProcessor = dynamic_cast<Processor_OpenCL *>(mProcessor);
     assert(NULL != lProcessor);
 
-    mProgram = lProcessor->Program_Create(&mKernelFunctions);
+    mProgram = lProcessor->Program_Create(&mKernelFunctions, ADAPTER_NO_UNKNOWN);
     assert(NULL != mProgram);
 
     Thread_OpenCL::Prepare(dynamic_cast<Processor_OpenCL *>(mProcessor), &mAdapters, mKernel, &mBuffers);

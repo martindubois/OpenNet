@@ -64,9 +64,9 @@ System_Internal::System_Internal()
 {
     mDebugLog.Log( "System_Internal()" );
 
-    memset(&mConfig , 0, sizeof(mConfig ));
-    memset(&mConnect, 0, sizeof(mConnect));
-    memset(&mInfo   , 0, sizeof(mInfo   ));
+    memset(&mConfig    , 0, sizeof(mConfig    ));
+    memset(&mConnect_In, 0, sizeof(mConnect_In));
+    memset(&mInfo      , 0, sizeof(mInfo      ));
 
     mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
 
@@ -182,7 +182,7 @@ OpenNet::Status System_Internal::Adapter_Connect(OpenNet::Adapter * aAdapter)
 
         if (OpenNet::STATUS_OK == lResult)
         {
-            lAdapter->Connect(&mConnect);
+            lAdapter->Connect(&mConnect_In);
         }
     }
     catch (KmsLib::Exception * eE)
@@ -264,7 +264,7 @@ unsigned int System_Internal::Adapter_GetCount() const
 
 OpenNet::Status System_Internal::Display(FILE * aOut)
 {
-    assert(0 != mConnect.mSystemId);
+    assert(0 != mConnect_In.mSystemId);
 
     if (NULL == aOut)
     {
@@ -277,7 +277,7 @@ OpenNet::Status System_Internal::Display(FILE * aOut)
     fprintf(aOut, "  %zu Processors\n"  , mProcessors.size() );
     fprintf(aOut, "  %zu Threads\n"     , mThreads   .size() );
     fprintf(aOut, "  State       = %s\n", STATE_NAMES[mState]);
-    fprintf(aOut, "  System Id   = %u\n", mConnect.mSystemId );
+    fprintf(aOut, "  System Id   = %u\n", mConnect_In.mSystemId);
 
     return OpenNet::STATUS_OK;
 }

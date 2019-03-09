@@ -11,6 +11,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+// ===== C++ ================================================================
+#include <map>
+
 // ===== Includes ===========================================================
 #include <OpenNet/SourceCode.h>
 #include <OpenNet/StatisticsProvider.h>
@@ -20,6 +23,8 @@ class Event;
 
 namespace OpenNet
 {
+
+    class UserBuffer;
 
     // Class
     /////////////////////////////////////////////////////////////////////////
@@ -67,8 +72,8 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir le log de compilation
-        /// \retval Cette methode retourne l'adresse d'un espace de memoire
-        ///         interne.
+        /// \retval Cette m&eacute;thode retourne l'adresse d'un espace de
+        ///         m&eacute;moire interne.
         /// \endcond
         OPEN_NET_PUBLIC const char * GetBuildLog() const;
 
@@ -78,7 +83,8 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir le nombre de lignes de code
-        /// \retval Cette methode retourne le nombre de lignes de code.
+        /// \retval Cette m&eacute;thode retourne le nombre de lignes de
+        ///         code.
         /// \endcond
         OPEN_NET_PUBLIC unsigned int  GetCodeLineCount();
 
@@ -88,8 +94,8 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir les lignes de code
-        /// \retval Cette methode retourne l'adresse d'un espace de memoire
-        ///         interne.
+        /// \retval Cette m&eacute;thode retourne l'adresse d'un espace de
+        ///         m&eacute;moire interne.
         /// \endcond
         OPEN_NET_PUBLIC const char ** GetCodeLines();
 
@@ -111,11 +117,27 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Est-ce que le profiling OpenCL est activ&eacute;?
-        /// \note   Cette methode fait partie du chemin critique.
+        /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
         /// \retval false
         /// \retval true
         OPEN_NET_PUBLIC bool IsProfilingEnabled() const;
+
+        /// \cond en
+        /// \brief  Add a user argument always passed to the kernel
+        /// \param  aIndex  The argument index
+        /// \param  aArg    The argument
+        /// \endcond
+        /// \cond fr
+        /// \brief  Ajouter un argument utilisateur qui est toujours
+        ///         pass&eacutee au kernel
+        /// \param  aIndex  L'index de l'argument.
+        /// \param  aArg    L'argument
+        /// \endcond
+        /// \retval false
+        /// \retval true
+        /// \sa     Processor::AllocateUserBuffer
+        OPEN_NET_PUBLIC Status SetStaticUserArgument(unsigned int aIndex, UserBuffer * aArg);
 
         /// \cond en
         /// \brief  Called to add user arguments to the kernel.
@@ -135,7 +157,7 @@ namespace OpenNet
         /// \brief  Appel&eacute; pour ajouter des arguments utilisateur au kernel.
         /// \param  aArguments  Le tableau d'arguments a completer
         /// \endcond
-        OPEN_NET_PUBLIC virtual void SetUserKernelArgs(void * * aArguments );
+        OPEN_NET_PUBLIC virtual void SetUserKernelArgs(void * * aArguments);
 
         // ===== SourceCode =================================================
         OPEN_NET_PUBLIC virtual              ~Kernel     ();
@@ -164,6 +186,8 @@ namespace OpenNet
 
     private:
 
+        typedef std::map< unsigned int, UserBuffer * > UserArgumentMap;
+
         Kernel(const Kernel &);
 
         const Kernel & operator = (const Kernel &);
@@ -185,6 +209,8 @@ namespace OpenNet
         bool           mProfilingEnabled ;
         unsigned int * mStatistics       ;
         uint64_t       mStatisticsSums[3];
+
+        UserArgumentMap mUserArguments;
 
     };
 

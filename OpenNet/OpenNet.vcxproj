@@ -129,6 +129,10 @@
     <ClCompile Include="StatisticsProvider.cpp" />
     <ClCompile Include="Status.cpp" />
     <ClCompile Include="System.cpp" />
+    <ClCompile Include="System_CUDA.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="System_Internal.cpp" />
     <ClCompile Include="System_OpenCL.cpp" />
     <ClCompile Include="Thread.cpp" />
@@ -141,6 +145,9 @@
     <ClCompile Include="Thread_Kernel.cpp" />
     <ClCompile Include="Thread_Kernel_OpenCL.cpp" />
     <ClCompile Include="Thread_OpenCL.cpp" />
+    <ClCompile Include="UserBuffer.cpp" />
+    <ClCompile Include="UserBuffer_Internal.cpp" />
+    <ClCompile Include="UserBuffer_OpenCL.cpp" />
     <ClCompile Include="VersionInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +176,8 @@
     <ClInclude Include="Thread_Kernel.h" />
     <ClInclude Include="Thread_Kernel_OpenCL.h" />
     <ClInclude Include="Thread_OpenCL.h" />
+    <ClInclude Include="UserBuffer_Internal.h" />
+    <ClInclude Include="UserBuffer_OpenCL.h" />
     <ClInclude Include="VersionInfo.h" />
   </ItemGroup>
   <ItemGroup>

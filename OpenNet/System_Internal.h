@@ -85,11 +85,12 @@ protected:
 
     typedef std::vector<Processor_Internal *> ProcessorVector;
 
-    Adapter_Vector   mAdapters  ;
-    IoCtl_Connect_In mConnect   ;
-    KmsLib::DebugLog mDebugLog  ;
-    Info             mInfo      ;
-    ProcessorVector  mProcessors;
+    Adapter_Vector    mAdapters   ;
+    IoCtl_Connect_In  mConnect_In ;
+    IoCtl_Connect_Out mConnect_Out;
+    KmsLib::DebugLog  mDebugLog   ;
+    Info              mInfo       ;
+    ProcessorVector   mProcessors ;
 
 private:
 

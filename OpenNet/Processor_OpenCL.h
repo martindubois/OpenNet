@@ -29,9 +29,11 @@ public:
 
     cl_command_queue CommandQueue_Create(bool aProfilingEnabled);
 
-    cl_program Program_Create(OpenNet::Kernel * aKernel);
+    cl_program Program_Create(OpenNet::Kernel * aKernel, unsigned int aAdapterNo);
 
     // ====== Processor_Internal ============================================
+
+    virtual OpenNet::UserBuffer * AllocateUserBuffer_Internal(unsigned int aSize_byte);
 
     virtual Thread_Functions * Thread_Get();
 

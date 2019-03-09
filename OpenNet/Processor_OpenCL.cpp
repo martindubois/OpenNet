@@ -20,11 +20,15 @@
 #include <OpenNetK/Constants.h>
 #include <OpenNetK/Types.h>
 
+// ===== Common =============================================================
+#include "../Common/Constants.h"
+
 // ===== OpenNet ============================================================
 #include "Buffer_Data_OpenCL.h"
 #include "Constants.h"
 #include "OCLW.h"
 #include "Thread_Functions_OpenCL.h"
+#include "UserBuffer_OpenCL.h"
 
 #include "Processor_OpenCL.h"
 
@@ -134,10 +138,11 @@ cl_command_queue Processor_OpenCL::CommandQueue_Create(bool aProfilingEnabled)
 }
 
 // aKernel [---;RW-]
+// aAdapterNo
 //
 // Return  This method returns a newly created cl_program. The caller is
 //         responsible for releasing it when it is no longer needed.
-cl_program Processor_OpenCL::Program_Create(OpenNet::Kernel * aKernel)
+cl_program Processor_OpenCL::Program_Create(OpenNet::Kernel * aKernel, unsigned int aAdapterNo)
 {
     assert(NULL != aKernel);
 
@@ -155,9 +160,21 @@ cl_program Processor_OpenCL::Program_Create(OpenNet::Kernel * aKernel)
     //       contient le fichier "OpenNetK/Kernel.h". Essayer en premier la
     //       variable d'environnement OPEN_NET_INCLUDES. Essayer en dernier
     //       "V:/OpenNet/Includes".
+
+    char lArgs[1024];
+
+    if (ADAPTER_NO_UNKNOWN == aAdapterNo)
+    {
+        sprintf_s(lArgs, "-D _OPEN_NET_OPEN_CL_ -I V:/OpenNet/Includes");
+    }
+    else
+    {
+        sprintf_s(lArgs, "-D OPEN_NET_ADAPTER_NO=(%u) -D _OPEN_NET_OPEN_CL_ -I V:/OpenNet/Includes", aAdapterNo);
+    }
+
     try
     {
-        OCLW_BuildProgram(lResult, 1, &mDevice, "-D _OPEN_NET_OPEN_CL_ -I V:/OpenNet/Includes", NULL, NULL);
+        OCLW_BuildProgram(lResult, 1, &mDevice, lArgs, NULL, NULL);
     }
     catch (...)
     {
@@ -185,6 +202,15 @@ Thread_Functions * Processor_OpenCL::Thread_Get()
     }
 
     return mThread;
+}
+
+OpenNet::UserBuffer * Processor_OpenCL::AllocateUserBuffer_Internal(unsigned int aSize_byte)
+{
+    assert(0 < aSize_byte);
+
+    assert(NULL != mContext);
+
+    return new UserBuffer_OpenCL(aSize_byte, mContext, CommandQueue_Create(false));
 }
 
 // ===== OpenNet::Processor =================================================

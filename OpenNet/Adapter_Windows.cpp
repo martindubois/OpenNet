@@ -118,13 +118,14 @@ void Adapter_Windows::SetInputFilter_Internal(OpenNet::Kernel * aKernel)
 {
     assert(NULL != aKernel);
 
-    assert(NULL != mProcessor);
-    assert(NULL == mProgram  );
+    assert(ADAPTER_NO_UNKNOWN != mConnect_Out.mAdapterNo);
+    assert(NULL               != mProcessor             );
+    assert(NULL               == mProgram               );
 
     Processor_OpenCL * lProcessor = dynamic_cast<Processor_OpenCL *>(mProcessor);
     assert(NULL != lProcessor);
 
-    mProgram = lProcessor->Program_Create(aKernel);
+    mProgram = lProcessor->Program_Create(aKernel, mConnect_Out.mAdapterNo );
 }
 
 // Private

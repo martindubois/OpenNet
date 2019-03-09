@@ -98,8 +98,9 @@ namespace OpenNetK
             aInfo->mOut_MinSize_byte = sizeof(Adapter_Config);
             break;
         case IOCTL_CONNECT         :
-            aInfo->mIn_MaxSize_byte  = sizeof(IoCtl_Connect_In);
-            aInfo->mIn_MinSize_byte  = sizeof(IoCtl_Connect_In);
+            aInfo->mIn_MaxSize_byte  = sizeof(IoCtl_Connect_In );
+            aInfo->mIn_MinSize_byte  = sizeof(IoCtl_Connect_In );
+            aInfo->mOut_MinSize_byte = sizeof(IoCtl_Connect_Out);
             break;
         case IOCTL_INFO_GET        :
             aInfo->mOut_MinSize_byte = sizeof(Adapter_Info);
@@ -258,7 +259,10 @@ namespace OpenNetK
 
                     // TODO  OpenNetK.Adapter.PartialBuffer
                     //       Low (Feature)
-                    ASSERT(0 != (OPEN_NET_PACKET_PROCESSED & aBufferInfo->mPackets[i].mSendTo));
+                    if (0 == (OPEN_NET_PACKET_PROCESSED & aBufferInfo->mPackets[i].mSendTo))
+                    {
+                        mStatistics[ADAPTER_STATS_NOT_PROCESSED_packet]++;
+                    }
 
                     aBufferInfo->mPackets[i].mState = Packet::STATE_TX_RUNNING;
                     // no break;
@@ -448,7 +452,7 @@ namespace OpenNetK
         {
         case IOCTL_CONFIG_GET                 : lResult = IoCtl_Config_Get                (reinterpret_cast<      Adapter_Config *>(aOut)); break;
         case IOCTL_CONFIG_SET                 : lResult = IoCtl_Config_Set                (reinterpret_cast<const Adapter_Config *>(aIn ), reinterpret_cast<Adapter_Config *>(aOut)); break;
-        case IOCTL_CONNECT                    : lResult = IoCtl_Connect                   (                                         aIn  , aFileObject  ); break;
+        case IOCTL_CONNECT                    : lResult = IoCtl_Connect                   (                                                 aIn  , aOut, aFileObject  ); break;
         case IOCTL_INFO_GET                   : lResult = IoCtl_Info_Get                  (reinterpret_cast<      Adapter_Info   *>(aOut)); break;
         case IOCTL_PACKET_DROP                : lResult = IoCtl_Packet_Drop               (); break;
         case IOCTL_PACKET_SEND_EX             : lResult = IoCtl_Packet_Send_Ex            (                                         aIn  , aInSize_byte ); break;
@@ -982,16 +986,16 @@ namespace OpenNetK
         return sizeof(Adapter_Config);
     }
 
-    int Adapter::IoCtl_Connect( const void * aIn, void * aFileObject )
+    int Adapter::IoCtl_Connect( const void * aIn, void * aOut, void * aFileObject )
     {
-        // TRACE_DEBUG "%s( ,  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
-
-        ASSERT(NULL != aIn);
+        ASSERT(NULL != aIn         );
+        ASSERT(NULL != aOut        );
         ASSERT(NULL != aFileObject );
 
         mStatistics[ADAPTER_STATS_IOCTL_CONNECT] ++;
 
-        const IoCtl_Connect_In * lIn = reinterpret_cast<const IoCtl_Connect_In *>(aIn);
+        const IoCtl_Connect_In  * lIn  = reinterpret_cast<const IoCtl_Connect_In  *>(aIn );
+              IoCtl_Connect_Out * lOut = reinterpret_cast<      IoCtl_Connect_Out *>(aOut);
 
         if ( NULL == lIn->mSharedMemory )
         {
@@ -1033,7 +1037,9 @@ namespace OpenNetK
 
                 mConnect_FileObject = aFileObject;
 
-                return IOCTL_RESULT_OK;
+                lOut->mAdapterNo = i;
+
+                return sizeof(IoCtl_Connect_Out);
             }
         }
 

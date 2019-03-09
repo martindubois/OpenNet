@@ -114,6 +114,7 @@ protected:
     unsigned int                    mBufferCount ;
     OpenNetK::Buffer                mBuffers[OPEN_NET_BUFFER_QTY];
     Config                          mConfig      ;
+    IoCtl_Connect_Out               mConnect_Out ;
     KmsLib::DebugLog              * mDebugLog    ;
     KmsLib::DriverHandle          * mHandle      ;
     Info                            mInfo        ;

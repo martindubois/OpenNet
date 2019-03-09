@@ -41,9 +41,9 @@ namespace OpenNetK
     /// \endcond
     /// \cond fr
     /// \brief  Cette classe maintien les informations concernant un
-    ///         adaptateur sur le reseau interne OpenNet.
-    /// \note   Classe noyau - Pas de constructeur, pas de destructor, pas de
-    ///         methodes virtuelle
+    ///         adaptateur sur le r&eacute;seau interne OpenNet.
+    /// \note   Classe noyau - Pas de constructeur, pas de destructor, pas
+    ///         de m&eacute;thodes virtuelle
     /// \endcond
     class Adapter
     {
@@ -59,7 +59,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Optenir l'information au sujet d'un code IoCtl
         /// \param  aCode  Le code IoCtl
-        /// \param  aInfo  L'espace memoire de sortie
+        /// \param  aInfo  L'espace m&eacute;moire de sortie
         /// \retval false  Erreur
         /// \endcond
         /// \retval true   OK
@@ -107,9 +107,9 @@ namespace OpenNetK
         ///         documented and may change or disapear in futur version.
         /// \endcond
         /// \cond fr
-        /// \brief  L'information au sujet d'un espace memoire.
+        /// \brief  L'information au sujet d'un espace m&eacute;moire.
         ///         Cette structure n'est pas document&eacute;. Elle peut
-        ///         changer ou disparaitre dans une version future.
+        ///         changer ou dispara&icirc;tre dans une version future.
         /// \endcond
         typedef struct
         {
@@ -185,7 +185,7 @@ namespace OpenNetK
         // ===== IoCtl ======================================================
         int IoCtl_Config_Get      (      Adapter_Config * aOut);
         int IoCtl_Config_Set      (const Adapter_Config * aIn , Adapter_Config * aOut);
-        int IoCtl_Connect         (const void           * aIn , void * aFileObject );
+        int IoCtl_Connect         (const void           * aIn , void           * aOut, void * aFileObject );
         int IoCtl_Info_Get        (      Adapter_Info   * aOut) const;
         int IoCtl_Packet_Drop     ();
         int IoCtl_Packet_Send_Ex  (const void           * aIn , unsigned int aInSize_byte );

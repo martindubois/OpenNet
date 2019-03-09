@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/OCLW.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/OCLW.h
 
 #pragma once
 
@@ -21,8 +22,9 @@ extern void       OCLW_WaitForEvents (cl_uint aCount, const cl_event * aEvents);
 // ===== cl_command_queue ===================================================
 extern void OCLW_EnqueueMakeBufferResident(cl_command_queue aCommandQueue, cl_uint aMemCount, cl_mem * aMems, cl_bool aBlocking, cl_bus_address_amd * aAddress, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent);
 extern void OCLW_EnqueueNDRangeKernel     (cl_command_queue aCommandQueue, cl_kernel aKernel, cl_uint aWorkDim, const size_t * aGlobalWorkOffset, const size_t * aGlobalWorkSize, const size_t * aLocalWorkSize, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent);
-extern void OCLW_EnqueueReadBuffer        (cl_command_queue aCommandQueue, cl_mem aBuffer, cl_bool aBlockingRead, size_t aOffset_byte, size_t aSize_byte, void * aOut, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent);
+extern void OCLW_EnqueueReadBuffer        (cl_command_queue aCommandQueue, cl_mem aBuffer, cl_bool aBlocking, size_t aOffset_byte, size_t aSize_byte,      void * aOut, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent);
 extern void OCLW_EnqueueWaitSignal        (cl_command_queue aCommandQueue, cl_mem aBuffer, int aValue, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent);
+extern void OCLW_EnqueueWriteBuffer       (cl_command_queue aCommandQueue, cl_mem aBuffer, cl_bool aBlocking, size_t aOffset_byte, size_t aSize_byte, const void * aIn, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent);
 extern void OCLW_Flush                    (cl_command_queue aCommandQueue);
 extern void OCLW_ReleaseCommandQueue      (cl_command_queue aCommandQueue);
 

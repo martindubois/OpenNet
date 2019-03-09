@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/OCLW.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/OCLW.h
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -132,6 +133,21 @@ void OCLW_EnqueueWaitSignal(cl_command_queue aCommandQueue, cl_mem aBuffer, int 
     {
         throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
             "clEnqueueWaitSignal( , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
+    }
+}
+
+void OCLW_EnqueueWriteBuffer(cl_command_queue aCommandQueue, cl_mem aBuffer, cl_bool aBlocking, size_t aOffset_byte, size_t aSize_byte, const void * aIn, cl_uint aEventCount, const cl_event * aEvents, cl_event * aEvent)
+{
+    assert(NULL != aCommandQueue);
+    assert(NULL != aBuffer      );
+    assert(   0 <  aSize_byte   );
+    assert(NULL != aIn          );
+
+    cl_int lStatus = clEnqueueWriteBuffer(aCommandQueue, aBuffer, aBlocking, aOffset_byte, aSize_byte, aIn, aEventCount, aEvents, aEvent);
+    if (CL_SUCCESS != lStatus)
+    {
+        throw new KmsLib::Exception(KmsLib::Exception::CODE_OPEN_CL_ERROR,
+            "clEnqueueWriteBuffer( , , , , , , , ,  ) failed", NULL, __FILE__, __FUNCTION__, __LINE__, lStatus);
     }
 }
 

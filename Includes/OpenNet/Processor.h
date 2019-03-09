@@ -18,6 +18,8 @@
 namespace OpenNet
 {
 
+    class UserBuffer;
+
     // Class
     /////////////////////////////////////////////////////////////////////////
 
@@ -25,7 +27,8 @@ namespace OpenNet
     /// \brief  This class define the processor level interface.
     /// \endcond
     /// \cond fr
-    /// \brief  Cette classe definit l'interface au niveau du processeur.
+    /// \brief  Cette classe d&eacute;finit l'interface au niveau du
+    ///         processeur.
     /// \endcond
     class Processor
     {
@@ -46,6 +49,7 @@ namespace OpenNet
         /// \cond fr
         /// \brief  Cette structure contient la configuration d'un Processor.
         /// \endcond
+        /// \todo   Document members
         typedef struct
         {
             struct
@@ -133,7 +137,7 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Afficher
-        /// \param  aIn  [---;R--] L'instance d'Info a afficher
+        /// \param  aIn  [---;R--] L'instance d'Info &agrave; afficher
         /// \param  aOut [---;RW-] Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
@@ -159,7 +163,8 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief   Obtenir le contexte OpenCL
-        /// \return  Cette methode retourne un valeur cl_context valide
+        /// \return  Cette m&eacute;thode retourne une valeur cl_context
+        ///          valide
         /// \endcond
         virtual void * GetContext() = 0;
 
@@ -169,8 +174,8 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief   Obtenir l'indentificateur de device OpenCL
-        /// \return  Cette methode retourne un cl_device_id ou CUdevice
-        ///          valide
+        /// \return  Cette m&eacute;thode retourne un cl_device_id ou
+        ///          CUdevice valide
         /// \endcond
         virtual void * GetDevice() = 0;
 
@@ -192,8 +197,8 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir le nom de l'instance
-        /// \retval Cette methode retourne l'adresse d'un espace memoire
-        ///         interne.
+        /// \retval Cette m&eacute;thode retourne l'adresse d'un espace
+        ///         m&eacute;moire interne.
         /// \endcond
         virtual const char * GetName() const = 0;
 
@@ -210,11 +215,27 @@ namespace OpenNet
         virtual Status SetConfig(const Config & aConfig) = 0;
 
         /// \cond en
+        /// \brief  Allocate a user buffer in the processor memory
+        /// \param  aSize_byte  The size of the buffer
+        /// \retval NULL   Error
+        /// \retval Other  The UserBuffer instance
+        /// \endcond
+        /// \cond fr
+        /// \brief  Allouer un espace m&eacute;moire utilisateur dans la
+        ///         m&eacute;moire du Processor
+        /// \param  aSize_byte  La taille de l'espace m&eacutemoire
+        /// \retval NULL   Erreur
+        /// \retval Other  L'instance de UserBuffer
+        /// \endcond
+        /// \sa     Kernel::SetStaticUserArgument, UserBuffer::Delete
+        virtual UserBuffer * AllocateUserBuffer(unsigned int aSize_byte) = 0;
+
+        /// \cond en
         /// \brief  Display
         /// \param  aOut [---;RW-] The output stream
         /// \endcond
         /// \cond fr
-        /// \brief  Affiche
+        /// \brief  Afficher
         /// \retval aOut [---;RW-] Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK

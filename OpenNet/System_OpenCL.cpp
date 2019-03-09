@@ -31,7 +31,7 @@ System_OpenCL::System_OpenCL()
     mInfo.mSystemId = GetCurrentProcessId();
     assert(0 != mInfo.mSystemId);
 
-    mConnect.mSystemId = mInfo.mSystemId;
+    mConnect_In.mSystemId = mInfo.mSystemId;
 
     FindAdapters  ();
     FindPlatform  ();
@@ -43,16 +43,20 @@ System_OpenCL::System_OpenCL()
     }
 
     // VirtualAlloc ==> VirtualAlloc  See the destructor
-    mConnect.mSharedMemory = VirtualAlloc(NULL, SHARED_MEMORY_SIZE_byte, MEM_COMMIT, PAGE_READWRITE);
-    assert(NULL != mConnect.mSharedMemory);
+    mConnect_In.mSharedMemory = VirtualAlloc(NULL, SHARED_MEMORY_SIZE_byte, MEM_COMMIT, PAGE_READWRITE);
+    assert(NULL != mConnect_In.mSharedMemory);
 
-    memset( mConnect.mSharedMemory, 0, SHARED_MEMORY_SIZE_byte );
+    memset( mConnect_In.mSharedMemory, 0, SHARED_MEMORY_SIZE_byte );
 }
 
 System_OpenCL::~System_OpenCL()
 {
+    assert(NULL != mConnect_In.mSharedMemory);
+
+    Cleanup();
+
     // VirtualAlloc ==> VirtualAlloc  See the default constructor
-    void * lRetVP = VirtualAlloc(mConnect.mSharedMemory, SHARED_MEMORY_SIZE_byte, MEM_RESET, 0);
+    void * lRetVP = VirtualAlloc(mConnect_In.mSharedMemory, SHARED_MEMORY_SIZE_byte, MEM_RESET, 0);
     assert(NULL == lRetVP);
     (void)(lRetVP);
 }

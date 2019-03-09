@@ -79,8 +79,8 @@
 #define IOCTL_CONFIG_SET        IOCTL_CODE_RW(1, OpenNetK::Adapter_Config)
 
 // Input   IoCtl_Connect_In
-// Output  None
-#define IOCTL_CONNECT           IOCTL_CODE_W(16, IoCtl_Connect_In)
+// Output  IoCtl_Connect_Out
+#define IOCTL_CONNECT           IOCTL_CODE_RW(16, IoCtl_Connect_In)
 
 // Input   None
 // Output  OpenNetK::Adatper_Info
@@ -149,6 +149,15 @@ typedef struct
     uint8_t  mReserved1[44];
 }
 IoCtl_Connect_In;
+
+// mAdapterNo  The numero of the adapter
+typedef struct
+{
+    uint32_t mAdapterNo;
+
+    uint8_t mReserved[60];
+}
+IoCtl_Connect_Out;
 
 // mRepeatCount  The number of time the packet must be send
 // mSize_byte    The size of packet

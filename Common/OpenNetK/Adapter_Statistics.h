@@ -41,9 +41,9 @@ namespace OpenNetK
         ADAPTER_STATS_IOCTL_STOP           = 15,
         ADAPTER_STATS_RUNNING_TIME_ms      = 16,
         ADAPTER_STATS_TX_packet            = 17,
-        // ===== 0.0.7 =======================================================
-        ADAPTER_STATS_CORRUPTED_BUFFER           = 18,
 
+        ADAPTER_STATS_CORRUPTED_BUFFER           = 18,
+        ADAPTER_STATS_NOT_PROCESSED_packet       = 19,
         ADAPTER_STATS_PACKET_GENERATOR_BREAK     = 20,
         ADAPTER_STATS_PACKET_GENERATOR_ITERATION = 21,
 

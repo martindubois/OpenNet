@@ -62,6 +62,7 @@ Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::Debug
     mDebugLog->Log( "Adapter_Internal::Adapter_Internal( ,  )" );
 
     memset(&mConfig      , 0, sizeof(mConfig      ));
+    memset(&mConnect_Out , 0, sizeof(mConnect_Out ));
     memset(&mDriverConfig, 0, sizeof(mDriverConfig));
     memset(&mInfo        , 0, sizeof(mInfo        ));
     memset(&mName        , 0, sizeof(mName        ));
@@ -69,6 +70,8 @@ Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::Debug
 
     mConfig.mBufferQty = 4;
 	mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
+
+    mConnect_Out.mAdapterNo = ADAPTER_NO_UNKNOWN;
 
 	mDriverConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
 
@@ -161,18 +164,26 @@ void Adapter_Internal::Buffers_Release()
     mBufferCount = 0;
 }
 
-// aConnect [---;R--]
+// aIn [---;R--] The IoCtl_Connect_In structure common to all connected
+//               adapters in a system.
 //
-// Exception  KmsLib::Exception *  CODE_TIMEOUT
+// Exception  KmsLib::Exception *  CODE_IOCTL_ERROR
 //                                 See KmsLib::Windows::DriverHandle::Control
 // Threads    Apps
-void Adapter_Internal::Connect(IoCtl_Connect_In * aConnect)
+void Adapter_Internal::Connect(IoCtl_Connect_In * aIn)
 {
-    assert(NULL != aConnect);
+    assert(NULL != aIn );
 
-    assert(NULL != mHandle);
+    assert(ADAPTER_NO_UNKNOWN == mConnect_Out.mAdapterNo);
+    assert(NULL               != mHandle                );
 
-    mHandle->Control(IOCTL_CONNECT, aConnect, sizeof(IoCtl_Connect_In), NULL, 0);
+    mHandle->Control(IOCTL_CONNECT, aIn, sizeof(IoCtl_Connect_In), &mConnect_Out, sizeof(mConnect_Out));
+
+    if ((ADAPTER_NO_UNKNOWN == mConnect_Out.mAdapterNo) || (ADAPTER_NO_QTY <= mConnect_Out.mAdapterNo))
+    {
+        throw new KmsLib::Exception(KmsLib::Exception::CODE_IOCTL_ERROR,
+            "The connection is not valid", NULL, __FILE__, __CLASS__ "Connect", __LINE__, mConnect_Out.mAdapterNo);
+    }
 }
 
 // aIn [---;R--] The header and the packet to send. The header contain the
@@ -308,27 +319,24 @@ OpenNet::Status Adapter_Internal::GetAdapterNo(unsigned int * aOut)
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
-    OpenNet::Adapter::State lState;
+    OpenNet::Status lResult;
 
-    OpenNet::Status lResult = GetState(&lState);
-    if (OpenNet::STATUS_OK == lResult)
+    if (ADAPTER_NO_UNKNOWN == mConnect_Out.mAdapterNo)
     {
-        if (ADAPTER_NO_UNKNOWN == lState.mAdapterNo)
+        mDebugLog->Log(__FILE__, __CLASS__ "GetAdapterNo", __LINE__);
+        lResult = OpenNet::STATUS_ADAPTER_NOT_CONNECTED;
+    }
+    else
+    {
+        if (ADAPTER_NO_QTY <= mConnect_Out.mAdapterNo)
         {
             mDebugLog->Log(__FILE__, __CLASS__ "GetAdapterNo", __LINE__);
-            lResult = OpenNet::STATUS_ADAPTER_NOT_CONNECTED;
+            lResult = OpenNet::STATUS_CORRUPTED_DRIVER_DATA;
         }
         else
         {
-            if (ADAPTER_NO_QTY <= lState.mAdapterNo)
-            {
-                mDebugLog->Log(__FILE__, __CLASS__ "GetAdapterNo", __LINE__);
-                lResult = OpenNet::STATUS_CORRUPTED_DRIVER_DATA;
-            }
-            else
-            {
-                (*aOut) = lState.mAdapterNo;
-            }
+            (*aOut) = mConnect_Out.mAdapterNo;
+            lResult = OpenNet::STATUS_OK;
         }
     }
 
@@ -665,6 +673,12 @@ OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::SourceCode * aSourceCo
     {
         mDebugLog->Log(__FILE__, __CLASS__ "SetInputFilter", __LINE__);
         return OpenNet::STATUS_PROCESSOR_NOT_SET;
+    }
+
+    if (ADAPTER_NO_UNKNOWN == mConnect_Out.mAdapterNo)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "SetInputFilter", __LINE__);
+        return OpenNet::STATUS_ADAPTER_NOT_CONNECTED;
     }
 
     try

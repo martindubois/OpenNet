@@ -60,7 +60,8 @@ KMS_TEST_BEGIN(Device_SetupA)
 {
     uint8_t                          lBuffer[1024];
     OpenNetK::Adapter_Config         lConfig ;
-    IoCtl_Connect_In                 lConnect;
+    IoCtl_Connect_In                 lConnect_In ;
+    IoCtl_Connect_Out                lConnect_Out;
     OpenNetK::PacketGenerator_Config lPacketGenConfig;
     IoCtl_Packet_Send_Ex_In        * lPacketSendExIn = reinterpret_cast< IoCtl_Packet_Send_Ex_In * >( lBuffer );
     KmsLib::DriverHandle             lDH0    ;
@@ -96,8 +97,8 @@ KMS_TEST_BEGIN(Device_SetupA)
     #endif
 
     // ===== IOCTL_CONNECT ==================================================
-    KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_CONNECT, NULL      ,                  0, NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR ) );
-    KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_CONNECT, & lConnect, sizeof( lConnect ), NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR ) );
+    KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_CONNECT, NULL         ,                     0, NULL          ,                      0, KmsLib::Exception::CODE_IOCTL_ERROR ) );
+    KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_CONNECT, & lConnect_In, sizeof( lConnect_In ), & lConnect_Out, sizeof( lConnect_Out ), KmsLib::Exception::CODE_IOCTL_ERROR ) );
 
     // ===== IOCTL_INFO_GET =================================================
     KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_INFO_GET, NULL, 0, NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR ) );

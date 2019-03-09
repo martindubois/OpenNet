@@ -17,6 +17,7 @@
 #include <stdint.h>
 
 // ===== Import/Includes ====================================================
+#include <KmsLib/Exception.h>
 #include <KmsLib/ValueVector.h>
 
 // ===== Includes/OpenNet ===================================================
@@ -28,6 +29,11 @@
 // ===== OpenNet ============================================================
 #include "Constants.h"
 #include "Event.h"
+
+#ifdef _KMS_WINDOWS_
+    #include "OCLW.h"
+    #include "UserBuffer_OpenCL.h"
+#endif
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
@@ -127,6 +133,59 @@ namespace OpenNet
     void * Kernel::GetCommandQueue()
     {
         return mCommandQueue;
+    }
+
+    OpenNet::Status Kernel::SetStaticUserArgument(unsigned int aIndex, UserBuffer * aArg)
+    {
+        if (0 == aIndex)
+        {
+            return OpenNet::STATUS_INVALID_INDEX;
+        }
+
+        if (NULL == aArg)
+        {
+            mUserArguments.erase(aIndex);
+        }
+        else
+        {
+            mUserArguments.insert(UserArgumentMap::value_type(aIndex, aArg));
+        }
+
+        return OpenNet::STATUS_OK;
+    }
+
+    void Kernel::SetUserKernelArgs(void * aKernel)
+    {
+        assert(NULL != aKernel);
+
+        for (UserArgumentMap::iterator lIt = mUserArguments.begin(); lIt != mUserArguments.end(); lIt++)
+        {
+            try
+            {
+                assert(NULL != lIt->second);
+
+                #ifdef _KMS_WINDOWS_
+
+                    UserBuffer_OpenCL * lUB = dynamic_cast<UserBuffer_OpenCL *>(lIt->second);
+                    assert(NULL != lUB);
+
+                    OCLW_SetKernelArg(reinterpret_cast<cl_kernel>(aKernel), lIt->first, sizeof(cl_mem), &lUB->mMem);
+
+                #endif
+            }
+            catch (KmsLib::Exception * eE)
+            {
+                eE->Write(stderr);
+            }
+        }
+    }
+
+    void Kernel::SetUserKernelArgs(void * * aArguments)
+    {
+        assert(NULL != aArguments);
+
+        #ifdef _KMS_LINUX_
+        #endif
     }
 
     // ===== SourceCode =====================================================
@@ -290,16 +349,6 @@ namespace OpenNet
         memset(&mStatisticsSums, 0, sizeof(mStatisticsSums));
 
         return STATUS_OK;
-    }
-
-    void Kernel::SetUserKernelArgs(void * aKernel)
-    {
-        assert(NULL != aKernel);
-    }
-
-    void Kernel::SetUserKernelArgs( void * * aArguments )
-    {
-        assert( NULL != aArguments );
     }
 
     // Internal

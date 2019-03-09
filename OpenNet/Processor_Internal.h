@@ -18,6 +18,7 @@
 // ===== Includes ===========================================================
 #include <OpenNet/Kernel.h>
 #include <OpenNet/Processor.h>
+#include <OpenNet/UserBuffer.h>
 #include <OpenNetK/Adapter_Types.h>
 
 class Buffer_Data     ;
@@ -37,6 +38,8 @@ public:
     Thread           * Thread_Prepare();
     void               Thread_Release();
 
+    virtual OpenNet::UserBuffer * AllocateUserBuffer_Internal(unsigned int aSize_byte) = 0;
+
     // Return  The adresse of the newly created instance
     //
     // Threads  Apps
@@ -52,6 +55,9 @@ public:
     virtual OpenNet::Status GetInfo  (      Info   * aOut   ) const;
     virtual const char    * GetName  () const;
     virtual OpenNet::Status SetConfig(const Config & aConfig);
+
+    virtual OpenNet::UserBuffer * AllocateUserBuffer(unsigned int aSize_byte);
+
     virtual OpenNet::Status Display  (      FILE   * aOut   ) const;
 
     // ===== OpenNet::StatisticsProvider ====================================
