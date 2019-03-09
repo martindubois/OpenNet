@@ -19,7 +19,7 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-TestF::TestF() : Test("F", CODE_FORWARD, MODE_FUNCTION)
+TestF::TestF() : Test("F", TestLib::CODE_FORWARD, MODE_FUNCTION)
 {
 }
 

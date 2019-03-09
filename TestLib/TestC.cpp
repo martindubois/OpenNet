@@ -11,6 +11,7 @@
 #include <assert.h>
 
 // ===== Includes ===========================================================
+#include <OpenNet/UserBuffer.h>
 #include <OpenNetK/Hardware_Statistics.h>
 
 // ===== TestLib ============================================================
@@ -19,7 +20,7 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-TestC::TestC() : Test("C", CODE_REPLY_ON_ERROR, MODE_FUNCTION)
+TestC::TestC() : Test("C", TestLib::CODE_REPLY_ON_SEQUENCE_ERROR, MODE_KERNEL)
 {
 }
 
@@ -63,6 +64,14 @@ void TestC::Info_Display() const
 
 // ===== TestLib::Test ======================================================
 
+void TestC::AdjustGeneratorConfig(OpenNet::PacketGenerator::Config * aConfig)
+{
+    assert(NULL != aConfig);
+
+    aConfig->mAllowedIndexRepeat = 16;
+    aConfig->mIndexOffset_byte   = 16;
+}
+
 unsigned int TestC::Init()
 {
     assert(NULL == mAdapters[0]);
@@ -81,7 +90,7 @@ unsigned int TestC::Init()
         OpenNet::Status lStatus = mAdapters[0]->GetInfo(&lInfo);
         assert(OpenNet::STATUS_OK == lStatus);
 
-        mAdapters[1] = GetSystem()->Adapter_Get(lInfo.mEthernetAddress.mAddress, MASK_1, MASK_E);
+        mAdapters[1] = GetSystem()->Adapter_Get(lInfo.mEthernetAddress.mAddress, MASK_E, MASK_1);
         if (NULL == mAdapters[1])
         {
             printf("%s - Not enough adapter\n", __FUNCTION__);
@@ -101,14 +110,50 @@ unsigned int TestC::Start( unsigned int aFlags )
 {
     SetBufferQty(0, GetConfig()->mBufferQty);
 
+    mUserBuffer = mProcessor->AllocateUserBuffer(sizeof(unsigned int) * 64);
+    assert(NULL != mUserBuffer);
+
+    OpenNet::Status lStatus = mKernels[0].SetStaticUserArgument(1, mUserBuffer);
+    if (OpenNet::STATUS_OK != lStatus)
+    {
+        printf("%s - Kernel::SetStaticUserArgument( ,  ) failed - ", __FUNCTION__);
+        OpenNet::Status_Display(lStatus, stdout);
+        printf("\n");
+
+        return __LINE__;
+    }
+
     return Test::Start( aFlags );
 }
 
 unsigned int TestC::Stop()
 {
+    assert(NULL != mUserBuffer);
+
     unsigned int lResult = Test::Stop();
     if (0 == lResult)
     {
+        unsigned int lCounters[64];
+
+        OpenNet::Status lStatus = mUserBuffer->Read(0, lCounters, sizeof(lCounters));
+        if (OpenNet::STATUS_OK == lStatus)
+        {
+            for (unsigned int i = 0; i < 64; i++)
+            {
+                printf(" %u", lCounters[i]);
+            }
+
+            printf("\n");
+        }
+        else
+        {
+            printf("%s - UserBuffer::Read( , ,  ) failed - ", __FUNCTION__);
+            OpenNet::Status_Display(lStatus, stdout);
+            printf("\n");
+
+            return __LINE__;
+        }
+
         InitAdapterConstraints();
 
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_BUFFERS_PROCESS].mMax = 10100;
@@ -125,6 +170,8 @@ unsigned int TestC::Stop()
 
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMax = 1010;
         mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_RUNNING_TIME_ms].mMin = 1000;
+
+        mConstraints[TestLib::Test::ADAPTER_BASE + OpenNetK::ADAPTER_STATS_IOCTL_STATISTICS_GET_RESET].mMax = 0xffffffff;
 
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMax = 10100;
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS].mMin =  7490;
@@ -157,6 +204,8 @@ unsigned int TestC::Stop()
             mResult.mPacketThroughput_packet_s /= lRunningTime_ms;
         }
     }
+
+    mUserBuffer->Delete();
 
     return lResult;
 }

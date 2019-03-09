@@ -18,7 +18,7 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-TestE::TestE() : Test("E", CODE_REPLY, MODE_FUNCTION)
+TestE::TestE() : Test("E", TestLib::CODE_REPLY, MODE_FUNCTION)
 {
 }
 

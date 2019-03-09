@@ -22,7 +22,7 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-TestA::TestA() : Test("A", CODE_NOTHING, MODE_FUNCTION)
+TestA::TestA() : Test("A", TestLib::CODE_NOTHING, MODE_FUNCTION)
 {
 }
 

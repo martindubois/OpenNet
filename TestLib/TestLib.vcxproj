@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Code.cpp" />
     <ClCompile Include="Test.cpp" />
     <ClCompile Include="TestA.cpp" />
     <ClCompile Include="TestB.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="TestFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Code.h" />
     <ClInclude Include="TestA.h" />
     <ClInclude Include="TestB.h" />
     <ClInclude Include="TestC.h" />

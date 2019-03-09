@@ -26,6 +26,7 @@
 // ===== Common =============================================================
 #include "../Common/OpenNet/Adapter_Statistics.h"
 #include "../Common/OpenNetK/Adapter_Statistics.h"
+#include "../Common/TestLib/Code.h"
 
 namespace TestLib
 {
@@ -37,20 +38,6 @@ namespace TestLib
     {
 
     public:
-
-        typedef enum
-        {
-            CODE_DEFAULT              ,
-            CODE_DO_NOT_REPLY_ON_ERROR,
-            CODE_FORWARD              ,
-            CODE_NONE                 ,
-            CODE_NOTHING              ,
-            CODE_REPLY                ,
-            CODE_REPLY_ON_ERROR       ,
-
-            CODE_QTY
-        }
-        Code;
 
         typedef enum
         {
@@ -79,7 +66,6 @@ namespace TestLib
         static const unsigned int BUFFER_QTY_MAX;
         static const unsigned int BUFFER_QTY_MIN;
 
-        static const char * CODE_NAMES[CODE_QTY];
         static const char * MODE_NAMES[MODE_QTY];
 
         static const unsigned char MASK_E[6];
@@ -116,6 +102,7 @@ namespace TestLib
             ADAPTER_BASE  = OpenNet::ADAPTER_STATS_QTY,
             ADAPTER_QTY   =   4,
             HARDWARE_BASE = OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_QTY,
+            KERNEL_QTY    =   2,
             STATS_QTY     = 128,
         };
 
@@ -142,6 +129,7 @@ namespace TestLib
         void SetCode          (unsigned int aIndex, Code         aCode);
         void SetGeneratorCount(unsigned int aCount);
 
+        virtual void         AdjustGeneratorConfig   (OpenNet::PacketGenerator::Config * aConfig);
         void                 DisplayAdapterStats     (unsigned int aIndex);
         virtual unsigned int Init            ();
         void                 InitAdapterConstraints  ();
@@ -151,6 +139,8 @@ namespace TestLib
 
         OpenNet::Adapter                     * mAdapters   [ADAPTER_QTY];
         KmsLib::ValueVector::Constraint_UInt32 mConstraints[STATS_QTY];
+        OpenNet::Kernel                        mKernels    [KERNEL_QTY ];
+        OpenNet::Processor                   * mProcessor;
         Result                                 mResult;
 
     private:
@@ -159,7 +149,6 @@ namespace TestLib
         {
             FUNCTION_QTY  = 2,
             GENERATOR_QTY = 2,
-            KERNEL_QTY    = 2,
         };
 
         typedef struct
@@ -181,17 +170,17 @@ namespace TestLib
 
         unsigned int InitAndPrepare();
 
-        void Prepare();
+        unsigned int Prepare();
 
         void ResetInputFilters();
         void ResetStatistics  ();
 
         void RetrieveStatistics();
 
-        void SetFunction(unsigned int aAdapterIndex);
-        void SetFunction(OpenNet::Adapter * aAdapter, OpenNet::Function * aFunction, const char * aCode, const char * aName, const char * aIndex);
-        void SetKernel  (unsigned int aAdapterIndex);
-        void SetKernel  (OpenNet::Adapter * aAdapter, OpenNet::Kernel   * aKernel  , const char * aCode,                     const char * aIndex);
+        unsigned int SetFunction(unsigned int aAdapterIndex);
+        unsigned int SetFunction(OpenNet::Adapter * aAdapter, OpenNet::Function * aFunction, const char * aCode, const char * aName, const char * aIndex);
+        unsigned int SetKernel  (unsigned int aAdapterIndex);
+        unsigned int SetKernel  (OpenNet::Adapter * aAdapter, OpenNet::Kernel   * aKernel  , const char * aCode,                     const char * aIndex);
 
         void Uninit();
 
@@ -208,11 +197,9 @@ namespace TestLib
         OpenNet::Function          mFunctions [FUNCTION_QTY];
         unsigned int               mGeneratorCount;
         OpenNet::PacketGenerator * mGenerators[GENERATOR_QTY];
-        OpenNet::Kernel            mKernels   [KERNEL_QTY];
         char                       mName      [16];
         char                       mNos       [ADAPTER_QTY][8];
         unsigned int               mPriorityClass ;
-        OpenNet::Processor       * mProcessor;
         OpenNet::System          * mSystem;
         
     };

@@ -19,7 +19,7 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-TestB::TestB() : Test("B", CODE_REPLY, MODE_FUNCTION)
+TestB::TestB() : Test("B", TestLib::CODE_REPLY, MODE_FUNCTION)
 {
 }
 

@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     Common/TestLib/TestFactory.h
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       Common/TestLib/TestFactory.h
 
 #pragma once
 
@@ -9,6 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Common =============================================================
+#include "Code.h"
 #include "Test.h"
 
 namespace TestLib
@@ -30,7 +32,7 @@ namespace TestLib
         unsigned int SetBandwidth (const char * aBandwidth_MiB_s);
         unsigned int SetBufferQty (unsigned int aBufferQty      );
         unsigned int SetBufferQty (const char * aBufferQty      );
-        void         SetCode      (Test::Code   aCode           );
+        void         SetCode      (Code         aCode           );
         unsigned int SetCode      (const char * aCode           );
         void         SetMode      (Test::Mode   aMode           );
         unsigned int SetMode      (const char * aMode           );

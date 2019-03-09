@@ -15,9 +15,11 @@
 
 // ===== Common =============================================================
 #include "../Common/Constants.h"
+
 #include "../Common/TestLib/TestFactory.h"
 
 // ===== TestLib ============================================================
+#include "Code.h"
 #include "TestA.h"
 #include "TestB.h"
 #include "TestC.h"
@@ -139,11 +141,11 @@ namespace TestLib
     // Return
     //     0  OK
     // Ohter  Error
-    void TestFactory::SetCode(Test::Code aCode)
+    void TestFactory::SetCode(Code aCode)
     {
-        assert(Test::CODE_QTY > aCode);
+        assert(CODE_QTY > aCode);
 
-        assert(Test::CODE_QTY > mConfig.mCode);
+        assert(CODE_QTY > mConfig.mCode);
 
         mConfig.mCode = aCode;
     }
@@ -157,11 +159,11 @@ namespace TestLib
     {
         assert(NULL != aCode);
 
-        assert(Test::CODE_QTY > mConfig.mCode);
+        assert(CODE_QTY > mConfig.mCode);
 
         unsigned int lResult = Test::CodeFromName(aCode, &mConfig.mCode);
 
-        assert(Test::CODE_QTY > mConfig.mCode);
+        assert(CODE_QTY > mConfig.mCode);
 
         return lResult;
     }
@@ -310,7 +312,7 @@ namespace TestLib
         assert(Test::BANDWIDTH_MIN_MiB_s       <= mConfig.mBandwidth_MiB_s);
         assert(Test::BUFFER_QTY_MAX            >= mConfig.mBufferQty      );
         assert(Test::BUFFER_QTY_MIN            <= mConfig.mBufferQty      );
-        assert(Test::CODE_QTY                  >  mConfig.mCode           );
+        assert(CODE_QTY                        >  mConfig.mCode           );
         assert(Test::MODE_QTY                  >  mConfig.mMode           );
         assert(Test::TEST_PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
         assert(Test::TEST_PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte);
@@ -324,7 +326,7 @@ namespace TestLib
             "Profiling  = %s\n",
             mConfig.mBandwidth_MiB_s,
             mConfig.mBufferQty      ,
-            Test::CODE_NAMES[mConfig.mCode],
+            CODES[mConfig.mCode].mName,
             Test::MODE_NAMES[mConfig.mMode],
             mConfig.mPacketSize_byte,
             mConfig.mProfiling ? "true" : "false");
@@ -334,7 +336,7 @@ namespace TestLib
     {
         mConfig.mBandwidth_MiB_s = Test::BANDWIDTH_MAX_MiB_s;
         mConfig.mBufferQty       =                         2;
-        mConfig.mCode            = Test::CODE_DEFAULT       ;
+        mConfig.mCode            = CODE_DEFAULT             ;
         mConfig.mMode            = Test::MODE_DEFAULT       ;
         mConfig.mPacketSize_byte =                      1024;
         mConfig.mProfiling       = false                    ;

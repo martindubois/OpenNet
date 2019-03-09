@@ -19,7 +19,7 @@
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-TestD::TestD() : Test("D", CODE_NOTHING, MODE_FUNCTION)
+TestD::TestD() : Test("D", TestLib::CODE_NOTHING, MODE_FUNCTION)
 {
 }
 

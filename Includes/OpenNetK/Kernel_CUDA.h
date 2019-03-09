@@ -17,3 +17,4 @@
 #define OPEN_NET_GROUP_ID            blockIdx.x
 #define OPEN_NET_KERNEL              extern "C" __global__
 #define OPEN_NET_PACKET_INDEX        threadIdx.x
+#define OPEN_NET_PACKET_QTY          blockDim.x
