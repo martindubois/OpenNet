@@ -4,7 +4,7 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright &copy; 2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/IoCtl.h
-/// \brief      OpenNetK_IoCtl_Info, OpenNetK_IoCtl_Result
+/// \brief      OpenNetK_IoCtl_Info
 
 #pragma once
 
@@ -14,12 +14,16 @@
 /// \cond en
 /// \brief  This structure contains information about buffer size an
 ///         IoCtl accepts.
+/// \note   This data type is part of the Driver Development Kit (DDK).
+/// \todo   Document members of OpenNetK_IoCtl_Info
 /// \endcond
 /// \cond fr
 /// \brief  Cette structure contient les tailles d'espace m&eacute;moire
 ///         qu'un IoCtl accepte.
+/// \note   Ce type de donn&eacute;e fait partie de l'ensemble de
+///         developpement de pilotes (DDK).
+/// \todo   Documenter les membre de OpenNetK_IoCtl_Out
 /// \endcond
-/// \todo   Document the members
 typedef struct
 {
     unsigned int mIn_MaxSize_byte ;
@@ -30,12 +34,16 @@ OpenNetK_IoCtl_Info;
 
 /// \cond en
 /// \brief  This enumeration defines the value IoCtl can return.
+/// \note   This data type is part of the Driver Development Kit (DDK).
+/// \todo   Document values of OpenNetK_IoCtl_Result
 /// \endcond
 /// \cond fr
-/// \brief  Cette enum&eacute;ration definit les valeurs que les IoCtl
+/// \brief  Cette enum&eacute;ration d&eacute;finit les valeurs que les IoCtl
 ///         peuvent retourner.
+/// \note   Ce type de donn&eacute;e fait partie de l'ensemble de
+///         developpement de pilotes (DDK).
+/// \todo   Documenter les valeurs de OpenNetK_IoCtl_Result
 /// \endcond
-/// \todo   Document the values
 typedef enum
 {
     IOCTL_RESULT_OK                = 0x00000000,

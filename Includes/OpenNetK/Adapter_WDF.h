@@ -4,7 +4,7 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Adapter_WDF.h
-/// \brief      OpenNetK::Adapter_WDF
+/// \brief      OpenNetK::Adapter_WDF (DDK, Windows)
 
 #pragma once
 
@@ -24,12 +24,14 @@ namespace OpenNetK
     /////////////////////////////////////////////////////////////////////////
 
     /// \cond en
-    /// \brief  This class maintains information about an adapter on the
-    ///         OpenNet internal network.
+    /// \brief  The Adapter_WDF class (DDK, Windows only)
+    /// \note   Kernel class - No constructor, no destructor, no virtual
+    ///         method
     /// \endcond
     /// \cond fr
-    /// \brief  Cette classe maintien les information concernant un
-    ///         adaptateur sur le reseau interne OpenNet.
+    /// \brief  La classe Adapter_WDF (DDK, Windows seulement)
+    /// \note   Classe noyau - Pas de constructeur, pas de destructor, pas
+    ///         de m&eacute;thodes virtuelle
     /// \endcond
     class Adapter_WDF
     {
@@ -38,51 +40,53 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Initialize the instance.
-        /// \param  aAdapter      [-K-;RW-] The Adapter
-        /// \param  aDevice       [-K-;RW-] The WDFDEVICE
-        /// \param  aHardware_WDF [-K-;RW-] The Hardware_WDF
+        /// \param  aAdapter       The Adapter
+        /// \param  aDevice        The WDFDEVICE
+        /// \param  aHardware_WDF  The Hardware_WDF
         /// \endcond
         /// \cond fr
-        /// \brief  Initialise l'instance
-        /// \param  aAdapter      [-K-;RW-] L'Adapter
-        /// \param  aDevice       [-K-;RW-] Le WDFDEVICE
-        /// \param  aHardware_WDF [-K-;RW-] Le Hardware_WDF
+        /// \brief  Initialiser l'instance
+        /// \param  aAdapter       L'Adapter
+        /// \param  aDevice        Le WDFDEVICE
+        /// \param  aHardware_WDF  Le Hardware_WDF
         /// \endcond
         void Init(Adapter * aAdapter, WDFDEVICE aDevice, Hardware_WDF * aHardware_WDF);
 
         /// \cond en
         /// \brief  Cleanup file
-        /// \param  aFileObject [---;RW-] The WDFFILEOBJECT instance
+        /// \param  aFileObject  The WDFFILEOBJECT instance
         /// \endcond
         /// \cond fr
         /// \brief  Nettoyer un fichier
-        /// \param  aFileObject [---;RW-] L'instance de WDFFILEOBJECT
+        /// \param  aFileObject  L'instance de WDFFILEOBJECT
         /// \endcond
         void FileCleanup(WDFFILEOBJECT aFileObject);
 
         /// \cond en
         /// \brief  Process an IoCtl request
-        /// \param  aRequest [---;RW-] The request
-        /// \param  aOutSize_byte      The maximum output data size
-        /// \param  aInSize_byte       The input data size
-        /// \param  aCode              The IoCtl request code
+        /// \param  aRequest       The request
+        /// \param  aOutSize_byte  The maximum output data size
+        /// \param  aInSize_byte   The input data size
+        /// \param  aCode          The IoCtl request code
         /// \endcond
         /// \cond fr
         /// \brief  Traite une commande IoCtl
-        /// \param  aRequest [---;RW-] La requete
-        /// \param  aOutSize_byte      La taille maximal des donnes de sortie
-        /// \param  aInSize_byte       La taille des donnees d'entree
-        /// \param  aCode              Le code de la commande IoCtl
+        /// \param  aRequest       La requete
+        /// \param  aOutSize_byte  La taille maximale des donn&eacute;es de
+        ///                        sortie
+        /// \param  aInSize_byte   La taille des donn&eacute;es
+        ///                        d'entr&eacute;e
+        /// \param  aCode          Le code de la commande IoCtl
         /// \endcond
         void IoDeviceControl(WDFREQUEST aRequest, size_t aOutSize_byte, size_t aInSize_byte, ULONG aCode);
 
         /// \cond en
         /// \brief  Process the request in the caller context.
-        /// \param  aRequest [---;RW-] The request
+        /// \param  aRequest  The request
         /// \endcond
         /// \cond fr
-        /// \brief  Traite la requete dans le context de l'appelant
-        /// \param  aRequest [---;RW-] La requete
+        /// \brief  Traiter la requ&ecirc;te dans le context de l'appelant
+        /// \param  aRequest  La requ&ecirc;te
         /// \endcond
         void IoInCallerContext(WDFREQUEST aRequest);
 

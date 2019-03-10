@@ -1,9 +1,10 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNet/Function.h
-/// \brief   OpenNet::Function
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNet/Function.h
+/// \brief      OpenNet::Function
 
 #pragma once
 
@@ -44,20 +45,22 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir le nom de la fonction
-        /// \return Cette methode retourne l'adresse d'une variable interne.
+        /// \return Cette m&eacute;thode retourne l'adresse d'une variable interne.
         /// \endcond
+        /// \sa     SetFunctionName
         OPEN_NET_PUBLIC const char * GetFunctionName() const;
 
         /// \cond en
         /// \brief  Set the function name
-        /// \param  aFunctionName [---;R--] The function name
+        /// \param  aFunctionName  The function name
         /// \endcond
         /// \cond fr
         /// \brief  Modifier le nom de la fonction
-        /// \param  aFunctionName [---;R--] Le nom de la fonction
+        /// \param  aFunctionName  Le nom de la fonction
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
+        /// \sa     GetFunctionName
         virtual Status SetFunctionName(const char * aFunctionName);
 
         // ===== SourceCode =================================================

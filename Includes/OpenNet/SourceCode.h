@@ -110,8 +110,8 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir le nom de l'instance
-        /// \return Cette methode retourne l'adresse d'un espace de memoire
-        ///         interne.
+        /// \return Cette m&eacute;thode retourne l'adresse d'un espace de
+        ///         m&eacute;moire interne.
         /// \endcond
         OPEN_NET_PUBLIC const char * GetName() const;
 
@@ -204,7 +204,7 @@ namespace OpenNet
         /// \cond fr
         /// \brief  Retirer des chaines du code
         /// \param  aSearch   La chaine &agrave; chercher et retirer
-        /// \return Cette methode retourne le nombre de chaine
+        /// \return Cette m&eacute;thode retourne le nombre de chaine
         ///         retir&eacute;es.
         /// \endcond
         OPEN_NET_PUBLIC virtual unsigned int Edit_Remove(const char * aSearch);
@@ -221,7 +221,7 @@ namespace OpenNet
         /// \param  aSearch   La chaine &agrave; chercher
         /// \param  aReplace  La chaine &agrave; utiliser pour remplacer les
         ///                   chaines trouvees
-        /// \return Cette methode retourne le nombre de remplacements
+        /// \return Cette m&eacute;thode retourne le nombre de remplacements
         ///         effectues
         /// \endcond
         OPEN_NET_PUBLIC virtual unsigned int Edit_Replace(const char * aSearch, const char * aReplace);
@@ -234,7 +234,7 @@ namespace OpenNet
         /// \cond fr
         /// \brief  Rechercher une chaines dans le code
         /// \param  aSearch  La chaine &agrave; chercher
-        /// \return Cette methode retourne le nombre d'instance
+        /// \return Cette m&eacute;thode retourne le nombre d'instance
         ///         trouv&eacute;es.
         /// \endcond
         OPEN_NET_PUBLIC unsigned int Edit_Search(const char * aSearch);

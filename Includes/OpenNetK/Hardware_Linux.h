@@ -4,7 +4,7 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright (C) 2018-2019 KMS. All right reserved.
 /// \file       Includes/OpenNetK/Hardware_Linux.h
-/// \brief      OpenNetK::Hardware_Linux
+/// \brief      OpenNetK::Hardware_Linux (DDK, Linux)
 
 #pragma once
 
@@ -22,12 +22,12 @@ namespace OpenNetK
     /////////////////////////////////////////////////////////////////////////
 
     /// \cond en
-    /// \brief  This class connect the Linux device with the Hardware class
+    /// \brief  The Hardware_Linux class (DDK, Linux only)
     /// \note   Kernel class - No constructor, no destructor, no virtual
     ///         methode
     /// \endcond
     /// \cond fr
-    /// \brief  Cette classe connecte un device Linux avec la class Hardware
+    /// \brief  La classe Hardware_Linux (DDK, Linux seulement)
     /// \note   Classe noyau - Pas de constructeur, pas de destructeur, pas
     ///         de methode virtuelle
     /// \endcond

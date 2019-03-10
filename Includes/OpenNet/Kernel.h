@@ -54,7 +54,9 @@ namespace OpenNet
         /// \cond fr
         /// \brief  D&eacute;sactiver le profiling OpenCL
         /// \endcond
+        /// \retval STATUS_OK
         /// \retval STATUS_PROFILING_ALREADY_DISABLED
+        /// \sa     EnableProfiling, IsProfilingEnabled
         OPEN_NET_PUBLIC Status DisableProfiling();
 
         /// \cond en
@@ -63,7 +65,9 @@ namespace OpenNet
         /// \cond fr
         /// \brief  Activer le profiling OpenCL
         /// \endcond
+        /// \retval STATUS_OK
         /// \retval STATUS_PROFILING_ALREADY_ENABLED
+        /// \sa     DisableProfiling, IsProfilingEnabled
         OPEN_NET_PUBLIC Status EnableProfiling();
 
         /// \cond en
@@ -121,6 +125,7 @@ namespace OpenNet
         /// \endcond
         /// \retval false
         /// \retval true
+        /// \sa     DisableProfiling, EnableProfiling
         OPEN_NET_PUBLIC bool IsProfilingEnabled() const;
 
         /// \cond en

@@ -4,6 +4,7 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright &copy; 2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Kernel_CUDA.h
+/// \brief      (CUDA)
 /// \todo       Document macros
 
 #pragma once

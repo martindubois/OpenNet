@@ -21,12 +21,13 @@
 
 /// \cond en
 /// \brief  This structure is used to pass the information about a buffer.
+/// \todo   Document member of OpenNet_BufferHeader
 /// \endcond
 /// \cond fr
-/// \brief  Cette structure est utilise pour passer les informations au sujet
-///         d'un espace memoire.
+/// \brief  Cette structure est utilis&eacute;e pour passer les informations
+///         au sujet d'un espace m&eacute;moire.
+/// \todo   Documenter les membres de OpenNet_BufferHeader
 /// \endcond
-/// \todo   Document members
 typedef struct
 {
     uint32_t mPacketQty            ;
@@ -41,24 +42,21 @@ OpenNet_BufferHeader;
 
 /// \cond en
 /// \brief  This structure is used to pass the information about a packet.
+/// \todo   Document member of OpenNet_PacketInfo
 /// \endcond
 /// \cond fr
-/// \brief  Cette structure est utilise pour passer les informations au sujet
-///         d'un paquet.
+/// \brief  Cette structure est utilis&eacute;e pour passer les informations
+///         au sujet d'un paquet.
+/// \todo   Documenter les membres de OpenNet_PacketInfo
 /// \endcond
-/// \todo   Document members
 typedef struct
 {
     volatile uint32_t mSendTo;
 
-    uint8_t mReserved0[4];
-
     uint32_t mOffset_byte;
-
-    uint8_t mReserved1[4];
 
     volatile uint32_t mSize_byte;
 
-    uint8_t mReserved2[12];
+    uint8_t mReserved2[4];
 }
 OpenNet_PacketInfo;

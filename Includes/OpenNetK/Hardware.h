@@ -27,9 +27,12 @@ namespace OpenNetK
 
     /// \cond en
     /// \brief  This class defines the hardware interface.
+    /// \note   This class is part of the Driver Development Kit (DDK).
     /// \endcond
     /// \cond fr
     /// \brief  Cette classe d&eacute;clare l'interface du materiel.
+    /// \note   Cette classe fait partie de l'ensemble de developpement de
+    ///         pilotes (DDK).
     /// \endcond
     class Hardware
     {
@@ -93,6 +96,7 @@ namespace OpenNetK
         /// \brief  R&eacute;initialiser toutes les regions de m&eacute;moire
         /// \endcond
         /// \note   Level = Thread, Thread = Uninitialisation
+        /// \sa     SetMemory
         virtual void ResetMemory();
 
         /// \cond en
@@ -148,6 +152,7 @@ namespace OpenNetK
         /// \endcond
         /// \retval true  OK
         /// \note   Level = Thread, Thread = Initialisation
+        /// \sa     ResetMemory
         virtual bool SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int aSize_byte);
 
         /// \cond en
@@ -157,6 +162,7 @@ namespace OpenNetK
         /// \brief  Entrer dans l'&eacute;tat D0
         /// \endcond
         /// \note   Level = Thread, Thread = Initialisation
+        /// \sa     D0_Exit
         virtual void D0_Entry();
 
         /// \cond en
@@ -169,6 +175,7 @@ namespace OpenNetK
         /// \endcond
         /// \retval true  OK
         /// \note   Level = Thread, Thread = Uninitialisation
+        /// \sa     D0_Exit
         virtual bool D0_Exit();
 
         /// \cond en
@@ -177,6 +184,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  D&eacute;sactiver les interruptions
         /// \endcond
+        /// \sa     Interrupt_Enable
         virtual void Interrupt_Disable();
 
         /// \cond en
@@ -185,6 +193,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Activer les interruptions
         /// \endcond
+        /// \sa     Interrupt_Disable, Interrupt_Process
         virtual void Interrupt_Enable();
 
         /// \cond en
@@ -205,6 +214,7 @@ namespace OpenNetK
         /// \retval true  L'adaptateur a caus&eacute; l'interruption.
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
+        /// \sa     Interrupt_Disable, Interrupt_Enable, Interrupt_Process2
         virtual bool Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing);
 
         /// \cond en
@@ -217,6 +227,7 @@ namespace OpenNetK
         /// \param  aNeedMoreProcessing
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
+        /// \sa     Interrupt_Process, Interrupt_Process3
         virtual void Interrupt_Process2(bool * aNeedMoreProcessing);
 
         /// \cond en
@@ -225,10 +236,12 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Traiter une interruption au troisi&egrave;me niveau
         /// \endcond
+        /// \sa     Interrupt_Process2
         virtual void Interrupt_Process3();
 
         // TODO  OpenNetK.Hardware
-        //       Use two lock, one for Rx and one for Tx
+        //       Normal (Optimisation) - Use two lock, one for Rx and one for
+        //       Tx
 
         /// \cond en
         /// \brief  Lock the hardware
@@ -236,9 +249,17 @@ namespace OpenNetK
         /// \endcond
         /// \cond fr
         /// \brief  Verouiller l'acc&egrave;s au mat&eacute;riel
-        /// \note   Cette methode fait partie du chemin critique.
+        /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
+        /// \sa     Unlock, Unlock_AfterReceive,
+        ///         Unlock_AfterReceive_FromThread, Unlock_AfterSend,
+        ///         Unlock_AfterSend_FromThread
         void Lock();
+
+        // TODO  OpenNet.Hardware
+        //       Normal (Feature) - Ajouter Lock_BeforeSend en passant un
+        //       nombre de descripteurs necessaires. Cette fonction echouera
+        //       s'il n'y a pas assez de descripteur disponible.
 
         /// \cond en
         /// \brief  Unlock the hardware
@@ -246,8 +267,9 @@ namespace OpenNetK
         /// \endcond
         /// \cond fr
         /// \brief  D&eacuteverouiller l'acc&egrave;s au mat&eacute;riel
-        /// \note   Cette methode fait partie du chemin critique.
+        /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
+        /// \sa     Lock
         void Unlock();
 
         /// \cond en
@@ -265,6 +287,7 @@ namespace OpenNetK
         /// \param  aFlags      La valeur &agrave; passer &agrave;
         ///                     SpinLock::UnlockFromThread
         /// \endcond
+        /// \sa     Lock
         void Unlock_AfterReceive_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags );
 
         /// \cond en
@@ -282,6 +305,7 @@ namespace OpenNetK
         /// \param  aFlags      La valeur &agrave; passer &agrave;
         ///                     SpinLock::UnlockFromThread
         /// \endcond
+        /// \sa     Lock
         void Unlock_AfterSend_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags );
 
         /// \cond en
@@ -297,7 +321,7 @@ namespace OpenNetK
         virtual bool Packet_Drop() = 0;
 
         // TODO  OpenNetK.Adapter
-        //       Pass the aCounter to Lock rather than at
+        //       Normal (Cleanup) - Pass the aCounter to Lock rather than at
         //       Packet_Receive_NoLock and Unlock_AfterSend and do not pass
         //       aPacketQty to Unlock_AfterSend. Replace it by an internal
         //       counter.
@@ -312,8 +336,9 @@ namespace OpenNetK
         /// \brief  Ajouter le paquet &agrave; la queue de r&eacute;ception
         /// \param  aPacket   Le Packet
         /// \param  aCounter  Le compteur d'op&acute;ration
-        /// \note   Cette methode fait partie du chemin critique.
+        /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
+        /// \sa     Lock, Unlock_AfterReceive
         virtual void Packet_Receive_NoLock(Packet * aPacket, volatile long * aCounter) = 0;
 
         /// \cond en
@@ -330,8 +355,9 @@ namespace OpenNetK
         /// \param  aPacket_XA  Les donn&eacute;es (C or M)
         /// \param  aSize_byte  La taille des donne&eacute;s
         /// \param  aCounter    Le compteur d'op&eacute;ration
-        /// \note   Cette methode fait partie du chemin critique.
+        /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
+        /// \sa     Lock, Unlock_AfterSend
         virtual void Packet_Send_NoLock(uint64_t aPacket_PA, const void * aPacket_XA, unsigned int aSize_byte, volatile long * aCounter) = 0;
 
         /// \cond en
@@ -367,7 +393,7 @@ namespace OpenNetK
         ///                        sortie
         /// \param  aReset         Remettre les statistiques &agrave;
         ///                        z&eacute;ro apr&egrave;s les avoir obtenus
-        /// \return Cette methode retourne la taille des statistiques
+        /// \return Cette m&eacute;thode retourne la taille des statistiques
         ///         &eacute;crites dans l'espace m&eacute;moire de sortie.
         /// \endcond
         /// \note   Level = SoftInt or Thread, Thread = Users
@@ -377,7 +403,7 @@ namespace OpenNetK
         /// \brief  Reset the statistics
         /// \endcond
         /// \cond fr
-        /// \brief  Remettre les statistiques a zero
+        /// \brief  Remettre les statistiques &agrave; z&eacute;ro
         /// \endcond
         /// \note   Level = SoftInt or Thread, Thread = Users
         virtual void Statistics_Reset();
@@ -405,7 +431,7 @@ namespace OpenNetK
         /// \param  aOut_XA     (C or M)
         /// \endcond
         /// \cond fr
-        /// \brief  Passer les dangereuse barriere de 64 Kio
+        /// \brief  Passer les dangereuses barriere de 64 Kio
         /// \param  aIn_PA
         /// \param  aIn_XA      (C ou M)
         /// \param  aSize_byte
@@ -419,7 +445,7 @@ namespace OpenNetK
         /// \brief  The default constructor
         /// \endcond
         /// \cond fr
-        /// \brief  Le constructeur par defaut
+        /// \brief  Le constructeur par d&eacute;faut
         /// \endcond
         /// \note   Thread = Initialisation
         Hardware();
@@ -431,7 +457,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  La partie de Unlock_AfterReceive qui d&eacute;pend du
         ///         mat&eacute;riel
-        /// \note   Cette methode fait partie du chemin critique.
+        /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
         virtual void Unlock_AfterReceive_Internal() = 0;
 
@@ -442,7 +468,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  La partie de Unlock_AfterSend qui d&eacute;pend du
         ///         mat&eacute;riel
-        /// \note   Cette methode fait partie du chemin critique.
+        /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
         virtual void Unlock_AfterSend_Internal() = 0;
 

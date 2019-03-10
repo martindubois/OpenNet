@@ -1,8 +1,9 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNetK/IPv4.h
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright &copy; 2018-1029 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/IPv4.h
 
 #pragma once
 
@@ -26,10 +27,10 @@
 /// \return  This function returns a pointer to the destination address.
 /// \endcond
 /// \cond    fr
-/// \brief   Cette fonction retourne a pointeur vers l'adresse de
+/// \brief   Cette fonction retourne un pointeur vers l'adresse de
 ///          destination.
-/// \param   aData  Un pointeur vers l'entete IPv4
-/// \return  Cette fonction retourne a pointeur vers l'adresse de
+/// \param   aData  Un pointeur vers l'ent&ecirc;te IPv4
+/// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          destination.
 /// \endcond
 __global unsigned char * IPv4_Destination(__global unsigned char * aData)
@@ -43,9 +44,9 @@ __global unsigned char * IPv4_Destination(__global unsigned char * aData)
 /// \return  This function returns a pointer to the source address.
 /// \endcond
 /// \cond    fr
-/// \brief   Cette fonction retourne a pointeur vers l'adresse de provenance.
-/// \param   aData  Un pointeur vers l'entete IPv4
-/// \return  Cette fonction retourne a pointeur vers l'adresse de provenance.
+/// \brief   Cette fonction retourne un pointeur vers l'adresse de provenance.
+/// \param   aData  Un pointeur vers l'ent&ecirc;te IPv4
+/// \return  Cette fonction retourne un pointeur vers l'adresse de provenance.
 /// \endcond
 __global unsigned char * IPv4_Source(__global unsigned char * aData)
 {

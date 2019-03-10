@@ -47,10 +47,10 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Lire des donn&eacute;es d'un UserBuffer
-        /// \param  aOffsetByte  O&ugrave; d&eacute;buter &agrave; lire dans
-        ///                      le UserBuffer
-        /// \param  aOut         O&ugrave; placer les donn&eacute;es lues
-        /// \param  aSize_byte   La taille des donn&eacute;es &agrave; lire
+        /// \param  aOffset_byte  O&ugrave; d&eacute;buter &agrave; lire dans
+        ///                       le UserBuffer
+        /// \param  aOut          O&ugrave; placer les donn&eacute;es lues
+        /// \param  aSize_byte    La taille des donn&eacute;es &agrave; lire
         /// \endcond
         /// \retval STATUS_OK
         virtual OpenNet::Status Read(unsigned int aOffset_byte, void * aOut, unsigned int aSize_byte) = 0;
@@ -58,17 +58,17 @@ namespace OpenNet
         /// \cond en
         /// \brief  Write data to a UserBuffer
         /// \param  aOffset_byte  Where to start to write in the UserBuffer
-        /// \param  aOut          Where to get the data to write
+        /// \param  aIn           Where to get the data to write
         /// \param  aSize_byte    Size of data to read
         /// \endcond
         /// \cond fr
         /// \brief  Lire des donn&eacute;es d'un UserBuffer
-        /// \param  aOffsetByte  O&ugrave; d&eacute;buter &agrave;
-        ///                      &eacute;crire dans le UserBuffer
-        /// \param  aOut         O&ugrave; prendre les donn&eacute;es
-        ///                      &agrave; &eacute;crire
-        /// \param  aSize_byte   La taille des donn&eacute;es &agrave;
-        ///                      &eacute;crire
+        /// \param  aOffset_byte  O&ugrave; d&eacute;buter &agrave;
+        ///                       &eacute;crire dans le UserBuffer
+        /// \param  aIn           O&ugrave; prendre les donn&eacute;es
+        ///                       &agrave; &eacute;crire
+        /// \param  aSize_byte    La taille des donn&eacute;es &agrave;
+        ///                       &eacute;crire
         /// \endcond
         /// \retval STATUS_OK
         virtual OpenNet::Status Write(unsigned int aOffset_byte, const void * aIn, unsigned int aSize_byte) = 0;

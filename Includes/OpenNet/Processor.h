@@ -36,20 +36,21 @@ namespace OpenNet
     public:
 
         // TODO  OpenNet.Processor
-        //       Low (Feature) - Ajouter un chemin de recherche additionnel
-        //       pour les includes dans la configuration.
+        //       Normal (Feature) - Ajouter un chemin de recherche
+        //       additionnel pour les includes dans la configuration.
 
         // TODO  OpenNet.Processor
-        //       Low (Feature) - Ajouter un parametre de configuration pour
-        //       le chemin de recherche des include d'OpenNet.
+        //       Normal (Feature) - Ajouter un parametre de configuration
+        //       pour le chemin de recherche des include d'OpenNet.
 
         /// \cond en
         /// \brief  This structure contains the configuration of a Processor.
+        /// \todo   Document members
         /// \endcond
         /// \cond fr
         /// \brief  Cette structure contient la configuration d'un Processor.
+        /// \todo   Documenter les membres
         /// \endcond
-        /// \todo   Document members
         typedef struct
         {
             struct
@@ -67,10 +68,12 @@ namespace OpenNet
         /// \cond en
         /// \brief  This structure contains the information about a
         ///         Processor.
+        /// \todo   Document members
         /// \endcond
         /// \cond fr
         /// \brief  Cette structure contient les information au sujet d'un
         ///         Processor.
+        /// \todo   Documenter les membres
         /// \endcond
         typedef struct
         {
@@ -132,13 +135,13 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Display
-        /// \param  aIn  [---;R--] The Info instance to Display
-        /// \param  aOut [---;RW-] The output stream
+        /// \param  aIn   The Info instance to Display
+        /// \param  aOut  The output stream
         /// \endcond
         /// \cond fr
         /// \brief  Afficher
-        /// \param  aIn  [---;R--] L'instance d'Info &agrave; afficher
-        /// \param  aOut [---;RW-] Le fichier de sortie
+        /// \param  aIn   L'instance d'Info &agrave; afficher
+        /// \param  aOut  Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_INVALID_REFERENCE
@@ -147,14 +150,15 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Retrieve configuration
-        /// \param  aOut [---;-W-] The configuration
+        /// \param  aOut  The configuration
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir la configuration
-        /// \param  aOut [---;-W-] La configuration
+        /// \param  aOut  La configuration
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
+        /// \sa     SetConfig
         virtual Status GetConfig(Config * aOut) const = 0;
 
         /// \cond en
@@ -181,11 +185,11 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Retrieve the Info
-        /// \param  aOut [---;RW-] The Info instance
+        /// \param  aOut  The Info instance
         /// \endcond
         /// \cond fr
         /// \brief  Retrouver le Info
-        /// \param  aOut [---;RW-] L'instance d'Info
+        /// \param  aOut  L'instance d'Info
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
@@ -204,14 +208,15 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Modify the configuration
-        /// \param  aConfig [---;-W-] The configuration
+        /// \param  aConfig  The configuration
         /// \endcond
         /// \cond fr
         /// \brief  Changer la configuration
-        /// \param  aConfig [---;-W-] La configuration
+        /// \param  aConfig  La configuration
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_INVALID_REFERENCE
+        /// \sa     GetConfig
         virtual Status SetConfig(const Config & aConfig) = 0;
 
         /// \cond en
@@ -232,11 +237,11 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Display
-        /// \param  aOut [---;RW-] The output stream
+        /// \param  aOut  The output stream
         /// \endcond
         /// \cond fr
         /// \brief  Afficher
-        /// \retval aOut [---;RW-] Le fichier de sortie
+        /// \retval aOut  Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT

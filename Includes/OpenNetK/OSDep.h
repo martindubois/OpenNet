@@ -4,8 +4,7 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/OSDep.h
-/// \brief      Define the OS dependent function the ONK_Lib calls.
-/// \todo       Document functions
+/// \brief      OpenNetK_OSDep
 
 #pragma once
 

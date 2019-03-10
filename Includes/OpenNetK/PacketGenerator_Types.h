@@ -13,11 +13,16 @@ namespace OpenNetK
 
     /// \cond en
     /// \brief  This structure is used to pass the configuration.
+    /// \note   This data type is part of the Driver Development Kit (DDK).
+    /// \todo   Document members of PacketGenerator_Config
     /// \endcond
     /// \cond fr
-    /// \brief  Cette structure est utilise pour passer la configuration.
+    /// \brief  Cette structure est utilis&eacute;e pour passer la
+    ///         configuration.
+    /// \note   Ce type de donn&eacute;e fait partie de l'ensemble de
+    ///         developpement de pilotes (DDK).
+    /// \todo   Documenter les membres de PacketGenerator_Config
     /// \endcond
-    /// \todo   Document the members
     typedef struct
     {
         uint32_t mAllowedIndexRepeat;

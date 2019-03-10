@@ -1,8 +1,9 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNetK/Ethernet.h
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/Ethernet.h
 
 #pragma once
 
@@ -17,12 +18,12 @@
 /// \return  This function returns a pointer to the Etehrnet payload.
 /// \endcond
 /// \cond    fr
-/// \brief   Cette fonction retourne a pointeur vers la charge utile du
+/// \brief   Cette fonction retourne un pointeur vers la charge utile du
 ///          paquet Ethernet.
-/// \param   aBase  Un pointeur vers le buffer
+/// \param   aBase        Un pointeur vers le d&eacute;but du paquet
 /// \param   aPacketInfo  Un pointeur vers l'information au sujet du paquet a
 ///          traiter
-/// \return  Cette fonction retourne a pointeur vers la charge utile du
+/// \return  Cette fonction retourne un pointeur vers la charge utile du
 ///          paquet Ethernet.
 /// \endcond
 __global unsigned char * Ethernet_Data(__global unsigned char * aBase, __global const OpenNet_PacketInfo * aPacketInfo)
@@ -39,7 +40,7 @@ __global unsigned char * Ethernet_Data(__global unsigned char * aBase, __global 
 /// \endcond
 /// \cond    fr
 /// \brief   Cette fonction retourne le type du paquet Ethernet.
-/// \param   aBase  Un pointeur vers le buffer
+/// \param   aBase        Un pointeur vers le d&eacute;but du paquet
 /// \param   aPacketInfo  Un pointeur vers l'information au sujet du paquet a
 ///          traiter
 /// \return  Cette fonction retourne le type du paquet Ethernet.

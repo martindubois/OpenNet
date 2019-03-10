@@ -4,7 +4,6 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright (C) 2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Kernel.h
-/// \brief      Defines the macro used to declare main functions and kernels.
 
 #pragma once
 
@@ -34,9 +33,23 @@
 
 // ===== Function ===========================================================
 
+/// \cond en
+/// \brief  Declare a packet processing function
+/// \param  F  The function name
+/// \endcond
+/// \cond fr
+/// \brief  D&eacute;clare une fonction de traitement de paquet
+/// \param  F  Le nom de la fonction
+/// \endcond
 #define OPEN_NET_FUNCTION_DECLARE(F)                                                        \
     OPEN_NET_DEVICE void F( OPEN_NET_GLOBAL OpenNet_BufferHeader * aBufferHeader )
 
+/// \cond en
+/// \brief  Begining of a packet processing function
+/// \endcond
+/// \cond fr
+/// \brief  D&eacute;but d'une fonction de traitement de paquet
+/// \endcond
 #define OPEN_NET_FUNCTION_BEGIN                                                                                                                     \
     OPEN_NET_GLOBAL_MEMORY_FENCE;                                                                                                                   \
     if ( 0 == ( OPEN_NET_BUFFER_EVENT_PROCESSED & aBufferHeader->mEvents ) )                                                                        \
@@ -47,6 +60,12 @@
         if ( 0 == lPacketInfo->mSendTo )                                                                                                            \
         {
 
+/// \cond en
+/// \brief  End of a packet processing function
+/// \endcond
+/// \cond fr
+/// \brief  Fin d'une fonction de traitement de paquet
+/// \endcond
 #define OPEN_NET_FUNCTION_END                                         \
         }                                                             \
         OPEN_NET_GLOBAL_MEMORY_FENCE;                                 \
@@ -59,9 +78,21 @@
 
 // ===== Kernel =============================================================
 
+/// \cond en
+/// \brief  Declare a packet processing kernel
+/// \endcond
+/// \cond fr
+/// \brief  D&eacute;clare un kernel de traitement de paquet
+/// \endcond
 #define OPEN_NET_KERNEL_DECLARE                                                                  \
     OPEN_NET_KERNEL void Filter( OPEN_NET_GLOBAL OpenNet_BufferHeader * aBufferHeader )
 
+/// \cond en
+/// \brief  Begining of a packet processing kernel
+/// \endcond
+/// \cond fr
+/// \brief  D&eacute;but d'un kernel de traitement de paquet
+/// \endcond
 #define OPEN_NET_KERNEL_BEGIN                                                                                                                       \
     OPEN_NET_GLOBAL_MEMORY_FENCE;                                                                                                                   \
     if ( 0 == ( OPEN_NET_BUFFER_EVENT_PROCESSED & aBufferHeader->mEvents ) )                                                                        \
@@ -72,6 +103,12 @@
         if ( 0 == lPacketInfo->mSendTo )                                                                                                            \
         {
 
+/// \cond en
+/// \brief  End of a packet processing kernel
+/// \endcond
+/// \cond fr
+/// \brief  Fin d'un kernel de traitement de paquet
+/// \endcond
 #define OPEN_NET_KERNEL_END                                           \
         }                                                             \
         OPEN_NET_GLOBAL_MEMORY_FENCE;                                 \

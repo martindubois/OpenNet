@@ -36,12 +36,15 @@ namespace OpenNetK
     /// \cond en
     /// \brief  This class maintains information about an adapter on the
     ///         OpenNet internal network.
+    /// \note   This class is part of the Driver Development Kit (DDK).
     /// \note   Kernel class - No constructor, no destructor, no virtual
     ///         method
     /// \endcond
     /// \cond fr
     /// \brief  Cette classe maintien les informations concernant un
     ///         adaptateur sur le r&eacute;seau interne OpenNet.
+    /// \note   Cette classe fait partie de l'ensemble de developpement de
+    ///         pilotes (DDK).
     /// \note   Classe noyau - Pas de constructeur, pas de destructor, pas
     ///         de m&eacute;thodes virtuelle
     /// \endcond

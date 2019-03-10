@@ -1,8 +1,9 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNetK/ARP.h
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/ARP.h
 
 #pragma once
 
@@ -26,9 +27,11 @@
 /// \return  This function returns a pointer to the requested address.
 /// \endcond
 /// \cond    fr
-/// \brief   Cette fonction retourne a pointeur vers l'adresse questionnee.
-/// \param   aData  Un pointeur vers l'entete ARP
-/// \return  Cette fonction retourne a pointeur vers l'adresse questionnee.
+/// \brief   Cette fonction retourne un pointeur vers l'adresse
+///          questionn&eacute;e.
+/// \param   aData  Un pointeur vers l'ent&ecirc;te ARP
+/// \return  Cette fonction retourne un pointeur vers l'adresse
+///          questionn&eacute;e.
 /// \endcond
 __global unsigned char * ARP_Destination(__global unsigned char * aData)
 {
@@ -41,9 +44,11 @@ __global unsigned char * ARP_Destination(__global unsigned char * aData)
 /// \return  This function returns a pointer to the source address.
 /// \endcond
 /// \cond    fr
-/// \brief   Cette fonction retourne a pointeur vers l'adresse de provenance.
-/// \param   aData  Un pointeur vers l'entete ARP
-/// \return  Cette fonction retourne a pointeur vers l'adresse de provenance.
+/// \brief   Cette fonction retourne un pointeur vers l'adresse de
+///          provenance.
+/// \param   aData  Un pointeur vers l'ent&ecirc;te ARP
+/// \return  Cette fonction retourne un pointeur vers l'adresse de
+///          provenance.
 /// \endcond
 __global unsigned char * ARP_Source(__global unsigned char * aData)
 {

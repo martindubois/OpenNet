@@ -24,11 +24,12 @@ namespace OpenNet
 
     /// \cond en
     /// \brief  The status codes
+    /// \todo   Document values
     /// \endcond
     /// \cond fr
     /// \brief  Les code de status
+    /// \todo   Documenter les valeurs
     /// \endcond
-    /// \todo   Document the values
     typedef enum
     {
         STATUS_OK = 0,
@@ -127,13 +128,13 @@ namespace OpenNet
 
     /// \cond en
     /// \brief  Display
-    /// \param  aStatus        The Status to display
-    /// \param  aOut [---;RW-] The output stream
+    /// \param  aStatus  The Status to display
+    /// \param  aOut     The output stream
     /// \endcond
     /// \cond fr
     /// \brief  Afficher le Status
-    /// \param  aStatus        Le Status &agarave; afficher
-    /// \param  aOut [---;RW-] Le fichier de sortie
+    /// \param  aStatus  Le Status &agarave; afficher
+    /// \param  aOut     Le fichier de sortie
     /// \endcond
     /// \retval STATUS_OK
     /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT

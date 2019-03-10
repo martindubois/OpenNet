@@ -37,9 +37,11 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  This enum indicate the protocol.
+        /// \todo   Document the values
         /// \endcond
         /// \cond fr
         /// \brief  Cette enum indique le protocol.
+        /// \todo   Documenter les valeurs
         /// \endcond
         typedef enum
         {
@@ -53,11 +55,12 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  PacketGenerator configuration
+        /// \todo   Document members
         /// \endcond
         /// \cond fr
         /// \brief  Configuration du PacketGenerator
+        /// \todo   Documenter les membres
         /// \endcond
-        /// \todo   Document the members
         typedef struct
         {
             OpenNetK::EthernetAddress mDestinationEthernet;
@@ -88,24 +91,25 @@ namespace OpenNet
         /// \return  This static methode return the new instance address.
         /// \endcond
         /// \cond fr
-        /// \brief   Cette methode statique cree une instance de la classe
-        ///          PacketGenerator.
-        /// \return  Cette methode statique retourne l'adresse de la nouvelle
-        ///          instance.
+        /// \brief   Cette m&eacute;thode statique cr&eacute;e une instance
+        ///          de la classe PacketGenerator.
+        /// \return  Cette m&eacute;thode statique retourne l'adresse de la
+        ///          nouvelle instance.
         /// \endcond
+        /// \sa      Delete
         OPEN_NET_PUBLIC static PacketGenerator * Create();
 
         /// \cond en
         /// \brief   This static methode display the PacketGenerator
         //           configuration.
-        /// \param   aConfig [---;R--] The configuration
-        /// \param   aOut    [---;RW-] The output stream
+        /// \param   aConfig  The configuration
+        /// \param   aOut     The output stream
         /// \endcond
         /// \cond fr
-        /// \brief   Cette methode statique affiche la configuration d'un
-        ///          PacketGenerator.
-        /// \param   aConfig [---;R--] La configuration
-        /// \param   aOut    [---;RW-] Le fichier de sortie
+        /// \brief   Cette m&eacute;thode statique affiche la configuration
+        ///          d'un PacketGenerator.
+        /// \param   aConfig  La configuration
+        /// \param   aOut     Le fichier de sortie
         /// \endcond
         /// \retval  STATUS_OK
         /// \retval  STATUS_INVALID_REFERENCE
@@ -114,14 +118,15 @@ namespace OpenNet
 
         /// \cond en
         /// \brief   Retrieve the configuration of the PacketGenerator
-        /// \param   aOut [---;-W-] The output space
+        /// \param   aOut  The output space
         /// \endcond
         /// \cond fr
         /// \brief   Obtenir la configuration du PacketGenerator
-        /// \param   aOut [---;-W-] L'espace memoire de sortie
+        /// \param   aOut  L'espace m&eacute;moire de sortie
         /// \endcond
         /// \retval  STATUS_OK
         /// \retval  STATUS_NOT_ALLOWER_NULL_ARGUMENT
+        /// \sa      SetConfig
         virtual Status GetConfig(Config * aOut) const = 0;
 
         /// \cond en
@@ -129,7 +134,7 @@ namespace OpenNet
         /// \param   aAdapter  The Adapter
         /// \endcond
         /// \cond fr
-        /// \brief   Connecte un Adapter au PacketGenerator
+        /// \brief   Connecter un Adapter au PacketGenerator
         /// \param   aAdapter  L'Adapter
         /// \endcond
         /// \retval  STATUS_OK
@@ -137,31 +142,33 @@ namespace OpenNet
 
         /// \cond en
         /// \brief   Modify the configuration of the PacketGenerator
-        /// \param   aConfig [---;-W-] The configuration
+        /// \param   aConfig  The configuration
         /// \endcond
         /// \cond fr
         /// \brief   Changer la configuration du PacketGenerator
-        /// \param   aConfig [---;-W-] La configuration
+        /// \param   aConfig  La configuration
         /// \endcond
         /// \retval  STATUS_OK
         /// \retval  STATUS_INVALID_REFERENCE
+        /// \sa      GetConfig
         virtual Status SetConfig(const Config & aConfig) = 0;
 
         /// \cond en
         /// \brief   This methode delete the instance.
         /// \endcond
         /// \cond fr
-        /// \brief   Cette methode detruit l'instance.
+        /// \brief   Cette m&eacute;thode detruit l'instance.
         /// \endcond
+        /// \sa      Create
         virtual void Delete();
 
         /// \cond en
         /// \brief  Display
-        /// \param  aOut [---;RW-] The output stream
+        /// \param  aOut  The output stream
         /// \endcond
         /// \cond fr
-        /// \brief  Affiche
-        /// \retval aOut [---;RW-] Le fichier de sortie
+        /// \brief  Afficher
+        /// \retval aOut  Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
         virtual Status Display(FILE * aOut) = 0;

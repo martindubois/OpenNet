@@ -3,8 +3,7 @@
 
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
-/// \file       Includes/OpenNetK/Linux.h
-/// \brief      Define what is needed for the operating system
+/// \file       Includes/OpenNetK/OS.h
 
 #pragma once
 

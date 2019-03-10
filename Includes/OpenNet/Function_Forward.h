@@ -1,9 +1,10 @@
 
 // Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \file    Includes/OpenNet/Function_Forward.h
-/// \brief   OpenNet::Function_Forward
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNet/Function_Forward.h
+/// \brief      OpenNet::Function_Forward
 
 #pragma once
 
@@ -41,29 +42,31 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Add a destination adapter
-        /// \param  aAdapter [---;RW-] The Adapter
+        /// \param  aAdapter  The Adapter
         /// \endcond
         /// \cond fr
         /// \brief  Ajouter un Adapter de destination
-        /// \param  aAdapter [---;RW-] L'Adapter
+        /// \param  aAdapter  L'Adapter
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_DESTINATION_ALREADY_SET
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
+        /// \sa     RemoveDestination, ResetDestinations
         OPEN_NET_PUBLIC Status AddDestination(Adapter * aAdapter);
 
         /// \cond en
         /// \brief  Remove a destination adapter
-        /// \param  aAdapter [---;RW-] The Adapter
+        /// \param  aAdapter  The Adapter
         /// \endcond
         /// \cond fr
         /// \brief  Retirer un Adapter de destination
-        /// \param  aAdapter [---;RW-] L'Adapter
+        /// \param  aAdapter  L'Adapter
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_DESTINATION_NOT_SET
         /// \retval STATUS_NO_DESTINATION_SET
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
+        /// \sa     AddDestination, ResetDestinations
         OPEN_NET_PUBLIC Status RemoveDestination(Adapter * aAdapter);
 
         /// \cond en
@@ -74,6 +77,7 @@ namespace OpenNet
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_NO_DESTINATION_NOT
+        /// \sa     AddDestination, RemoveDestination
         OPEN_NET_PUBLIC Status ResetDestinations();
 
         // ===== Function =======================================================

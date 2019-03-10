@@ -16,11 +16,14 @@ namespace OpenNetK
 
     /// \cond en
     /// \brief  This class cache packet information
+    /// \note   This class is part of the Driver Development Kit (DDK).
     /// \note   Kernel class - No constructor, no destructor, no virtual
     ///         method
     /// \endcond
     /// \cond fr
     /// \brief  Cette classe cache les information d'un paquet
+    /// \note   Cette classe fait partie de l'ensemble de developpement de
+    ///         pilotes (DDK).
     /// \note   Classe noyau - Pas de constructeur, pas de destructor, pas de
     ///         method virtuel
     /// \endcond
@@ -34,8 +37,8 @@ namespace OpenNetK
         /// \return This method returns a physica address of data
         /// \endcond
         /// \cond fr
-        /// \brief  Obtenir l'adresse physique des donnees
-        /// \return Cette methode retourne une adresse physique
+        /// \brief  Obtenir l'adresse physique des donn&eacute;es
+        /// \return Cette m&eacute;thode retourne une adresse physique
         /// \endcond
         uint64_t GetData_PA();
 
@@ -46,8 +49,8 @@ namespace OpenNetK
         /// \endcond
         /// \cond fr
         /// \brief  Obtenir l'adresse virtuelle des donnees
-        /// \return Cette methode retourne une adresse virtuel dans l'espace
-        //          d'adressage dy system
+        /// \return Cette m&eacute;thode retourne une adresse virtuel dans
+        ///         l'espace d'adressage du syst&egrave;me
         /// \endcond
         void * GetData_XA();
 
@@ -56,9 +59,9 @@ namespace OpenNetK
         /// \param  aSize_byte  The size of the received packet
         /// \endcond
         /// \cond fr
-        /// \brief  Indiquer que le paquet contient maintenant des donnees
-        ///         recu.
-        /// \param  aSize_byte  La taille du paquet recu
+        /// \brief  Indiquer que le paquet contient maintenant des
+        ///         donn&eacute;es re&ccedil;u.
+        /// \param  aSize_byte  La taille du paquet re&ccedil;u
         /// \endcond
         void IndicateRxCompleted(uint32_t aSize_byte);
 
@@ -66,8 +69,8 @@ namespace OpenNetK
         /// \brief  Indicate that the packet is now used to receive data.
         /// \endcond
         /// \cond fr
-        /// \brief  Indiquer que le paquet est maintenant utilise pour
-        ///         recevoir des donnees.
+        /// \brief  Indiquer que le paquet est maintenant utilis&eacute; pour
+        ///         recevoir des donn&eacute;es.
         /// \endcond
         void IndicateRxRunning();
 

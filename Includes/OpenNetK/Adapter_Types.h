@@ -19,12 +19,14 @@ namespace OpenNetK
 
     /// \cond en
     /// \brief  This structure is used to pass the information about a buffer.
+    /// \note   This data type is part of the Driver Development Kit (DDK).
+    /// \todo   Document members of OpenNetK::Buffer
     /// \endcond
     /// \cond fr
-    /// \brief  Cette structure est utilise pour passer les informations au sujet
-    ///         d'un espace memoire.
+    /// \brief  Cette structure est utilis&eacute;e pour passer les
+    ///         informations au sujet d'un espace m&eacute;moire.
+    /// \todo   Documenter les membres de OpenNetK::Buffer
     /// \endcond
-    /// \todo   Document the members
     typedef struct
     {
         uint64_t mBuffer_PA;
@@ -40,11 +42,14 @@ namespace OpenNetK
 
     /// \cond en
     /// \brief  This structure is used for Ethernet address.
+    /// \note   This data type is part of the Driver Development Kit (DDK).
+    /// \todo   Document members of OpenNetK::EthernetAddress
     /// \endcond
     /// \cond fr
-    /// \brief  Cette structure est utilise pour les adresse Ethernet.
+    /// \brief  Cette structure est utilis&eacute;e pour les adresses
+    ///         Ethernet.
+    /// \todo   Documenter les membres de OpenNetL::EthernetAddress
     /// \endcond
-    /// \todo   Document the members
     typedef struct
     {
         uint8_t mAddress[6];
@@ -55,11 +60,15 @@ namespace OpenNetK
 
     /// \cond en
     /// \brief  This structure is used for IPv4 address.
+    /// \note   This data type is part of the Driver Development Kit (DDK).
+    /// \todo   Document member of OpenNetK::IPv4Address
     /// \endcond
     /// \cond fr
-    /// \brief  Cette structure est utilise pour les adresse IPv4.
+    /// \brief  Cette structure est utilis&eacute;e pour les adresse IPv4.
+    /// \note   Cette classe fait partie de l'ensemble de developpement de
+    ///         pilotes (DDK).
+    /// \todo   Documenter les membres de OpenNetK::IPv4Address
     /// \endcond
-    /// \todo   Document the member
     typedef struct
     {
         uint8_t mAddress[4];
@@ -67,18 +76,22 @@ namespace OpenNetK
     IPv4Address;
 
     // TODO OpenNetK.Adapter_Types
-    //      Normal - Ajouter des informations : debug/release, date et heure
-    //      de compilation, nom du client, type de licence, nombre de
-    //      licences
+    //      High (Feature) - Ajouter des informations : debug/release, date
+    //      et heure de compilation, nom du client, type de licence, nombre
+    //      de licences
 
     /// \cond en
     /// \brief  This structure is used to return the version of a component.
+    /// \note   This data type is part of the Driver Development Kit (DDK).
+    /// \todo   Document members of VersionInfo
     /// \endcond
     /// \cond fr
-    /// \brief  Cette structure est utilise pour retourner la version d'un
-    ///         composant.
+    /// \brief  Cette structure est utilis&eacute;e pour retourner la version
+    ///         d'un composant.
+    /// \note   Cette classe fait partie de l'ensemble de developpement de
+    ///         pilotes (DDK).
+    /// \todo   Documenter les membres de VersionInfo
     /// \endcond
-    /// \todo   Document the members
     typedef struct
     {
         uint8_t mMajor        ;
@@ -95,11 +108,15 @@ namespace OpenNetK
 
     /// \cond en
     /// \brief  This enum indicate the adapter type.
+    /// \note   This data type is part of the Driver Development Kit (DDK).
+    /// \brief  Document values of Adapter_Type
     /// \endcond
     /// \cond fr
-    /// \brief  Cette enum indique le type de l'adaptateur.
+    /// \brief  Cette enum&eacute;ration indique le type de l'adaptateur.
+    /// \note   Cette classe fait partie de l'ensemble de developpement de
+    ///         pilotes (DDK).
+    /// \todo   Documenter les valeur de Adapter_Type
     /// \endcond
-    /// \todo   Document the values
     typedef enum
     {
         ADAPTER_TYPE_UNKNOWN ,
@@ -112,11 +129,16 @@ namespace OpenNetK
 
     /// \cond en
     /// \brief  This structure is used to pass the configuration.
+    /// \note   This data type is part of the Driver Development Kit (DDK).
+    /// \todo   Document members of Adapter_Config
     /// \endcond
     /// \cond fr
-    /// \brief  Cette structure est utilise pour passer la configuration.
+    /// \brief  Cette structure est utilis&eacute;e pour passer la
+    ///         configuration.
+    /// \note   Cette classe fait partie de l'ensemble de developpement de
+    ///         pilotes (DDK).
+    /// \todo   Documenter les membre d'Adapter_Config
     /// \endcond
-    /// \todo   Document the members
     typedef struct
     {
         uint32_t mPacketSize_byte;
@@ -130,15 +152,19 @@ namespace OpenNetK
     Adapter_Config;
 
     // TODO  OpenNetK.Adapter
-    //       Normal - Ajouter la largeur de lien PCIe a l'information
+    //       Normal (Feature) - Ajouter la largeur de lien PCIe et la
+    //       generation a l'information
 
     /// \cond en
     /// \brief  This structure is used to return the information about an
     ///         adapter.
+    /// \note   This data type is part of the Driver Development Kit (DDK).
     /// \endcond
     /// \cond fr
-    /// \brief  Cette structure est utilise pour retourner les information au
-    ///         sujet d'un adaptateur.
+    /// \brief  Cette structure est utilis&eacute;e pour retourner les
+    ///         informations au sujet d'un adaptateur.
+    /// \note   Cette classe fait partie de l'ensemble de developpement de
+    ///         pilotes (DDK).
     /// \endcond
     /// \todo   Document the members
     typedef struct
@@ -164,11 +190,15 @@ namespace OpenNetK
 
     /// \cond en
     /// \brief  This structure is used to return the status.
+    /// \note   This data type is part of the Driver Development Kit (DDK).
+    /// \todo   Document members of Adapter_State
     /// \endcond
     /// \cond fr
-    /// \brief  Cette structure est utilise pour retourner l'etat.
+    /// \brief  Cette structure est utilis&eacute;e pour retourner l'etat.
+    /// \note   Cette classe fait partie de l'ensemble de developpement de
+    ///         pilotes (DDK).
+    /// \todo   Documenter les membres de Adapter_State
     /// \endcond
-    /// \todo   Document the members
     typedef struct
     {
         struct

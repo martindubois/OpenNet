@@ -4,7 +4,7 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Linux.h
-/// \brief      Define what is needed on Linux
+/// \brief      (Linux)
 
 #pragma once
 
@@ -26,7 +26,7 @@
 #endif
 
 // TODO  OpenNetK.Linux
-//       High (Feature) - Add TRACE_INFO and TRACE_WARNING
+//       Normal (Feature) - Add TRACE_INFO and TRACE_WARNING
 
 #define TRACE_DEBUG printk( KERN_DEBUG __NAMESPACE__ __CLASS__
 #define TRACE_ERROR printk( KERN_ERR   __NAMESPACE__ __CLASS__

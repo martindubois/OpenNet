@@ -4,7 +4,7 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Hardware_WDF.h
-/// \brief      OpenNetK::Hardware_WDF
+/// \brief      OpenNetK::Hardware_WDF (DDK, Windows)
 
 #pragma once
 
@@ -23,12 +23,12 @@ namespace OpenNetK
     /////////////////////////////////////////////////////////////////////////
 
     /// \cond en
-    /// \brief  This class connect the WDF device with the Hardware class
+    /// \brief  The Hardware_WDF class (DDK, Windows only)
     /// \note   Kernel class - No constructor, no destructor, no virtual
-    ///         methode
+    ///         method
     /// \endcond
     /// \cond fr
-    /// \brief  Cette classe connecte un device WDF avec la class Hardware
+    /// \brief  La class Hardware_WDF (DDK, Windows seulement)
     /// \note   Classe noyau - Pas de constructeur, pas de destructeur, pas
     ///         de methode virtuelle
     /// \endcond
@@ -39,13 +39,13 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Initialize the instance.
-        /// \param  aDevice   ] The WDFDEVICE
-        /// \param  aHardware ] The Hardware
+        /// \param  aDevice    The WDFDEVICE
+        /// \param  aHardware  The Hardware
         /// \endcond
         /// \cond fr
         /// \brief  Initialise l'instance
         /// \param  aDevice   Le WDFDEVICE
-        /// \param  aHardware L'Hardware
+        /// \param  aHardware Le Hardware
         /// \endcond
         /// \retval STATUS_SUCCESS
         NTSTATUS Init(WDFDEVICE aDevice, Hardware * aHardware);
@@ -66,8 +66,8 @@ namespace OpenNetK
         /// \param  aTargetState  Target state
         /// \endcond
         /// \cond fr
-        /// \brief  Sortir de l'etat D0
-        /// \param  aTargetState  Etat cible
+        /// \brief  Sortir de l'&eacute;tat D0
+        /// \param  aTargetState  &Eacute;tat cible
         /// \endcond
         /// \retval STATUS_SUCCESS
         NTSTATUS D0Exit(WDF_POWER_DEVICE_STATE aTargetState);
@@ -78,7 +78,7 @@ namespace OpenNetK
         /// \param  aTranslated  The translated ressources
         /// \endcond
         /// \cond fr
-        /// \brief  Prepare le meteriel
+        /// \brief  Preparer le meteriel
         /// \param  aRaw         Les ressources "raw"
         /// \param  aTranslated  Les ressources "translated"
         /// \endcond
@@ -87,11 +87,11 @@ namespace OpenNetK
 
         /// \cond en
         /// \brief  Release the hardware
-        /// \param  aTranslated [---;RW-] The translated ressources
+        /// \param  aTranslated  The translated ressources
         /// \endcond
         /// \cond fr
         /// \brief  Relacher le materiel
-        /// \param  aTranslated [---;RW-] Les ressources "translated"
+        /// \param  aTranslated  Les ressources "translated"
         /// \endcond
         /// \retval STATUS_SUCCESS
         NTSTATUS ReleaseHardware(WDFCMRESLIST aTranslated);
