@@ -361,8 +361,8 @@ void Thread::Run_Wait()
     }
 
     // TODO  OpenNet.Adapter_Internal.Error_Handling
-    //       Low - This is a big problem because the driver still use GPU
-    //       buffer and the application is maybe going to release them.
+    //       Low (Issue) - This is a big problem because the driver still use
+    //       GPU buffer and the application is maybe going to release them.
 
     mDebugLog->Log(__FILE__, __CLASS__ "Run_Wait", __LINE__);
     throw new KmsLib::Exception(KmsLib::Exception::CODE_TIMEOUT,

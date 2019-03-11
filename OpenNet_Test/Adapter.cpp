@@ -158,7 +158,8 @@ KMS_TEST_BEGIN(Adapter_SetupA)
     OpenNet::Adapter::Config * lCP = NULL;
 
     // TODO  OpenNet.Adapter
-    //       This test cause a seg fault on linux when compiled with -O2<br>
+    //       High (Issue) - This test cause a seg fault on linux when
+    //       compiled with -O2<br>
     //       KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE, lSetup.mAdapter->SetConfig(*lCP));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK               , lSetup.mAdapter->SetConfig( lC0));
 

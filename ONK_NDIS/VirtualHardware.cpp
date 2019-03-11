@@ -127,7 +127,7 @@ void VirtualHardware::D0_Entry()
 
 bool VirtualHardware::Packet_Drop()
 {
-    // TODO Dev
+    // TODO  ONK_NDIS
     return false;
 }
 
@@ -224,10 +224,10 @@ bool VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte,
 
 void VirtualHardware::Unlock_AfterReceive_Internal()
 {
-    // TODO  Dev
+    // TODO  ONK_NDIS
 }
 
 void VirtualHardware::Unlock_AfterSend_Internal()
 {
-    // TODO  Dev
+    // TODO  ONK_NDIS
 }

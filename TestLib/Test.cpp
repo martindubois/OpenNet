@@ -1371,18 +1371,18 @@ namespace TestLib
         }
 
         // TODO  OpenNet_Tool.Test
-        //       Normal - Ajouter des informations : Le filtre des traces de
-        //       debug du driver, la version du driver, la version de la DLL,
-        //       la config du driver (Debug/Release), la config de la DLL
-        //       (Debug/Release), la date de compilation de TestLib, la date
-        //       de compilation de OpenNet.dll, la date de compilation du
-        //       driver, la vitesse du lien ethernet, le type de carte
-        //       graphique, nom de l'ordinateur, nom de l'utilisateur, la
-        //       date et l'heure d'execution...
+        //       Normal (Feature) - Ajouter des informations : Le filtre des
+        //       traces de debug du driver, la version du driver, la version
+        //       de la DLL, la config du driver (Debug/Release), la config de
+        //       la DLL (Debug/Release), la date de compilation de TestLib,
+        //       la date de compilation de OpenNet.dll, la date de
+        //       compilation du driver, la vitesse du lien ethernet, le type
+        //       de carte graphique, nom de l'ordinateur, nom de
+        //       l'utilisateur, la date et l'heure d'execution...
 
         // TODO  OpenNet_Tool.Test
-        //       Normal - Limiter a une decimal le bandwith et a 0 decimal le
-        //       nombre de paquet.
+        //       Normal (Feature) - Limiter a une decimal le bandwith et a 0
+        //       decimal le nombre de paquet.
 
         fprintf(aOut, "%s;%.1f;%u;%s;%s;%u;%s;%.1f;%.1f;%s;%s;"
 #ifdef _DEBUG

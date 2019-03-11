@@ -149,6 +149,9 @@
     <ClCompile Include="System_CUDA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CUW.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="System_Internal.h">

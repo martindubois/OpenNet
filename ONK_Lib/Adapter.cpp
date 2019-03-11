@@ -253,11 +253,11 @@ namespace OpenNetK
                 {
                 case Packet::STATE_RX_COMPLETED:
                     // TODO  ONK_Lib.Adapter
-                    //       Normal (Performance) - Use burst
+                    //       Normal (Optimisation) - Use burst
 
                     aBufferInfo->mPackets[i].mSendTo = lPacketInfo_XA[i].mSendTo;
 
-                    // TODO  OpenNetK.Adapter.PartialBuffer
+                    // TODO  ONK_Lib.Adapter.PartialBuffer
                     //       Low (Feature)
                     if (0 == (OPEN_NET_PACKET_PROCESSED & aBufferInfo->mPackets[i].mSendTo))
                     {
@@ -659,7 +659,7 @@ namespace OpenNetK
 
         mZone0->Unlock();
 
-            // TODO  OpenNetK.Adapter
+            // TODO  ONK_Lib.Adapter
             //       Normal (Optimisation) - Avoid walking all the list at
             //       all iteration
 
@@ -879,8 +879,8 @@ namespace OpenNetK
         }
     }
 
-    // TODO  OpenNetK.Adapter
-    //       Low (Feature) - Ajouter la possibilite de remplacer le
+    // TODO  ONK_Lib.Adapter
+    //       Normal (Feature) - Ajouter la possibilite de remplacer le
     //       traitement OpenCL par un "Forward" fixe. Cela implique
     //       l'allocation de buffer dans la memoire de l'ordinateur par le
     //       pilote lui meme.
@@ -1175,9 +1175,6 @@ namespace OpenNetK
         return IOCTL_RESULT_OK;
     }
 
-    // TODO  OpenNetK.Adapter
-    //       Stop the packet generator when the application who started it
-    //       close the connection.
     int Adapter::IoCtl_PacketGenerator_Stop()
     {
         // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
@@ -1211,8 +1208,8 @@ namespace OpenNetK
         uint32_t lFlags = mZone0->LockFromThread();
 
             // TODO  ONK_Lib.Adapter
-            //       High - Refuse to start if the number of buffer may cause
-            //       a descriptor overrun.
+            //       Normal (Feature) - Refuse to start if the number of
+            //       buffer may cause a descriptor overrun.
 
             ASSERT(OPEN_NET_BUFFER_QTY >= mBuffer.mCount);
 

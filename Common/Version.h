@@ -11,11 +11,13 @@
 
 #define VERSION_MAJOR         ( 0)
 #define VERSION_MINOR         ( 0)
-#define VERSION_BUILD         (10)
+#define VERSION_BUILD         (11)
 #define VERSION_COMPATIBILITY ( 0)
 
-#define VERSION_RC   0,0,9,0
-#define VERSION_STR  "0.0.10.0"
-#define VERSION_STR0 "0.0.10.0\0"
+#define VERSION_RC   0,0,11,0
+#define VERSION_STR  "0.0.11.0"
+#define VERSION_STR0 "0.0.11.0\0"
 
 #define VERSION_TYPE "KI"
+
+#define VERSION_CLIENT "KMS"

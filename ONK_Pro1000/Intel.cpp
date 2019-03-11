@@ -61,7 +61,7 @@ void Intel::GetState(OpenNetK::Adapter_State * aState)
         aState->mFlags.mTx_Off     = lDeviceStatus.mFields.mTx_Off    ;
 
         // TODO  ONK_Intel.Intel
-        //       High (Feature) - Comprendre pourquoi la vitesse n'est pas
+        //       Normal (Issue) - Comprendre pourquoi la vitesse n'est pas
         //       indique correctement.
 
         switch (lDeviceStatus.mFields.mSpeed)

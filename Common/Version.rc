@@ -34,14 +34,14 @@ BEGIN
 		BLOCK "040904E4"
 		BEGIN
 			VALUE "CompanyName"     , "KMS"
-			VALUE "FileDescription" , "OpenNet"
+			VALUE "FileDescription" , "Purchased by " VERSION_CLIENT
 			VALUE "FileVersion"     , VERSION_STR0
 			VALUE "InternalName"    , "OpenNet"
-			VALUE "LegalCopyright"  , ""
+			VALUE "LegalCopyright"  , "Copyright (C) 2018-2019 KMS."
 			VALUE "LegalTrademarks1", ""
 			VALUE "LegalTrademarks2", ""
 			VALUE "OriginalFilename", "OpenNet"
-			VALUE "ProductName"     , VERSION_STR0
+			VALUE "ProductName"     , "OpenNet"
 			VALUE "ProductVersion"  , VERSION_STR0
 		END
 	END

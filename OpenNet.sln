@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC
 		Includes\OpenNetK\Debug.h = Includes\OpenNetK\Debug.h
 		Includes\OpenNetK\Ethernet.h = Includes\OpenNetK\Ethernet.h
 		Includes\OpenNetK\Hardware.h = Includes\OpenNetK\Hardware.h
+		Includes\OpenNetK\Hardware_Linux.h = Includes\OpenNetK\Hardware_Linux.h
 		Includes\OpenNetK\Hardware_Statistics.h = Includes\OpenNetK\Hardware_Statistics.h
 		Includes\OpenNetK\Hardware_WDF.h = Includes\OpenNetK\Hardware_WDF.h
 		Includes\OpenNetK\Interface.h = Includes\OpenNetK\Interface.h
@@ -90,6 +91,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 		RunDoxygen.cmd = RunDoxygen.cmd
 		Test.cmd = Test.cmd
+		UploadDocumentation.cmd = UploadDocumentation.cmd
+		UploadDocumentation.cmd.txt = UploadDocumentation.cmd.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocDev", "_DocDev", "{2347E8F1-0547-43FF-9456-724FC9DAC35F}"

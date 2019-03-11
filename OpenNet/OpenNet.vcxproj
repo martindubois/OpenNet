@@ -101,6 +101,10 @@
     <ClCompile Include="Adapter_Windows.cpp" />
     <ClCompile Include="Buffer_Data.cpp" />
     <ClCompile Include="Buffer_Data_OpenCL.cpp" />
+    <ClCompile Include="CUW.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="EthernetAddress.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="Event_CUDA.cpp">

@@ -14,6 +14,8 @@ Operating system   [ ] Ubuntu 18.04                            [ ] Windows 10
 
 Version            _____ . _____ . _____ . _____ - __________________________
 
+Client             _______________________, ______ RT, ______ SDK, ______ DDK
+
 [ ] File "_DocUser/ReadMe.txt"
 [ ] File "ONK_Lib/_DocUser/ReadMe.txt"
 [ ] File "ONK_Pro1000/_DocUser/ReadMe.txt"

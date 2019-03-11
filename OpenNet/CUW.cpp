@@ -5,7 +5,7 @@
 // File       OpenNet/CUW.cpp
 
 // CONFIG  _CHECK_
-//         Basic leeak check
+//         Define to enable basic leak check
 #define _CHECK_
 
 // Includes
