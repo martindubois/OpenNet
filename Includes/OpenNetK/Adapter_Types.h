@@ -101,8 +101,11 @@ namespace OpenNetK
 
         uint8_t mReserved0[44];
 
-        char mComment[64];
-        char mType   [16];
+        char mClient     [64];
+        char mCompiled_At[32];
+        char mCompiled_On[32];
+        char mComment    [64];
+        char mType       [16];
     }
     VersionInfo;
 

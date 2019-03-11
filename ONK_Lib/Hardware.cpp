@@ -349,9 +349,13 @@ namespace OpenNetK
         mInfo.mVersion_ONK_Lib.mBuild         = VERSION_BUILD;
         mInfo.mVersion_ONK_Lib.mCompatibility = VERSION_COMPATIBILITY;
     
-        strcpy(mInfo.mVersion_Driver .mType   , VERSION_TYPE);
-        strcpy(mInfo.mVersion_ONK_Lib.mComment, "ONK_Lib"   );
-        strcpy(mInfo.mVersion_ONK_Lib.mType   , VERSION_TYPE);
+        strcpy(mInfo.mVersion_Driver .mClient     , VERSION_CLIENT);
+        strcpy(mInfo.mVersion_Driver .mType       , VERSION_TYPE  );
+        strcpy(mInfo.mVersion_ONK_Lib.mClient     , VERSION_CLIENT);
+        strcpy(mInfo.mVersion_ONK_Lib.mCompiled_At, __TIME__      );
+        strcpy(mInfo.mVersion_ONK_Lib.mCompiled_On, __DATE__      );
+        strcpy(mInfo.mVersion_ONK_Lib.mComment    , "ONK_Lib"     );
+        strcpy(mInfo.mVersion_ONK_Lib.mType       , VERSION_TYPE  );
     }
 
 }
