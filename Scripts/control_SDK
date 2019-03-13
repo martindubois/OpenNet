@@ -1,0 +1,8 @@
+Package: kms-opennet-sdk
+Version: 0.0-0
+Section: base
+Priority: optional
+Architecture: amd64
+Maintainer: KMS <opennet@kms-quebec.com>
+Description: OpenNet Software Development Kit
+ OpenNet 0.0.12 Software Development Kit
