@@ -39,16 +39,23 @@ mkdir Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION
 mkdir Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/bin
 mkdir Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc
 mkdir Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
+mkdir Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/ONK_Intel
+mkdir Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/OpenNet
+mkdir Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/OpenNet_Tool
 
-cp Binaries/OpenNet.so             Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/bin
-cp Binaries/OpenNet_Tool           Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/bin
-cp Includes/OpenNetK/ARP.h         Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
-cp Includes/OpenNetK/Ethernet.h    Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
-cp Includes/OpenNetK/IPv4.h        Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
-cp Includes/OpenNetK/Kernel_CUDA.h Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
-cp Includes/OpenNetK/Kernel.h      Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
-cp Includes/OpenNetK/Types.h       Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
-cp ONK_Pro1000/ONK_Pro1000.ko      Packages/$PACKAGE_NAME_RT/lib/modules/$KERNEL/kernel/pci
+cp _DocUser/ReadMe.txt              Packages/$PACKAGE_NAME_RT
+cp Binaries/OpenNet.so              Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/bin
+cp Binaries/OpenNet_Tool            Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/bin
+cp Includes/OpenNetK/ARP.h          Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
+cp Includes/OpenNetK/Ethernet.h     Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
+cp Includes/OpenNetK/IPv4.h         Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
+cp Includes/OpenNetK/Kernel_CUDA.h  Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
+cp Includes/OpenNetK/Kernel.h       Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
+cp Includes/OpenNetK/Types.h        Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/inc/OpenNetK
+cp ONK_Pro1000/_DocUser/ReadMe.txt  Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/ONK_Intel
+cp ONK_Pro1000/ONK_Pro1000.ko       Packages/$PACKAGE_NAME_RT/lib/modules/$KERNEL/kernel/pci
+cp OpenNet/_DocUser/ReadMe.txt      Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/OpenNet
+cp OpenNet_Tool/_DocUser/ReadMe.txt Packages/$PACKAGE_NAME_RT/usr/local/OpenNet_$VERSION/OpenNet_Tool
 
 mkdir Packages/$PACKAGE_NAME_RT/DEBIAN
 
@@ -71,8 +78,10 @@ mkdir Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc
 mkdir Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc/OpenNet
 mkdir Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc/OpenNetK
 
+cp _DocUser/ReadMe.txt               Packages/$PACKAGE_NAME_SDK
 cp Includes/OpenNet/*.h              Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc/OpenNet
 cp Includes/OpenNetK/Adapter_Types.h Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc/OpenNet
+cp DoxyFile_*.txt                    Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION
 
 mkdir Packages/$PACKAGE_NAME_SDK/DEBIAN
 
@@ -92,6 +101,7 @@ mkdir Packages/$PACKAGE_NAME_DDK/usr/local/OpenNet_$VERSION/bin
 mkdir Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc
 mkdir Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc/OpenNetK
 mkdir Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/lib
+mkdir Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/ONK_lib
 
 cp Includes/OpenNetK/Adapter.h               Packages/$PACKAGE_NAME_DDK/usr/local/OpenNet_$VERSION/inc/OpenNetK
 cp Includes/OpenNetK/Adapter_Linux.h         Packages/$PACKAGE_NAME_DDK/usr/local/OpenNet_$VERSION/inc/OpenNetK
@@ -109,6 +119,7 @@ cp Includes/OpenNetK/PacketGenerator_Types.h Packages/$PACKAGE_NAME_DDK/usr/loca
 cp Includes/OpenNetK/SpinLock.h              Packages/$PACKAGE_NAME_DDK/usr/local/OpenNet_$VERSION/inc/OpenNetK
 cp Includes/OpenNetK/Types.h                 Packages/$PACKAGE_NAME_DDK/usr/local/OpenNet_$VERSION/inc/OpenNetK
 cp Libraries/ONK_Lib.a                       Packages/$PACKAGE_NAME_DDK/usr/local/OpenNet_$VERSION/lib
+cp ONK_Lib/_DocUser/ReadMe.txt               Packages/$PACKAGE_NAME_DDK/usr/local/OpenNet_$VERSION/ONK_Lib
 
 mkdir Packages/$PACKAGE_NAME_DDK/DEBIAN
 

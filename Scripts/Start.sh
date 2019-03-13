@@ -17,9 +17,6 @@ if [ 0 != $? ] ; then
     exit 1
 fi
 
-sudo ln -s /dev/ONK_Pro1000_0 /dev/OpenNet0
-sudo ln -s /dev/ONK_Pro1000_1 /dev/OpenNet1
-
 cd OpenNet/Binaries
 
 if [ "" != "$1" ] ; then

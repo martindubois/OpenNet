@@ -3,10 +3,10 @@
 # Author     KMS - Martin Dubois, ing.
 # Copyright  (C) 2019 KMS. All rights reserved.
 # Product    OpenNet
-# File       Clean.sh
-# Usage      ./Clean.sh
+# File       UpdateDepend.sh
+# Usage      ./UpdateDepend.sh
 
-echo Excuting  Clean.sh  ...
+echo Excuting  UpdateDepend.sh  ...
 
 # ===== Initialisation ======================================================
 
