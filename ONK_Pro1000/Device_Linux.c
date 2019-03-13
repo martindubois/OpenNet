@@ -478,7 +478,7 @@ int Device_Init( DeviceContext * aThis, unsigned int aIndex )
     if ( 0 == lRet )
     {
         // device_create ==> device_destroy  See Device_Uninit
-        aThis->mDevice = device_create( aThis->mClass, NULL, aThis->mDevId, NULL, "ONK_Pro1000_%u", aIndex );
+        aThis->mDevice = device_create( aThis->mClass, NULL, aThis->mDevId, NULL, "OpenNet%u", aIndex );
         if ( NULL == aThis->mDevice )
         {
             printk( KERN_ERR "%s - device_create( 0x%p, , , , , %u ) failed\n", __FUNCTION__, aThis->mClass, aIndex );
