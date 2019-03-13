@@ -42,12 +42,12 @@ System_CUDA::System_CUDA()
 {
     // printf( __CLASS__ "System_CUDA()\n" );
 
-    assert( NULL == mConnect.mSharedMemory );
+    assert( NULL == mConnect_In.mSharedMemory );
 
     mInfo.mSystemId = getpid();
     assert(0 != mInfo.mSystemId);
 
-    mConnect.mSystemId = mInfo.mSystemId;
+    mConnect_In.mSystemId = mInfo.mSystemId;
 
     FindAdapters  ();
 
@@ -69,10 +69,10 @@ System_CUDA::System_CUDA()
     FindProcessors();
 
     // valloc ==> free  See the descructor
-    mConnect.mSharedMemory = valloc( SHARED_MEMORY_SIZE_byte );
-    assert( NULL != mConnect.mSharedMemory );
+    mConnect_In.mSharedMemory = valloc( SHARED_MEMORY_SIZE_byte );
+    assert( NULL != mConnect_In.mSharedMemory );
 
-    memset( mConnect.mSharedMemory, 0, SHARED_MEMORY_SIZE_byte );
+    memset( mConnect_In.mSharedMemory, 0, SHARED_MEMORY_SIZE_byte );
 }
 
 // ===== OpenNet::~System ===================================================
@@ -81,14 +81,14 @@ System_CUDA::~System_CUDA()
 {
     // printf( __CLASS__ "~System_CUDA()\n" );
 
-    assert( NULL != mConnect.mSharedMemory );
+    assert( NULL != mConnect_In.mSharedMemory );
 
     assert( 0 < sCounter );
 
     Cleanup();
 
     // valloc ==> free  See the constructor
-    free( mConnect.mSharedMemory );
+    free( mConnect_In.mSharedMemory );
 
     sCounter --;
 

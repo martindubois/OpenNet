@@ -4,6 +4,8 @@
 // Product    OpenNet
 // File       TestLib/TestC.cpp
 
+#define __CLASS__ "TestC::"
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -93,7 +95,7 @@ unsigned int TestC::Init()
         mAdapters[1] = GetSystem()->Adapter_Get(lInfo.mEthernetAddress.mAddress, MASK_E, MASK_1);
         if (NULL == mAdapters[1])
         {
-            printf("%s - Not enough adapter\n", __FUNCTION__);
+            printf( __CLASS__ "Init - Not enough adapter\n");
             lResult = __LINE__;
         }
         else
@@ -116,7 +118,7 @@ unsigned int TestC::Start( unsigned int aFlags )
     OpenNet::Status lStatus = mKernels[0].SetStaticUserArgument(1, mUserBuffer);
     if (OpenNet::STATUS_OK != lStatus)
     {
-        printf("%s - Kernel::SetStaticUserArgument( ,  ) failed - ", __FUNCTION__);
+        printf(__CLASS__ "Start - Kernel::SetStaticUserArgument( ,  ) failed - ");
         OpenNet::Status_Display(lStatus, stdout);
         printf("\n");
 
@@ -147,7 +149,7 @@ unsigned int TestC::Stop()
         }
         else
         {
-            printf("%s - UserBuffer::Read( , ,  ) failed - ", __FUNCTION__);
+            printf( __CLASS__ "Stop - UserBuffer::Read( , ,  ) failed - " );
             OpenNet::Status_Display(lStatus, stdout);
             printf("\n");
 
@@ -187,6 +189,8 @@ unsigned int TestC::Stop()
 
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 1420000;
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =   13800;
+
+        mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID ].mMax = 51;
 
         lResult = VerifyAdapterStats(0);
         if (0 == lResult)

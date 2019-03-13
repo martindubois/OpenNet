@@ -19,7 +19,8 @@ typedef struct
 {
     const char * mName;
 
-    const char * mKernelCode;
+    unsigned int mKernelArgCount;
+    const char * mKernelCode    ;
 
     const char * mFunctionCodes[2];
     const char * mFunctionNames[2];

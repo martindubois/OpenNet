@@ -30,6 +30,10 @@
 #include "Constants.h"
 #include "Event.h"
 
+#ifdef _KMS_LINUX_
+    #include "UserBuffer_CUDA.h"
+#endif
+
 #ifdef _KMS_WINDOWS_
     #include "OCLW.h"
     #include "UserBuffer_OpenCL.h"
@@ -162,12 +166,14 @@ namespace OpenNet
         {
             try
             {
+                assert(   0 <  lIt->first );
                 assert(NULL != lIt->second);
 
                 #ifdef _KMS_WINDOWS_
 
                     UserBuffer_OpenCL * lUB = dynamic_cast<UserBuffer_OpenCL *>(lIt->second);
-                    assert(NULL != lUB);
+                    assert(NULL != lUB       );
+                    assert(NULL != lUB->mMem );
 
                     OCLW_SetKernelArg(reinterpret_cast<cl_kernel>(aKernel), lIt->first, sizeof(cl_mem), &lUB->mMem);
 
@@ -184,8 +190,28 @@ namespace OpenNet
     {
         assert(NULL != aArguments);
 
-        #ifdef _KMS_LINUX_
-        #endif
+        for (UserArgumentMap::iterator lIt = mUserArguments.begin(); lIt != mUserArguments.end(); lIt++)
+        {
+            try
+            {
+                assert(   0 <  lIt->first );
+                assert(NULL != lIt->second);
+
+                #ifdef _KMS_LINUX_
+
+                    UserBuffer_CUDA * lUB = dynamic_cast<UserBuffer_CUDA *>(lIt->second);
+                    assert(NULL != lUB          );
+                    assert(   0 != lUB->mMem_DA );
+
+                    aArguments[ lIt->first ] = & lUB->mMem_DA;
+
+                #endif
+            }
+            catch (KmsLib::Exception * eE)
+            {
+                eE->Write(stderr);
+            }
+        }
     }
 
     // ===== SourceCode =====================================================

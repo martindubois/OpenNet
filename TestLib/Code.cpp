@@ -392,12 +392,12 @@ static const char * KERNEL_REPLY_ON_SEQUENCE_ERROR =
 
 const CodeInfo CODES[TestLib::CODE_QTY] =
 {
-    { "DEFAULT"                , NULL                          , { NULL                            , NULL                             }, { NULL                , NULL                 } },
-    { "DO_NOT_REPLY_ON_ERROR"  , KERNEL_DO_NOT_REPLY_ON_ERROR  , { FUNCTION_DO_NOT_REPLY_ON_ERROR_0, FUNCTION_DO_NOT_REPLY_ON_ERROR_1 }, { "DoNotReplyOnError0", "DoNotReplyOnError1" } },
-    { "FORWARD"                , KERNEL_FORWARD                , { FUNCTION_FORWARD_0              , FUNCTION_FORWARD_1               }, { "Forward0"          , "Forward1"           } },
-    { "NONE"                   , NULL                          , { NULL                            , NULL                             }, { NULL                , NULL                 } },
-    { "NOTHING"                , KERNEL_NOTHING                , { FUNCTION_NOTHING_0              , FUNCTION_NOTHING_1               }, { "Nothing0"          , "Nothing1"           } },
-    { "REPLY"                  , KERNEL_FORWARD                , { FUNCTION_FORWARD_0              , FUNCTION_FORWARD_1               }, { "Forward0"          , "Forward1"           } },
-    { "REPLY_ON_ERROR"         , KERNEL_REPLY_ON_ERROR         , { FUNCTION_REPLY_ON_ERROR_0       , FUNCTION_REPLY_ON_ERROR_1        }, { "ReplyOnError0"     , "ReplyOnError1"      } },
-    { "REPLY_ON_SEQUENCE_ERROR", KERNEL_REPLY_ON_SEQUENCE_ERROR, { NULL                            , NULL                             }, { NULL                , NULL                 } },
+    { "DEFAULT"                , 1, NULL                          , { NULL                            , NULL                             }, { NULL                , NULL                 } },
+    { "DO_NOT_REPLY_ON_ERROR"  , 1, KERNEL_DO_NOT_REPLY_ON_ERROR  , { FUNCTION_DO_NOT_REPLY_ON_ERROR_0, FUNCTION_DO_NOT_REPLY_ON_ERROR_1 }, { "DoNotReplyOnError0", "DoNotReplyOnError1" } },
+    { "FORWARD"                , 1, KERNEL_FORWARD                , { FUNCTION_FORWARD_0              , FUNCTION_FORWARD_1               }, { "Forward0"          , "Forward1"           } },
+    { "NONE"                   , 1, NULL                          , { NULL                            , NULL                             }, { NULL                , NULL                 } },
+    { "NOTHING"                , 1, KERNEL_NOTHING                , { FUNCTION_NOTHING_0              , FUNCTION_NOTHING_1               }, { "Nothing0"          , "Nothing1"           } },
+    { "REPLY"                  , 1, KERNEL_FORWARD                , { FUNCTION_FORWARD_0              , FUNCTION_FORWARD_1               }, { "Forward0"          , "Forward1"           } },
+    { "REPLY_ON_ERROR"         , 1, KERNEL_REPLY_ON_ERROR         , { FUNCTION_REPLY_ON_ERROR_0       , FUNCTION_REPLY_ON_ERROR_1        }, { "ReplyOnError0"     , "ReplyOnError1"      } },
+    { "REPLY_ON_SEQUENCE_ERROR", 2, KERNEL_REPLY_ON_SEQUENCE_ERROR, { NULL                            , NULL                             }, { NULL                , NULL                 } },
 };

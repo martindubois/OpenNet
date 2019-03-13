@@ -38,8 +38,6 @@ public:
     Thread           * Thread_Prepare();
     void               Thread_Release();
 
-    virtual OpenNet::UserBuffer * AllocateUserBuffer_Internal(unsigned int aSize_byte) = 0;
-
     // Return  The adresse of the newly created instance
     //
     // Threads  Apps
@@ -65,6 +63,8 @@ public:
     virtual OpenNet::Status ResetStatistics();
 
 protected:
+
+    virtual OpenNet::UserBuffer * AllocateUserBuffer_Internal(unsigned int aSize_byte) = 0;
 
     Config             mConfig  ;
     KmsLib::DebugLog * mDebugLog;

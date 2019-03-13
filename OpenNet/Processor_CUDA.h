@@ -28,7 +28,7 @@ public:
 
     Buffer_Data * Buffer_Allocate( bool aProfiling, unsigned int aPacketSize_byte, OpenNetK::Buffer * aBuffer);
 
-    CUmodule Module_Create(OpenNet::Kernel * aKernel);
+    CUmodule Module_Create(OpenNet::Kernel * aKernel, unsigned int aAdapterNo );
 
     void SetContext();
 
@@ -43,11 +43,17 @@ public:
     virtual void          * GetContext ();
     virtual void          * GetDevice  ();
 
+protected:
+
+    // ====== Processor_Internal ============================================
+
+    virtual OpenNet::UserBuffer * AllocateUserBuffer_Internal( unsigned int aSize_byte );
+
 private:
 
     void InitInfo();
 
-    nvrtcProgram Program_CreateAndCompile( OpenNet::Kernel * aKernel );
+    nvrtcProgram Program_CreateAndCompile( OpenNet::Kernel * aKernel, unsigned int aAdapterNo );
 
     CUcontext mContext;
     CUdevice  mDevice ;

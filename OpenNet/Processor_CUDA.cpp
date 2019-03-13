@@ -18,11 +18,15 @@
 // ===== Includes ===========================================================
 #include <OpenNetK/Types.h>
 
+// ===== Common =============================================================
+#include "../Common/Constants.h"
+
 // ===== OpenNet ============================================================
 #include "Buffer_Data_CUDA.h"
 #include "CUW.h"
 #include "NVRTCW.h"
 #include "Thread_Functions_CUDA.h"
+#include "UserBuffer_CUDA.h"
 
 #include "Processor_CUDA.h"
 
@@ -111,6 +115,7 @@ Buffer_Data * Processor_CUDA::Buffer_Allocate( bool aProfiling, unsigned int aPa
 }
 
 // aKernel [---;R--] The kernel to compile
+// aAdapterNo
 //
 // Return  The new CUmodule instance
 //
@@ -121,7 +126,7 @@ Buffer_Data * Processor_CUDA::Buffer_Allocate( bool aProfiling, unsigned int aPa
 // Threads    Apps
 //
 // Processor_CUDA::Module_Create ==> NVRTCW_ModuleUnload
-CUmodule Processor_CUDA::Module_Create( OpenNet::Kernel * aKernel )
+CUmodule Processor_CUDA::Module_Create( OpenNet::Kernel * aKernel, unsigned int aAdapterNo )
 {
     assert( NULL != aKernel );
 
@@ -130,7 +135,7 @@ CUmodule Processor_CUDA::Module_Create( OpenNet::Kernel * aKernel )
 
     SetContext();
 
-    nvrtcProgram lProgram = Program_CreateAndCompile( aKernel );
+    nvrtcProgram lProgram = Program_CreateAndCompile( aKernel, aAdapterNo );
 
     size_t lSize_byte;
 
@@ -234,6 +239,20 @@ void * Processor_CUDA::GetDevice()
     return (void *)( static_cast< uint64_t >( mDevice ) );
 }
 
+// Protected
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== Processor_Internal =================================================
+
+OpenNet::UserBuffer * Processor_CUDA::AllocateUserBuffer_Internal( unsigned int aSize_byte )
+{
+    assert( 0 < aSize_byte );
+
+    SetContext();
+
+    return new UserBuffer_CUDA( aSize_byte );
+}
+
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
@@ -284,6 +303,7 @@ void Processor_CUDA::InitInfo()
 }
 
 // aKernel [---;R--] The kernel to compile
+// aAdapterNo
 //
 // Return  The new nvrtcProgram instance
 //
@@ -293,7 +313,7 @@ void Processor_CUDA::InitInfo()
 //                                 NVRTC_DestroyProgram
 //
 // Process_CUDA::Program_CreateAndCompile ==> NVRTCW_DestroyProgram
-nvrtcProgram Processor_CUDA::Program_CreateAndCompile( OpenNet::Kernel * aKernel )
+nvrtcProgram Processor_CUDA::Program_CreateAndCompile( OpenNet::Kernel * aKernel, unsigned int aAdapterNo )
 {
     assert( NULL != aKernel );
 
@@ -305,15 +325,24 @@ nvrtcProgram Processor_CUDA::Program_CreateAndCompile( OpenNet::Kernel * aKernel
     NVRTCW_CreateProgram( & lResult, aKernel->GetCode(), NULL, 0, NULL, NULL );
     assert( NULL != lResult );
 
-    const char * lOptions[ 3 ];
+    char lAdapterNo[64];
 
-    lOptions[ 0 ] = "-I /home/mdubois/OpenNet/Includes";
-    lOptions[ 1 ] = "-D_OPEN_NET_CUDA_";
-    lOptions[ 2 ] = "--gpu-architecture=compute_61";
+    unsigned int lOptionCount = 0;
+    const char * lOptions[ 4 ];
+
+    lOptions[ lOptionCount ] = "-I /home/mdubois/OpenNet/Includes"; lOptionCount ++;
+    lOptions[ lOptionCount ] = "-D _OPEN_NET_CUDA_"               ; lOptionCount ++;
+    lOptions[ lOptionCount ] = "--gpu-architecture=compute_61"    ; lOptionCount ++;
+
+    if ( ADAPTER_NO_UNKNOWN != aAdapterNo )
+    {
+        sprintf( lAdapterNo, "-D OPEN_NET_ADAPTER_NO=(%u)", aAdapterNo );
+        lOptions[ lOptionCount ] = lAdapterNo; lOptionCount ++;
+    }
 
     try
     {
-        NVRTCW_CompileProgram( lResult, sizeof( lOptions ) / sizeof( lOptions[ 0 ] ), lOptions );
+        NVRTCW_CompileProgram( lResult, lOptionCount, lOptions );
     }
     catch ( KmsLib::Exception * eE )
     {

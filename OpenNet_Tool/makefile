@@ -45,9 +45,10 @@ OpenNet_Tool.o: ../Includes/OpenNet/StatisticsProvider.h
 OpenNet_Tool.o: ../Includes/OpenNetK/Adapter_Types.h
 OpenNet_Tool.o: ../Includes/OpenNet/Kernel_Forward.h
 OpenNet_Tool.o: ../Includes/OpenNet/Kernel.h ../Includes/OpenNet/SourceCode.h
-OpenNet_Tool.o: ../Includes/OpenNetK/Constants.h ../Common/Version.h Test.h
+OpenNet_Tool.o: ../Includes/OpenNet/System.h ../Includes/OpenNetK/Constants.h
+OpenNet_Tool.o: ../Common/Version.h Test.h
 Test.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 Test.o: ../Import/Includes/WindowsToLinux.h
 Test.o: ../Import/Includes/KmsLib/ToolBase.h
 Test.o: ../Import/Includes/KmsLib/Exception.h ../Common/TestLib/TestFactory.h
-Test.o: Test.h
+Test.o: ../Common/TestLib/Code.h Test.h

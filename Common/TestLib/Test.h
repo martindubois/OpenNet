@@ -178,9 +178,9 @@ namespace TestLib
         void RetrieveStatistics();
 
         unsigned int SetFunction(unsigned int aAdapterIndex);
-        unsigned int SetFunction(OpenNet::Adapter * aAdapter, OpenNet::Function * aFunction, const char * aCode, const char * aName, const char * aIndex);
+        unsigned int SetFunction(OpenNet::Adapter * aAdapter, OpenNet::Function * aFunction,                         const char * aCode, const char * aName, const char * aIndex);
         unsigned int SetKernel  (unsigned int aAdapterIndex);
-        unsigned int SetKernel  (OpenNet::Adapter * aAdapter, OpenNet::Kernel   * aKernel  , const char * aCode,                     const char * aIndex);
+        unsigned int SetKernel  (OpenNet::Adapter * aAdapter, OpenNet::Kernel   * aKernel  , unsigned int aArgCount, const char * aCode,                     const char * aIndex);
 
         void Uninit();
 

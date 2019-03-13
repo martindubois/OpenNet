@@ -19,6 +19,7 @@
 #include <OpenNet/Function.h>
 
 // ===== Common =============================================================
+#include "../Common/Constants.h"
 #include "../Common/IoCtl.h"
 
 // ===== OpenNet ============================================================
@@ -97,6 +98,7 @@ void Adapter_Linux::SetInputFilter_Internal(OpenNet::Kernel * aKernel)
 {
     assert(NULL != aKernel);
 
+    assert( ADAPTER_NO_UNKNOWN != mConnect_Out.mAdapterNo );
     assert( NULL != mProcessor );
     assert( NULL == mModule    );
 
@@ -104,7 +106,7 @@ void Adapter_Linux::SetInputFilter_Internal(OpenNet::Kernel * aKernel)
     assert( NULL != lProcessor );
 
     // Processor_CUDA::Module_Create ==> CUW_ModuleUnload  See ResetInputFilter_Internal
-    mModule = lProcessor->Module_Create( aKernel );
+    mModule = lProcessor->Module_Create( aKernel, mConnect_Out.mAdapterNo );
     assert( NULL != mModule );
 }
 

@@ -10,7 +10,8 @@ INCLUDES = -I ../Includes $(INCLUDE_IMPORT)
 
 OUTPUT = ../Libraries/TestLib.a
 
-SOURCES =	Test.cpp        \
+SOURCES =	Code.cpp        \
+			Test.cpp        \
 			TestA.cpp       \
 			TestB.cpp       \
 			TestC.cpp       \
@@ -52,7 +53,8 @@ Test.o: ../Includes/OpenNet/Function_Forward.h ../Includes/OpenNet/Function.h
 Test.o: ../Includes/OpenNet/SourceCode.h ../Includes/OpenNet/Kernel_Forward.h
 Test.o: ../Includes/OpenNet/Kernel.h ../Includes/OpenNet/PacketGenerator.h
 Test.o: ../Includes/OpenNet/System.h ../Common/OpenNet/Adapter_Statistics.h
-Test.o: ../Common/OpenNetK/Adapter_Statistics.h
+Test.o: ../Common/OpenNetK/Adapter_Statistics.h ../Common/TestLib/Code.h
+Test.o: Code.h
 TestA.o: ../Includes/OpenNetK/Hardware_Statistics.h
 TestA.o: ../Common/OpenNetK/Adapter_Statistics.h TestA.h
 TestA.o: ../Common/TestLib/Test.h ../Import/Includes/KmsLib/ValueVector.h
@@ -64,7 +66,7 @@ TestA.o: ../Includes/OpenNet/Function_Forward.h
 TestA.o: ../Includes/OpenNet/Function.h ../Includes/OpenNet/SourceCode.h
 TestA.o: ../Includes/OpenNet/Kernel_Forward.h ../Includes/OpenNet/Kernel.h
 TestA.o: ../Includes/OpenNet/PacketGenerator.h ../Includes/OpenNet/System.h
-TestA.o: ../Common/OpenNet/Adapter_Statistics.h
+TestA.o: ../Common/OpenNet/Adapter_Statistics.h ../Common/TestLib/Code.h
 TestB.o: ../Includes/OpenNetK/Hardware_Statistics.h TestB.h
 TestB.o: ../Common/TestLib/Test.h ../Import/Includes/KmsLib/ValueVector.h
 TestB.o: ../Includes/OpenNet/Adapter.h ../Includes/OpenNet/Processor.h
@@ -76,11 +78,12 @@ TestB.o: ../Includes/OpenNet/Function.h ../Includes/OpenNet/SourceCode.h
 TestB.o: ../Includes/OpenNet/Kernel_Forward.h ../Includes/OpenNet/Kernel.h
 TestB.o: ../Includes/OpenNet/PacketGenerator.h ../Includes/OpenNet/System.h
 TestB.o: ../Common/OpenNet/Adapter_Statistics.h
-TestB.o: ../Common/OpenNetK/Adapter_Statistics.h
+TestB.o: ../Common/OpenNetK/Adapter_Statistics.h ../Common/TestLib/Code.h
+TestC.o: ../Includes/OpenNet/UserBuffer.h ../Includes/OpenNet/Status.h
+TestC.o: ../Includes/OpenNet/OpenNet.h
 TestC.o: ../Includes/OpenNetK/Hardware_Statistics.h TestC.h
 TestC.o: ../Common/TestLib/Test.h ../Import/Includes/KmsLib/ValueVector.h
 TestC.o: ../Includes/OpenNet/Adapter.h ../Includes/OpenNet/Processor.h
-TestC.o: ../Includes/OpenNet/OpenNet.h ../Includes/OpenNet/Status.h
 TestC.o: ../Includes/OpenNet/StatisticsProvider.h
 TestC.o: ../Includes/OpenNetK/Adapter_Types.h
 TestC.o: ../Includes/OpenNet/Function_Forward.h
@@ -88,7 +91,7 @@ TestC.o: ../Includes/OpenNet/Function.h ../Includes/OpenNet/SourceCode.h
 TestC.o: ../Includes/OpenNet/Kernel_Forward.h ../Includes/OpenNet/Kernel.h
 TestC.o: ../Includes/OpenNet/PacketGenerator.h ../Includes/OpenNet/System.h
 TestC.o: ../Common/OpenNet/Adapter_Statistics.h
-TestC.o: ../Common/OpenNetK/Adapter_Statistics.h
+TestC.o: ../Common/OpenNetK/Adapter_Statistics.h ../Common/TestLib/Code.h
 TestD.o: ../Includes/OpenNetK/Hardware_Statistics.h TestD.h
 TestD.o: ../Common/TestLib/Test.h ../Import/Includes/KmsLib/ValueVector.h
 TestD.o: ../Includes/OpenNet/Adapter.h ../Includes/OpenNet/Processor.h
@@ -100,7 +103,7 @@ TestD.o: ../Includes/OpenNet/Function.h ../Includes/OpenNet/SourceCode.h
 TestD.o: ../Includes/OpenNet/Kernel_Forward.h ../Includes/OpenNet/Kernel.h
 TestD.o: ../Includes/OpenNet/PacketGenerator.h ../Includes/OpenNet/System.h
 TestD.o: ../Common/OpenNet/Adapter_Statistics.h
-TestD.o: ../Common/OpenNetK/Adapter_Statistics.h
+TestD.o: ../Common/OpenNetK/Adapter_Statistics.h ../Common/TestLib/Code.h
 TestE.o: ../Includes/OpenNetK/Hardware_Statistics.h TestE.h
 TestE.o: ../Common/TestLib/Test.h ../Import/Includes/KmsLib/ValueVector.h
 TestE.o: ../Includes/OpenNet/Adapter.h ../Includes/OpenNet/Processor.h
@@ -112,7 +115,7 @@ TestE.o: ../Includes/OpenNet/Function.h ../Includes/OpenNet/SourceCode.h
 TestE.o: ../Includes/OpenNet/Kernel_Forward.h ../Includes/OpenNet/Kernel.h
 TestE.o: ../Includes/OpenNet/PacketGenerator.h ../Includes/OpenNet/System.h
 TestE.o: ../Common/OpenNet/Adapter_Statistics.h
-TestE.o: ../Common/OpenNetK/Adapter_Statistics.h
+TestE.o: ../Common/OpenNetK/Adapter_Statistics.h ../Common/TestLib/Code.h
 TestF.o: ../Includes/OpenNetK/Hardware_Statistics.h TestF.h
 TestF.o: ../Common/TestLib/Test.h ../Import/Includes/KmsLib/ValueVector.h
 TestF.o: ../Includes/OpenNet/Adapter.h ../Includes/OpenNet/Processor.h
@@ -124,10 +127,11 @@ TestF.o: ../Includes/OpenNet/Function.h ../Includes/OpenNet/SourceCode.h
 TestF.o: ../Includes/OpenNet/Kernel_Forward.h ../Includes/OpenNet/Kernel.h
 TestF.o: ../Includes/OpenNet/PacketGenerator.h ../Includes/OpenNet/System.h
 TestF.o: ../Common/OpenNet/Adapter_Statistics.h
-TestF.o: ../Common/OpenNetK/Adapter_Statistics.h
+TestF.o: ../Common/OpenNetK/Adapter_Statistics.h ../Common/TestLib/Code.h
 TestFactory.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 TestFactory.o: ../Import/Includes/WindowsToLinux.h ../Common/Constants.h
-TestFactory.o: ../Common/TestLib/TestFactory.h ../Common/TestLib/Test.h
+TestFactory.o: ../Common/TestLib/TestFactory.h Code.h
+TestFactory.o: ../Common/TestLib/Code.h ../Common/TestLib/Test.h
 TestFactory.o: ../Import/Includes/KmsLib/ValueVector.h
 TestFactory.o: ../Includes/OpenNet/Adapter.h ../Includes/OpenNet/Processor.h
 TestFactory.o: ../Includes/OpenNet/OpenNet.h ../Includes/OpenNet/Status.h

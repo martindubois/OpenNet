@@ -15,6 +15,9 @@
 #include <assert.h>
 #include <stdint.h>
 
+// ===== Commmon ============================================================
+#include "../Common/Constants.h"
+
 // ===== OpenNet ============================================================
 #include "Buffer_Data_CUDA.h"
 #include "CUW.h"
@@ -47,7 +50,7 @@ void Thread_Functions_CUDA::Prepare()
     assert( NULL != lProcessor );
 
     // Processor_CUDA::Module_Create ==> CUW_ModuleUnload  See Release
-    mModule = lProcessor->Module_Create( & mKernelFunctions );
+    mModule = lProcessor->Module_Create( & mKernelFunctions, ADAPTER_NO_UNKNOWN );
     assert( NULL != mModule );
 
     Thread_CUDA::Prepare( & mAdapters, & mBuffers, false );

@@ -166,8 +166,6 @@ namespace TestLib
     //  Other  Error
     unsigned int Test::Run()
     {
-        printf("%s()\n", __FUNCTION__);
-
         unsigned int lResult = InitAndPrepare();
         if (0 == lResult)
         {
@@ -998,8 +996,6 @@ namespace TestLib
     //  Ohter  Error
     unsigned int Test::InitAndPrepare()
     {
-        printf("%s()\n", __FUNCTION__);
-
         unsigned int lResult = Init();
         if (0 == lResult)
         {
@@ -1011,8 +1007,6 @@ namespace TestLib
 
     unsigned int Test::Prepare()
     {
-        printf("%s()\n", __FUNCTION__);
-
         assert(             0 <  mAdapterCount0);
         assert(ADAPTER_QTY    >= mAdapterCount0);
         assert(NULL           != mProcessor    );
@@ -1022,8 +1016,6 @@ namespace TestLib
 
         for (i = 0; i < mAdapterCount0; i++)
         {
-            printf("%s - Adapter %u\n", __FUNCTION__, i);
-
             OpenNet::Adapter * lAdapter = mAdapters[i];
             assert(NULL != lAdapter);
 
@@ -1195,8 +1187,6 @@ namespace TestLib
     // aAdapterIndex
     unsigned int Test::SetKernel(unsigned int aAdapterIndex)
     {
-        printf("%s( %u )\n", __FUNCTION__, aAdapterIndex);
-
         assert(ADAPTER_QTY > aAdapterIndex);
 
         assert(ADAPTER_QTY   > mAdapterCount0       );
@@ -1218,11 +1208,11 @@ namespace TestLib
         case CODE_DO_NOT_REPLY_ON_ERROR:
         case CODE_REPLY                :
         case CODE_REPLY_ON_ERROR       :
-            lResult = SetKernel(lAdapter, lK, lCI.mKernelCode, mNos[aAdapterIndex]);
+            lResult = SetKernel(lAdapter, lK, lCI.mKernelArgCount, lCI.mKernelCode, mNos[aAdapterIndex]);
             break;
 
         case CODE_FORWARD:
-            lResult = SetKernel(lAdapter, lK, lCI.mKernelCode, mNos[lOtherIndex]);
+            lResult = SetKernel(lAdapter, lK, lCI.mKernelArgCount, lCI.mKernelCode, mNos[lOtherIndex]);
             break;
 
         case CODE_NONE:
@@ -1231,7 +1221,7 @@ namespace TestLib
 
         case CODE_NOTHING                :
         case CODE_REPLY_ON_SEQUENCE_ERROR:
-            lResult = SetKernel(lAdapter, lK, lCI.mKernelCode, NULL);
+            lResult = SetKernel(lAdapter, lK, lCI.mKernelArgCount, lCI.mKernelCode, NULL);
             break;
 
         default: assert(false);
@@ -1244,15 +1234,17 @@ namespace TestLib
     // aKernel  [-K-;RW-]
     // aCode    [---;R--]
     // aIndex   [---;R--]
-    unsigned int Test::SetKernel(OpenNet::Adapter * aAdapter, OpenNet::Kernel * aKernel, const char * aCode, const char * aIndex)
+    unsigned int Test::SetKernel(OpenNet::Adapter * aAdapter, OpenNet::Kernel * aKernel, unsigned int aArgCount, const char * aCode, const char * aIndex)
     {
-        printf("%s( , , , \"%s\" )\n", __FUNCTION__, aIndex);
-
         assert(NULL != aAdapter);
         assert(NULL != aKernel );
+        assert(   0 <  aArgCount );
         assert(NULL != aCode   );
 
         OpenNet::Status lStatus = aKernel->SetCode(aCode, static_cast<unsigned int>(strlen(aCode)));
+        assert(OpenNet::STATUS_OK == lStatus);
+
+        lStatus = aKernel->SetArgumentCount( aArgCount );
         assert(OpenNet::STATUS_OK == lStatus);
 
         if (NULL != aIndex)
