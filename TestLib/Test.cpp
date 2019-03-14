@@ -61,16 +61,16 @@ namespace TestLib
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    const double Test::BANDWIDTH_MAX_MiB_s = 120.0;
-    const double Test::BANDWIDTH_MIN_MiB_s =   0.1;
+    const double Test::BANDWIDTH_MAX_MiB_s = 1300.0;
+    const double Test::BANDWIDTH_MIN_MiB_s =    0.1;
 
     const unsigned int Test::BUFFER_QTY_MAX = OPEN_NET_BUFFER_QTY - 1;
     const unsigned int Test::BUFFER_QTY_MIN =                       1;
 
     const char * Test::MODE_NAMES[MODE_QTY] = { "DEFAULT", "FUNCTION", "KERNEL" };
 
-    const unsigned char Test::MASK_E[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe };
-    const unsigned char Test::MASK_1[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
+    const unsigned char Test::MASK_E[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc };
+    const unsigned char Test::MASK_1[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x03 };
 
     const unsigned int Test::TEST_PACKET_SIZE_MAX_byte = 9000;
     const unsigned int Test::TEST_PACKET_SIZE_MIN_byte =   64;

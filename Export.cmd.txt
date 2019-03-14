@@ -61,7 +61,7 @@ Includes/OpenNetK
 ONK_Lib/_DocUser ONK_Lib
 	ReadMe.txt
 
-ONK_Pro1000/_DocUser ONK_Pro1000
+ONK_Pro1000/_DocUser ONK_Intel
 	ReadMe.txt
 
 OpenNet/_DocUser OpenNet
@@ -90,7 +90,7 @@ x64/Debug Tests/Debug_64
     ONK_Test.exe
     OpenNet_Test.exe
 
-x64/Debug/ONK_Pro1000 Drivers/Debug_64/ONK_Pro1000
+x64/Debug/ONK_Pro1000 Drivers/Debug_64/ONK_Intel
     onk_pro1000.cat
     ONK_Pro1000.inf
     ONK_Pro1000.sys
@@ -107,7 +107,7 @@ x64/Release Tests/Release_64
     ONK_Test.exe
     OpenNet_Test.exe
 
-x64/Release/ONK_Pro1000 Drivers/Release_64/ONK_Pro1000
+x64/Release/ONK_Pro1000 Drivers/Release_64/ONK_Intel
     onk_pro1000.cat
     ONK_Pro1000.inf
     ONK_Pro1000.sys

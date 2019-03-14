@@ -334,7 +334,7 @@ namespace TestLib
 
     void TestFactory::ResetConfig()
     {
-        mConfig.mBandwidth_MiB_s = Test::BANDWIDTH_MAX_MiB_s;
+        mConfig.mBandwidth_MiB_s =                     120.0;
         mConfig.mBufferQty       =                         2;
         mConfig.mCode            = CODE_DEFAULT             ;
         mConfig.mMode            = Test::MODE_DEFAULT       ;

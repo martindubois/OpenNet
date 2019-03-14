@@ -281,9 +281,9 @@ unsigned int ValidateStats0( const unsigned int * aStats, unsigned int aSize_byt
             break;
 
         case 61 : // HARDWARE_STATS_RX_HOST_byte
-            if ( 996 != aStats[ i ] )
+            if ( ( 992 != aStats[ i ] ) && ( 996 != aStats[ i ] ) )
             {
-                printf( "ERROR  Counter %3u = %3u, Expected 996\n", i, aStats[ i ] );
+                printf( "ERROR  Counter %3u = %3u, Expected 992 or 996\n", i, aStats[ i ] );
                 lResult ++;
             }
             break;
@@ -338,9 +338,9 @@ unsigned int ValidateStats1( const unsigned int * aStats, unsigned int aSize_byt
             break;
 
         case 74 : // HARDWARE_STATS_TX_HOST_byte
-            if ( 996 != aStats[ i ] )
+            if ( ( 992 != aStats[ i ] ) && ( 996 != aStats[ i ] ) )
             {
-                printf( "ERROR  Counter %3u = %3u, Expected 996\n", i, aStats[ i ] );
+                printf( "ERROR  Counter %3u = %3u, Expected 992 or 996\n", i, aStats[ i ] );
                 lResult ++;
             }
             break;

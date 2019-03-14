@@ -110,14 +110,14 @@ void Intel::SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA)
         mRx_CA = reinterpret_cast<Intel_Rx_Descriptor *>(lCommon_CA);
         mRx_PA = lCommon_PA;
 
-        lCommon_CA += sizeof(Intel_Rx_Descriptor) * RX_DESCRIPTOR_QTY;
-        lCommon_PA += sizeof(Intel_Rx_Descriptor) * RX_DESCRIPTOR_QTY;
+        lCommon_CA += sizeof(Intel_Rx_Descriptor) * mInfo.mRx_Descriptors;
+        lCommon_PA += sizeof(Intel_Rx_Descriptor) * mInfo.mRx_Descriptors;
 
         mTx_CA = reinterpret_cast<Intel_Tx_Descriptor *>(lCommon_CA);
         mTx_PA = lCommon_PA;
 
-        lCommon_CA += sizeof(Intel_Tx_Descriptor) * TX_DESCRIPTOR_QTY;
-        lCommon_PA += sizeof(Intel_Tx_Descriptor) * TX_DESCRIPTOR_QTY;
+        lCommon_CA += sizeof(Intel_Tx_Descriptor) * mInfo.mTx_Descriptors;
+        lCommon_PA += sizeof(Intel_Tx_Descriptor) * mInfo.mTx_Descriptors;
 
         unsigned int i;
 
@@ -128,7 +128,7 @@ void Intel::SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA)
             ASSERT(NULL != mPacketBuffer_CA[i]);
         }
 
-        for (i = 0; i < TX_DESCRIPTOR_QTY; i++)
+        for (i = 0; i < mInfo.mTx_Descriptors; i++)
         {
             mTx_CA[i].mFields.mEndOfPacket  = true;
             mTx_CA[i].mFields.mInsertCRC    = true;
@@ -305,8 +305,8 @@ void Intel::Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile long * aC
     ASSERT(NULL != aPacket );
     ASSERT(NULL != aCounter);
 
-    ASSERT(NULL              != mRx_CA);
-    ASSERT(RX_DESCRIPTOR_QTY >  mRx_In);
+    ASSERT(NULL                  != mRx_CA);
+    ASSERT(mInfo.mRx_Descriptors >  mRx_In);
 
     mRx_Counter   [mRx_In] = aCounter;
     mRx_PacketData[mRx_In] = aPacket ;
@@ -317,7 +317,7 @@ void Intel::Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile long * aC
 
     mRx_CA[mRx_In].mLogicalAddress = aPacket->GetData_PA();
 
-    mRx_In = (mRx_In + 1) % RX_DESCRIPTOR_QTY;
+    mRx_In = (mRx_In + 1) % mInfo.mRx_Descriptors;
 }
 
 void Intel::Packet_Send_NoLock(uint64_t aData_PA, const void *, unsigned int aSize_byte, volatile long * aCounter)
@@ -327,8 +327,8 @@ void Intel::Packet_Send_NoLock(uint64_t aData_PA, const void *, unsigned int aSi
     ASSERT(0 != aData_PA  );
     ASSERT(0 <  aSize_byte);
 
-    ASSERT(NULL              != mTx_CA);
-    ASSERT(TX_DESCRIPTOR_QTY >  mTx_In);
+    ASSERT(NULL                  != mTx_CA);
+    ASSERT(mInfo.mTx_Descriptors >  mTx_In);
 
     mTx_Counter[mTx_In] = aCounter;
 
@@ -336,7 +336,7 @@ void Intel::Packet_Send_NoLock(uint64_t aData_PA, const void *, unsigned int aSi
     mTx_CA[mTx_In].mFields.mSize_byte      = aSize_byte;
     mTx_CA[mTx_In].mLogicalAddress         = aData_PA  ;
 
-    mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
+    mTx_In = (mTx_In + 1) % mInfo.mTx_Descriptors;
 }
 
 bool Intel::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
@@ -417,17 +417,11 @@ Intel::Intel()
 
     mInfo.mPacketSize_byte = PACKET_SIZE_byte;
 
-    mInfo.mCommonBufferSize_byte += (sizeof(Intel_Rx_Descriptor) * RX_DESCRIPTOR_QTY); // Rx packet descriptors
-    mInfo.mCommonBufferSize_byte += (sizeof(Intel_Tx_Descriptor) * TX_DESCRIPTOR_QTY); // Tx packet descriptors
     mInfo.mCommonBufferSize_byte += (PACKET_SIZE_byte * PACKET_BUFFER_QTY); // Packet buffers
     mInfo.mCommonBufferSize_byte += (mInfo.mCommonBufferSize_byte / OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte) * PACKET_SIZE_byte; // Skip 64 KB boundaries
 
-    mInfo.mRx_Descriptors = RX_DESCRIPTOR_QTY;
-    mInfo.mTx_Descriptors = TX_DESCRIPTOR_QTY;
-
     strcpy(mInfo.mComment                  , "ONK_Intel");
     strcpy(mInfo.mVersion_Driver  .mComment, "ONK_Intel");
-    strcpy(mInfo.mVersion_Hardware.mComment, "Intel Ethernet Adapter");
 
     memset((void *)(&mPacketBuffer_Counter), 0, sizeof(mPacketBuffer_Counter)); // volatile_cast
 }
@@ -482,9 +476,9 @@ void Intel::Rx_Process_Zone0()
 {
     // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
-    ASSERT(NULL              != mRx_CA );
-    ASSERT(RX_DESCRIPTOR_QTY >  mRx_In );
-    ASSERT(RX_DESCRIPTOR_QTY >  mRx_Out);
+    ASSERT(NULL                  != mRx_CA );
+    ASSERT(mInfo.mRx_Descriptors >  mRx_In );
+    ASSERT(mInfo.mRx_Descriptors >  mRx_Out);
 
     while (mRx_In != mRx_Out)
     {
@@ -500,7 +494,7 @@ void Intel::Rx_Process_Zone0()
 
         ( * mRx_Counter[ mRx_Out ] ) --;
 
-        mRx_Out = (mRx_Out + 1) % RX_DESCRIPTOR_QTY;
+        mRx_Out = (mRx_Out + 1) % mInfo.mRx_Descriptors;
 
         mStatistics[OpenNetK::HARDWARE_STATS_RX_packet] ++;
     }
@@ -510,10 +504,10 @@ unsigned int Intel::Rx_GetAvailableDescriptor_Zone0()
 {
     // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
-    ASSERT(RX_DESCRIPTOR_QTY > mTx_In );
-    ASSERT(RX_DESCRIPTOR_QTY > mTx_Out);
+    ASSERT(mInfo.mRx_Descriptors > mTx_In );
+    ASSERT(mInfo.mRx_Descriptors > mTx_Out);
 
-    return ((mRx_Out + RX_DESCRIPTOR_QTY - mRx_In - 1) % RX_DESCRIPTOR_QTY);
+    return ((mRx_Out + mInfo.mRx_Descriptors - mRx_In - 1) % mInfo.mRx_Descriptors);
 }
 
 // Level  SoftInt
@@ -524,9 +518,9 @@ void Intel::Tx_Process_Zone0()
 {
     // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
-    ASSERT(NULL              != mTx_CA );
-    ASSERT(TX_DESCRIPTOR_QTY >  mTx_In );
-    ASSERT(TX_DESCRIPTOR_QTY >  mTx_Out);
+    ASSERT(NULL                  != mTx_CA );
+    ASSERT(mInfo.mTx_Descriptors >  mTx_In );
+    ASSERT(mInfo.mTx_Descriptors >  mTx_Out);
 
     while (mTx_In != mTx_Out)
     {
@@ -540,7 +534,7 @@ void Intel::Tx_Process_Zone0()
             ( * mTx_Counter[ mTx_Out ] ) --;
         }
 
-        mTx_Out = (mTx_Out + 1) % TX_DESCRIPTOR_QTY;
+        mTx_Out = (mTx_Out + 1) % mInfo.mTx_Descriptors;
 
         mStatistics[OpenNetK::HARDWARE_STATS_TX_packet] ++;
     }
@@ -550,8 +544,8 @@ unsigned int Intel::Tx_GetAvailableDescriptor_Zone0()
 {
     // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
-    ASSERT(TX_DESCRIPTOR_QTY > mTx_In );
-    ASSERT(TX_DESCRIPTOR_QTY > mTx_Out);
+    ASSERT(mInfo.mTx_Descriptors > mTx_In );
+    ASSERT(mInfo.mTx_Descriptors > mTx_Out);
 
-    return ((mTx_Out + TX_DESCRIPTOR_QTY - mTx_In - 1) % TX_DESCRIPTOR_QTY);
+    return ((mTx_Out + mInfo.mTx_Descriptors - mTx_In - 1) % mInfo.mTx_Descriptors);
 }

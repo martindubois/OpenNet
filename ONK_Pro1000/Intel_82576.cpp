@@ -25,6 +25,14 @@
 Intel_82576::Intel_82576() : mBAR1_82576_MA(NULL)
 {
     ASSERT(0x0e02c == sizeof(Intel_82576_BAR1));
+
+    mInfo.mRx_Descriptors = RX_DESCRIPTOR_QTY;
+    mInfo.mTx_Descriptors = TX_DESCRIPTOR_QTY;
+
+    mInfo.mCommonBufferSize_byte += (sizeof(Intel_Rx_Descriptor) * RX_DESCRIPTOR_QTY); // Rx packet descriptors
+    mInfo.mCommonBufferSize_byte += (sizeof(Intel_Tx_Descriptor) * TX_DESCRIPTOR_QTY); // Tx packet descriptors
+
+    strcpy(mInfo.mVersion_Hardware.mComment, "Intel 1 Gb Ethernet Adapter (82576)");
 }
 
 // ===== OpenNetK::Adapter ==================================================
@@ -246,7 +254,7 @@ void Intel_82576::Rx_Config_Zone0()
     mBAR1_82576_MA->mRx_DescriptorBaseAddressHigh0 = (mRx_PA >> 32) & 0xffffffff;
     mBAR1_82576_MA->mRx_DescriptorBaseAddressLow0  =  mRx_PA        & 0xffffffff;
 
-    mBAR1_82576_MA->mRx_DescriptorRingLength0.mFields.mValue_byte = sizeof(Intel_Rx_Descriptor) * RX_DESCRIPTOR_QTY;
+    mBAR1_82576_MA->mRx_DescriptorRingLength0.mFields.mValue_byte = sizeof(Intel_Rx_Descriptor) * mInfo.mRx_Descriptors;
 
     mBAR1_82576_MA->mRx_PacketBufferSize.mFields.mValue_KB = 84;
 
@@ -274,7 +282,7 @@ void Intel_82576::Tx_Config_Zone0()
     mBAR1_82576_MA->mTx_DescriptorBaseAddressHigh0 = (mTx_PA >> 32) & 0xffffffff;
     mBAR1_82576_MA->mTx_DescriptorBaseAddressLow0  =  mTx_PA        & 0xffffffff;
 
-    mBAR1_82576_MA->mTx_DescriptorRingLength0.mFields.mValue_bytes = sizeof(Intel_Tx_Descriptor) * TX_DESCRIPTOR_QTY;
+    mBAR1_82576_MA->mTx_DescriptorRingLength0.mFields.mValue_bytes = sizeof(Intel_Tx_Descriptor) * mInfo.mTx_Descriptors;
 
     mBAR1_82576_MA->mTx_PacketBufferSize.mFields.mValue_KB = 20;
 

@@ -38,30 +38,31 @@ HKR, , Security, , "D:P(A;;GA;;;SY)(A;;GA;;;BA)(A;;GA;;;AU)"
 %ManufacturerName% = Standard, NTamd64
 
 [Standard.NTamd64]
-%DeviceDesc% = ONK_Pro1000_Device, PCI\VEN_8086&DEV_10C9
+%DeviceDesc% = ONK_Intel_Device, PCI\VEN_8086&DEV_10C9
+%DeviceDesc% = ONK_Intel_Device, PCI\VEN_8086&DEV_10FB
 
-; ===== ONK_Pro1000_Device ==================================================
+; ===== ONK_ProIntel_Device =================================================
 
-[ONK_Pro1000_Device.NT]
+[ONK_Intel_Device.NT]
 CopyFiles=Drivers_Dir
 
-[ONK_Pro1000_Device.NT.HW]
-AddReg=ONK_Pro1000_Device_AddReg
+[ONK_Intel_Device.NT.HW]
+AddReg=ONK_Intel_Device_AddReg
 
 [Drivers_Dir]
 ONK_Pro1000.sys
 
-[ONK_Pro1000_Device_AddReg]
+[ONK_Intel_Device_AddReg]
 HKR, Interrupt Management, , 0x00000010
 HKR, Interrupt Management\MessageSignaledInterruptProperties, , 0x00000010
 HKR, Interrupt Management\MessageSignaledInterruptProperties, MSISupported, 0x00010001, 1
 
 ; ===== Service =============================================================
 
-[ONK_Pro1000_Device.NT.Services]
-AddService = ONK_Pro1000, 0x00000002, ONK_Pro1000_Service_Inst
+[ONK_Intel_Device.NT.Services]
+AddService = ONK_Intel, 0x00000002, ONK_Intel_Service_Inst
 
-[ONK_Pro1000_Service_Inst]
+[ONK_Intel_Service_Inst]
 DisplayName    = %ServiceDesc%
 ServiceType    = 1
 StartType      = 3
@@ -70,18 +71,18 @@ ServiceBinary  = %12%\ONK_Pro1000.sys
 
 ; ===== CoInstaller =========================================================
 
-[ONK_Pro1000_Device.NT.CoInstallers]
-AddReg    = ONK_Pro1000_Device_CoInstaller_AddReg
+[ONK_Intel_Device.NT.CoInstallers]
+AddReg    = ONK_Intel_Device_CoInstaller_AddReg
 
-[ONK_Pro1000_Device_CoInstaller_AddReg]
+[ONK_Intel_Device_CoInstaller_AddReg]
 HKR, , CoInstallers32, 0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
 
 ; ===== WDF =================================================================
 
-[ONK_Pro1000_Device.NT.Wdf]
-KmdfService = ONK_Pro1000, ONK_Pro1000_wdfsect
+[ONK_Intel_Device.NT.Wdf]
+KmdfService = ONK_Intel, ONK_Intel_wdfsect
 
-[ONK_Pro1000_wdfsect]
+[ONK_Intel_wdfsect]
 KmdfLibraryVersion = $KMDFVERSION$
 
 ; ===== Strings =============================================================
@@ -89,6 +90,6 @@ KmdfLibraryVersion = $KMDFVERSION$
 [Strings]
 ManufacturerName = "KMS"
 ClassName        = "OpenNetAdapter"
-DiskName         = "ONK_Pro1000 Installation Disk"
-DeviceDesc       = "ONK_Pro1000 Device"
-ServiceDesc      = "ONK_Pro1000 Service"
+DiskName         = "ONK_Intel Installation Disk"
+DeviceDesc       = "ONK_Intel Device"
+ServiceDesc      = "ONK_Intel Service"

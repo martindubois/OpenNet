@@ -25,22 +25,12 @@ Binaries/Release_64
     OpenNet.dll
     OpenNet_Tool.exe
 
-Drivers/Debug_64/ONK_NDIS
-    onk_ndis.cat
-    ONK_NDIS.inf
-    ONK_NDIS.sys
-
-Drivers/Debug_64/ONK_Pro1000
+Drivers/Debug_64/ONK_Intel
     onk_pro1000.cat
     ONK_Pro1000.inf
     ONK_Pro1000.sys
 
-Drivers/Release_64/ONK_NDIS
-    onk_ndis.cat
-    ONK_NDIS.inf
-    ONK_NDIS.sys
-
-Drivers/Release_64/ONK_Pro1000
+Drivers/Release_64/ONK_Intel
     onk_pro1000.cat
     ONK_Pro1000.inf
     ONK_Pro1000.sys
@@ -80,7 +70,7 @@ Libraries/Release_64
 ONK_Lib
 	ReadMe.txt
 
-ONK_Pro1000
+ONK_Intel
 	ReadMe.txt
 
 OpenNet

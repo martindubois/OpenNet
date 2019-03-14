@@ -94,7 +94,8 @@ namespace OpenNet
         STATUS_ADAPTER_NOT_SET       ,
         STATUS_INVALID_ARGUMENT_COUNT,
         STATUS_INVALID_INDEX         ,
-        STATUS_INVALID_OFFSET        , // 60
+        STATUS_INVALID_LINK_SPEED    , // 60
+        STATUS_INVALID_OFFSET        ,
         STATUS_INVALID_PROTOCOL      ,
         STATUS_INVALID_SIZE          ,
 

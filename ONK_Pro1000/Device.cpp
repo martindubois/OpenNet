@@ -3,6 +3,10 @@
 // Product  OpenNet
 // File     ONK_Pro1000/Device.cpp
 
+// TODO ONK_Intel
+//      Normal (Cleanup) - Move all what can be moved from Device.cpp to
+//      OpenNetK::Hardware_WDF.
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -17,6 +21,7 @@
 // ===== ONK_Pro1000 ========================================================
 #include "Queue.h"
 #include "Intel_82576.h"
+#include "Intel_82599.h"
 
 #include "Device.h"
 
@@ -26,9 +31,15 @@
 typedef struct
 {
     OpenNetK::Adapter      mAdapter     ;
-    Intel_82576            mHardware    ;
+    Intel                * mHardware    ;
     OpenNetK::Adapter_WDF  mAdapter_WDF ;
     OpenNetK::Hardware_WDF mHardware_WDF;
+
+    union
+    {
+        Intel_82576              mIntel_82576;
+        Intel_82599::Intel_82599 mIntel_82599;
+    };
 }
 DeviceContext;
 
@@ -40,6 +51,8 @@ WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DeviceContext, GetDeviceContext)
 static NTSTATUS Init(DeviceContext * aThis, WDFDEVICE aDevice);
 
 static void DeviceInit_Init(PWDFDEVICE_INIT aDeviceInit);
+
+static unsigned short RetrieveDeviceId(WDFDEVICE aDevice);
 
 // ===== Entry points =======================================================
 extern "C"
@@ -127,15 +140,28 @@ NTSTATUS Init(DeviceContext * aThis, WDFDEVICE aDevice)
     ASSERT(NULL != aThis);
     ASSERT(NULL != aDevice);
 
-    new (&aThis->mHardware) Intel_82576();
+    // TODO  OpenNetK.Adapter
+    //       Normal (Feature) - Add the PCI device and vendor ID to the
+    //       information about the adapter.
+    unsigned short lDeviceId = RetrieveDeviceId(aDevice);
 
-    NTSTATUS lResult = aThis->mHardware_WDF.Init(aDevice, &aThis->mHardware);
+    switch (lDeviceId)
+    {
+    case 0x10c9: aThis->mHardware = new (&aThis->mIntel_82576)              Intel_82576(); break;
+    case 0x10fb: aThis->mHardware = new (&aThis->mIntel_82599) Intel_82599::Intel_82599(); break;
+
+    default: ASSERT(false);
+    }
+
+    ASSERT(NULL != aThis->mHardware);
+
+    NTSTATUS lResult = aThis->mHardware_WDF.Init(aDevice, aThis->mHardware);
     if (STATUS_SUCCESS == lResult)
     {
         aThis->mAdapter_WDF.Init(&aThis->mAdapter, aDevice, &aThis->mHardware_WDF);
-        aThis->mAdapter.SetHardware(&aThis->mHardware);
+        aThis->mAdapter.SetHardware(aThis->mHardware);
 
-        aThis->mHardware.SetAdapter(&aThis->mAdapter);
+        aThis->mHardware->SetAdapter(&aThis->mAdapter);
     }
     else
     {
@@ -171,6 +197,53 @@ void DeviceInit_Init(PWDFDEVICE_INIT aDeviceInit)
 
     WdfDeviceInitSetPnpPowerEventCallbacks(aDeviceInit, & lPnpPowerEventCallbacks);
 
+}
+
+// aDevice [---;RW-]
+//
+// Return  This method returns the PCI device id of the controller card.
+unsigned short RetrieveDeviceId(WDFDEVICE aDevice)
+{
+    ASSERT(NULL != aDevice);
+
+    WDFIOTARGET lTarget = WdfDeviceGetIoTarget(aDevice);
+    ASSERT(NULL != lTarget);
+
+    WDFREQUEST lRequest;
+
+    NTSTATUS lStatus = WdfRequestCreate(WDF_NO_OBJECT_ATTRIBUTES, lTarget, &lRequest);
+    ASSERT(STATUS_SUCCESS == lStatus);
+    (void)(lStatus);
+
+    unsigned short lBuffer[2];
+
+    IO_STACK_LOCATION lStack;
+
+    memset(&lStack, 0, sizeof(lStack));
+
+    lStack.MajorFunction = IRP_MJ_PNP        ;
+    lStack.MinorFunction = IRP_MN_READ_CONFIG;
+
+    lStack.Parameters.ReadWriteConfig.Buffer     = lBuffer;
+    lStack.Parameters.ReadWriteConfig.Length     = 4;
+    lStack.Parameters.ReadWriteConfig.Offset     = 0;
+    lStack.Parameters.ReadWriteConfig.WhichSpace = PCI_WHICHSPACE_CONFIG;
+
+    WdfRequestWdmFormatUsingStackLocation(lRequest, &lStack);
+
+    WDF_REQUEST_SEND_OPTIONS lOptions;
+
+    WDF_REQUEST_SEND_OPTIONS_INIT(&lOptions, WDF_REQUEST_SEND_OPTION_SYNCHRONOUS | WDF_REQUEST_SEND_OPTION_IGNORE_TARGET_STATE);
+
+    BOOLEAN lRetB = WdfRequestSend(lRequest, lTarget, &lOptions);
+    ASSERT(lRetB);
+    (void)(lRetB);
+
+    WdfObjectDelete(lRequest);
+
+    ASSERT(0x8086 == lBuffer[0]);
+
+    return lBuffer[1];
 }
 
 // ===== Entry points =======================================================

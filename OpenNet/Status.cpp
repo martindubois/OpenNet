@@ -88,6 +88,7 @@ static const StatusInfo STATUS_INFO[OpenNet::STATUS_QTY] =
     { "ADAPTER_NOT_SET"       , "The adapter is not set" },
     { "INVALID_ARGUMENT_COUNT", "Invalid argument count" },
     { "INVALID_INDEX"         , "Invalid index"          },
+    { "INVALID_LINK_SPEED"    , "Invalid link speed"     },
     { "INVALID_OFFSET"        , "Invalid offset"         },
     { "INVALID_PROTOCOL"      , "Invalid protocol"       },
     { "INVALID_SIZE"          , "Invalid size"           },

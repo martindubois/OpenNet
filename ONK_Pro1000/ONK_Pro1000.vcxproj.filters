@@ -42,6 +42,9 @@
     <ClCompile Include="Intel_82576.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Intel_82599.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component.h">

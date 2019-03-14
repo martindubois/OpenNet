@@ -92,6 +92,7 @@
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="Driver.cpp" />
     <ClCompile Include="Intel_82576.cpp" />
+    <ClCompile Include="Intel_82599.cpp" />
     <ClCompile Include="Queue.cpp" />
   </ItemGroup>
   <ItemGroup>
