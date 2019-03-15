@@ -24,6 +24,7 @@
 static struct pci_device_id ID_TABLE[] =
 {
     { PCI_DEVICE( 0x8086, 0x10c9 ), },
+    { PCI_DEVICE( 0x8086, 0x10fb ), },
 
     { 0, }
 };

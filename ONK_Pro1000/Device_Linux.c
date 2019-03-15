@@ -41,7 +41,7 @@
 
 #define MODULE_NAME "ONK_Pro1000"
 
-#define VECTOR_MAX (16)
+#define VECTOR_MAX (64)
 #define VECTOR_MIN ( 1)
 
 // Data types
@@ -79,6 +79,8 @@ typedef struct
     // ===== Interrupt information ==========================================
     int mIrq        ;
     int mVectorCount;
+
+    struct msix_entry mMsiXEntries[ VECTOR_MAX ];
 
     // ====== Information about buffers =====================================
     NvBuffer mBuffers[ OPEN_NET_BUFFER_QTY ];
@@ -242,7 +244,7 @@ void * Device_Create( struct pci_dev * aPciDev, unsigned char aMajor, unsigned c
         INIT_WORK     ( & lResult->mWork   , Work   );
 
         // DeviceCpp_Init ==> DeviceCpp_Uninit  See Device_Delete
-        DeviceCpp_Init( lResult->mDeviceCpp, & lResult->mOSDep, & lResult->mAdapterLock, & lResult->mHardwareLock );
+        DeviceCpp_Init( lResult->mDeviceCpp, & lResult->mOSDep, & lResult->mAdapterLock, & lResult->mHardwareLock, aPciDev->device );
 
         lRet = pci_write_config_word( aPciDev, 6, 0x0800 );
         if ( 0 != lRet )

@@ -134,7 +134,13 @@ namespace Intel_82599
 
         ASSERT(NULL != mBAR1_82599_MA);
 
-        mBAR1_82599_MA->mEIMS_0.mFields.mRTxQ = 0x0001;
+        EI lReg;
+
+        lReg.mValue = 0;
+
+        lReg.mFields.mRTxQ = 0x0001;
+
+        mBAR1_82599_MA->mEIMS_0.mValue = lReg.mValue;
 
         mZone0->UnlockFromThread(lFlags);
     }
@@ -258,7 +264,12 @@ namespace Intel_82599
         mBAR1_82599_MA->mHLReg0.mFields.mRxCrcStrip   = true;
         mBAR1_82599_MA->mHLReg0.mFields.mRxPadStripEn = true;
 
-        mBAR1_82599_MA->mMaxFrS.mFields.mMFS_byte = mConfig.mPacketSize_byte;
+        MaxFrS lMaxFrS;
+
+        lMaxFrS.mValue = 0;
+        lMaxFrS.mFields.mMFS_byte = mConfig.mPacketSize_byte;
+
+        mBAR1_82599_MA->mMaxFrS.mValue = lMaxFrS.mValue;;
 
         /* TODO  Dev
         mBAR1_82599_MA->mRx_DmaMaxOutstandingData.mFields.mValue_256_bytes = 0xfff;

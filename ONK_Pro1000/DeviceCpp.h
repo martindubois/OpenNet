@@ -22,7 +22,7 @@ ProcessIrqResult;
 
 extern unsigned int DeviceCpp_GetContextSize( void );
 
-extern void DeviceCpp_Init  ( void * aThis, OpenNetK_OSDep * aOSDep, void * aAdapterLock, void * aHardwareLock );
+extern void DeviceCpp_Init  ( void * aThis, OpenNetK_OSDep * aOSDep, void * aAdapterLock, void * aHardwareLock, unsigned short aDeviceId );
 extern void DeviceCpp_Uninit( void * aThis );
 
 extern unsigned int DeviceCpp_CommonBuffer_GetSize( void * aThis );
