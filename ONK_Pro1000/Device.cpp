@@ -37,7 +37,7 @@ typedef struct
 
     union
     {
-        Intel_82576              mIntel_82576;
+        Intel_82576::Intel_82576 mIntel_82576;
         Intel_82599::Intel_82599 mIntel_82599;
     };
 }
@@ -147,7 +147,7 @@ NTSTATUS Init(DeviceContext * aThis, WDFDEVICE aDevice)
 
     switch (lDeviceId)
     {
-    case 0x10c9: aThis->mHardware = new (&aThis->mIntel_82576)              Intel_82576(); break;
+    case 0x10c9: aThis->mHardware = new (&aThis->mIntel_82576) Intel_82576::Intel_82576(); break;
     case 0x10fb: aThis->mHardware = new (&aThis->mIntel_82599) Intel_82599::Intel_82599(); break;
 
     default: ASSERT(false);

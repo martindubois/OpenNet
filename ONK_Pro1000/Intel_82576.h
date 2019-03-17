@@ -13,41 +13,46 @@
 #include "Intel.h"
 #include "Intel_82576_Regs.h"
 
-// Class
-/////////////////////////////////////////////////////////////////////////////
-
-class Intel_82576 : public Intel
+namespace Intel_82576
 {
 
-public:
+    // Class
+    /////////////////////////////////////////////////////////////////////////
 
-    Intel_82576();
+    class Intel_82576 : public Intel
+    {
 
-    // ===== OpenNetK::Hardware =============================================
-    virtual bool SetMemory        (unsigned int aIndex, void * aMemory_MA, unsigned int aSize_byte);
-    virtual void D0_Entry         ();
-    virtual void Interrupt_Enable ();
-    virtual bool Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing);
+    public:
 
-protected:
+        Intel_82576();
 
-    // ===== Intel ==========================================================
-    virtual void Interrupt_Disable_Zone0();
-    virtual void Reset_Zone0            ();
-    virtual void Statistics_Update      ();
+        // ===== OpenNetK::Hardware =========================================
+        virtual bool SetMemory        (unsigned int aIndex, void * aMemory_MA, unsigned int aSize_byte);
+        virtual void D0_Entry         ();
+        virtual void Interrupt_Enable ();
+        virtual bool Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing);
 
-    // ===== OpenNetK::Hardware =============================================
-    virtual void Unlock_AfterReceive_Internal();
-    virtual void Unlock_AfterSend_Internal   ();
+    protected:
 
-private:
+        // ===== Intel ======================================================
+        virtual void Interrupt_Disable_Zone0();
+        virtual void Reset_Zone0            ();
+        virtual void Statistics_Update      ();
 
-    void Rx_Config_Zone0();
+        // ===== OpenNetK::Hardware =========================================
+        virtual void Unlock_AfterReceive_Internal();
+        virtual void Unlock_AfterSend_Internal   ();
 
-    void Tx_Config_Zone0();
+    private:
 
-    // ===== Zone 0 =========================================================
+        void Rx_Config_Zone0();
 
-    volatile Intel_82576_BAR1 * mBAR1_82576_MA;
+        void Tx_Config_Zone0();
 
-};
+        // ===== Zone 0 =====================================================
+
+        volatile BAR1 * mBAR1_82576_MA;
+
+    };
+
+}
