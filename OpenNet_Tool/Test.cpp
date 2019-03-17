@@ -93,10 +93,9 @@ static unsigned int         sTest_Passed = 0;
 // Macros
 /////////////////////////////////////////////////////////////////////////////
 
-#define TEST_EXEC(M,F)                                                           \
+#define TEST_EXEC(F)                                                             \
     void Test_##F(KmsLib::ToolBase * aToolBase, const char * aArg)               \
     {                                                                            \
-        printf("Test " M " %s\n", aArg);                                         \
         TestLib::Test * lTest = sTestFactory.CreateTest(aArg);                   \
         if (NULL != lTest)                                                       \
         {                                                                        \
@@ -118,7 +117,6 @@ static unsigned int         sTest_Passed = 0;
 #define TEST_SET(P)                                                           \
     void Test_Set##P(KmsLib::ToolBase * aToolBase, const char * aArg)         \
     {                                                                         \
-        printf("Test Set" #P " %s\n", aArg);                                  \
         unsigned int lRet = sTestFactory.Set##P( aArg );                      \
         if (0 == lRet)                                                        \
         {                                                                     \
@@ -129,14 +127,14 @@ static unsigned int         sTest_Passed = 0;
 // Commands
 /////////////////////////////////////////////////////////////////////////////
 
-TEST_EXEC( "Run"              , Run               )
-TEST_EXEC( "Search Bandwidth" , Search_Bandwidth  )
-TEST_EXEC( "Search BufferQty" , Search_BufferQty  )
-TEST_EXEC( "Search PacketSize", Search_PacketSize )
-TEST_EXEC( "StartStop"        , StartStop         )
-TEST_EXEC( "Verify Bandwidth" , Verify_Bandwidth  )
-TEST_EXEC( "Verify BufferQty" , Verify_BufferQty  )
-TEST_EXEC( "Verify PacketSize", Verify_PacketSize )
+TEST_EXEC( Run               )
+TEST_EXEC( Search_Bandwidth  )
+TEST_EXEC( Search_BufferQty  )
+TEST_EXEC( Search_PacketSize )
+TEST_EXEC( StartStop         )
+TEST_EXEC( Verify_Bandwidth  )
+TEST_EXEC( Verify_BufferQty  )
+TEST_EXEC( Verify_PacketSize )
 
 TEST_SET( Bandwidth  )
 TEST_SET( BufferQty  )
@@ -147,11 +145,6 @@ TEST_SET( Profiling  )
 
 void Test_DisplayConfig(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
-    assert(NULL != aArg);
-
-    printf("Test DisplayConfig %s\n", aArg);
-    printf("Test DisplayConfig\n");
-
     sTestFactory.DisplayConfig();
 }
 
@@ -159,24 +152,19 @@ void Test_Info(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Test Info %s\n", aArg);
-
     TestLib::Test * lTest = sTestFactory.CreateTest(aArg);
-    if (NULL != lTest)
+    if (NULL == lTest)
     {
-        lTest->Info_Display();
-
-        delete lTest;
+        return;
     }
+
+    lTest->Info_Display();
+
+    delete lTest;
 }
 
 void Test_ResetConfig(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
-    assert(NULL != aArg);
-
-    printf("Test ResetConfig %s\n", aArg);
-    printf("Test ResetConfig\n");
-
     sTestFactory.ResetConfig();
 
     KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Config reset");

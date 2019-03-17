@@ -55,13 +55,7 @@ PacketGenerator_Internal::PacketGenerator_Internal() : mAdapter(NULL), mDebugLog
     memset(&mConfig.mDestinationIPv4             , 0xff, sizeof(mConfig.mDestinationIPv4             ));
     memset(&mDriverConfig                        ,    0, sizeof(mDriverConfig                        ));
 
-    mConfig.mAllowedIndexRepeat = REPEAT_COUNT_MAX;
-    mConfig.mBandwidth_MiB_s    =   50.0;
-    mConfig.mDestinationPort    = 0x0a0a;
-    mConfig.mEthernetProtocol   = 0x0a0a;
-    mConfig.mPacketSize_byte    = 1024  ;
-    mConfig.mProtocol           = PROTOCOL_ETHERNET;
-    mConfig.mSourcePort         = 0x0909;
+    Config_Reset();
 }
 
 // ===== OpenNet::PacketGenerator ===========================================
@@ -99,6 +93,32 @@ OpenNet::Status PacketGenerator_Internal::GetConfig(Config * aOut) const
     }
 
     memcpy(aOut, &mConfig, sizeof(mConfig));
+
+    return OpenNet::STATUS_OK;
+}
+
+OpenNet::Status PacketGenerator_Internal::ResetConfig()
+{
+    if (mRunning)
+    {
+        mDebugLog.Log(__FILE__, __CLASS__ "ResetConfig", __LINE__);
+        return OpenNet::STATUS_PACKET_GENERATOR_RUNNING;
+    }
+
+    try
+    {
+        Config_Reset();
+
+        if (NULL != mAdapter)
+        {
+            UpdateDriverConfig();
+        }
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog.Log(eE);
+        return OpenNet::STATUS_EXCEPTION;
+    }
 
     return OpenNet::STATUS_OK;
 }
@@ -262,6 +282,17 @@ void PacketGenerator_Internal::Config_Apply(const Config & aConfig)
     {
         UpdateDriverConfig();
     }
+}
+
+void PacketGenerator_Internal::Config_Reset()
+{
+    mConfig.mAllowedIndexRepeat = REPEAT_COUNT_MAX ;
+    mConfig.mBandwidth_MiB_s    =              50.0;
+    mConfig.mDestinationPort    = 0x0a0a           ;
+    mConfig.mEthernetProtocol   = 0x0a0a           ;
+    mConfig.mPacketSize_byte    =            1024  ;
+    mConfig.mProtocol           = PROTOCOL_ETHERNET;
+    mConfig.mSourcePort         = 0x0909           ;
 }
 
 void PacketGenerator_Internal::Config_Update()

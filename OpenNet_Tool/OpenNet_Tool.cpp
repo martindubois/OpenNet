@@ -27,38 +27,22 @@
 #include <KmsTool.h>
 
 // ===== Includes ===========================================================
-#include <OpenNet/Adapter.h>
 #include <OpenNet/Kernel_Forward.h>
-#include <OpenNet/System.h>
 #include <OpenNetK/Constants.h>
 
 // ===== Common =============================================================
 #include "../Common/Version.h"
 
 // ===== OpenNet_Tool =======================================================
+#include "Adapter.h"
+#include "Globals.h"
+#include "PacketGenerator.h"
+#include "Processor.h"
 #include "Test.h"
+#include "Utils.h"
 
 // Commands
 /////////////////////////////////////////////////////////////////////////////
-
-static void Adapter_Display  (KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Adapter_GetConfig(KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Adapter_GetState (KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Adapter_GetStats (KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Adapter_List     (KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Adapter_Select   (KmsLib::ToolBase * aToolBase, const char * aArg);
-
-static const KmsLib::ToolBase::CommandInfo ADAPTER_COMMANDS[] =
-{
-    { "Display"  , Adapter_Display  , "Display                       Display the adapter"  , NULL },
-    { "GetConfig", Adapter_GetConfig, "GetConfig                     Display configuration", NULL },
-    { "GetState" , Adapter_GetState , "GetState                      Display state"        , NULL },
-    { "GetStats" , Adapter_GetStats , "GetStats [false|true]         Display statistics"   , NULL },
-	{ "List"     , Adapter_List     , "List                          List the adapters"    , NULL },
-	{ "Select"   , Adapter_Select   , "Select {Index}                Select an adapter"    , NULL },
-
-	{ NULL, NULL, NULL, NULL }
-};
 
 static void Kernel_Forward_AddDestination   (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Kernel_Forward_Create           (KmsLib::ToolBase * aToolBase, const char * aArg);
@@ -68,11 +52,11 @@ static void Kernel_Forward_ResetDestinations(KmsLib::ToolBase * aToolBase, const
 
 static const KmsLib::ToolBase::CommandInfo KERNEL_FORWARD_COMMANDS[] =
 {
-    { "AddDestination"   , Kernel_Forward_AddDestination   , "AddDestination [Adapter]      Add a destination"               , NULL },
-    { "Create"           , Kernel_Forward_Create           , "Create                        Create a Kernel_Forward instance", NULL },
-    { "List"             , Kernel_Forward_List             , "List                          List the Kernel_Forward instance", NULL },
-    { "RemoveDestination", Kernel_Forward_RemoveDestination, "RemoveDestination [Adapter]   Remove a destination"            , NULL },
-    { "ResetDestinations", Kernel_Forward_ResetDestinations, "RestedDestinations            Remove all destiations"          , NULL },
+    { "AddDestination"   , Kernel_Forward_AddDestination   , "AddDestination [Adapter]"   , NULL },
+    { "Create"           , Kernel_Forward_Create           , "Create {Name}"              , NULL },
+    { "List"             , Kernel_Forward_List             , "List"                       , NULL },
+    { "RemoveDestination", Kernel_Forward_RemoveDestination, "RemoveDestination [Adapter]", NULL },
+    { "ResetDestinations", Kernel_Forward_ResetDestinations, "RestedDestinations"         , NULL },
 
     { NULL, NULL, NULL, NULL }
 };
@@ -91,33 +75,20 @@ static void Kernel_SetCode     (KmsLib::ToolBase * aToolBase, const char * aArg)
 
 static const KmsLib::ToolBase::CommandInfo KERNEL_COMMANDS[] =
 {
-    { "Create"      , Kernel_Create      , "Create {Name}                 Create a Kernel instance"  , NULL },
-    { "Delete"      , Kernel_Delete      , "Delete                        Delete the Kernel instance", NULL },
-    { "Display"     , Kernel_Display     , "Display                       Display the Kernel"        , NULL },
-    { "Edit_Remove" , Kernel_Edit_Remove , "Edit_Remote {Remove}          Remove strings from code"  , NULL },
-    { "Edit_Replace", Kernel_Edit_Replace, "Edit_Replace {Search} [Rep]   Search and replace strings", NULL },
-    { "Edit_Search" , Kernel_Edit_Search , "Edit_Search {Search}          Search a string"           , NULL },
-    { "Forward"     , NULL               , "Forward ..."                                             , KERNEL_FORWARD_COMMANDS },
-    { "List"        , Kernel_List        , "List                          List the Kernel instances" , NULL },
-    { "GetCodeSize" , Kernel_GetCodeSize , "GetCodeSize                   Display code size"         , NULL },
-    { "ResetCode"   , Kernel_ResetCode   , "ResetCode                     Reset the code"            , NULL },
-    { "Select"      , Kernel_Select      , "Select {Name}                 Select a Kernel"           , NULL },
-    { "SetCode"     , Kernel_SetCode     , "SetCode {FileName}            Set the code"              , NULL },
+    { "Create"      , Kernel_Create      , "Create {Name}"              , NULL                    },
+    { "Delete"      , Kernel_Delete      , "Delete"                     , NULL                    },
+    { "Display"     , Kernel_Display     , "Display"                    , NULL                    },
+    { "Edit_Remove" , Kernel_Edit_Remove , "Edit_Remote {Remove}"       , NULL                    },
+    { "Edit_Replace", Kernel_Edit_Replace, "Edit_Replace {Search} [Rep]", NULL                    },
+    { "Edit_Search" , Kernel_Edit_Search , "Edit_Search {Search}"       , NULL                    },
+    { "Forward"     , NULL               , "Forward ..."                , KERNEL_FORWARD_COMMANDS },
+    { "List"        , Kernel_List        , "List"                       , NULL                    },
+    { "GetCodeSize" , Kernel_GetCodeSize , "GetCodeSize"                , NULL                    },
+    { "ResetCode"   , Kernel_ResetCode   , "ResetCode"                  , NULL                    },
+    { "Select"      , Kernel_Select      , "Select {Name}"              , NULL                    },
+    { "SetCode"     , Kernel_SetCode     , "SetCode {FileName}"         , NULL                    },
 
     { NULL, NULL, NULL, NULL }
-};
-
-static void Processor_Display(KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Processor_List   (KmsLib::ToolBase * aToolBase, const char * aArg);
-static void Processor_Select (KmsLib::ToolBase * aToolBase, const char * aArg);
-
-static const KmsLib::ToolBase::CommandInfo PROCESSOR_COMMANDS[] =
-{
-	{ "Display", Processor_Display, "Display                       Display the processor", NULL },
-	{ "List"   , Processor_List   , "List                          List the processors"  , NULL },
-	{ "Select" , Processor_Select , "Select {Index}                Select an processor"  , NULL },
-
-	{ NULL, NULL, NULL, NULL }
 };
 
 static void Display(KmsLib::ToolBase * aToolBase, const char * aArg);
@@ -127,15 +98,16 @@ static void Stop   (KmsLib::ToolBase * aToolBase, const char * aArg);
 
 static const KmsLib::ToolBase::CommandInfo COMMANDS[] =
 {
-	{ "Adapter"      , NULL                           , "Adapter ..."                                             , ADAPTER_COMMANDS   },
-    { "Display"      , Display                        , "Display                       Display system information", NULL               },
-	{ "ExecuteScript", KmsLib::ToolBase::ExecuteScript, "ExecuteSript {Script}         Execute script"            , NULL               },
-	{ "Exit"         , Exit                           , "Exit                          Exit"                      , NULL               },
-    { "Kernel"       , NULL                           , "Kernel ..."                                              , KERNEL_COMMANDS    },
-	{ "Processor"    , NULL                           , "Processor ..."                                           , PROCESSOR_COMMANDS },
-    { "Start"        , Start                          , "Start                         Start the system"          , NULL               },
-    { "Stop"         , Stop                           , "Stop                          Stop the system"           , NULL               },
-    { "Test"         , NULL                           , "Test ..."                                                , TEST_COMMANDS      },
+	{ "Adapter"        , NULL                           , "Adapter ..."          , ADAPTER_COMMANDS          },
+    { "Display"        , Display                        , "Display"              , NULL                      },
+	{ "ExecuteScript"  , KmsLib::ToolBase::ExecuteScript, "ExecuteSript {Script}", NULL                      },
+	{ "Exit"           , Exit                           , "Exit"                 , NULL                      },
+    { "Kernel"         , NULL                           , "Kernel ..."           , KERNEL_COMMANDS           },
+    { "PacketGenerator", NULL                           , "PacketGenerator ..."  , PACKET_GENERATOR_COMMANDS },
+	{ "Processor"      , NULL                           , "Processor ..."        , PROCESSOR_COMMANDS        },
+    { "Start"          , Start                          , "Start"                , NULL                      },
+    { "Stop"           , Stop                           , "Stop"                 , NULL                      },
+    { "Test"           , NULL                           , "Test ..."             , TEST_COMMANDS             },
 
 	{ NULL, NULL, NULL, NULL }
 };
@@ -152,11 +124,9 @@ static void System_Connect();
 
 typedef std::map<std::string, OpenNet::Kernel *> KernelMap;
 
-static OpenNet::Adapter   * sAdapter   = NULL;
 static OpenNet::Kernel    * sKernel    = NULL;
 static KernelMap            sKernels;
 static OpenNet::Processor * sProcessor = NULL;
-static OpenNet::System    * sSystem;
 
 // Entry point
 /////////////////////////////////////////////////////////////////////////////
@@ -177,7 +147,9 @@ int main(int aCount, const char ** aVector)
 		    lToolBase.ParseCommands();
 	    }
 
-	    sSystem->Delete();
+        PacketGenerator_Exit();
+
+	    gSystem->Delete();
     }
     catch ( KmsLib::Exception * eE )
     {
@@ -195,157 +167,19 @@ int main(int aCount, const char ** aVector)
 // Commands
 /////////////////////////////////////////////////////////////////////////////
 
-void Adapter_Display(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-    assert(NULL != aArg);
-
-    printf("Adapter Display %s\n", aArg);
-    printf("Adapter Display\n");
-
-    if (NULL == sAdapter)
-    {
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No adapter selected");
-        return;
-    }
-
-    OpenNet::Status lStatus = sAdapter->Display(stdout);
-    assert(OpenNet::STATUS_OK == lStatus);
-}
-
-void Adapter_GetConfig(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-    assert(NULL != aArg);
-
-    printf("Adapter GetConfig %s\n", aArg);
-    printf("Adapter GetConfig\n");
-
-    if (NULL == sAdapter)
-    {
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No adapter selected");
-        return;
-    }
-
-    OpenNet::Adapter::Config lConfig;
-
-    OpenNet::Status lStatus = sAdapter->GetConfig(&lConfig);
-    assert(OpenNet::STATUS_OK == lStatus);
-
-    OpenNet::Adapter::Display(lConfig, stdout);
-}
-
-void Adapter_GetState(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-    assert(NULL != aArg);
-
-    printf("Adapter GetState %s\n", aArg);
-    printf("Adapter GetState\n");
-
-    if (NULL == sAdapter)
-    {
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No adapter selected");
-        return;
-    }
-
-    OpenNet::Adapter::State lState;
-
-    OpenNet::Status lStatus = sAdapter->GetState(&lState);
-    assert(OpenNet::STATUS_OK == lStatus);
-
-    OpenNet::Adapter::Display(lState, stdout);
-}
-
-void Adapter_GetStats(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-    assert(NULL != aArg);
-
-    printf("Adapter GetStats %s\n", aArg);
-
-    if (NULL == sAdapter)
-    {
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No adapter selected");
-        return;
-    }
-
-    bool lReset = (0 == strcmp("true", aArg));
-
-    // TODO  OpenNet_Tool
-    //       Low (Feature) - Ajouter un argument pour le MinLevel
-
-    printf("Adapter GetStats %s\n", lReset ? "true" : "false");
-
-    unsigned int lInfo_byte;
-    unsigned int lStats[1024];
-
-    OpenNet::Status lStatus = sAdapter->GetStatistics(lStats, sizeof(lStats), &lInfo_byte, lReset);
-    assert(OpenNet::STATUS_OK == lStatus);
-
-    lStatus = sAdapter->DisplayStatistics(lStats, lInfo_byte, stdout);
-    assert(OpenNet::STATUS_OK == lStatus);
-}
-
-void Adapter_List(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-	assert(NULL != aArg);
-
-	printf("Adapter List %s\n", aArg);
-	printf("Adapter List\n");
-
-	unsigned int lCount = sSystem->Adapter_GetCount();
-	for (unsigned int i = 0; i < lCount; i++)
-	{
-		printf("Adapter %u of %u : %s\n", i, lCount, sSystem->Adapter_Get(i)->GetName());
-	}
-}
-
-void Adapter_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-	assert(NULL != aArg);
-
-	printf("Adapter Select %s\n", aArg);
-
-	unsigned int lIndex;
-
-	switch (sscanf_s(aArg, "%u", &lIndex))
-	{
-	case 1 :
-		printf("Adapter Select %u\n", lIndex);
-
-		unsigned int lCount;
-		
-		lCount = sSystem->Adapter_GetCount();
-		if (lCount <= lIndex)
-		{
-			KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid index");
-            return;
-		}
-
-        sAdapter = sSystem->Adapter_Get(lIndex);
-		assert(NULL != sAdapter);
-
-		KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Adapter selected");
-        break;
-
-	default :
-		KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
-	}
-}
-
 void Display(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Display %s\n", aArg);
-    printf("Display\n");
-
-    OpenNet::Status lStatus = sSystem->Display(stdout);
-    assert(OpenNet::STATUS_OK == lStatus);
+    OpenNet::Status lStatus = gSystem->Display(stdout);
+    UTL_VERIFY_STATUS("OpenNet::System::Display(  ) failed");
 }
 
 void Exit(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
-    printf("Exit\n");
+    PacketGenerator_Exit();
 
-    sSystem->Delete();
+    gSystem->Delete();
 
     exit( 0 );
 }
@@ -354,8 +188,6 @@ void Kernel_Forward_AddDestination(KmsLib::ToolBase * aToolBase, const char * aA
 {
     assert(NULL != aArg);
 
-    printf("Kernel_Forward AddDestination %s\n", aArg);
-
     OpenNet::Adapter * lAdapter;
     unsigned int       lAdapterIndex;
 
@@ -363,24 +195,24 @@ void Kernel_Forward_AddDestination(KmsLib::ToolBase * aToolBase, const char * aA
     {
     case EOF:
         printf("Kernel_Forward AddDestination\n");
-        if (NULL == sAdapter)
+        if (NULL == gAdapter)
         {
             KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No adapter selected");
             return;
         }
-        lAdapter = sAdapter;
+        lAdapter = gAdapter;
         break;
 
     case 1:
         printf("Kernel_Forward AddDestination %u\n", lAdapterIndex);
 
-        if (sSystem->Adapter_GetCount() >= lAdapterIndex)
+        if (gSystem->Adapter_GetCount() >= lAdapterIndex)
         {
             KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid adapter index");
             return;
         }
 
-        lAdapter = sSystem->Adapter_Get(lAdapterIndex);
+        lAdapter = gSystem->Adapter_Get(lAdapterIndex);
         assert(NULL != lAdapter);
         break;
 
@@ -408,8 +240,6 @@ void Kernel_Forward_AddDestination(KmsLib::ToolBase * aToolBase, const char * aA
 void Kernel_Forward_Create(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
-
-    printf("Kernel_Forward Create %s\n", aArg);
 
     char lName[64];
 
@@ -442,9 +272,6 @@ void Kernel_Forward_List(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Kernel_Forward List %s\n", aArg);
-    printf("Kernel_Forward List\n");
-
     for (KernelMap::iterator lIt = sKernels.begin(); lIt != sKernels.end(); lIt++)
     {
         assert(NULL != lIt->second);
@@ -465,8 +292,6 @@ void Kernel_Forward_RemoveDestination(KmsLib::ToolBase * aToolBase, const char *
 {
     assert(NULL != aArg);
 
-    printf("Kernel_Forward RemoveDestination %s\n", aArg);
-
     OpenNet::Adapter * lAdapter;
     unsigned int       lAdapterIndex;
 
@@ -474,24 +299,24 @@ void Kernel_Forward_RemoveDestination(KmsLib::ToolBase * aToolBase, const char *
     {
     case EOF:
         printf("Kernel_Forward RemoveDestination\n");
-        if (NULL == sAdapter)
+        if (NULL == gAdapter)
         {
             KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No adapter selected");
             return;
         }
-        lAdapter = sAdapter;
+        lAdapter = gAdapter;
         break;
 
     case 1:
         printf("Kernel_Forward RemoveDestination %u\n", lAdapterIndex);
 
-        if (sSystem->Adapter_GetCount() >= lAdapterIndex)
+        if (gSystem->Adapter_GetCount() >= lAdapterIndex)
         {
             KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid adapter index");
             return;
         }
 
-        lAdapter = sSystem->Adapter_Get(lAdapterIndex);
+        lAdapter = gSystem->Adapter_Get(lAdapterIndex);
         assert(NULL != lAdapter);
         break;
 
@@ -520,9 +345,6 @@ void Kernel_Forward_ResetDestinations(KmsLib::ToolBase * aToolBase, const char *
 {
     assert(NULL != aArg);
 
-    printf("Kernel_Forward ResetDestination %s\n", aArg);
-    printf("Kernel_Forward ResetDestination\n");
-
     if (NULL == sKernel)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No Kernel selected");
@@ -542,8 +364,6 @@ void Kernel_Forward_ResetDestinations(KmsLib::ToolBase * aToolBase, const char *
 void Kernel_Create(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
-
-    printf("Kernel Create %s\n", aArg);
 
     char lName[64];
 
@@ -576,9 +396,6 @@ void Kernel_Delete(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Kernel Delete %s\n", aArg);
-    printf("Kernel Delete\n");
-
     if (NULL == sKernel)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No filter selected");
@@ -605,9 +422,6 @@ void Kernel_Display(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Kernel Display %s\n", aArg);
-    printf("Kernel Display\n");
-
     if (NULL == sKernel)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No Kernel selected");
@@ -622,15 +436,11 @@ void Kernel_Edit_Remove(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Kernel Edit_Remove %s\n", aArg);
-
     char lRemove[64];
 
     switch (sscanf_s(aArg, "%s", lRemove SIZE_INFO(static_cast<unsigned int>(sizeof(lRemove)))))
     {
     case 1:
-        printf("Kernel Edit_Remove %s\n", lRemove);
-
         if (NULL == sKernel)
         {
             KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No Kernel selected");
@@ -653,15 +463,11 @@ void Kernel_Edit_Search(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Kernel Edit_Search %s\n", aArg);
-
     char lSearch[64];
 
     switch (sscanf_s(aArg, "%s", lSearch SIZE_INFO(static_cast<unsigned int>(sizeof(lSearch)))))
     {
     case 1:
-        printf("Kernel Edit_Search %s\n", lSearch);
-
         if (NULL == sKernel)
         {
             KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No Kernel selected");
@@ -683,8 +489,6 @@ void Kernel_Edit_Search(KmsLib::ToolBase * aToolBase, const char * aArg)
 void Kernel_Edit_Replace(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
-
-    printf("Kernel Edit_Search %s\n", aArg);
 
     char lSearch [64];
     char lReplace[64];
@@ -720,9 +524,6 @@ void Kernel_GetCodeSize(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Kernel GetCodeSize %s\n", aArg);
-    printf("Kernel GetCodeSize\n");
-
     if (NULL == sKernel)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No Kernel selected");
@@ -742,9 +543,6 @@ void Kernel_List(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Kernel List %s\n", aArg);
-    printf("Kernel List\n");
-
     for (KernelMap::iterator lIt = sKernels.begin(); lIt != sKernels.end(); lIt++)
     {
         assert(NULL != lIt->second);
@@ -761,9 +559,6 @@ void Kernel_ResetCode(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Kernel GetCodeSize %s\n", aArg);
-    printf("Kernel GetCodeSize\n");
-
     if (NULL == sKernel)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No Kernel selected");
@@ -776,8 +571,6 @@ void Kernel_ResetCode(KmsLib::ToolBase * aToolBase, const char * aArg)
 void Kernel_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
-
-    printf("Kernel Select %s\n", aArg);
 
     KernelMap::iterator lIt;
 
@@ -812,8 +605,6 @@ void Kernel_SetCode(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Kernel SetCode %s\n", aArg);
-
     KernelMap::iterator lIt;
 
     char lFileName[64];
@@ -837,86 +628,12 @@ void Kernel_SetCode(KmsLib::ToolBase * aToolBase, const char * aArg)
     }
 }
 
-void Processor_Display(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-    assert(NULL != aArg);
-
-    printf("Processor Display %s\n", aArg);
-    printf("Processor Display\n");
-
-    if (NULL == sProcessor)
-    {
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "No processor selected");
-        return;
-    }
-
-    OpenNet::Status lStatus = sProcessor->Display(stdout);
-    assert(OpenNet::STATUS_OK == lStatus);
-}
-
-void Processor_List(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-	assert(NULL != aArg);
-
-	printf("Processor List %s\n", aArg);
-	printf("Processor List\n");
-
-	unsigned int lCount = sSystem->Processor_GetCount();
-	for (unsigned int i = 0; i < lCount; i++)
-	{
-		printf("Processor %u of %u : %s\n", i, lCount, sSystem->Processor_Get(i)->GetName());
-	}
-
-    KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Processor listed");
-}
-
-void Processor_Select(KmsLib::ToolBase * aToolBase, const char * aArg)
-{
-	assert(NULL != aArg);
-
-	printf("Processor Select %s", aArg);
-
-	unsigned int lIndex;
-
-	switch (sscanf_s(aArg, "%u", &lIndex))
-	{
-	case 1:
-		printf("Processor Select %u\n", lIndex);
-
-		unsigned int lCount;
-
-		lCount = sSystem->Processor_GetCount();
-		if (lCount <= lIndex)
-		{
-		    KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid index");
-            return;
-		}
-
-        sProcessor = sSystem->Processor_Get(lIndex);
-		assert(NULL != sProcessor );
-
-		KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "Processor selected");
-		break;
-
-	default:
-		KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "Invalid argument");
-	}
-}
-
 void Stop(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     assert(NULL != aArg);
 
-    printf("Stop %s\n", aArg);
-    printf("Stop\n");
-
-    OpenNet::Status lStatus = sSystem->Stop();
-    if (OpenNet::STATUS_OK != lStatus)
-    {
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System::Stop failed");
-        OpenNet::Status_Display(lStatus, stdout);
-        return;
-    }
+    OpenNet::Status lStatus = gSystem->Stop();
+    UTL_VERIFY_STATUS("OpenNet::System::Stop() failed");
 
     KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System stopped");
 }
@@ -928,13 +645,8 @@ void Start(KmsLib::ToolBase * aToolBase, const char * aArg)
     printf("Start %s\n", aArg);
     printf("Start\n");
 
-    OpenNet::Status lStatus = sSystem->Start(0);
-    if (OpenNet::STATUS_OK != lStatus)
-    {
-        KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System::Start failed");
-        OpenNet::Status_Display(lStatus, stdout);
-        return;
-    }
+    OpenNet::Status lStatus = gSystem->Start(0);
+    UTL_VERIFY_STATUS("OpenNet::System::Start(  ) failed");
 
     KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_OK, "System started");
 }
@@ -959,8 +671,8 @@ void System_Connect()
 {
     printf("Connecting...\n");
 
-    sSystem = OpenNet::System::Create();
-    if (NULL == sSystem)
+    gSystem = OpenNet::System::Create();
+    if (NULL == gSystem)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_FATAL_ERROR, "OpenNet::System::Create() failed");
         exit(__LINE__);

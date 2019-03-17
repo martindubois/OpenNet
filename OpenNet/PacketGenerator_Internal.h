@@ -33,16 +33,18 @@ public:
 
     virtual ~PacketGenerator_Internal();
 
-    virtual OpenNet::Status GetConfig (Config * aOut) const;
-    virtual OpenNet::Status SetAdapter(OpenNet::Adapter * aAdapter);
-    virtual OpenNet::Status SetConfig (const Config & aConfig);
-    virtual OpenNet::Status Display   (FILE * aOut);
-    virtual OpenNet::Status Start     ();
-    virtual OpenNet::Status Stop      ();
+    virtual OpenNet::Status GetConfig  (Config * aOut) const;
+    virtual OpenNet::Status ResetConfig();
+    virtual OpenNet::Status SetAdapter (OpenNet::Adapter * aAdapter);
+    virtual OpenNet::Status SetConfig  (const Config & aConfig);
+    virtual OpenNet::Status Display    (FILE * aOut);
+    virtual OpenNet::Status Start      ();
+    virtual OpenNet::Status Stop       ();
 
 private:
 
     void            Config_Apply   (const Config & aConfig);
+    void            Config_Reset   ();
     void            Config_Update  ();
     OpenNet::Status Config_Validate(const Config & aConfig);
 

@@ -126,8 +126,18 @@ namespace OpenNet
         /// \endcond
         /// \retval  STATUS_OK
         /// \retval  STATUS_NOT_ALLOWER_NULL_ARGUMENT
-        /// \sa      SetConfig
+        /// \sa      ResetConfig, SetConfig
         virtual Status GetConfig(Config * aOut) const = 0;
+
+        /// \cond en
+        /// \brief   Reset the configuration of the PacketGenerator
+        /// \endcond
+        /// \cond fr
+        /// \brief   R&eacute;initialise la configuration du PacketGenerator
+        /// \endcond
+        /// \retval  STATUS_OK
+        /// \sa      GetConfig, SetConfig
+        virtual Status ResetConfig() = 0;
 
         /// \cond en
         /// \brief   Connect an Adapter to the PacketGenerator
@@ -150,7 +160,7 @@ namespace OpenNet
         /// \endcond
         /// \retval  STATUS_OK
         /// \retval  STATUS_INVALID_REFERENCE
-        /// \sa      GetConfig
+        /// \sa      GetConfig, ResetConfig
         virtual Status SetConfig(const Config & aConfig) = 0;
 
         /// \cond en
