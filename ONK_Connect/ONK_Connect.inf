@@ -1,0 +1,81 @@
+
+; Author     KMS - Martin Dubois, ing.
+; Copyright  (C) 2019 KMS. All rights reserved.
+; Product    OpenNet
+; File       ONK_Connect/ONK_Connect.inf
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = Net
+ClassGuid   = {4d36e972-e325-11ce-bfc1-08002be10318}
+Provider    = %String_Provider%
+DriverVer   =
+CatalogFile = ONK_Connect.cat
+
+[Manufacturer]
+%String_Manufacturer% = Standard, NTamd64
+
+[Standard.NTamd64]
+%String_Device% = ONK_Connect.ndi, root\ONK_Connect
+
+[ONK_Connect.ndi]
+Characteristics    = 0x1
+*IfType            = 0x6
+*MediaType         = 0x0
+*PhysicalMediaType = 14
+AddReg             = ONK_Connect.ndi.AddReg
+CopyFiles          = ONK_Connect.ndi.CopyFiles
+
+[ONK_Connect.ndi.Services]
+AddService = ONK_Connect, 2, ONK_Connect.ndi.Service, ONK_Connect.ndi.EventLog
+
+[ONK_Connect.ndi.AddReg]
+HKR,                                 , BusNumber , 0, "0"
+HKR, Ndi                             , Service   , 0, "ONK_Connect"
+HKR, Ndi\Interfaces                  , UpperRange, 0, "ndis5"
+HKR, Ndi\Interfaces                  , LowerRange, 0, "ethernet"
+HKR, Ndi\Params\*EthernetAddress_High, Default   , 0, "35243"
+HKR, Ndi\Params\*EthernetAddress_High, Max       , 0, "65535"
+HKR, Ndi\Params\*EthernetAddress_High, Min       , 0, "1"
+HKR, Ndi\Params\*EthernetAddress_High, ParamDesc , 0, %String_Param_EthernetAddress_High%
+HKR, Ndi\Params\*EthernetAddress_High, Type      , 0, dword
+HKR, Ndi\Params\*EthernetAddress_Low , Default   , 0, "19088743"
+HKR, Ndi\Params\*EthernetAddress_Low , Max       , 0, "4294967295"
+HKR, Ndi\Params\*EthernetAddress_Low , Min       , 0, "1"
+HKR, Ndi\Params\*EthernetAddress_Low , ParamDesc , 0, %String_Param_EthernetAddress_Low%
+HKR, Ndi\Params\*EthernetAddress_Low , Type      , 0, dword
+
+[ONK_Connect.ndi.CopyFiles]
+ONK_Connect.sys, , , 2
+
+[ONK_Connect.ndi.Service]
+DisplayName   = %String_Service%
+ServiceType   = 1
+StartType     = 3
+ErrorControl  = 1
+ServiceBinary = %12%\ONK_Connect.sys
+
+[ONK_Connect.ndi.EventLog]
+AddReg = ONK_Connect.ndi.EventLog.AddReg
+
+[ONK_Connect.ndi.EventLog.AddReg]
+HKR, , EventMessageFile, 0x00020000, "%%SystemRoot%%\System32\ONK_Connect.sys"
+HKR, , TypesSupported  , 0x00010001, 7
+
+[SourceDisksNames]
+1 = %String_Disk%, , , ""
+
+[SourceDisksFiles]
+ONK_Connect.sys = 1, ,
+
+[DestinationDirs]
+ONK_Connect.ndi.CopyFiles = 12
+
+[Strings]
+String_Device                     = "OpenNet - Connect"
+String_Disk                       = "OpenNet Installation Disk"
+String_Manufacturer               = "KMS"
+String_Param_EthernetAddress_High = "Ethernet Address (High)"
+String_Param_EthernetAddress_Low  = "Ethernet Address (Low)"
+String_Provider                   = "KMS"
+String_Service                    = "OpenNet - Connect"
