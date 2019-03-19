@@ -49,7 +49,7 @@ protected:
         TX_DESCRIPTOR_QTY = 32 * 1024,
     };
 
-    Intel();
+    Intel(OpenNetK::Adapter_Type aType);
 
     void MulticastArray_Clear_Zone0();
 

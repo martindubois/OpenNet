@@ -329,15 +329,19 @@ namespace OpenNetK
         (*aIn_XA) = (*aOut_XA) + aSize_byte;
     }
 
-    Hardware::Hardware() : mAdapter(NULL), mZone0(NULL)
+    Hardware::Hardware(OpenNetK::Adapter_Type aType, unsigned int aPacketSize_byte) : mAdapter(NULL), mZone0(NULL)
     {
+        ASSERT(OpenNetK::ADAPTER_TYPE_UNKNOWN != aType           );
+        ASSERT(PACKET_SIZE_MAX_byte           >= aPacketSize_byte);
+        ASSERT(PACKET_SIZE_MIN_byte           <= aPacketSize_byte);
+
         memset(&mConfig, 0, sizeof(mConfig));
         memset(&mInfo  , 0, sizeof(mInfo  ));
 
-        mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
+        mConfig.mPacketSize_byte = aPacketSize_byte;
 
-        mInfo.mAdapterType     = ADAPTER_TYPE_ETHERNET;
-        mInfo.mPacketSize_byte = PACKET_SIZE_MAX_byte ;
+        mInfo.mAdapterType     = aType           ;
+        mInfo.mPacketSize_byte = aPacketSize_byte;
 
         mInfo.mVersion_Driver.mMajor         = VERSION_MAJOR;
         mInfo.mVersion_Driver.mMinor         = VERSION_MINOR;

@@ -17,35 +17,23 @@
       <UniqueIdentifier>{8E41214B-6785-4CFE-B992-037D68949A14}</UniqueIdentifier>
       <Extensions>inf;inv;inx;mof;mc;</Extensions>
     </Filter>
-    <Filter Include="_DocUser">
-      <UniqueIdentifier>{d441608a-9109-448c-bcdc-f7367f6b3591}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="ONK_Pro1000.inf">
+    <Inf Include="ONK_Tunnel_IO.inf">
       <Filter>Driver Files</Filter>
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Device.cpp">
+    <ClCompile Include="Driver_WDF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Driver.cpp">
+    <ClCompile Include="Device_WDF.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VirtualHardware.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Queue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Intel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Intel_82576.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Intel_82599.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Driver_Linux.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,46 +41,17 @@
     <ClInclude Include="Component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Device.h">
+    <ClInclude Include="Device_WDF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Intel_Regs.h">
+    <ClInclude Include="VirtualHardware.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Intel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Intel_82576_Regs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Intel_82576.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Intel_82599_Regs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Intel_82599.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Regs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\Common\Version.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="kdfile_debug" />
-    <None Include="kdfile_release" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="_DocUser\ReadMe.txt">
-      <Filter>_DocUser</Filter>
-    </Text>
   </ItemGroup>
 </Project>

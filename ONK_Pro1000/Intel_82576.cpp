@@ -25,7 +25,7 @@ namespace Intel_82576
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    Intel_82576::Intel_82576() : mBAR1_82576_MA(NULL)
+    Intel_82576::Intel_82576() : Intel(OpenNetK::ADAPTER_TYPE_HARDWARE_1G), mBAR1_82576_MA(NULL)
     {
         ASSERT(0x0e02c == sizeof(BAR1));
 

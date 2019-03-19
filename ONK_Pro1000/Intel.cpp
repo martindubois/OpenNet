@@ -14,6 +14,10 @@
 #define __CLASS__     "Intel::"
 #define __NAMESPACE__ ""
 
+// TODO  ONK_Hardware
+//       Normal (Feature) - Create a library for all network adapter code
+//       with a factory.
+
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
@@ -404,7 +408,7 @@ void Intel::Statistics_Reset()
 // Protected
 /////////////////////////////////////////////////////////////////////////////
 
-Intel::Intel()
+Intel::Intel(OpenNetK::Adapter_Type aType) : Hardware(aType, PACKET_SIZE_byte)
 {
     // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
@@ -412,10 +416,6 @@ Intel::Intel()
     ASSERT(       4 == sizeof( Intel_DeviceControl ) );
     ASSERT(      16 == sizeof( Intel_Rx_Descriptor ) );
     ASSERT(      16 == sizeof( Intel_Tx_Descriptor ) );
-
-    mConfig.mPacketSize_byte = PACKET_SIZE_byte;
-
-    mInfo.mPacketSize_byte = PACKET_SIZE_byte;
 
     mInfo.mCommonBufferSize_byte += (PACKET_SIZE_byte * PACKET_BUFFER_QTY); // Packet buffers
     mInfo.mCommonBufferSize_byte += (mInfo.mCommonBufferSize_byte / OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte) * PACKET_SIZE_byte; // Skip 64 KB boundaries

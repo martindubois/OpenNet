@@ -1,0 +1,85 @@
+
+; Author     KMS - Martin Dubois, ing.
+; Copyright  (c) 2019 KMS. All rights reserved.
+; Product    OpenNet
+; File       ONK_Pro1000/ONK_Pro1000.inf
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = OpenNetAdapter
+ClassGuid   = {36576B2C-E9F4-4671-A8EF-4BFB46CDD122}
+Provider    = %String_Manufacturer%
+CatalogFile = ONK_Tunnel_IO.cat
+DriverVer   = 05/02/2018,0.0.0.0
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %String_Disk%, , , ""
+
+[SourceDisksFiles]
+ONK_Tunnel_IO.sys = 1 , ,
+
+; ===== Class ===============================================================
+
+[ClassInstall32]
+Addreg = ClassReg
+
+[ClassReg]
+HKR, , ,0 , %String_Class%
+HKR, , Icon, , -5
+HKR, , Security, , "D:P(A;;GA;;;SY)(A;;GA;;;BA)(A;;GA;;;AU)"
+
+; ===== Device list =========================================================
+
+[Manufacturer]
+%String_Manufacturer% = Standard, NTamd64
+
+[Standard.NTamd64]
+%String_Device% = Device, ROOT\OpenNet_Tunnel_IO
+
+; ===== Device ==============================================================
+
+[Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+ONK_Tunnel_IO.sys
+
+; ===== Service =============================================================
+
+[Device.NT.Services]
+AddService = ONK_Tunnel_IO, 0x00000002, ONK_Tunnel_IO_Service_Inst
+
+[ONK_Tunnel_IO_Service_Inst]
+DisplayName    = %String_Service%
+ServiceType    = 1
+StartType      = 3
+ErrorControl   = 1
+ServiceBinary  = %12%\ONK_Tunnel_IO.sys
+
+; ===== CoInstaller =========================================================
+
+[Device.NT.CoInstallers]
+AddReg    = Device_CoInstaller_AddReg
+
+[Device_CoInstaller_AddReg]
+HKR, , CoInstallers32, 0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+; ===== WDF =================================================================
+
+[Device.NT.Wdf]
+KmdfService = ONK_Tunnel_IO, Device_wdfsect
+
+[Device_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+; ===== Strings =============================================================
+
+[Strings]
+String_Class        = "OpenNetAdapter"
+String_Device       = "ONK_Tunnel_IO Device"
+String_Disk         = "OpenNet Installation Disk"
+String_Manufacturer = "KMS"
+String_Service      = "ONK_Tunnel_IO Service"

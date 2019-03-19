@@ -18,7 +18,8 @@ namespace OpenNetK
 {
 
     /// \cond en
-    /// \brief  This structure is used to pass the information about a buffer.
+    /// \brief  This structure is used to pass the information about a
+    ///         buffer.
     /// \note   This data type is part of the Driver Development Kit (DDK).
     /// \todo   Document members of OpenNetK::Buffer
     /// \endcond
@@ -76,9 +77,7 @@ namespace OpenNetK
     IPv4Address;
 
     // TODO OpenNetK.Adapter_Types
-    //      High (Feature) - Ajouter des informations : debug/release, date
-    //      et heure de compilation, nom du client, type de licence, nombre
-    //      de licences
+    //      Normal (Feature) - Ajouter des informations : debug/release
 
     /// \cond en
     /// \brief  This structure is used to return the version of a component.
@@ -122,11 +121,28 @@ namespace OpenNetK
     /// \endcond
     typedef enum
     {
-        ADAPTER_TYPE_UNKNOWN ,
-        ADAPTER_TYPE_ETHERNET,
-        ADAPTER_TYPE_NDIS    ,
+        ADAPTER_TYPE_UNKNOWN = 0,
 
-        ADAPTER_TYPE_QTY
+        ADAPTER_TYPE_CONNECT = 0x00000001,
+        ADAPTER_TYPE_NULL    = 0x00000002,
+
+        ADAPTER_TYPE_HARDWARE     = 0x00000700,
+        ADAPTER_TYPE_HARDWARE_1G  = 0x00000100,
+        ADAPTER_TYPE_HARDWARE_10G = 0x00000200,
+        ADAPTER_TYPE_HARDWARE_40G = 0x00000400,
+
+        ADAPTER_TYPE_TUNNEL      = 0x00070000,
+        ADAPTER_TYPE_TUNNEL_FILE = 0x00010000,
+        ADAPTER_TYPE_TUNNEL_IO   = 0x00020000,
+        ADAPTER_TYPE_TUNNEL_TCP  = 0x00040000,
+
+        ADAPTER_TYPE_USER   = 0x0f000000,
+        ADAPTER_TYPE_USER_0 = 0x01000000,
+        ADAPTER_TYPE_USER_1 = 0x02000000,
+        ADAPTER_TYPE_USER_2 = 0x04000000,
+        ADAPTER_TYPE_USER_3 = 0x08000000,
+
+        ADAPTER_TYPE_ALL = 0x0f070703
     }
     Adapter_Type;
 
@@ -156,7 +172,8 @@ namespace OpenNetK
 
     // TODO  OpenNetK.Adapter
     //       Normal (Feature) - Ajouter la largeur de lien PCIe et la
-    //       generation a l'information
+    //       generation a l'information. Ajouter aussi la vitesse maximum du
+    //       lien.
 
     /// \cond en
     /// \brief  This structure is used to return the information about an

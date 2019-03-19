@@ -106,7 +106,7 @@ KMS_TEST_BEGIN(Adapter_SetupA)
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mAdapter->GetInfo(NULL));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , lSetup.mAdapter->GetInfo(&lI0));
 
-    KMS_TEST_COMPARE(OpenNetK::ADAPTER_TYPE_ETHERNET, lI0.mAdapterType);
+    KMS_TEST_COMPARE(OpenNetK::ADAPTER_TYPE_HARDWARE, lI0.mAdapterType);
 
     KMS_TEST_COMPARE(false, OpenNet::EthernetAddress_IsBroadcast(lI0.mEthernetAddress));
     KMS_TEST_COMPARE(false, OpenNet::EthernetAddress_IsMulticast(lI0.mEthernetAddress));

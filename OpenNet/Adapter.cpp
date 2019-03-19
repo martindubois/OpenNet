@@ -37,13 +37,6 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-static const char * ADAPTER_TYPE_NAMES[OpenNetK::ADAPTER_TYPE_QTY] =
-{
-    "UNKNOWN" ,
-    "ETHERNET",
-    "NDIS"    ,
-};
-
 const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS[] =
 {
     { "OpenNet::Adapter - BUFFER_ALLOCATED         ", "", 0 }, //  0
@@ -203,6 +196,8 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
 
+static const char * GetAdapterTypeName(OpenNetK::Adapter_Type aType);
+
 namespace OpenNet
 {
 
@@ -243,16 +238,7 @@ namespace OpenNet
         if (NULL ==   aOut)	{ return STATUS_NOT_ALLOWED_NULL_ARGUMENT; }
 
         fprintf(aOut, "  Adapter::Info :\n");
-
-        if ((0 <= aIn.mAdapterType) && (OpenNetK::ADAPTER_TYPE_QTY > aIn.mAdapterType))
-        {
-            fprintf(aOut, "    Adapter Type       = %u - %s\n", aIn.mAdapterType, ADAPTER_TYPE_NAMES[aIn.mAdapterType]);
-        }
-        else
-        {
-            fprintf(aOut, "    Adapter Type       = %u - ERROR  Invalid value\n", aIn.mAdapterType);
-        }
-
+        fprintf(aOut, "    Adapter Type       = %u - %s\n" , aIn.mAdapterType, GetAdapterTypeName(aIn.mAdapterType));
         fprintf(aOut, "    Comment            = %s\n"      , aIn.mComment);
         fprintf(aOut, "    Common Buffer Size = %u bytes\n", aIn.mCommonBufferSize_byte);
 
@@ -319,4 +305,38 @@ namespace OpenNet
     {
     }
 
+}
+
+// Static functions
+/////////////////////////////////////////////////////////////////////////////
+
+const char * GetAdapterTypeName(OpenNetK::Adapter_Type aType)
+{
+    switch (aType)
+    {
+    case OpenNetK::ADAPTER_TYPE_ALL         : return "ALL"         ;
+    case OpenNetK::ADAPTER_TYPE_CONNECT     : return "CONNECT"     ;
+    case OpenNetK::ADAPTER_TYPE_HARDWARE    : return "HARDWARE"    ;
+    case OpenNetK::ADAPTER_TYPE_HARDWARE_1G : return "HARDWARE_1G" ;
+    case OpenNetK::ADAPTER_TYPE_HARDWARE_10G: return "HARDWARE_10G";
+    case OpenNetK::ADAPTER_TYPE_HARDWARE_40G: return "HARDWARE_40G";
+    case OpenNetK::ADAPTER_TYPE_NULL        : return "NULL"        ;
+    case OpenNetK::ADAPTER_TYPE_TUNNEL      : return "TUNNEL"      ;
+    case OpenNetK::ADAPTER_TYPE_TUNNEL_FILE : return "TUNNEL_FILE" ;
+    case OpenNetK::ADAPTER_TYPE_TUNNEL_IO   : return "TUNNEL_IO"   ;
+    case OpenNetK::ADAPTER_TYPE_TUNNEL_TCP  : return "TUNNEL_TCP"  ;
+    case OpenNetK::ADAPTER_TYPE_UNKNOWN     : return "UNKNOWN"     ;
+    case OpenNetK::ADAPTER_TYPE_USER        : return "USER"        ;
+    case OpenNetK::ADAPTER_TYPE_USER_0      : return "USER_0"      ;
+    case OpenNetK::ADAPTER_TYPE_USER_1      : return "USER_1"      ;
+    case OpenNetK::ADAPTER_TYPE_USER_2      : return "USER_2"      ;
+    case OpenNetK::ADAPTER_TYPE_USER_3      : return "USER_3"      ;
+    }
+
+    if (0 == (aType & OpenNetK::ADAPTER_TYPE_ALL))
+    {
+        return "Multiple";
+    }
+
+    return "ERROR  Invalid adapter type";
 }

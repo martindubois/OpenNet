@@ -25,7 +25,7 @@ namespace Intel_82599
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    Intel_82599::Intel_82599() : mBAR1_82599_MA(NULL)
+    Intel_82599::Intel_82599() : Intel(OpenNetK::ADAPTER_TYPE_HARDWARE_10G), mBAR1_82599_MA(NULL)
     {
         ASSERT(INTEL_82599_BAR1_SIZE == sizeof(BAR1));
 

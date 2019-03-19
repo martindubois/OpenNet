@@ -7,18 +7,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== WDM ================================================================
-
-#define INITGUID
-
-#include <ntddk.h>
-
-// ===== WDF ================================================================
-#include <wdf.h>
+#include "Component.h"
 
 // ===== Includes ===========================================================
-#include <OpenNetK/StdInt.h>
-
 #include <OpenNetK/Hardware.h>
 
 #include <OpenNetK/Hardware_WDF.h>
@@ -58,8 +49,13 @@ namespace OpenNetK
     // Public
     /////////////////////////////////////////////////////////////////////////
 
+    // NOT TESTED  Driver.LoadUnlock
+    //             WdfDmaEnablerCreate fails<br>
+    //             WdfCommonBufferCreate fail<br>
     NTSTATUS Hardware_WDF::Init(WDFDEVICE aDevice, Hardware * aHardware)
     {
+        DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
+
         ASSERT(NULL != aDevice  );
         ASSERT(NULL != aHardware);
 
@@ -111,19 +107,26 @@ namespace OpenNetK
                     memset((void *)(lVirtualAddress), 0, lSize_byte); // volatile_cast
 
                     mHardware->SetCommonBuffer(lLogicalAddress.QuadPart, lVirtualAddress);
-
-                    InitTimer();
-                    InitWorkItem();
                 }
             }
         }
 
+        if (STATUS_SUCCESS == lResult)
+        {
+            InitTimer   ();
+            InitWorkItem();
+        }
+
+        DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ " - End" DEBUG_EOL);
         return lResult;
     }
 
     NTSTATUS Hardware_WDF::D0Entry(WDF_POWER_DEVICE_STATE aPreviousState)
     {
-        ASSERT(NULL != mTimer);
+        DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "(  )" DEBUG_EOL);
+
+        ASSERT(NULL != mHardware);
+        ASSERT(NULL != mTimer   );
 
         (void)(aPreviousState);
 
@@ -132,6 +135,8 @@ namespace OpenNetK
         BOOLEAN lRetB = WdfTimerStart(mTimer, 1000);
         ASSERT(!lRetB);
         (void)(lRetB);
+
+        DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ " - OK" DEBUG_EOL);
 
         return STATUS_SUCCESS;
     }
@@ -153,6 +158,8 @@ namespace OpenNetK
     //             PrepareInterrupt or PrepareMemory fail
     NTSTATUS Hardware_WDF::PrepareHardware(WDFCMRESLIST aRaw, WDFCMRESLIST aTranslated)
     {
+        DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ "( ,  )" DEBUG_EOL);
+
         ASSERT(NULL != aRaw       );
         ASSERT(NULL != aTranslated);
 
@@ -179,6 +186,8 @@ namespace OpenNetK
                 break;
             }
         }
+
+        DbgPrintEx(DEBUG_ID, DEBUG_ENTRY_POINT, PREFIX __FUNCTION__ " - End" DEBUG_EOL);
 
         return lResult;
     }
@@ -267,9 +276,10 @@ namespace OpenNetK
     //                1 / hardware interrupt + 1 / tick
     void Hardware_WDF::TrigProcess2()
     {
-        ASSERT(NULL != mInterrupt);
-
-        WdfInterruptQueueDpcForIsr(mInterrupt);
+        if (NULL != mInterrupt)
+        {
+            WdfInterruptQueueDpcForIsr(mInterrupt);
+        }
     }
 
     // CRITICAL PATH  Interrupt

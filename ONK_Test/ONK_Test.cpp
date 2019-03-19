@@ -22,12 +22,18 @@ KMS_TEST_GROUP_LIST_BEGIN
     KMS_TEST_GROUP_LIST_ENTRY("Setup-B")
 KMS_TEST_GROUP_LIST_END
 
-extern int Device_SetupA();
-extern int Device_SetupB();
+extern int Device_SetupA          ();
+extern int Device_Hardware_SetupA ();
+extern int Device_Tunnel_SetupA   ();
+extern int Device_Tunnel_IO_SetupA();
+extern int Device_SetupB          ();
 
 KMS_TEST_LIST_BEGIN
-    KMS_TEST_LIST_ENTRY(Device_SetupA, "Device - Setup A", 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
-    KMS_TEST_LIST_ENTRY(Device_SetupB, "Device - Setup B", 2, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(Device_SetupA          , "Device - Setup A"             , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(Device_Hardware_SetupA , "Device - Hardware - SetupA"   , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(Device_Tunnel_SetupA   , "Device - Tunnel - SetupA"     , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(Device_Tunnel_IO_SetupA, "Device - Tunnel - IO - SetupA", 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
+    KMS_TEST_LIST_ENTRY(Device_SetupB          , "Device - Setup B"             , 2, KMS_TEST_FLAG_INTERACTION_NEEDED)
 KMS_TEST_LIST_END
 
 KMS_TEST_MAIN

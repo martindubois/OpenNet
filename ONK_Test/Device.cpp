@@ -103,15 +103,8 @@ KMS_TEST_BEGIN(Device_SetupA)
     // ===== IOCTL_INFO_GET =================================================
     KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_INFO_GET, NULL, 0, NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR ) );
 
-    // ====== IOCTL_PACKET_SEND =============================================
-
     // ====== IOCTL_PACKET_SEND_EX ==========================================
     KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_PACKET_SEND_EX, NULL, 0, NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR ) );
-
-    lPacketSendExIn->mRepeatCount = 1;
-    lPacketSendExIn->mSize_byte   = sizeof( lBuffer ) - sizeof(IoCtl_Packet_Send_Ex_In );
-
-    lDH0.Control( IOCTL_PACKET_SEND_EX, lPacketSendExIn, sizeof( lBuffer ), NULL, 0 );
 
     // ===== IOCTL_START ====================================================
     KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_START, NULL, 0, NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR ) );
@@ -126,9 +119,6 @@ KMS_TEST_BEGIN(Device_SetupA)
 
     // ===== IOCTL_STOP =====================================================
     KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_STOP, NULL, 0, NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR ) );
-
-    // ===== IOCTL_PACKET_DROP ==============================================
-    lDH0.Control( IOCTL_PACKET_DROP, NULL, 0, NULL, 0 );
 
     // ===== IOCTL_PACKET_GENERATOR_CONFIG_GET ==============================
     KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_PACKET_GENERATOR_CONFIG_GET, NULL, 0, NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR ) );
@@ -153,6 +143,93 @@ KMS_TEST_BEGIN(Device_SetupA)
     KmsLib::ThreadBase::Sleep_ms( 200 );
 
     lDH0.Control( IOCTL_PACKET_GENERATOR_STOP , NULL, 0, NULL, 0 );
+}
+KMS_TEST_END_2
+
+KMS_TEST_BEGIN(Device_Hardware_SetupA)
+{
+    uint8_t                          lBuffer[1024];
+    KmsLib::DriverHandle             lDH0;
+    IoCtl_Packet_Send_Ex_In        * lPacketSendExIn = reinterpret_cast<IoCtl_Packet_Send_Ex_In *>(lBuffer);
+
+    memset( & lBuffer      , 0xff, sizeof( lBuffer                 ) );
+    memset( lPacketSendExIn,    0, sizeof( IoCtl_Packet_Send_Ex_In ) );
+
+    #ifdef _KMS_LINUX_
+        lDH0.Connect("/dev/OpenNet0", O_RDWR);
+    #endif
+
+    #ifdef _KMS_WINDOWS_
+        lDH0.Connect(OPEN_NET_DRIVER_INTERFACE, 0, GENERIC_ALL, 0);
+    #endif
+
+    // ====== IOCTL_PACKET_SEND_EX ==========================================
+
+    lPacketSendExIn->mRepeatCount = 1;
+    lPacketSendExIn->mSize_byte   = sizeof( lBuffer ) - sizeof(IoCtl_Packet_Send_Ex_In );
+
+    lDH0.Control(IOCTL_PACKET_SEND_EX, lPacketSendExIn, sizeof(lBuffer), NULL, 0);
+
+    // ===== IOCTL_PACKET_DROP ==============================================
+    lDH0.Control(IOCTL_PACKET_DROP, NULL, 0, NULL, 0);
+}
+KMS_TEST_END_2
+
+KMS_TEST_BEGIN(Device_Tunnel_SetupA)
+{
+    uint8_t                          lBuffer[1024];
+    KmsLib::DriverHandle             lDH0;
+    IoCtl_Packet_Send_Ex_In        * lPacketSendExIn = reinterpret_cast<IoCtl_Packet_Send_Ex_In *>(lBuffer);
+
+    memset( & lBuffer      , 0xff, sizeof( lBuffer                 ) );
+    memset( lPacketSendExIn,    0, sizeof( IoCtl_Packet_Send_Ex_In ) );
+
+    #ifdef _KMS_LINUX_
+        lDH0.Connect("/dev/OpenNet0", O_RDWR);
+    #endif
+
+    #ifdef _KMS_WINDOWS_
+        lDH0.Connect(OPEN_NET_DRIVER_INTERFACE, 0, GENERIC_ALL, 0);
+    #endif
+
+    // ====== IOCTL_PACKET_SEND_EX ==========================================
+
+    lPacketSendExIn->mRepeatCount = 1;
+    lPacketSendExIn->mSize_byte   = sizeof( lBuffer ) - sizeof(IoCtl_Packet_Send_Ex_In );
+
+    KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_PACKET_SEND_EX, lPacketSendExIn, sizeof(lBuffer), NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR ) );
+
+    // ===== IOCTL_PACKET_DROP ==============================================
+    KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_PACKET_DROP, NULL, 0, NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR) );
+}
+KMS_TEST_END_2
+
+// TEST INFO  ONK_Tunnel_IO.Read.ErrorHandling
+//            Buffer too small
+
+// TEST INFO  ONK_Tunnel_IO.Read
+//            Read when no data is waiting
+
+KMS_TEST_BEGIN(Device_Tunnel_IO_SetupA)
+{
+    uint8_t              lBuffer[1024];
+    KmsLib::DriverHandle lDH0;
+    DWORD                lInfo_byte;
+
+    memset(&lBuffer, 0, sizeof(lBuffer));
+
+    #ifdef _KMS_LINUX_
+        lDH0.Connect("/dev/OpenNet0", O_RDWR);
+    #endif
+
+    #ifdef _KMS_WINDOWS_
+        lDH0.Connect(OPEN_NET_DRIVER_INTERFACE, 0, GENERIC_ALL, 0);
+    #endif
+
+    KMS_TEST_ASSERT(!ReadFile(lDH0, lBuffer, 1, &lInfo_byte, NULL));
+
+    KMS_TEST_ASSERT(ReadFile(lDH0, lBuffer, sizeof(lBuffer), &lInfo_byte, NULL));
+    KMS_TEST_COMPARE(0, lInfo_byte);
 }
 KMS_TEST_END_2
 
