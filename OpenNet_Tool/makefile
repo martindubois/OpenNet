@@ -12,8 +12,13 @@ LIBRARIES = ../Binaries/OpenNet.so ../Libraries/TestLib.a $(KMS_LIB_A)
 
 OUTPUT = ../Binaries/OpenNet_Tool
 
-SOURCES =	OpenNet_Tool.cpp \
-            Test.cpp
+SOURCES =	Adapter.cpp         \
+			Globals.cpp         \
+			OpenNet_Tool.cpp    \
+			PacketGenerator.cpp \
+			Processor.cpp       \
+            Test.cpp            \
+			Utils.cpp
 
 # ===== Rules / Regles ======================================================
 

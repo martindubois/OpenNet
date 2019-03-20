@@ -214,22 +214,32 @@ KMS_TEST_BEGIN(Device_Tunnel_IO_SetupA)
 {
     uint8_t              lBuffer[1024];
     KmsLib::DriverHandle lDH0;
-    DWORD                lInfo_byte;
 
     memset(&lBuffer, 0, sizeof(lBuffer));
 
     #ifdef _KMS_LINUX_
+
         lDH0.Connect("/dev/OpenNet0", O_RDWR);
+
+        KMS_TEST_ASSERT(0 > read(lDH0, lBuffer, 1));
+
+        KMS_TEST_ASSERT(0 == read(lDH0, lBuffer, sizeof(lBuffer)));
+
     #endif
 
     #ifdef _KMS_WINDOWS_
+
         lDH0.Connect(OPEN_NET_DRIVER_INTERFACE, 0, GENERIC_ALL, 0);
+
+        DWORD lInfo_byte;
+
+        KMS_TEST_ASSERT(!ReadFile(lDH0, lBuffer, 1, &lInfo_byte, NULL));
+
+        KMS_TEST_ASSERT(ReadFile(lDH0, lBuffer, sizeof(lBuffer), &lInfo_byte, NULL));
+        KMS_TEST_COMPARE(0, lInfo_byte);
+
     #endif
 
-    KMS_TEST_ASSERT(!ReadFile(lDH0, lBuffer, 1, &lInfo_byte, NULL));
-
-    KMS_TEST_ASSERT(ReadFile(lDH0, lBuffer, sizeof(lBuffer), &lInfo_byte, NULL));
-    KMS_TEST_COMPARE(0, lInfo_byte);
 }
 KMS_TEST_END_2
 

@@ -15,6 +15,7 @@ mkdir OpenNet/Binaries
 mkdir OpenNet/Includes
 mkdir OpenNet/Includes/OpenNetK
 mkdir OpenNet/ONK_Pro1000
+mkdir OpenNet/ONK_Tunnel_IO
 mkdir OpenNet/Scripts
 mkdir OpenNet/Scripts/OpenNet_Tool
 

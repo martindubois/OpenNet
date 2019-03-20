@@ -45,7 +45,7 @@ static void Display(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void List   (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Select (KmsLib::ToolBase * aToolBase, const char * aArg);
 
-static const KmsLib::ToolBase::CommandInfo ADAPTER_COMMANDS[] =
+const KmsLib::ToolBase::CommandInfo ADAPTER_COMMANDS[] =
 {
     { "Display", Display, "Display"       , NULL         },
     { "Get"    , NULL   , "Get ..."       , GET_COMMANDS },

@@ -33,8 +33,9 @@ VirtualHardware::VirtualHardware() : Hardware(OpenNetK::ADAPTER_TYPE_TUNNEL, PAC
 {
     TRACE_DEBUG "VirtualHardware()" DEBUG_EOL TRACE_END;
 
-    strcpy(mInfo.mComment                , "ONK_Tunnel_IO");
-    strcpy(mInfo.mVersion_Driver.mComment, "ONK_Tunnel_IO");
+    strcpy(mInfo.mComment                  , "ONK_Tunnel_IO"    );
+    strcpy(mInfo.mVersion_Driver.mComment  , "ONK_Tunnel_IO"    );
+    strcpy(mInfo.mVersion_Hardware.mComment, "OpenNet Tunnel IO");
 }
 
 unsigned int VirtualHardware::Read(void * aOut, unsigned int aOutSize_byte)
@@ -55,7 +56,7 @@ unsigned int VirtualHardware::Read(void * aOut, unsigned int aOutSize_byte)
 
         while (mTx_In != mTx_Out)
         {
-            if (lSize_byte < (mTx_Size_byte[mTx_Out] + sizeof(OpenNetK::Tunnel_PacketHeader)))
+            if (lSize_byte < (mTx_Size_byte[mTx_Out] + sizeof(OpenNet_Tunnel_PacketHeader)))
             {
                 break;
             }
@@ -164,13 +165,13 @@ unsigned int VirtualHardware::CopyPacket_Zone0(uint8_t * aOut)
     uint8_t * lOut         = aOut;
     uint16_t  lResult_byte = mTx_Size_byte[mTx_Out];
 
-    OpenNetK::Tunnel_PacketHeader * lHeader = reinterpret_cast<OpenNetK::Tunnel_PacketHeader *>(lOut);
+    OpenNet_Tunnel_PacketHeader * lHeader = reinterpret_cast<OpenNet_Tunnel_PacketHeader *>(lOut);
 
     lHeader->mPacketSize_byte = lResult_byte;
     lHeader->mReserved0       = 0;
-    lHeader->mSyncCheck       = OpenNetK::SYNC_CHECK_VALUE;
+    lHeader->mSyncCheck       = OPEN_NET_SYNC_CHECK_VALUE;
 
-    lOut += sizeof(OpenNetK::Tunnel_PacketHeader);
+    lOut += sizeof(OpenNet_Tunnel_PacketHeader);
 
     if (0 < lResult_byte)
     {
@@ -187,5 +188,5 @@ unsigned int VirtualHardware::CopyPacket_Zone0(uint8_t * aOut)
 
     mTx_Out = (mTx_Out + 1) % TX_DESCRIPTOR_QTY;
 
-    return ( lResult_byte + sizeof(OpenNetK::Tunnel_PacketHeader) );
+    return ( lResult_byte + sizeof(OpenNet_Tunnel_PacketHeader) );
 }

@@ -32,3 +32,11 @@
 #define TRACE_ERROR printk( KERN_ERR   __NAMESPACE__ __CLASS__
 
 #define TRACE_END )
+
+// Global variable
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef __cplusplus
+    extern struct class * gOpenNet_Class      ;
+    extern unsigned int   gOpenNet_DeviceCount;
+#endif

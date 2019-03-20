@@ -41,7 +41,7 @@ typedef struct
 
     union
     {
-        Intel_82576              mIntel_82576;
+        Intel_82576::Intel_82576 mIntel_82576;
         Intel_82599::Intel_82599 mIntel_82599;
     };
 }
@@ -78,7 +78,7 @@ void DeviceCpp_Init( void * aThis, OpenNetK_OSDep * aOSDep, void * aAdapterLock,
 
     switch ( aDeviceId )
     {
-        case 0x10c9 : lThis->mHardware = new ( & lThis->mIntel_82576 )              Intel_82576(); break;
+        case 0x10c9 : lThis->mHardware = new ( & lThis->mIntel_82576 ) Intel_82576::Intel_82576(); break;
         case 0x10fb : lThis->mHardware = new ( & lThis->mIntel_82599 ) Intel_82599::Intel_82599(); break;
 
         default : ASSERT( false );

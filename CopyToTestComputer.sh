@@ -10,7 +10,7 @@ echo Excuting  CopyToTestComputer.sh  ...
 
 # ===== Configuration =======================================================
 
-TEST_COMPUTER=192.168.0.198
+TEST_COMPUTER=192.168.0.197
 
 # ===== Initialisation ======================================================
 
@@ -68,22 +68,28 @@ if [ 0 != $? ] ; then
     RESULT=8
 fi
 
+scp ONK_Tunnel_IO/ONK_Tunnel_IO.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Tunnel_IO
+if [ 0 != $? ] ; then
+    echo ERROR  scp ONK_Tunnel_IO/ONK_Tunnel_IO.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Tunnel_IO  failed - $?
+    RESULT=9
+fi
+
 scp Packages/kms-opennet-rt_0.0-0.deb $TEST_COMPUTER:$DST_FOLDER/Packages
 if [ 0 != $? ] ; then
     echo ERROR  scp Packages/kms-opennet-rt_0.0-0.deb $TEST_COMPUTER:$DST_FOLDER/Packages  failed - $?
-    RESULT=9
+    RESULT=10
 fi
 
 scp Scripts/Start.sh $TEST_COMPUTER:~
 if [ 0 != $? ] ; then
     echo ERROR  scp Scripts/Start.sh $TEST_COMPUTER:~  failed - $?
-    RESULT=10
+    RESULT=11
 fi
 
 scp Scripts/OpenNet_Tool/*.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool
 if [ 0 != $? ] ; then
     echo ERROR  scp Scripts/OpenNet_Tool/A00RRU_*_18.04.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool  failed - $?
-    RESULT=11
+    RESULT=12
 fi
 
 # ===== End =================================================================

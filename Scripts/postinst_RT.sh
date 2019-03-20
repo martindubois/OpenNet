@@ -21,10 +21,16 @@ if [ 0 != $? ] ; then
     exit 2
 fi
 
+echo ONK_Tunnel_IO >> /etc/modules
+if [ 0 != $? ] ; then
+    echo ERROR  Cannot edit /etc/modules
+    exit 3
+fi
+
 depmod
 if [ 0 != $? ] ; then
     echo ERROR  depmod  failed
-    exit 3
+    exit 4
 fi
 
 # ===== End =================================================================

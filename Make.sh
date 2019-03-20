@@ -37,12 +37,21 @@ if [ 0 != $? ] ; then
 fi
 cd ..
 
+echo Building ONK_Tunnel_IO ...
+cd ONK_Tunnel_IO
+make
+if [ 0 != $? ] ; then
+    echo ERROR  ONK_Tunnel_IO - make  failed
+    exit 4
+fi
+cd ..
+
 echo Building OpenNet ...
 cd OpenNet
 make
 if [ 0 != $? ] ; then
     echo ERROR  OpenNet - make  failed
-    exit 4
+    exit 5
 fi
 cd ..
 
@@ -51,7 +60,7 @@ cd OpenNet_Test
 make
 if [ 0 != $? ] ; then
     echo ERROR  OpenNet_Test - make  failed
-    exit 5
+    exit 6
 fi
 cd ..
 
@@ -60,7 +69,7 @@ cd TestLib
 make
 if [ 0 != $? ] ; then
     echo ERROR  TestLib - make  failed
-    exit 6
+    exit 7
 fi
 cd ..
 
@@ -69,7 +78,7 @@ cd OpenNet_Tool
 make
 if [ 0 != $? ] ; then
     echo ERROR  OpenNet_Tool - make  failed
-    exit 7
+    exit 8
 fi
 cd ..
 

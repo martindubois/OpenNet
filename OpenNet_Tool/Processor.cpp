@@ -30,7 +30,7 @@ static void Display(KmsLib::ToolBase * aToolBase, const char * aArg);
 static void List   (KmsLib::ToolBase * aToolBase, const char * aArg);
 static void Select (KmsLib::ToolBase * aToolBase, const char * aArg);
 
-static const KmsLib::ToolBase::CommandInfo PROCESSOR_COMMANDS[] =
+const KmsLib::ToolBase::CommandInfo PROCESSOR_COMMANDS[] =
 {
     { "Display", Display, "Display"       , NULL },
     { "List"   , List   , "List"          , NULL },

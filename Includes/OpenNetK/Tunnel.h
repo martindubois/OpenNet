@@ -4,29 +4,33 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright (C) 2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Tunnel.h
-/// \brief      OpenNetK::Tunnel_PacketHeader
+/// \brief      OpenNet_Tunnel_PacketHeader
 
 #pragma once
 
-namespace OpenNetK
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define OPEN_NET_SYNC_CHECK_VALUE (0xbef9)
+
+// Data type
+/////////////////////////////////////////////////////////////////////////////
+
+/// \cond en
+/// \brief  This structure is used as packet header into a tunnel.
+/// \todo   Document member of OpenNet_Tunnel_PacketHeader
+/// \endcond
+/// \cond fr
+/// \brief  Cette structure est utilis&eacute;e pour passer les informations
+///         au sujet d'un paquet dans un tunnel.
+/// \todo   Documenter les membres de OpenNet_Tunne_PacketHeader
+/// \endcond
+typedef struct
 {
+    uint16_t mSyncCheck;
 
-    // Constants
-    /////////////////////////////////////////////////////////////////////////
+    uint16_t mPacketSize_byte;
 
-    static const uint16_t SYNC_CHECK_VALUE = 0xbef9;
-
-    // Data type
-    /////////////////////////////////////////////////////////////////////////
-
-    typedef struct
-    {
-        uint16_t mSyncCheck;
-
-        uint16_t mPacketSize_byte;
-
-        uint32_t mReserved0;
-    }
-    Tunnel_PacketHeader;
-
+    uint32_t mReserved0;
 }
+OpenNet_Tunnel_PacketHeader;

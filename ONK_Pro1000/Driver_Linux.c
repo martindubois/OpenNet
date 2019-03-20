@@ -13,6 +13,10 @@
 #include <linux/module.h>
 #include <linux/pci.h>
 
+// ===== Includes ===========================================================
+#include <OpenNetK/Constants.h>
+#include <OpenNetK/Linux.h>
+
 // ===== ONK_Pro1000 ========================================================
 #include "Device_Linux.h"
 
@@ -31,7 +35,7 @@ static struct pci_device_id ID_TABLE[] =
 
 MODULE_DEVICE_TABLE( pci, ID_TABLE );
 
-#define NAME "ONK_Pro1000"
+#define MODULE_NAME "ONK_Pro1000"
 
 // Data type
 /////////////////////////////////////////////////////////////////////////////
@@ -45,10 +49,9 @@ DeviceInfo;
 
 typedef struct
 {
-    struct class * mClass      ;
-    dev_t          mDevice     ;
-    unsigned int   mDeviceCount;
-    DeviceInfo     mDevices[ DEVICE_COUNT_MAX ];
+    dev_t        mChrDev     ;
+    unsigned int mDeviceCount;
+    DeviceInfo   mDevices[ DEVICE_COUNT_MAX ];
 }
 DriverContext;
 
@@ -62,15 +65,24 @@ static int  __init Init  ( void );
 static int         Probe ( struct pci_dev * aDev, const struct pci_device_id * aId );
 static void        Remove( struct pci_dev * aDev );
 
+// Global variables
+/////////////////////////////////////////////////////////////////////////////
+
+struct class * gOpenNet_Class       = NULL;
+unsigned int   gOpenNet_DeviceCount =    0;
+
+EXPORT_SYMBOL( gOpenNet_Class       );
+EXPORT_SYMBOL( gOpenNet_DeviceCount );
+
 // Static variables
 /////////////////////////////////////////////////////////////////////////////
 
 static struct pci_driver sPciDriver =
 {
-    .name     = NAME    ,
-    .id_table = ID_TABLE,
-    .probe    = Probe   ,
-    .remove   = Remove  ,
+    .name     = MODULE_NAME,
+    .id_table = ID_TABLE   ,
+    .probe    = Probe      ,
+    .remove   = Remove     ,
 };
 
 static DriverContext sThis;
@@ -85,7 +97,7 @@ void * Driver_FindDevice( unsigned char aMinor )
 {
     // printk( KERN_DEBUG "%s( %u )\n", __FUNCTION__, aMinor );
 
-    return sThis.mDevices[ aMinor - MINOR( sThis.mDevice ) ].mDevice;
+    return sThis.mDevices[ aMinor - MINOR( sThis.mChrDev ) ].mDevice;
 }
 
 // Static functions
@@ -109,15 +121,19 @@ void Exit()
 {
     // printk( KERN_DEBUG "%s()\n", __FUNCTION__ );
 
+    ASSERT( NULL != gOpenNet_Class );
+
     // pci_register_driver ==> pci_unregister_driver  See Init
     pci_unregister_driver( & sPciDriver );
 
     // class_create ==> class_destroy  See Init
-    class_destroy( sThis.mClass );
+    class_destroy( gOpenNet_Class );
 
     // alloc_chrdev_region ==> unregister_chrdev_region  See Init
-    unregister_chrdev_region( sThis.mDevice, DEVICE_COUNT_MAX );
+    unregister_chrdev_region( sThis.mChrDev, DEVICE_COUNT_MAX );
 }
+
+module_exit( Exit );
 
 int Init()
 {
@@ -125,27 +141,26 @@ int Init()
 
     // printk( KERN_DEBUG "%s()\n", __FUNCTION__ );
 
+    ASSERT( NULL == gOpenNet_Class );
+
     sThis.mDeviceCount = 0;
 
     // class_create ==> class_destroy  See Exit
-    sThis.mClass = class_create( THIS_MODULE, NAME );
-    if ( NULL == sThis.mClass )
+    gOpenNet_Class = class_create( THIS_MODULE, "OpenNet" );
+    if ( NULL == gOpenNet_Class )
     {
         printk( KERN_ERR "%s - class_create( ,  ) failed", __FUNCTION__ );
         return ( - __LINE__ );
     }
 
-    sThis.mClass->devnode = DevNode;
+    gOpenNet_Class->devnode = DevNode;
 
     // alloc_chrdev_region ==> unregister_chrdev_region  See Exit
-    lRet = alloc_chrdev_region( & sThis.mDevice, 0, DEVICE_COUNT_MAX, NAME );
+    lRet = alloc_chrdev_region( & sThis.mChrDev, 0, DEVICE_COUNT_MAX, MODULE_NAME );
     if ( 0 != lRet )
     {
         printk( KERN_ERR "%s - alloc_chrdev_region( , , ,  ) failed - %d\n", __FUNCTION__, lRet );
-
-        class_destroy( sThis.mClass );
-
-        return ( - __LINE__ );
+        goto Error0;
     }
 
     // pci_register_driver ==> pci_unregister_driver  See Exit
@@ -154,24 +169,32 @@ int Init()
     {
         printk( KERN_ERR "%s - pci_register_driver(  ) failed - %d\n", __FUNCTION__, lRet );
 
-        unregister_chrdev_region( sThis.mDevice, DEVICE_COUNT_MAX );
+        unregister_chrdev_region( sThis.mChrDev, DEVICE_COUNT_MAX );
         
-        class_destroy( sThis.mClass );
-
-        return ( - __LINE__ );
+        goto Error0;
     }
 
     return 0;
+
+Error0:
+    class_destroy( gOpenNet_Class );
+    return ( - __LINE__ );
 }
 
 module_init( Init );
-module_exit( Exit );
 
 int Probe( struct pci_dev * aDev, const struct pci_device_id * aId )
 {
     // printk( KERN_DEBUG "%s( ,  )\n", __FUNCTION__ );
 
-    sThis.mDevices[ sThis.mDeviceCount ].mDevice = Device_Create( aDev, MAJOR( sThis.mDevice ), MINOR( sThis.mDevice ) + sThis.mDeviceCount, sThis.mDeviceCount, sThis.mClass );
+    ASSERT( NULL != aDev );
+    ASSERT( NULL != aId  );
+
+    ASSERT( NULL != gOpenNet_Class );
+    
+    ASSERT( DEVICE_COUNT_MAX > sThis->mDeviceCount );
+
+    sThis.mDevices[ sThis.mDeviceCount ].mDevice = Device_Create( aDev, MAJOR( sThis.mChrDev ), MINOR( sThis.mChrDev ) + sThis.mDeviceCount, gOpenNet_DeviceCount, gOpenNet_Class );
     sThis.mDevices[ sThis.mDeviceCount ].mPciDev =                aDev;
 
     if ( NULL == sThis.mDevices[ sThis.mDeviceCount ].mDevice )
@@ -180,7 +203,8 @@ int Probe( struct pci_dev * aDev, const struct pci_device_id * aId )
         return ( - __LINE__ );
     }
 
-    sThis.mDeviceCount ++;
+    gOpenNet_DeviceCount ++;
+    sThis  .mDeviceCount ++;
 
     return 0;
 }
