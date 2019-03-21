@@ -225,6 +225,7 @@ namespace OpenNetK
         {
             unsigned mFullDuplex : 1;
             unsigned mLinkUp     : 1;
+            unsigned mTx_Enabled : 1;
             unsigned mTx_Off     : 1;
 
             unsigned mReserved0 : 29;

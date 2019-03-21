@@ -206,6 +206,31 @@ OpenNet::Adapter * System_Internal::Adapter_Get(unsigned int aIndex)
     return mAdapters[aIndex];
 }
 
+OpenNet::Adapter * System_Internal::Adapter_Get(OpenNetK::Adapter_Type aType, unsigned int aIndex)
+{
+    if (mAdapters.size() <= aIndex)
+    {
+        return NULL;
+    }
+
+    unsigned int lIndex = 0;
+
+    for (Adapter_Vector::iterator lIt = mAdapters.begin(); lIt != mAdapters.end(); lIt++)
+    {
+        if (0 != ((*lIt)->GetType() & aType))
+        {
+            if (aIndex == lIndex)
+            {
+                return (*lIt);
+            }
+
+            lIndex++;
+        }
+    }
+
+    return NULL;
+}
+
 OpenNet::Adapter * System_Internal::Adapter_Get(const unsigned char * aAddress, const unsigned char * aMask, const unsigned char * aMaskDiff)
 {
     if ((NULL == aAddress) || (NULL == aMask) || (NULL == aMaskDiff))

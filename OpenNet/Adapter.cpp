@@ -87,10 +87,14 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     { "OpenNetK::Adapter - IOCTL - CONNECT         ", ""      , 0 },
     { "OpenNetK::Adapter - IOCTL - INFO_GET        ", ""      , 0 },
     { "OpenNetK::Adapter - IOCTL - PACKET_SEND     ", ""      , 1 },
-    { "OpenNetK::Adapter - IOCTL - START           ", ""      , 0 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
     { "OpenNetK::Adapter - IOCTL - STATE_GET       ", ""      , 0 }, // 45
     { "OpenNetK::Adapter - IOCTL - STATISTICS - GET", ""      , 0 },
-    { "OpenNetK::Adapter - IOCTL - STOP            ", ""      , 0 },
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
     { "OpenNetK::Adapter - RUNNING_TIME            ", "ms"    , 1 },
     { "OpenNetK::Adapter - TX                      ", "packet", 1 },
     // ===== 0.0.7 ==========================================================
@@ -211,7 +215,7 @@ namespace OpenNet
 
         fprintf(aOut, "  Adapter::Config :\n");
 
-        if ((OPEN_NET_BUFFER_QTY >= aIn.mBufferQty) && (0 < aIn.mBufferQty))
+        if (OPEN_NET_BUFFER_QTY >= aIn.mBufferQty)
         {
             fprintf(aOut, "    Buffer Quantity = %u\n", aIn.mBufferQty);
         }
@@ -292,6 +296,7 @@ namespace OpenNet
 
         fprintf(aOut, "    Full Duplxe = %s\n"     , aIn.mFlags.mFullDuplex ? "true" : "false");
         fprintf(aOut, "    Link Up     = %s\n"     , aIn.mFlags.mLinkUp     ? "true" : "false");
+        fprintf(aOut, "    Tx Enabled  = %s\n"     , aIn.mFlags.mTx_Enabled ? "true" : "false");
         fprintf(aOut, "    Tx Off      = %s\n"     , aIn.mFlags.mTx_Off     ? "true" : "false");
         fprintf(aOut, "    Speed       = %u MB/s\n", aIn.mSpeed_MB_s);
 

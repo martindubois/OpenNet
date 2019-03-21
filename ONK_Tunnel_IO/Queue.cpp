@@ -136,7 +136,7 @@ void IoRead(WDFQUEUE aQueue, WDFREQUEST aRequest, size_t aSize_byte)
     PVOID  lOut;
     size_t lOutSize_byte;
 
-    NTSTATUS lStatus = WdfRequestRetrieveOutputBuffer(aRequest, sizeof(OpenNetK::Tunnel_PacketHeader) + 1, &lOut, &lOutSize_byte);
+    NTSTATUS lStatus = WdfRequestRetrieveOutputBuffer(aRequest, sizeof(OpenNet_Tunnel_PacketHeader) + 1, &lOut, &lOutSize_byte);
     if (STATUS_SUCCESS == lStatus)
     {
         unsigned int lInfo_byte = lThis->mHardware->Read(lOut, static_cast<unsigned int>(lOutSize_byte));

@@ -35,10 +35,10 @@ namespace OpenNetK
         ADAPTER_STATS_IOCTL_CONNECT        =  9,
         ADAPTER_STATS_IOCTL_INFO_GET       = 10,
         ADAPTER_STATS_IOCTL_PACKET_SEND    = 11,
-        ADAPTER_STATS_IOCTL_START          = 12,
+
         ADAPTER_STATS_IOCTL_STATE_GET      = 13,
         ADAPTER_STATS_IOCTL_STATISTICS_GET = 14,
-        ADAPTER_STATS_IOCTL_STOP           = 15,
+
         ADAPTER_STATS_RUNNING_TIME_ms      = 16,
         ADAPTER_STATS_TX_packet            = 17,
 

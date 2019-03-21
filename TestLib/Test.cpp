@@ -14,6 +14,7 @@
 
 // ===== C ==================================================================
 #include <assert.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef _KMS_WINDOWS_
@@ -40,9 +41,6 @@
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
-
-#define FLAG_DO_NOT_SLEEP           (0x00000001)
-#define FLAG_DO_NOT_START_GENERATOR (0x00000002)
 
 #ifdef _KMS_LINUX_
     #define RESULT_FILE "/home/mdubois/Export/OpenNet/TestResults/f02.txt"
@@ -667,6 +665,22 @@ namespace TestLib
         assert(OpenNet::STATUS_OK == lStatus);
     }
 
+    unsigned int Test::Execute(unsigned int aFlags)
+    {
+        unsigned int lResult = Start(aFlags);
+        if (0 == lResult)
+        {
+            if (0 == (aFlags & FLAG_DO_NOT_SLEEP))
+            {
+                KmsLib::ThreadBase::Sleep_s(1);
+            }
+
+            lResult = Stop();
+        }
+
+        return lResult;
+    }
+
     // Return
     //      0  OK
     //  Ohter  Error
@@ -970,27 +984,6 @@ namespace TestLib
         WriteResult  (aNote);
     }
 
-    // aFlags  See FLAG_...
-    //
-    // Return
-    //      0  OK
-    //  Ohter  Error
-    unsigned int Test::Execute( unsigned int aFlags )
-    {
-        unsigned int lResult = Start( aFlags );
-        if (0 == lResult)
-        {
-            if ( 0 == ( aFlags & FLAG_DO_NOT_SLEEP ) )
-            {
-                KmsLib::ThreadBase::Sleep_s(1);
-            }
-
-            lResult = Stop();
-        }
-
-        return lResult;
-    }
-
     // Return
     //      0  OK
     //  Ohter  Error
@@ -1060,12 +1053,15 @@ namespace TestLib
         {
             assert(NULL != mAdapters[i]);
 
-            OpenNet::Status lStatus = mAdapters[i]->ResetInputFilter();
-            if (OpenNet::STATUS_OK != lStatus)
+            if (TestLib::CODE_NONE != mCodes[i])
             {
-                printf("WARNING  Adapter::ResetInputFilter() failed - ");
-                OpenNet::Status_Display(lStatus, stdout);
-                printf("\n");
+                OpenNet::Status lStatus = mAdapters[i]->ResetInputFilter();
+                if (OpenNet::STATUS_OK != lStatus)
+                {
+                    printf("WARNING  Adapter::ResetInputFilter() failed - ");
+                    OpenNet::Status_Display(lStatus, stdout);
+                    printf("\n");
+                }
             }
         }
     }

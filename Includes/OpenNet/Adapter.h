@@ -300,6 +300,40 @@ namespace OpenNet
         /// \retval STATUS_PACKET_TO_SMALL
         virtual Status Packet_Send(const void * aData, unsigned int aSize_byte) = 0;
 
+        /// \cond en
+        /// \brief  This methode read data from the driver.
+        /// \param  aOut        The output buffer
+        /// \param  aSize_byte  The size of the output buffer
+        /// \param  aInfo_byte  The method put the size of read data here
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette m&eacute;thode lit des donn&eacute;es du pilote.
+        /// \param  aOut           L'espace de sortie
+        /// \param  aOutSize_byte  La taille de l'espace de sortie
+        /// \param  aInfo_byte     La m&eacute;thode place la taille des
+        ///                        donn&eacute;es lues ici
+        /// \endcond
+        /// \retval STATUS_OK
+        virtual Status Read(void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte) = 0;
+
+        /// \cond en
+        /// \brief  This methode disable packet transmit.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette m&eacute;thode d&eacute;sactive la transmission.
+        /// \endcond
+        /// \retval STATUS_OK
+        virtual Status Tx_Disable() = 0;
+
+        /// \cond en
+        /// \brief  This methode enable packet transmit.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette m&eacute;thode active la transmission.
+        /// \endcond
+        /// \retval STATUS_OK
+        virtual Status Tx_Enable() = 0;
+
     protected:
 
         Adapter();

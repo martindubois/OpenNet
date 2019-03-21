@@ -13,6 +13,7 @@
 // ===== Includes ===========================================================
 #include <OpenNet/OpenNet.h>
 #include <OpenNet/Status.h>
+#include <OpenNetK/Adapter_Types.h>
 
 namespace OpenNet
 {
@@ -205,6 +206,20 @@ namespace OpenNet
         /// \retval  Other   L'adresse de l'instance d'Adapter
         /// \endcond
         virtual Adapter * Adapter_Get( unsigned int aIndex ) = 0;
+
+        /// \cond en
+        /// \param   aType   See OpenNetK::Adapter_Type
+        /// \param   aIndex  The index of the adapter to get
+        /// \retval  NULL    Not found
+        /// \retval  Other   The address of the Adapter instance
+        /// \endcond
+        /// \cond fr
+        /// \param   aType   Voir OpenNetK::Adapter_Type
+        /// \param   aIndex  L'index de l'adaptateur &agrave; retourner
+        /// \retval  NULL    Introuvable
+        /// \retval  Other   L'adresse de l'instance d'Adapter
+        /// \endcond
+        virtual Adapter * Adapter_Get(OpenNetK::Adapter_Type aType, unsigned int aIndex) = 0;
 
         /// \cond en
         /// \param   aAddress   The Ethernet address to look for

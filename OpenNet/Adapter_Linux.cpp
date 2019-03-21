@@ -52,16 +52,17 @@ void Adapter_Linux::Buffers_Allocate( bool aProfiling, Buffer_Data_Vector * aBuf
 {
     assert( NULL != aBuffers );
 
-    assert( 0 < mConfig.mBufferQty );
-
-    memset( & mBuffers, 0, sizeof( mBuffers ) );
-
-    for ( unsigned int i = 0; i < mConfig.mBufferQty; i ++ )
+    if (0 < mConfig.mBufferQty)
     {
-        Buffer_Data * lBD = Buffer_Allocate( aProfiling );
-        assert( NULL != lBD );
+        memset(&mBuffers, 0, sizeof(mBuffers));
 
-        aBuffers->push_back( lBD );
+        for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
+        {
+            Buffer_Data * lBD = Buffer_Allocate(aProfiling);
+            assert(NULL != lBD);
+
+            aBuffers->push_back(lBD);
+        }
     }
 }
 

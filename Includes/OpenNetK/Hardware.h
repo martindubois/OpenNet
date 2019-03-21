@@ -408,6 +408,35 @@ namespace OpenNetK
         /// \note   Level = SoftInt or Thread, Thread = Users
         virtual void Statistics_Reset();
 
+        /// \cond en
+        /// \brief  Is Tx enabled?
+        /// \endcond
+        /// \cond fr
+        /// \brief  La transmission est-elle active?
+        /// \endcond
+        /// \retval false
+        /// \retval true
+        /// \note   Level = SoftInt or Thread, Thread = Users
+        bool Tx_IsEnabled() const;
+
+        /// \cond en
+        /// \brief  Disable transmission
+        /// \endcond
+        /// \cond fr
+        /// \brief  D&eacute;sactiver la transmission
+        /// \endcond
+        /// \note   Level = SoftInt or Thread, Thread = Users
+        virtual void Tx_Disable();
+
+        /// \cond en
+        /// \brief  Enable transmission
+        /// \endcond
+        /// \cond fr
+        /// \brief  Activer la transmission
+        /// \endcond
+        /// \note   Level = SoftInt or Thread, Thread = Users
+        virtual void Tx_Enable();
+
     // internal:
 
         void Init(SpinLock * aZone0);
@@ -521,6 +550,8 @@ namespace OpenNetK
 
         Adapter * mAdapter;
 
+        bool mTx_Enabled;
+
     };
 
     // Public
@@ -534,6 +565,11 @@ namespace OpenNetK
     inline void Hardware::Unlock()
     {
         mZone0->Unlock();
+    }
+
+    inline bool Hardware::Tx_IsEnabled() const
+    {
+        return mTx_Enabled;
     }
 
     // Internal

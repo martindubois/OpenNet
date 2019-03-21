@@ -49,6 +49,8 @@ public:
     unsigned int GetBufferQty () const;
     unsigned int GetPacketSize() const;
 
+    OpenNetK::Adapter_Type GetType() const;
+
     void SetPacketSize(unsigned int aSize_byte);
 
     void Buffers_Release ();
@@ -86,8 +88,10 @@ public:
     virtual OpenNet::Status SetConfig       (const Config        & aConfig    );
     virtual OpenNet::Status SetInputFilter  (OpenNet::SourceCode * aSourceCode);
     virtual OpenNet::Status SetProcessor    (OpenNet::Processor  * aProcessor );
-
-    virtual OpenNet::Status Display(FILE * aOut) const;
+    virtual OpenNet::Status Display         (FILE * aOut) const;
+    virtual OpenNet::Status Read            (void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte);
+    virtual OpenNet::Status Tx_Disable      ();
+    virtual OpenNet::Status Tx_Enable       ();
 
 protected:
 

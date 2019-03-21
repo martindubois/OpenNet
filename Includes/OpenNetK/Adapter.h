@@ -201,6 +201,8 @@ namespace OpenNetK
         int IoCtl_Statistics_Get  (const void           * aIn , uint32_t * aOut, unsigned int aOutSize_byte) const;
         int IoCtl_Statistics_Reset();
         int IoCtl_Stop            ();
+        int IoCtl_Tx_Disable      ();
+        int IoCtl_Tx_Enable       ();
 
         Adapter   ** mAdapters ;
         unsigned int mAdapterNo;

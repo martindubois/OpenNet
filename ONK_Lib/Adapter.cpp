@@ -136,8 +136,10 @@ namespace OpenNetK
         case IOCTL_PACKET_DROP           :
         case IOCTL_PACKET_GENERATOR_START:
         case IOCTL_PACKET_GENERATOR_STOP :
-        case IOCTL_STATISTICS_RESET:
-        case IOCTL_STOP            :
+        case IOCTL_STATISTICS_RESET      :
+        case IOCTL_STOP                  :
+        case IOCTL_TX_DISABLE            :
+        case IOCTL_TX_ENABLE             :
             break;
 
         default : return false;
@@ -239,6 +241,11 @@ namespace OpenNetK
 
         ASSERT(ADAPTER_NO_QTY >  mAdapterNo);
         ASSERT(NULL           != mHardware );
+
+        if (!mHardware->Tx_IsEnabled())
+        {
+            return;
+        }
 
         uint32_t  lAdapterBit = 1 << mAdapterNo;
         bool      lLocked     = false          ;
@@ -465,6 +472,8 @@ namespace OpenNetK
         case IOCTL_STATISTICS_GET             : lResult = IoCtl_Statistics_Get            (                                         aIn  , reinterpret_cast<uint32_t *>(aOut), aOutSize_byte); break;
         case IOCTL_STATISTICS_RESET           : lResult = IoCtl_Statistics_Reset          (); break;
         case IOCTL_STOP                       : lResult = IoCtl_Stop                      (); break;
+        case IOCTL_TX_DISABLE                 : lResult = IoCtl_Tx_Disable                (); break;
+        case IOCTL_TX_ENABLE                  : lResult = IoCtl_Tx_Enable                 (); break;
 
         default: ASSERT(false);
         }
@@ -1103,7 +1112,7 @@ namespace OpenNetK
 
         if (!mHardware->Packet_Send(lIn + 1, lSize_byte, lIn->mRepeatCount))
         {
-            TRACE_ERROR "%s - Hardware::PacketSend( , %u byte, %u )\n", __FUNCTION__, lSize_byte, lIn->mRepeatCount TRACE_END;
+            TRACE_ERROR "IoCtl_Packet_Send_Ex - Hardware::PacketSend( , %u byte, %u ) failed\n", lSize_byte, lIn->mRepeatCount TRACE_END;
             return IOCTL_RESULT_CANNOT_SEND;
         }
 
@@ -1199,8 +1208,6 @@ namespace OpenNetK
 
         ASSERT(NULL != mZone0);
 
-        mStatistics[ADAPTER_STATS_IOCTL_START] ++;
-
         unsigned int lCount = aInSize_byte / sizeof(Buffer);
 
         OpenNetK_IoCtl_Result lResult;
@@ -1273,6 +1280,8 @@ namespace OpenNetK
         aOut->mAdapterNo   = mAdapterNo    ;
         aOut->mBufferCount = mBuffer.mCount;
         aOut->mSystemId    = mSystemId     ;
+
+        aOut->mFlags.mTx_Enabled = mHardware->Tx_IsEnabled();
 
         mHardware->GetState(aOut);
 
@@ -1383,9 +1392,27 @@ namespace OpenNetK
 
         mZone0->UnlockFromThread( lFlags );
 
-        mStatistics[ADAPTER_STATS_IOCTL_STOP] ++;
-
         return lResult;
+    }
+
+    // TODO  ONK_Lib.Adapter
+    //       Normal (Feature) - Re-enable Tx when the disabler disconnect
+    int Adapter::IoCtl_Tx_Disable()
+    {
+        ASSERT(NULL != mHardware);
+
+        mHardware->Tx_Disable();
+
+        return IOCTL_RESULT_OK;
+    }
+
+    int Adapter::IoCtl_Tx_Enable()
+    {
+        ASSERT(NULL != mHardware);
+
+        mHardware->Tx_Enable();
+
+        return IOCTL_RESULT_OK;
     }
 
 }

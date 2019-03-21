@@ -133,6 +133,14 @@
 // Output  None
 #define IOCTL_PACKET_GENERATOR_STOP       IOCTL_CODE(131)
 
+// Input   None
+// Output  None
+#define IOCTL_TX_DISABLE                  IOCTL_CODE(144)
+
+// Input   None
+// Output  None
+#define IOCTL_TX_ENABLE                   IOCTL_CODE(145)
+
 // Data types
 /////////////////////////////////////////////////////////////////////////////
 

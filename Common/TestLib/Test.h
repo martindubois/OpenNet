@@ -101,6 +101,8 @@ namespace TestLib
         {
             ADAPTER_BASE  = OpenNet::ADAPTER_STATS_QTY,
             ADAPTER_QTY   =   4,
+            FLAG_DO_NOT_SLEEP           = 0x00000001,
+            FLAG_DO_NOT_START_GENERATOR = 0x00000002,
             HARDWARE_BASE = OpenNet::ADAPTER_STATS_QTY + OpenNetK::ADAPTER_STATS_QTY,
             KERNEL_QTY    =   2,
             STATS_QTY     = 128,
@@ -131,6 +133,14 @@ namespace TestLib
 
         virtual void         AdjustGeneratorConfig   (OpenNet::PacketGenerator::Config * aConfig);
         void                 DisplayAdapterStats     (unsigned int aIndex);
+
+        // aFlags  See FLAG_...
+        //
+        // Return
+        //      0  OK
+        //  Ohter  Error
+        virtual unsigned int Execute(unsigned int aFlags);
+
         virtual unsigned int Init            ();
         void                 InitAdapterConstraints  ();
         virtual unsigned int Start                   (unsigned int aFlags);
@@ -165,8 +175,6 @@ namespace TestLib
         void DisplayResult();
 
         void DisplayAndWriteResult(const char * aNote);
-
-        unsigned int Execute( unsigned int aFlags );
 
         unsigned int InitAndPrepare();
 

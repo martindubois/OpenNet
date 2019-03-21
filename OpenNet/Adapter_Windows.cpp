@@ -56,11 +56,12 @@ void Adapter_Windows::Buffers_Allocate( bool aProfiling, cl_command_queue aComma
     assert(NULL != aKernel      );
     assert(NULL != aBuffers     );
 
-    assert(0 < mConfig.mBufferQty);
-
-    for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
+    if (0 < mConfig.mBufferQty)
     {
-        aBuffers->push_back(Buffer_Allocate( aProfiling, aCommandQueue, aKernel));
+        for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
+        {
+            aBuffers->push_back(Buffer_Allocate(aProfiling, aCommandQueue, aKernel));
+        }
     }
 }
 

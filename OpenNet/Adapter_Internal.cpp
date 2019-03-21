@@ -104,7 +104,6 @@ Adapter_Internal::~Adapter_Internal()
 
 unsigned int Adapter_Internal::GetBufferQty() const
 {
-    assert(0                   <  mConfig.mBufferQty);
     assert(OPEN_NET_BUFFER_QTY >= mConfig.mBufferQty);
 
     return mConfig.mBufferQty;
@@ -117,6 +116,11 @@ unsigned int Adapter_Internal::GetPacketSize() const
     assert(PACKET_SIZE_MIN_byte <= mConfig.mPacketSize_byte);
 
     return mConfig.mPacketSize_byte;
+}
+
+OpenNetK::Adapter_Type Adapter_Internal::GetType() const
+{
+    return mInfo.mAdapterType;
 }
 
 // Exception  KmsLib::Exception *  CODE_INVALID_ARGUMENT
@@ -634,12 +638,6 @@ OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
         return OpenNet::STATUS_TOO_MANY_BUFFER;
     }
 
-    if (0 >= aConfig.mBufferQty)
-    {
-        mDebugLog->Log(__FILE__, __CLASS__ "SetConfig", __LINE__);
-        return OpenNet::STATUS_NO_BUFFER;
-    }
-
     memcpy(&mConfig, &aConfig, sizeof(mConfig));
 
     mDriverConfig.mPacketSize_byte = mConfig.mPacketSize_byte;
@@ -652,6 +650,10 @@ OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
 
     return lResult;
 }
+
+// TODO  OpenNet.Adapter
+//       Normal (Feature) - Permettre de changer le filtre pendant
+//       l'execution pour le Kernel en premier et pour les Fonction aussi.
 
 OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::SourceCode * aSourceCode)
 {
@@ -749,6 +751,44 @@ OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
     OpenNet::Adapter::Display(mInfo  , aOut);
 
     return OpenNet::STATUS_OK;
+}
+
+OpenNet::Status Adapter_Internal::Read(void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte)
+{
+    if ((NULL == aOut) || (NULL == aInfo_byte))
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Read", __LINE__);
+        return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
+    }
+
+    if (0 >= aOutSize_byte)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Read", __LINE__);
+        return OpenNet::STATUS_INVALID_SIZE;
+    }
+
+    try
+    {
+        (*aInfo_byte) = mHandle->Read(aOut, aOutSize_byte);
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Read", __LINE__);
+        mDebugLog->Log(eE);
+        return ExceptionToStatus(eE);
+    }
+
+    return OpenNet::STATUS_OK;
+}
+
+OpenNet::Status Adapter_Internal::Tx_Disable()
+{
+    return Control(IOCTL_TX_DISABLE, NULL, 0, NULL, 0);
+}
+
+OpenNet::Status Adapter_Internal::Tx_Enable()
+{
+    return Control(IOCTL_TX_ENABLE, NULL, 0, NULL, 0);
 }
 
 // Protected

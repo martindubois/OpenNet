@@ -138,6 +138,28 @@ void VirtualHardware::Packet_Send_NoLock(uint64_t aData_PA, const void * aData_X
     mTx_In = (mTx_In + 1) % TX_DESCRIPTOR_QTY;
 }
 
+void VirtualHardware::Tx_Disable()
+{
+    ASSERT(NULL != mZone0);
+
+    Hardware::Tx_Disable();
+
+    uint32_t lFlags = mZone0->LockFromThread();
+
+        ASSERT(TX_DESCRIPTOR_QTY > mTx_In );
+        ASSERT(TX_DESCRIPTOR_QTY > mTx_Out);
+
+        while (mTx_In != mTx_Out)
+        {
+            (*mTx_Counter[mTx_Out])--;
+
+            mTx_Out = (mTx_Out + 1) % TX_DESCRIPTOR_QTY;
+        }
+
+    mZone0->UnlockFromThread(lFlags);
+
+}
+
 void VirtualHardware::Unlock_AfterReceive_Internal()
 {
     TRACE_DEBUG "Unlock_AfterReceive_Internal()" DEBUG_EOL TRACE_END;

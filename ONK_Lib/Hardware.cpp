@@ -216,6 +216,16 @@ namespace OpenNetK
         memset(&mStatistics, 0, sizeof(uint32_t) * HARDWARE_STATS_RESET_QTY);
     }
 
+    void Hardware::Tx_Disable()
+    {
+        mTx_Enabled = false;
+    }
+
+    void Hardware::Tx_Enable()
+    {
+        mTx_Enabled = true;
+    }
+
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
@@ -329,7 +339,7 @@ namespace OpenNetK
         (*aIn_XA) = (*aOut_XA) + aSize_byte;
     }
 
-    Hardware::Hardware(OpenNetK::Adapter_Type aType, unsigned int aPacketSize_byte) : mAdapter(NULL), mZone0(NULL)
+    Hardware::Hardware(OpenNetK::Adapter_Type aType, unsigned int aPacketSize_byte) : mAdapter(NULL), mTx_Enabled(true), mZone0(NULL)
     {
         ASSERT(OpenNetK::ADAPTER_TYPE_UNKNOWN != aType           );
         ASSERT(PACKET_SIZE_MAX_byte           >= aPacketSize_byte);
