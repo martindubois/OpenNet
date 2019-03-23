@@ -1,7 +1,8 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Kernel.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/Kernel.cpp
 
 #define __CLASS__     "Kernel::"
 #define __NAMESPACE__ "OpenNet::"
@@ -9,10 +10,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <memory.h>
 #include <stdint.h>
 
@@ -139,6 +139,8 @@ namespace OpenNet
         return mCommandQueue;
     }
 
+    // TODO  OpenNet.SourceCode
+    //       Normal (Feature) - Supporter pour les fonctions aussi
     OpenNet::Status Kernel::SetStaticUserArgument(unsigned int aIndex, UserBuffer * aArg)
     {
         if (0 == aIndex)

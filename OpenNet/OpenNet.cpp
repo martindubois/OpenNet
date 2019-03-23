@@ -1,10 +1,13 @@
 
-// Author / Auteur    KMS - Martin Dubois, ing.
-// Product / Produit  OpenNet
-// File / Fichier     OpenNet/OpenNet.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/OpenNet.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
+
+#include "Component.h"
 
 // ===== Windows ============================================================
 #include <Windows.h>

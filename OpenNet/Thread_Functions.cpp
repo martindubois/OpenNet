@@ -9,10 +9,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 
 #ifdef _KMS_WINDOWS_

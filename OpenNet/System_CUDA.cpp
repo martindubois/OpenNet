@@ -9,10 +9,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <fcntl.h>
 #include <unistd.h>
 

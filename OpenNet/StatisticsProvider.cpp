@@ -1,13 +1,13 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/StatisticsProvider.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/StatisticsProvider.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/ValueVector.h>

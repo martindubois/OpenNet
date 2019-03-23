@@ -167,6 +167,14 @@ void DeviceInit_Init(PWDFDEVICE_INIT aDeviceInit)
 
     ASSERT(NULL != aDeviceInit);
 
+    WDF_IO_TYPE_CONFIG lIoType;
+
+    WDF_IO_TYPE_CONFIG_INIT(&lIoType);
+
+    lIoType.ReadWriteIoType = WdfDeviceIoDirect;
+
+    WdfDeviceInitSetIoTypeEx(aDeviceInit, &lIoType);
+
     WDF_FILEOBJECT_CONFIG lFileObjectConfig;
 
     WDF_FILEOBJECT_CONFIG_INIT(&lFileObjectConfig, NULL, NULL, FileCleanup);
