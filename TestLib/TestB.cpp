@@ -7,8 +7,7 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Includes ===========================================================
 #include <OpenNetK/Hardware_Statistics.h>
@@ -50,7 +49,9 @@ void TestB::Info_Display() const
         "PCIe                      x2      x1      x3\n"
         "Memory - GPU              x1      x1      x1\n"
         "Memory - Main             x1              x1\n"
-        "==============================================\n");
+        "=== Code ============================ Mode ===\n"
+        "DO_NOT_REPLY_ON_ERROR               FUNCTION *\n"
+        "REPLY *                             KERNEL\n");
 }
 
 // Protected

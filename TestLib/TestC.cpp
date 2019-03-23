@@ -9,8 +9,7 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Includes ===========================================================
 #include <OpenNet/UserBuffer.h>
@@ -58,7 +57,8 @@ void TestC::Info_Display() const
         "PCIe                  x1      x1       x2\n"
         "Memory - GPU          x1      x1       x2\n"
         "Memory - Main         x1               x1\n"
-        "==============================================\n");
+        "=== Code ============================ Mode ===\n"
+        "REPLY_ON_SEQUENCE_ERROR *             KERNEL *\n");
 }
 
 // Protected

@@ -9,10 +9,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 
 // ===== Includes ===========================================================
@@ -43,7 +42,7 @@ void TestD::Info_Display() const
         "===== Sequence ===============================\n"
         "    Internel   Ethernet   Internal\n"
         "\n"
-        "        +--- 0 <------- 1 <-- Generator\n"
+        "        +--- 0 <------- 2 <-- Generator\n"
         "        |"
         "        +--> 1"
         "\n"
@@ -54,9 +53,11 @@ void TestD::Info_Display() const
         "                 1       Read    Write   Total\n"
         "Ethernet         x1                       x1\n"
         "PCIe                      x1      x1      x2\n"
-        "Memory - GPU                      x2      x2\n"
+        "Memory - GPU              x1      x1      x2\n"
         "Memory - Main             x1              x1\n"
-        "==============================================\n");
+        "=== Code ============================ Mode ===\n"
+        "FORWARD *                           FUNCTION *\n"
+        "                                    KERNEL\n");
 }
 
 // Protected
