@@ -21,7 +21,7 @@
 #include <OpenNet/UserBuffer.h>
 #include <OpenNetK/Adapter_Types.h>
 
-class Buffer_Data     ;
+class Buffer_Internal ;
 class Thread          ;
 class Thread_Functions;
 
