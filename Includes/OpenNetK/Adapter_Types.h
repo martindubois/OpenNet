@@ -1,13 +1,13 @@
 
-// Product / Produit  OpenNet
+// Product  OpenNet
 
-/// \author  KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
-/// \file    Includes/OpenNetK/Adapter_Types.h
-/// \brief   OpenNetK::Adapter_Config, OpenNetK::Adapter_Info,
-///          OpenNetK::Adapter_State, OpenNetK::Buffer,
-///          OpenNetK::EthernetAddress, OpenNetK::IPv4Address,
-///          OpenNetK::VersionInfo
+/// \author     KMS - Martin Dubois, ing.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/Adapter_Types.h
+/// \brief      OpenNetK::Adapter_Config, OpenNetK::Adapter_Info,
+///             OpenNetK::Adapter_State, OpenNetK::Buffer,
+///             OpenNetK::EthernetAddress, OpenNetK::IPv4Address,
+///             OpenNetK::VersionInfo (SDK)
 
 #pragma once
 
@@ -49,7 +49,7 @@ namespace OpenNetK
     /// \cond fr
     /// \brief  Cette structure est utilis&eacute;e pour les adresses
     ///         Ethernet.
-    /// \todo   Documenter les membres de OpenNetL::EthernetAddress
+    /// \todo   Documenter les membres de OpenNet::EthernetAddress
     /// \endcond
     typedef struct
     {
@@ -58,6 +58,44 @@ namespace OpenNetK
         uint8_t mReserved[2];
     }
     EthernetAddress;
+
+    /// \cond en
+    /// \brief  This enum defines the event types.
+    /// \note   This data type is part of the Software Development Kit (SDK).
+    /// \todo   Document values of OpenNetK::Event_Type
+    /// \endcond
+    /// \cond fr
+    /// \brief  Cette &eacute;num&eacute;ration d&eacute;finit les type
+    ///         d&eacute;v;eacute;nements
+    /// \todo   Documenter les valeur de OpenNet::Event_Type
+    /// \endcond
+    typedef enum
+    {
+        EVENT_TYPE_BUFFER     ,
+        EVENT_TYPE_WAIT_CANCEL,
+
+        EVENT_TYPE_QTY
+    }
+    Event_Type;
+
+    /// \cond en
+    /// \brief  This structure is used for event returned to the user
+    ///         application.
+    /// \note   This data type is part of the Software Development Kit (SDK).
+    /// \todo   Document members of OpenNetK::Event
+    /// \endcond
+    /// \cond fr
+    /// \brief  Cette structure est utilis&eacute;e pour transmettre le
+    ///         &eacute;v&eacute;nement &agrave; l'application.
+    /// \todo   Documenter les membres de OpenNetL::Event
+    /// \endcond
+    typedef struct
+    {
+        Event_Type  mType        ;
+        uint32_t    mData        ;
+        uint64_t    mTimestamp_us;
+    }
+    Event;
 
     /// \cond en
     /// \brief  This structure is used for IPv4 address.

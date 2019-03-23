@@ -9,25 +9,21 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
-
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 #ifdef _KMS_WINDOWS_
     // ===== Windows ========================================================
     #include <Windows.h>
 #endif
 
-// ===== Import/Includes ====================================================
-#include <KmsLib/Exception.h>
-
 // ===== Common =============================================================
 #include "../Common/Constants.h"
 
 // ===== OpenNet ============================================================
+#include "Buffer_Internal.h"
 #include "EthernetAddress.h"
 #include "Thread_Functions.h"
+#include "Utils.h"
 
 #include "Adapter_Internal.h"
 
@@ -44,59 +40,12 @@ static const uint8_t LOOP_BACK_PACKET_DATA[64] =
 // Public
 /////////////////////////////////////////////////////////////////////////////
 
-// aHandle   [DK-;RW-]
-// aDebugLog [-K-;RW-]
-//
-// Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
-// Threads    Apps
-Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog)
-    : mBufferCount(0)
-    , mDebugLog   (aDebugLog)
-    , mHandle     (aHandle)
-    , mProcessor  (NULL)
-    , mSourceCode (NULL)
-{
-    assert(NULL != aHandle  );
-    assert(NULL != aDebugLog);
-
-    mDebugLog->Log( "Adapter_Internal::Adapter_Internal( ,  )" );
-
-    memset(&mConfig      , 0, sizeof(mConfig      ));
-    memset(&mConnect_Out , 0, sizeof(mConnect_Out ));
-    memset(&mDriverConfig, 0, sizeof(mDriverConfig));
-    memset(&mInfo        , 0, sizeof(mInfo        ));
-    memset(&mName        , 0, sizeof(mName        ));
-    memset(&mStatistics  , 0, sizeof(mStatistics  ));
-
-    mConfig.mBufferQty = 4;
-	mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
-
-    mConnect_Out.mAdapterNo = ADAPTER_NO_UNKNOWN;
-
-	mDriverConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
-
-    mHandle->Control(IOCTL_CONFIG_GET, NULL, 0, &mDriverConfig, sizeof(mDriverConfig));
-    mHandle->Control(IOCTL_INFO_GET  , NULL, 0, &mInfo        , sizeof(mInfo        ));
-
-    Config_Update();
-
-    strncpy_s(mName, mInfo.mVersion_Hardware.mComment, sizeof(mName) - 1);
-    strcat_s (mName, " ");
-
-    unsigned int lOffset_byte = static_cast<unsigned int>(strlen(mName));
-
-    if (44 < lOffset_byte)
-    {
-        lOffset_byte = 44;
-    }
-
-    OpenNet::EthernetAddress_GetText(mInfo.mEthernetAddress, mName + strlen(mName), sizeof(mName) - lOffset_byte);
-}
-
 // Threads  Apps
 Adapter_Internal::~Adapter_Internal()
 {
     // printf( __CLASS__ "~AdapterInternal()\n" );
+
+    assert(NULL != mHandle);
 
     // new ==> delete
     delete mHandle;
@@ -270,7 +219,14 @@ void Adapter_Internal::Start()
     assert(   0 <  mBufferCount);
     assert(NULL != mHandle     );
 
+    if (NULL != mEvent_Callback)
+    {
+        ThreadBase::Start();
+    }
+
     mHandle->Control(IOCTL_START, mBuffers, sizeof(OpenNetK::Buffer) * mBufferCount, NULL, 0);
+
+    mRunning = true;
 }
 
 // Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
@@ -278,6 +234,15 @@ void Adapter_Internal::Start()
 void Adapter_Internal::Stop()
 {
     assert(NULL != mHandle);
+
+    mRunning = false;
+
+    if ((NULL != mEvent_Callback) && IsRunning())
+    {
+        ThreadBase::Stop();
+
+        Stop_Internal();
+    }
 
     mHandle->Control(IOCTL_STOP, NULL, 0, NULL, 0);
 }
@@ -289,6 +254,8 @@ Thread * Adapter_Internal::Thread_Prepare()
 {
     // printf( __CLASS__ "Thread_Pepare()\n" );
 
+    assert(NULL == mThread);
+
     if (NULL != mSourceCode)
     {
         assert(NULL != mProcessor);
@@ -296,7 +263,10 @@ Thread * Adapter_Internal::Thread_Prepare()
         OpenNet::Kernel * lKernel = dynamic_cast<OpenNet::Kernel *>(mSourceCode);
         if (NULL != lKernel)
         {
-            return Thread_Prepare_Internal(lKernel);
+            mThread = Thread_Prepare_Internal(lKernel);
+            assert(NULL != mThread);
+
+            return mThread;
         }
 
         OpenNet::Function * lFunction = dynamic_cast<OpenNet::Function *>(mSourceCode);
@@ -306,6 +276,8 @@ Thread * Adapter_Internal::Thread_Prepare()
         assert(NULL != lThread);
 
         lThread->AddAdapter(this, *lFunction);
+
+        mThread = lThread;
     }
 
     return NULL;
@@ -382,7 +354,7 @@ const char * Adapter_Internal::GetName() const
     return mName;
 }
 
-OpenNet::Status Adapter_Internal::GetState(State * aOut)
+OpenNet::Status Adapter_Internal::GetState(Adapter::State * aOut)
 {
     assert(NULL != mDebugLog);
     assert(NULL != mHandle  );
@@ -393,7 +365,7 @@ OpenNet::Status Adapter_Internal::GetState(State * aOut)
         return OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT;
     }
 
-    return Control(IOCTL_STATE_GET, NULL, 0, aOut, sizeof(State));
+    return Control(IOCTL_STATE_GET, NULL, 0, aOut, sizeof(Adapter::State));
 }
 
 OpenNet::Status Adapter_Internal::GetStatistics(unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset)
@@ -459,7 +431,7 @@ bool Adapter_Internal::IsConnected()
 {
     // printf( __CLASS__ "IsConnected()\n" );
 
-    State lState;
+    Adapter::State lState;
 
     OpenNet::Status lStatus = GetState(&lState);
     assert(OpenNet::STATUS_OK == lStatus);
@@ -477,7 +449,7 @@ bool Adapter_Internal::IsConnected(const OpenNet::System & aSystem)
         return false;
     }
 
-    State lState;
+    Adapter::State lState;
 
     OpenNet::Status lStatus = GetState(&lState);
     assert(OpenNet::STATUS_OK == lStatus);
@@ -537,7 +509,7 @@ OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int a
     catch (KmsLib::Exception * eE)
     {
         mDebugLog->Log(eE);
-        lResult = ExceptionToStatus(eE);
+        lResult = Utl_ExceptionToStatus(eE);
     }
 
     delete[] lBuffer;
@@ -575,7 +547,7 @@ OpenNet::Status Adapter_Internal::ResetInputFilter()
         mDebugLog->Log( __FILE__, __CLASS__ "ResetInputFilter", __LINE__ );
         mDebugLog->Log( eE );
 
-        return ExceptionToStatus( eE );
+        return Utl_ExceptionToStatus( eE );
     }
 
     return OpenNet::STATUS_OK;
@@ -695,7 +667,7 @@ OpenNet::Status Adapter_Internal::SetInputFilter(OpenNet::SourceCode * aSourceCo
     {
         mDebugLog->Log(__FILE__, __CLASS__ "SetInputFilter", __LINE__);
         mDebugLog->Log(eE);
-        return ExceptionToStatus(eE);
+        return Utl_ExceptionToStatus(eE);
     }
 
     mSourceCode = aSourceCode;
@@ -753,6 +725,41 @@ OpenNet::Status Adapter_Internal::Display(FILE * aOut) const
     return OpenNet::STATUS_OK;
 }
 
+OpenNet::Status Adapter_Internal::Event_RegisterCallback(Event_Callback aCallback, void * aContext)
+{
+    // printf(__CLASS__ "Event_RegisterCallback( ,  )\n");
+
+    assert(NULL != mHandle);
+
+    try
+    {
+        if ((NULL != mEvent_Callback) && IsRunning())
+        {
+            ThreadBase::Stop();
+
+            mHandle->Control(IOCTL_EVENT_WAIT_CANCEL, NULL, 0, NULL, 0);
+
+            Wait(true, 1000);
+        }
+
+        mEvent_Callback = aCallback;
+        mEvent_Context  = aContext ;
+
+        if ((NULL != mEvent_Callback) && mRunning)
+        {
+            ThreadBase::Start();
+        }
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Event_RegisterCallback", __LINE__);
+        mDebugLog->Log(eE);
+        return Utl_ExceptionToStatus(eE);
+    }
+
+    return OpenNet::STATUS_OK;
+}
+
 OpenNet::Status Adapter_Internal::Read(void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte)
 {
     if ((NULL == aOut) || (NULL == aInfo_byte))
@@ -775,7 +782,7 @@ OpenNet::Status Adapter_Internal::Read(void * aOut, unsigned int aOutSize_byte, 
     {
         mDebugLog->Log(__FILE__, __CLASS__ "Read", __LINE__);
         mDebugLog->Log(eE);
-        return ExceptionToStatus(eE);
+        return Utl_ExceptionToStatus(eE);
     }
 
     return OpenNet::STATUS_OK;
@@ -791,27 +798,99 @@ OpenNet::Status Adapter_Internal::Tx_Enable()
     return Control(IOCTL_TX_ENABLE, NULL, 0, NULL, 0);
 }
 
+// ===== KmsLib::ThreadBase =================================================
+
+// CRITICAL PATH  BufferEvent
+unsigned int Adapter_Internal::Run()
+{
+    assert(NULL != mEvent_Callback);
+
+    try
+    {
+        IoCtl_Event_Wait_In lIn;
+        OpenNetK::Event     lOut[32];
+
+        memset(&lIn, 0, sizeof(lIn));
+
+        lIn.mOutputSize_byte = sizeof(lOut);
+
+        while (IsRunning())
+        {
+            unsigned int lInfo_byte = mHandle->Control(IOCTL_EVENT_WAIT, &lIn, sizeof(lIn), lOut, sizeof(lOut));
+
+            unsigned int lCount = lInfo_byte / sizeof(OpenNetK::Event);
+            if (0 == lCount)
+            {
+                mDebugLog->Log(__FILE__, __CLASS__ "Run", __LINE__);
+                break;
+            }
+
+            for (unsigned int i = 0; i < lCount; i++)
+            {
+                Event_Process(lOut[i]);
+            }
+        }
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Run", __LINE__);
+        mDebugLog->Log(eE);
+    }
+
+    return 0;
+}
+
 // Protected
 /////////////////////////////////////////////////////////////////////////////
 
-// aE [---;R--]
+// aHandle    [DK-;RW-]
+// aDebugLog  [-K-;RW-]
 //
-// Threads  Apps, Worker
-OpenNet::Status Adapter_Internal::ExceptionToStatus(const KmsLib::Exception * aE)
+// Exception  KmsLib::Exception *  See KmsLib::Windows::DriverHandle::Control
+// Threads    Apps
+Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog)
+    : mBufferCount(        0)
+    , mDebugLog   (aDebugLog)
+    , mHandle     (aHandle  )
+    , mProcessor  (NULL     )
+    , mRunning    (false    )
+    , mSourceCode (NULL     )
 {
-    assert(NULL != aE);
+    assert(NULL != aHandle  );
+    assert(NULL != aDebugLog);
 
-    switch (aE->GetCode())
+    mDebugLog->Log( "Adapter_Internal::Adapter_Internal( , ,  )" );
+
+    memset(&mConfig      , 0, sizeof(mConfig      ));
+    memset(&mConnect_Out , 0, sizeof(mConnect_Out ));
+    memset(&mDriverConfig, 0, sizeof(mDriverConfig));
+    memset(&mInfo        , 0, sizeof(mInfo        ));
+    memset(&mName        , 0, sizeof(mName        ));
+    memset(&mStatistics  , 0, sizeof(mStatistics  ));
+
+    mConfig.mBufferQty = 4;
+	mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
+
+    mConnect_Out.mAdapterNo = ADAPTER_NO_UNKNOWN;
+
+	mDriverConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
+
+    mHandle->Control(IOCTL_CONFIG_GET, NULL, 0, &mDriverConfig, sizeof(mDriverConfig));
+    mHandle->Control(IOCTL_INFO_GET  , NULL, 0, &mInfo        , sizeof(mInfo        ));
+
+    Config_Update();
+
+    strncpy_s(mName, mInfo.mVersion_Hardware.mComment, sizeof(mName) - 1);
+    strcat_s (mName, " ");
+
+    unsigned int lOffset_byte = static_cast<unsigned int>(strlen(mName));
+
+    if (44 < lOffset_byte)
     {
-    case KmsLib::Exception::CODE_IOCTL_ERROR      : return OpenNet::STATUS_IOCTL_ERROR    ;
-    case KmsLib::Exception::CODE_NOT_ENOUGH_MEMORY: return OpenNet::STATUS_TOO_MANY_BUFFER;
-    case KmsLib::Exception::CODE_OPEN_CL_ERROR    : return OpenNet::STATUS_OPEN_CL_ERROR  ;
+        lOffset_byte = 44;
     }
 
-    printf("%s ==> STATUS_EXCEPTION\n", KmsLib::Exception::GetCodeName(aE->GetCode()));
-    aE->Write( stdout );
-
-    return OpenNet::STATUS_EXCEPTION;
+    OpenNet::EthernetAddress_GetText(mInfo.mEthernetAddress, mName + strlen(mName), sizeof(mName) - lOffset_byte);
 }
 
 // aIn        [--O;R--]
@@ -839,7 +918,7 @@ OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, 
     {
         mDebugLog->Log(__FILE__, __CLASS__ "Control", __LINE__);
         mDebugLog->Log(eE);
-        return ExceptionToStatus(eE);
+        return Utl_ExceptionToStatus(eE);
     }
 
     return OpenNet::STATUS_OK;
@@ -847,6 +926,18 @@ OpenNet::Status Adapter_Internal::Control(unsigned int aCode, const void * aIn, 
 
 // Private
 /////////////////////////////////////////////////////////////////////////////
+
+// aIndex  The index of the buffer to retrieve
+//
+// Return  The Buffer_Internal instance or NULL if the index is not valid.
+//
+// CRITICAL PATH  BufferEvent  1 / Buffer event
+Buffer_Internal * Adapter_Internal::GetBuffer(unsigned int aIndex)
+{
+    assert(NULL != mThread);
+
+    return mThread->GetBuffer(this, aIndex);
+}
 
 void Adapter_Internal::Config_Update()
 {
@@ -856,4 +947,36 @@ void Adapter_Internal::Config_Update()
     assert(PACKET_SIZE_MIN_byte <= mDriverConfig.mPacketSize_byte);
 
     mConfig.mPacketSize_byte = mDriverConfig.mPacketSize_byte;
+}
+
+// aEvent [---;R--] The event to proces
+//
+// Thread  Event
+//
+// CRITICAL PATH  BufferEvent  1 / Buffer event
+void Adapter_Internal::Event_Process(const OpenNetK::Event & aEvent)
+{
+    assert(NULL != (&aEvent));
+
+    assert(NULL != mEvent_Callback);
+
+    switch (aEvent.mType)
+    {
+    case OpenNetK::EVENT_TYPE_BUFFER :
+        Buffer_Internal * lBuffer;
+
+        lBuffer = GetBuffer(aEvent.mData);
+        if (NULL != lBuffer)
+        {
+            lBuffer->FetchBufferInfo();
+
+            mEvent_Callback(mEvent_Context, aEvent.mType, aEvent.mTimestamp_us, aEvent.mData, lBuffer);
+        }
+        break;
+
+    case OpenNetK::EVENT_TYPE_WAIT_CANCEL :
+        break;
+
+    default: assert(false);
+    }
 }

@@ -25,7 +25,7 @@ public:
 
     Processor_OpenCL(cl_platform_id aPlatform, cl_device_id aDevice, KmsLib::DebugLog * aDebugLog);
 
-    Buffer_Data * Buffer_Allocate(bool aProfiling, unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer);
+    Buffer_Internal * Buffer_Allocate(bool aProfiling, unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer);
 
     cl_command_queue CommandQueue_Create(bool aProfilingEnabled);
 

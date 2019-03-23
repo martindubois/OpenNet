@@ -15,6 +15,7 @@
 // ===== Import/Includes ====================================================
 #include <KmsLib/DebugLog.h>
 #include <KmsLib/DriverHandle.h>
+#include <KmsLib/ThreadBase.h>
 
 // ===== Includes ===========================================================
 #include <OpenNet/Adapter.h>
@@ -27,22 +28,21 @@
 #include "../Common/OpenNet/Adapter_Statistics.h"
 
 // ===== OpenNet ============================================================
-#include "Buffer_Data.h"
+#include "Buffer_Internal.h"
 #include "Processor_Internal.h"
 
-class Thread;
+class Buffer_Internal;
+class Thread         ;
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
 
-class Adapter_Internal : public OpenNet::Adapter
+class Adapter_Internal : public OpenNet::Adapter, private KmsLib::ThreadBase
 {
 
 public:
 
     typedef void(*TryToSolveHang)(void *, Adapter_Internal *);
-
-    Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog);
 
     virtual ~Adapter_Internal();
 
@@ -77,7 +77,7 @@ public:
     virtual OpenNet::Status GetConfig       (Config       * aOut) const;
     virtual OpenNet::Status GetInfo         (Info         * aOut) const;
     virtual const char    * GetName         () const;
-    virtual OpenNet::Status GetState        (State        * aOut);
+    virtual OpenNet::Status GetState        (Adapter::State * aOut);
     virtual OpenNet::Status GetStatistics   (unsigned int * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte, bool aReset);
     virtual bool            IsConnected     ();
     virtual bool            IsConnected     (const OpenNet::System & aSystem);
@@ -89,13 +89,17 @@ public:
     virtual OpenNet::Status SetInputFilter  (OpenNet::SourceCode * aSourceCode);
     virtual OpenNet::Status SetProcessor    (OpenNet::Processor  * aProcessor );
     virtual OpenNet::Status Display         (FILE * aOut) const;
-    virtual OpenNet::Status Read            (void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte);
+    virtual OpenNet::Status Event_RegisterCallback(Event_Callback aCallback, void * aContext);
+    virtual OpenNet::Status Read            (void  * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte);
     virtual OpenNet::Status Tx_Disable      ();
     virtual OpenNet::Status Tx_Enable       ();
 
+    // ===== KmsLib::ThreadBase =============================================
+    virtual unsigned int Run();
+
 protected:
 
-    static OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE);
+    Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * aDebugLog);
 
     OpenNet::Status Control(unsigned int aCode, const void * aIn, unsigned int aInSize_byte, void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte = NULL);
 
@@ -108,6 +112,9 @@ protected:
     //
     // SetInputFilter_Internal ==> ResetInputFilter_Internal
     virtual void SetInputFilter_Internal  (OpenNet::Kernel * aKernel) = 0;
+
+    // Thread  Apps
+    virtual void Stop_Internal() = 0;
 
     // Threads  Apps
     //
@@ -128,10 +135,18 @@ protected:
 
 private:
 
+    Buffer_Internal * GetBuffer(unsigned int aIndex);
+
     void Config_Update();
 
+    void Event_Process(const OpenNetK::Event & aEvent);
+
     OpenNetK::Adapter_Config        mDriverConfig;
+    Event_Callback                  mEvent_Callback;
+    void                          * mEvent_Context ;
     char                            mName   [ 64];
+    bool                            mRunning       ;
+    Thread                        * mThread        ;
     
 };
 

@@ -4,7 +4,7 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright &copy; 2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/IoCtl.h
-/// \brief      OpenNetK_IoCtl_Info
+/// \brief      OpenNetK_IoCtl_Info (DDK)
 
 #pragma once
 
@@ -49,6 +49,7 @@ typedef enum
     IOCTL_RESULT_OK                = 0x00000000,
 
     IOCTL_RESULT_PROCESSING_NEEDED = 0xffffffe0,
+    IOCTL_RESULT_WAIT              = 0xffffffe1,
 
     IOCTL_RESULT_ALREADY_CONNECTED = 0xfffffff2,
     IOCTL_RESULT_CANNOT_DROP       = 0xfffffff3,

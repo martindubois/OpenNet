@@ -4,7 +4,7 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Adapter.h
-/// \brief      OpenNetK::Adapter
+/// \brief      OpenNetK::Adapter (DDK)
 
 #pragma once
 
@@ -53,6 +53,8 @@ namespace OpenNetK
 
     public:
 
+        typedef void(*Event_Callback)(void *);
+
         /// \cond en
         /// \brief  Retrieve information about an IoCtl code
         /// \param  aCode  The IoCtl code
@@ -99,6 +101,18 @@ namespace OpenNetK
         /// \endcond
         void SetOSDep( OpenNetK_OSDep * aOSDep );
 
+        /// \cond en
+        /// \brief  Register an event callback
+        /// \param  aCallback  The function to call
+        /// \param  aContext   The context to pass to the function
+        /// \endcond
+        /// \cond fr
+        /// \brief  Assigner la structure OSDep
+        /// \param  aCallback  La fonction
+        /// \param  aContext   Le contexte pass&eacute; &agrave; la fonction
+        /// \endcond
+        void Event_RegisterCallback(Event_Callback aCallback, void * aContext);
+
     // Internal
 
         // TODO  OpenNetK.Adapter
@@ -131,6 +145,7 @@ namespace OpenNetK
             }
             mFlags;
 
+            uint32_t      mEvents     ;
             uint32_t      mMarkerValue;
             unsigned int  mPacketInfoOffset_byte;
             volatile long mRx_Counter ;
@@ -157,6 +172,11 @@ namespace OpenNetK
 
     private:
 
+        enum
+        {
+            EVENT_QTY = 128,
+        };
+
         typedef struct
         {
             unsigned int mCount;
@@ -173,22 +193,30 @@ namespace OpenNetK
         void Buffer_Send_Zone0       (BufferInfo * aBufferInfo);
         void Buffer_WriteMarker_Zone0(BufferInfo * aBufferInfo);
 
+        void Event_Report_Zone0(Event_Type aType, uint32_t aData);
+
         void Interrupt_Process2_Px_Zone0();
         void Interrupt_Process2_Rx_Zone0();
         void Interrupt_Process2_Tx_Zone0();
 
         void Stop_Zone0();
 
-        // ===== Buffer_State ===============================================
-        void Buffer_Corrupted_Zone0(unsigned int aIndex     );
-        void Buffer_PxRunning_Zone0(BufferInfo * aBufferInfo);
-        void Buffer_RxRunning_Zone0(BufferInfo * aBufferInfo);
-        void Buffer_TxRunning_Zone0(BufferInfo * aBufferInfo);
+        // ===== Buffer_ State ==============================================
+        void Buffer_EventPending_Zone0(BufferInfo * aBufferInfo);
+        void Buffer_PxRunning_Zone0   (BufferInfo * aBufferInfo);
+        void Buffer_RxRunning_Zone0   (BufferInfo * aBufferInfo);
+        void Buffer_TxRunning_Zone0   (BufferInfo * aBufferInfo);
+
+        // ===== Buffer_Enter_ State ========================================
+        void Buffer_Enter_RxProgramming_Zone0(BufferInfo * aBufferInfo, unsigned int aIndex, const char * aFrom);
+        void Buffer_Enter_Stopped_Zone0      (BufferInfo * aBufferInfo, unsigned int aIndex, const char * aFrom);
 
         // ===== IoCtl ======================================================
         int IoCtl_Config_Get      (      Adapter_Config * aOut);
         int IoCtl_Config_Set      (const Adapter_Config * aIn , Adapter_Config * aOut);
         int IoCtl_Connect         (const void           * aIn , void           * aOut, void * aFileObject );
+        int IoCtl_Event_Wait      (const void           * aIn , Event * aOut, unsigned int aOutSize_byte);
+        int IoCtl_Event_Wait_Cancel();
         int IoCtl_Info_Get        (      Adapter_Info   * aOut) const;
         int IoCtl_Packet_Drop     ();
         int IoCtl_Packet_Send_Ex  (const void           * aIn , unsigned int aInSize_byte );
@@ -227,6 +255,13 @@ namespace OpenNetK
 
         BufferCountAndIndex mBuffer;
         BufferInfo          mBuffers[OPEN_NET_BUFFER_QTY];
+
+        Event_Callback mEvent_Callback;
+        void         * mEvent_Context ;
+        unsigned int   mEvent_In      ;
+        unsigned int   mEvent_Out     ;
+        bool           mEvent_Pending ;
+        Event          mEvents[EVENT_QTY];
 
     };
 

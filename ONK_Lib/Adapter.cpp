@@ -54,19 +54,16 @@
 
 // ===== Buffer state =======================================================
 
-//                  +--> STOPPED <--------------------------------+
-//                  |                                             |
-// --> INVALID --> TX_RUNNING <-- TX_PROGRAMMING <-----------+    |
-//                  |                                        |    |
-//                  +--> RX_PROGRAMMING --> RX_RUNNING --> PX_RUNNING
+// See ONK_Lib/_DocDev/BufferStates.graphml
 #define BUFFER_STATE_INVALID        (0)
-#define BUFFER_STATE_PX_RUNNING     (1)
-#define BUFFER_STATE_RX_PROGRAMMING (2)
-#define BUFFER_STATE_RX_RUNNING     (3)
-#define BUFFER_STATE_STOPPED        (4)
-#define BUFFER_STATE_TX_PROGRAMMING (5)
-#define BUFFER_STATE_TX_RUNNING     (6)
-#define BUFFER_STATE_QTY            (7)
+#define BUFFER_STATE_EVENT_PENDING  (1)
+#define BUFFER_STATE_PX_RUNNING     (2)
+#define BUFFER_STATE_RX_PROGRAMMING (3)
+#define BUFFER_STATE_RX_RUNNING     (4)
+#define BUFFER_STATE_STOPPED        (5)
+#define BUFFER_STATE_TX_PROGRAMMING (6)
+#define BUFFER_STATE_TX_RUNNING     (7)
+#define BUFFER_STATE_QTY            (8)
 
 // Static function declaration
 /////////////////////////////////////////////////////////////////////////////
@@ -102,6 +99,20 @@ namespace OpenNetK
             aInfo->mIn_MinSize_byte  = sizeof(IoCtl_Connect_In );
             aInfo->mOut_MinSize_byte = sizeof(IoCtl_Connect_Out);
             break;
+        case IOCTL_EVENT_WAIT      :
+            aInfo->mIn_MaxSize_byte  = sizeof(IoCtl_Event_Wait_In);
+            aInfo->mIn_MinSize_byte  = sizeof(IoCtl_Event_Wait_In);
+            aInfo->mOut_MinSize_byte = sizeof(OpenNetK::Event[32]);
+
+            #ifdef _KMS_LINUX_
+                aInfo->mOut_MinSize_byte = sizeof(OpenNetK::Event[32]);
+            #endif
+
+            #ifdef _KMS_WINDOWS_
+                aInfo->mOut_MinSize_byte = sizeof(OpenNetK::Event);
+            #endif
+            break;
+
         case IOCTL_INFO_GET        :
             aInfo->mOut_MinSize_byte = sizeof(Adapter_Info);
             break;
@@ -133,6 +144,7 @@ namespace OpenNetK
             #endif
             break;
 
+        case IOCTL_EVENT_WAIT_CANCEL     :
         case IOCTL_PACKET_DROP           :
         case IOCTL_PACKET_GENERATOR_START:
         case IOCTL_PACKET_GENERATOR_STOP :
@@ -190,6 +202,14 @@ namespace OpenNetK
         mStatistics_Start_us = mOSDep->GetTimeStamp();
     }
 
+    void Adapter::Event_RegisterCallback(Adapter::Event_Callback aCallback, void * aContext)
+    {
+        ASSERT(NULL != aCallback);
+
+        mEvent_Callback = aCallback;
+        mEvent_Context  = aContext ;
+    }
+
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
@@ -207,6 +227,10 @@ namespace OpenNetK
         memset(&mPacketGenerator_Config.mPacket, 0xff,                               6);
 
         memset(&mStatistics, 0, sizeof(mStatistics));
+
+        mEvent_Callback = NULL;
+        mEvent_In       =    0;
+        mEvent_Out      =    0;
 
         mPacketGenerator_Config.mAllowedIndexRepeat = REPEAT_COUNT_MAX;
         mPacketGenerator_Config.mPacketPer100ms     =                1;
@@ -359,7 +383,7 @@ namespace OpenNetK
 
             BufferCountAndIndex lBuffer;
 
-            do
+            for (unsigned int i = 0; i < mBuffer.mCount; i ++)
             {
                 lBuffer = mBuffer;
 
@@ -373,6 +397,7 @@ namespace OpenNetK
                     {
                     case BUFFER_STATE_STOPPED: Buffer_Release_Zone0(); break;
 
+                    case BUFFER_STATE_EVENT_PENDING :
                     case BUFFER_STATE_PX_RUNNING    :
                     case BUFFER_STATE_RX_PROGRAMMING:
                     case BUFFER_STATE_RX_RUNNING    :
@@ -383,10 +408,29 @@ namespace OpenNetK
                     default: ASSERT(false);
                     }
                 }
+
+                if ((lBuffer.mCount == mBuffer.mCount) && (lBuffer.mPx == mBuffer.mPx) && (lBuffer.mRx == mBuffer.mRx) && (lBuffer.mTx == mBuffer.mTx))
+                {
+                    break;
+                }
             }
-            while ((lBuffer.mCount != mBuffer.mCount) || (lBuffer.mPx != mBuffer.mPx) || (lBuffer.mRx != mBuffer.mRx) || (lBuffer.mTx != mBuffer.mTx));
 
         mZone0->Unlock();
+
+        // We cannot call the event callback while holding the mZone0 lock
+        // because the callback is calling Adapter::IoCtl and Adapter::IoCtl
+        // also acquire this lock. Also, calling the callback while
+        // processing packet delay the packet processing. More, waiting here
+        // help to return more than one event at the same time.
+        if (mEvent_Pending)
+        {
+            if (NULL != mEvent_Callback)
+            {
+                mEvent_Callback(mEvent_Context);
+            }
+
+            mEvent_Pending = false;
+        }
 
         if ( NULL != mPacketGenerator_FileObject )
         {
@@ -457,23 +501,33 @@ namespace OpenNetK
 
         switch (aCode)
         {
-        case IOCTL_CONFIG_GET                 : lResult = IoCtl_Config_Get                (reinterpret_cast<      Adapter_Config *>(aOut)); break;
-        case IOCTL_CONFIG_SET                 : lResult = IoCtl_Config_Set                (reinterpret_cast<const Adapter_Config *>(aIn ), reinterpret_cast<Adapter_Config *>(aOut)); break;
-        case IOCTL_CONNECT                    : lResult = IoCtl_Connect                   (                                                 aIn  , aOut, aFileObject  ); break;
-        case IOCTL_INFO_GET                   : lResult = IoCtl_Info_Get                  (reinterpret_cast<      Adapter_Info   *>(aOut)); break;
+        case IOCTL_CONFIG_GET                 : lResult = IoCtl_Config_Get                (reinterpret_cast<Adapter_Config *>(aOut)); break;
+        case IOCTL_INFO_GET                   : lResult = IoCtl_Info_Get                  (reinterpret_cast<Adapter_Info   *>(aOut)); break;
+
+        case IOCTL_CONFIG_SET                 : lResult = IoCtl_Config_Set                (reinterpret_cast<const Adapter_Config         *>(aIn), reinterpret_cast<Adapter_Config         *>(aOut)); break;
+        case IOCTL_PACKET_GENERATOR_CONFIG_SET: lResult = IoCtl_PacketGenerator_Config_Set(reinterpret_cast<const PacketGenerator_Config *>(aIn), reinterpret_cast<PacketGenerator_Config *>(aOut)); break;
+
+        case IOCTL_CONNECT                    : lResult = IoCtl_Connect                   (aIn, aOut, aFileObject); break;
+
+        case IOCTL_EVENT_WAIT                 : lResult = IoCtl_Event_Wait                (aIn, reinterpret_cast<Event    *>(aOut), aOutSize_byte); break;
+        case IOCTL_STATISTICS_GET             : lResult = IoCtl_Statistics_Get            (aIn, reinterpret_cast<uint32_t *>(aOut), aOutSize_byte); break;
+
+        case IOCTL_EVENT_WAIT_CANCEL          : lResult = IoCtl_Event_Wait_Cancel         (); break;
         case IOCTL_PACKET_DROP                : lResult = IoCtl_Packet_Drop               (); break;
-        case IOCTL_PACKET_SEND_EX             : lResult = IoCtl_Packet_Send_Ex            (                                         aIn  , aInSize_byte ); break;
-        case IOCTL_PACKET_GENERATOR_CONFIG_GET: lResult = IoCtl_PacketGenerator_Config_Get(reinterpret_cast<      PacketGenerator_Config *>(aOut)); break;
-        case IOCTL_PACKET_GENERATOR_CONFIG_SET: lResult = IoCtl_PacketGenerator_Config_Set(reinterpret_cast<const PacketGenerator_Config *>(aIn ), reinterpret_cast<PacketGenerator_Config *>(aOut)); break;
-        case IOCTL_PACKET_GENERATOR_START     : lResult = IoCtl_PacketGenerator_Start     ( aFileObject ); break;
         case IOCTL_PACKET_GENERATOR_STOP      : lResult = IoCtl_PacketGenerator_Stop      (); break;
-        case IOCTL_START                      : lResult = IoCtl_Start                     (reinterpret_cast<const Buffer         *>(aIn ), aInSize_byte ); break;
-        case IOCTL_STATE_GET                  : lResult = IoCtl_State_Get                 (reinterpret_cast<      Adapter_State  *>(aOut)); break;
-        case IOCTL_STATISTICS_GET             : lResult = IoCtl_Statistics_Get            (                                         aIn  , reinterpret_cast<uint32_t *>(aOut), aOutSize_byte); break;
         case IOCTL_STATISTICS_RESET           : lResult = IoCtl_Statistics_Reset          (); break;
         case IOCTL_STOP                       : lResult = IoCtl_Stop                      (); break;
         case IOCTL_TX_DISABLE                 : lResult = IoCtl_Tx_Disable                (); break;
         case IOCTL_TX_ENABLE                  : lResult = IoCtl_Tx_Enable                 (); break;
+
+        case IOCTL_PACKET_SEND_EX             : lResult = IoCtl_Packet_Send_Ex            (aIn, aInSize_byte ); break;
+
+        case IOCTL_PACKET_GENERATOR_CONFIG_GET: lResult = IoCtl_PacketGenerator_Config_Get(reinterpret_cast<PacketGenerator_Config *>(aOut)); break;
+        case IOCTL_STATE_GET                  : lResult = IoCtl_State_Get                 (reinterpret_cast<Adapter_State          *>(aOut)); break;
+
+        case IOCTL_PACKET_GENERATOR_START     : lResult = IoCtl_PacketGenerator_Start     (aFileObject); break;
+
+        case IOCTL_START                      : lResult = IoCtl_Start                     (reinterpret_cast<const Buffer *>(aIn ), aInSize_byte); break;
 
         default: ASSERT(false);
         }
@@ -520,7 +574,7 @@ namespace OpenNetK
 
         memset(aHeader_XA, 0, lPacketOffset_byte);
 
-        aHeader_XA->mEvents                = OPEN_NET_BUFFER_EVENT_PROCESSED;
+        aHeader_XA->mEvents                = OPEN_NET_BUFFER_PROCESSED;
         aHeader_XA->mPacketInfoOffset_byte = sizeof(OpenNet_BufferHeader);
         aHeader_XA->mPacketQty             = lPacketQty;
         aHeader_XA->mPacketSize_byte       = lPacketSize_byte;
@@ -703,6 +757,34 @@ namespace OpenNetK
         }
     }
 
+    // aType
+    // aData32
+    // aData64
+    //
+    // CRITICAL_PATH  BufferEvent  1 / Buffer event
+    void Adapter::Event_Report_Zone0(OpenNetK::Event_Type aType, uint32_t aData)
+    {
+        ASSERT(OpenNetK::EVENT_TYPE_QTY > aType);
+
+        ASSERT(EVENT_QTY > mEvent_In            );
+        ASSERT(EVENT_QTY > mEvent_Out           );
+        ASSERT(NULL      != mOSDep              );
+        ASSERT(NULL      != mOSDep->GetTimeStamp);
+
+        mEvents[mEvent_In].mData         = aData;
+        mEvents[mEvent_In].mTimestamp_us = mOSDep->GetTimeStamp();
+        mEvents[mEvent_In].mType         = aType;
+
+        mEvent_In = (mEvent_In + 1) % EVENT_QTY;
+        if (mEvent_Out == mEvent_In)
+        {
+            // The ring is full, we drop the oldest event
+            mEvent_Out = (mEvent_Out + 1) % EVENT_QTY;
+        }
+
+        mEvent_Pending = true;
+    }
+
     // CRITICAL PATH  Interrupt
     //                1 / buffer
     void Adapter::Interrupt_Process2_Px_Zone0()
@@ -713,6 +795,7 @@ namespace OpenNetK
             {
             case BUFFER_STATE_PX_RUNNING : Buffer_PxRunning_Zone0  ( mBuffers + mBuffer.mPx ); break;
 
+            case BUFFER_STATE_EVENT_PENDING:
             case BUFFER_STATE_STOPPED:
                 mBuffer.mPx = (mBuffer.mPx + 1) % mBuffer.mCount;
                 break;
@@ -742,6 +825,7 @@ namespace OpenNetK
             {
             case BUFFER_STATE_RX_RUNNING : Buffer_RxRunning_Zone0( mBuffers + mBuffer.mRx ); break;
 
+            case BUFFER_STATE_EVENT_PENDING:
             case BUFFER_STATE_STOPPED:
                 mBuffer.mRx = (mBuffer.mRx + 1) % mBuffer.mCount;
                 break;
@@ -769,7 +853,8 @@ namespace OpenNetK
         {
             switch ( mBuffers[ mBuffer.mTx ].mState )
             {
-            case BUFFER_STATE_TX_RUNNING : Buffer_TxRunning_Zone0( mBuffers + mBuffer.mTx ); break;
+            case BUFFER_STATE_EVENT_PENDING: Buffer_EventPending_Zone0(mBuffers + mBuffer.mTx); break;
+            case BUFFER_STATE_TX_RUNNING   : Buffer_TxRunning_Zone0   (mBuffers + mBuffer.mTx); break;
 
             case BUFFER_STATE_STOPPED:
                 mBuffer.mTx = (mBuffer.mTx + 1) % mBuffer.mCount;
@@ -804,13 +889,50 @@ namespace OpenNetK
         }
     }
 
-    // ===== Buffer_State ===================================================
+
+    // ===== Buffer_ State ==================================================
+    // aBufferInfo [---;R--]
+    //
     // Level  SoftInt
 
     // CRITICAL PATH  Interrupt
     //                1 / buffer
 
-    // aBufferInfo [---;R--]
+    void Adapter::Buffer_EventPending_Zone0(BufferInfo * aBufferInfo)
+    {
+        TRACE_DEBUG "Buffer_EventPending_Zone0(  )" DEBUG_EOL TRACE_END;
+
+        ASSERT(NULL != aBufferInfo            );
+        ASSERT(NULL != aBufferInfo->mHeader_XA);
+
+        ASSERT(BUFFER_STATE_EVENT_PENDING == aBufferInfo->mState);
+
+        ASSERT(mBuffer.mCount > mBuffer.mTx);
+
+        if (aBufferInfo->mFlags.mStopRequested)
+        {
+            Buffer_Enter_Stopped_Zone0(aBufferInfo, mBuffer.mTx, "EVENT_PENDING");
+        }
+        else
+        {
+            aBufferInfo->mEvents = aBufferInfo->mHeader_XA->mEvents;
+            if (0 != (OPEN_NET_BUFFER_RESERVED & aBufferInfo->mEvents))
+            {
+                TRACE_ERROR "Buffer_EventPending_Zone0 - A%u B%u - Corrupted" DEBUG_EOL, mAdapterNo, mBuffer.mTx TRACE_END;
+
+                mStatistics[ADAPTER_STATS_CORRUPTED_BUFFER] ++;
+
+                Buffer_Enter_Stopped_Zone0(aBufferInfo, mBuffer.mTx, "EVENT_PENDING");
+            }
+            else if (0 == (OPEN_NET_BUFFER_EVENT & aBufferInfo->mEvents))
+            {
+                Buffer_Enter_RxProgramming_Zone0(aBufferInfo, mBuffer.mTx, "EVENT_PENDING");
+            }
+        }
+
+        mBuffer.mTx = (mBuffer.mTx + 1) % mBuffer.mCount;
+    }
+
     void Adapter::Buffer_PxRunning_Zone0(BufferInfo * aBufferInfo)
     {
         // TRACE_DEBUG "%s(  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
@@ -827,63 +949,56 @@ namespace OpenNetK
 
         if (aBufferInfo->mFlags.mStopRequested)
         {
-            TRACE_BUFFER_STATE_CHANGE(mBuffer.mPx, "PX_RUNNING", "STOPPED");
-
-            aBufferInfo->mState = BUFFER_STATE_STOPPED;
+            Buffer_Enter_Stopped_Zone0(aBufferInfo, mBuffer.mPx, "PX_RUNNING");
 
             mBuffer.mPx = (mBuffer.mPx + 1) % mBuffer.mCount;
         }
         else
         {
-            uint32_t lEvents = aBufferInfo->mHeader_XA->mEvents;
-
-            if (0 != (OPEN_NET_BUFFER_EVENT_RESERVED & lEvents))
+            aBufferInfo->mEvents = aBufferInfo->mHeader_XA->mEvents;
+            if (0 != (OPEN_NET_BUFFER_RESERVED & aBufferInfo->mEvents))
             {
                 TRACE_ERROR "%s - A%u B%u - Corrupted" DEBUG_EOL, __FUNCTION__, mAdapterNo, mBuffer.mPx TRACE_END;
 
                 mStatistics[ADAPTER_STATS_CORRUPTED_BUFFER] ++;
 
-                TRACE_BUFFER_STATE_CHANGE(mBuffer.mPx, "PX_RUNNING", "STOPPED");
-
-                aBufferInfo->mState = BUFFER_STATE_STOPPED;
+                Buffer_Enter_Stopped_Zone0(aBufferInfo, mBuffer.mPx, "PX_RUNNING");
 
                 mBuffer.mPx = (mBuffer.mPx + 1) % mBuffer.mCount;
             }
-            else
+            else if (0 != (OPEN_NET_BUFFER_PROCESSED & aBufferInfo->mEvents))
             {
-                if (0 != (OPEN_NET_BUFFER_EVENT_PROCESSED & lEvents))
+                if (0 != (OPEN_NET_BUFFER_EVENT & aBufferInfo->mEvents))
                 {
-                    if (NULL == mAdapters)
-                    {
-                        TRACE_BUFFER_STATE_CHANGE(mBuffer.mPx, "PX_COMPLETED", "STOPPED");
-
-                        aBufferInfo->mState = BUFFER_STATE_STOPPED;
-
-                        Buffer_WriteMarker_Zone0(aBufferInfo);
-                    }
-                    else
-                    {
-                        // Here, we use a temporary state because Buffer_Send_Zone0
-                        // release the gate to avoid deadlock with the other adapter's
-                        // gates.
-
-                        TRACE_BUFFER_STATE_CHANGE(mBuffer.mPx, "PX_COMPLETED", "TX_PROGRAMMING");
-
-                        aBufferInfo->mState = BUFFER_STATE_TX_PROGRAMMING;
-
-                        Buffer_Send_Zone0(aBufferInfo);
-
-                        ASSERT(BUFFER_STATE_TX_PROGRAMMING == aBufferInfo->mState);
-
-                        TRACE_BUFFER_STATE_CHANGE(mBuffer.mPx, "TX_PROGRAMMING", "TX_RUNNING");
-
-                        aBufferInfo->mState = BUFFER_STATE_TX_RUNNING;
-
-                        Buffer_TxRunning_Zone0(aBufferInfo);
-                    }
-
-                    mBuffer.mPx = (mBuffer.mPx + 1) % mBuffer.mCount;
+                    Event_Report_Zone0(OpenNetK::EVENT_TYPE_BUFFER, mBuffer.mPx);
                 }
+
+                if (NULL == mAdapters)
+                {
+                    Buffer_Enter_Stopped_Zone0(aBufferInfo, mBuffer.mPx, "PX_RUNNING");
+
+                    Buffer_WriteMarker_Zone0(aBufferInfo);
+                }
+                else
+                {
+                    // Here, we use a temporary state because Buffer_Send_Zone0
+                    // release the gate to avoid deadlock with the other adapter's
+                    // gates.
+
+                    TRACE_BUFFER_STATE_CHANGE(mBuffer.mPx, "PX_COMPLETED", "TX_PROGRAMMING");
+                    aBufferInfo->mState = BUFFER_STATE_TX_PROGRAMMING;
+
+                    Buffer_Send_Zone0(aBufferInfo);
+
+                    ASSERT(BUFFER_STATE_TX_PROGRAMMING == aBufferInfo->mState);
+
+                    TRACE_BUFFER_STATE_CHANGE(mBuffer.mPx, "TX_PROGRAMMING", "TX_RUNNING");
+                    aBufferInfo->mState = BUFFER_STATE_TX_RUNNING;
+
+                    Buffer_TxRunning_Zone0(aBufferInfo);
+                }
+
+                mBuffer.mPx = (mBuffer.mPx + 1) % mBuffer.mCount;
             }
         }
     }
@@ -908,9 +1023,9 @@ namespace OpenNetK
         if (0 == aBufferInfo->mRx_Counter)
         {
             TRACE_BUFFER_STATE_CHANGE(mBuffer.mRx, "RX_RUNNING", "PX_RUNNING");
+            aBufferInfo->mState = BUFFER_STATE_PX_RUNNING;
 
             aBufferInfo->mHeader_XA->mEvents = 0;
-            aBufferInfo->mState = BUFFER_STATE_PX_RUNNING;
             Buffer_WriteMarker_Zone0(aBufferInfo);
 
             mBuffer.mRx = (mBuffer.mRx + 1) % mBuffer.mCount;
@@ -932,33 +1047,67 @@ namespace OpenNetK
         {
             if (aBufferInfo->mFlags.mStopRequested)
             {
-                TRACE_BUFFER_STATE_CHANGE(mBuffer.mTx, "TX_RUNNING", "STOPPED");
-
-                aBufferInfo->mState = BUFFER_STATE_STOPPED;
+                Buffer_Enter_Stopped_Zone0(aBufferInfo, mBuffer.mTx, "TX_RUNNING");
 
                 Buffer_WriteMarker_Zone0(aBufferInfo);
             }
             else
             {
-                // Here, we use a temporary state because Buffer_Receivd_Zone
-                // release the gate to avoid deadlock with the Hardware's
-                // gates.
-
-                TRACE_BUFFER_STATE_CHANGE(mBuffer.mTx, "TX_RUNNING", "RX_PROGRAMMING");
-
-                aBufferInfo->mState = BUFFER_STATE_RX_PROGRAMMING;
-
-                Buffer_Receive_Zone0(aBufferInfo);
-
-                ASSERT(BUFFER_STATE_RX_PROGRAMMING == aBufferInfo->mState);
-
-                TRACE_BUFFER_STATE_CHANGE(mBuffer.mTx, "RX_PROGRAMMING", "RX_RUNNING");
-
-                aBufferInfo->mState = BUFFER_STATE_RX_RUNNING;
+                if (0 == (OPEN_NET_BUFFER_EVENT & aBufferInfo->mEvents))
+                {
+                    Buffer_Enter_RxProgramming_Zone0(aBufferInfo, mBuffer.mTx, "TX_RUNNING");
+                }
+                else
+                {
+                    TRACE_BUFFER_STATE_CHANGE(mBuffer.mTx, "TX_RUNNING", "EVENT_PENDING");
+                    aBufferInfo->mState = BUFFER_STATE_EVENT_PENDING;
+                }
             }
 
             mBuffer.mTx = (mBuffer.mTx + 1) % mBuffer.mCount;
         }
+    }
+
+    // ===== Buffer_Enter_ State ============================================
+    // aBufferInfo
+    // aIndex       Used for traces
+    // aFrom        Used for traces
+    //
+    // Level  SoftInt
+
+    // CRITICAL PATH  Interrupt.Rx
+    void Adapter::Buffer_Enter_RxProgramming_Zone0(BufferInfo * aBufferInfo, unsigned int aIndex, const char * aFrom)
+    {
+        ASSERT(NULL != aBufferInfo);
+        ASSERT(NULL != aFrom      );
+
+        // Here, we use a temporary state because Buffer_Receivd_Zone release
+        // the gate to avoid deadlock with the Hardware's gates.
+
+        TRACE_BUFFER_STATE_CHANGE(aIndex, aFrom, "RX_PROGRAMMING");
+        aBufferInfo->mState = BUFFER_STATE_RX_PROGRAMMING;
+
+        Buffer_Receive_Zone0(aBufferInfo);
+
+        ASSERT(BUFFER_STATE_RX_PROGRAMMING == aBufferInfo->mState);
+
+        TRACE_BUFFER_STATE_CHANGE(aIndex, "RX_PROGRAMMING", "RX_RUNNING");
+        aBufferInfo->mState = BUFFER_STATE_RX_RUNNING;
+
+        (void)(aFrom );
+        (void)(aIndex);
+    }
+
+    void Adapter::Buffer_Enter_Stopped_Zone0(BufferInfo * aBufferInfo, unsigned int aIndex, const char * aFrom)
+    {
+        ASSERT(NULL != aBufferInfo);
+        ASSERT(NULL != aFrom      );
+
+        TRACE_BUFFER_STATE_CHANGE(aIndex, aFrom, "STOPPED");
+        aBufferInfo->mState = BUFFER_STATE_STOPPED;
+
+        (void)(aFrom );
+        (void)(aIndex);
     }
 
     // ===== IoCtl ==========================================================
@@ -1056,6 +1205,74 @@ namespace OpenNetK
 
         TRACE_ERROR "%s - IOCTL_RESULT_TOO_MANY_ADAPTER\n", __FUNCTION__ TRACE_END;
         return IOCTL_RESULT_TOO_MANY_ADAPTER;
+    }
+
+    // CRITICAL PATH  BufferEvent
+    int Adapter::IoCtl_Event_Wait(const void * aIn, OpenNetK::Event * aOut, unsigned int aOutSize_byte)
+    {
+        ASSERT(NULL                    != aIn          );
+        ASSERT(NULL                    != aOut         );
+        ASSERT(sizeof(OpenNetK::Event) <  aOutSize_byte);
+
+        const IoCtl_Event_Wait_In * lIn           = reinterpret_cast<const IoCtl_Event_Wait_In *>(aIn);
+        unsigned int                lOutSize_byte = aOutSize_byte;
+
+        if (sizeof(OpenNetK::Event) > lIn->mOutputSize_byte)
+        {
+            TRACE_ERROR "IoCtl_Event_Wait - IOCTL_RESULT_INVALID_PARAMETER" DEBUG_EOL TRACE_END;
+            return IOCTL_RESULT_INVALID_PARAMETER;
+        }
+
+        if (lIn->mOutputSize_byte < lOutSize_byte)
+        {
+            lOutSize_byte = lIn->mOutputSize_byte;
+        }
+
+        unsigned int lCount = lOutSize_byte / sizeof(OpenNetK::Event);
+        unsigned int lIndex = 0;
+
+        uint32_t lFlags = mZone0->LockFromThread();
+
+            while (mEvent_In != mEvent_Out)
+            {
+                aOut[lIndex] = mEvents[mEvent_Out];
+
+                mEvent_Out = (mEvent_Out + 1) % EVENT_QTY;
+
+                lIndex++;
+
+                if (lCount == lIndex)
+                {
+                    break;
+                }
+            }
+
+        mZone0->UnlockFromThread(lFlags);
+
+        return (0 == lIndex) ? IOCTL_RESULT_WAIT : (sizeof(OpenNetK::Event) * lIndex);
+    }
+
+    int Adapter::IoCtl_Event_Wait_Cancel()
+    {
+        ASSERT(NULL != mZone0);
+
+        uint32_t lFlags = mZone0->LockFromThread();
+
+            Event_Report_Zone0(OpenNetK::EVENT_TYPE_WAIT_CANCEL, 0);
+
+        mZone0->UnlockFromThread(lFlags);
+
+        if (mEvent_Pending)
+        {
+            if (NULL != mEvent_Callback)
+            {
+                mEvent_Callback(mEvent_Context);
+            }
+
+            mEvent_Pending = false;
+        }
+
+        return IOCTL_RESULT_OK;
     }
 
     int Adapter::IoCtl_Info_Get(Adapter_Info * aOut) const
@@ -1377,6 +1594,9 @@ namespace OpenNetK
         OpenNetK_IoCtl_Result lResult;
 
         uint32_t lFlags = mZone0->LockFromThread();
+
+            mEvent_In  = 0;
+            mEvent_Out = 0;
 
             if (0 < mBuffer.mCount)
             {

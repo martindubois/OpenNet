@@ -7,17 +7,14 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
-
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Windows ============================================================
 #include <Windows.h>
 
 // ===== OpenNet ============================================================
 #include "Adapter_Windows.h"
-#include "Buffer_Data_OpenCL.h"
+#include "Buffer_OpenCL.h"
 #include "OCLW.h"
 #include "Processor_OpenCL.h"
 
@@ -79,7 +76,7 @@ void Thread_Kernel_OpenCL::Processing_Queue(unsigned int aIndex)
 
     assert(NULL != mBuffers[aIndex]);
 
-    Buffer_Data_OpenCL * lBuffer = dynamic_cast< Buffer_Data_OpenCL * >(mBuffers[aIndex]);
+    Buffer_OpenCL * lBuffer = dynamic_cast< Buffer_OpenCL * >(mBuffers[aIndex]);
     assert(NULL != lBuffer        );
     assert(NULL != lBuffer->mMem  );
 

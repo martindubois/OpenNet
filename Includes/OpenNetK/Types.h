@@ -2,19 +2,21 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Types.h
-/// \brief      OpenNet_BufferHeader, OpenNet_PacketInfo
+/// \brief      OpenNet_BufferHeader, OpenNet_PacketInfo (RT)
 
 #pragma once
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-#define OPEN_NET_BUFFER_EVENT_PROCESSED (0x00000001)
-#define OPEN_NET_BUFFER_EVENT_RESERVED  (0xfffffffe)
+#define OPEN_NET_BUFFER_PROCESSED (0x00000001)
+#define OPEN_NET_BUFFER_EVENT     (0x00000002)
+#define OPEN_NET_BUFFER_RESERVED  (0xfffffffc)
 
 #define OPEN_NET_PACKET_PROCESSED (0x80000000)
+#define OPEN_NET_PACKET_EVENT     (0x40000000)
 
 // Data type
 /////////////////////////////////////////////////////////////////////////////

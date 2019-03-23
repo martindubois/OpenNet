@@ -26,7 +26,7 @@ public:
 
     Processor_CUDA( int aDevice, KmsLib::DebugLog * aDebugLog );
 
-    Buffer_Data * Buffer_Allocate( bool aProfiling, unsigned int aPacketSize_byte, OpenNetK::Buffer * aBuffer);
+    Buffer_Internal * Buffer_Allocate( bool aProfiling, unsigned int aPacketSize_byte, OpenNetK::Buffer * aBuffer);
 
     CUmodule Module_Create(OpenNet::Kernel * aKernel, unsigned int aAdapterNo );
 

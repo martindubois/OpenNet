@@ -14,7 +14,7 @@
 #define SHARED_MEMORY_SIZE_byte (8192)
 
 // ===== Adapter numero =====================================================
-#define ADAPTER_NO_QTY     (31)
+#define ADAPTER_NO_QTY     (30)
 #define ADAPTER_NO_UNKNOWN (99)
 
 // ===== Packet size ========================================================

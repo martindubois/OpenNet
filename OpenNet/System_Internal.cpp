@@ -9,10 +9,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -22,7 +21,6 @@
 #endif
 
 // ===== Import/Includes ====================================================
-#include <KmsLib/Exception.h>
 #include <KmsLib/DriverHandle.h>
 
 // ===== Common =============================================================
@@ -33,6 +31,7 @@
 #include "Constants.h"
 #include "Processor_Internal.h"
 #include "Thread.h"
+#include "Utils.h"
 
 #include "System_Internal.h"
 
@@ -47,8 +46,6 @@ static const char * STATE_NAMES[System_Internal::STATE_QTY] =
 
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
-
-static OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE);
 
 static void SendLoopBackPackets(void * aThis, Adapter_Internal * aAdapter);
 
@@ -190,7 +187,7 @@ OpenNet::Status System_Internal::Adapter_Connect(OpenNet::Adapter * aAdapter)
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog.Log(eE);
 
-        lResult = ExceptionToStatus(eE);
+        lResult = Utl_ExceptionToStatus(eE);
     }
 
     return lResult;
@@ -427,7 +424,7 @@ OpenNet::Status System_Internal::Start(unsigned int aFlags)
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog.Log(eE);
 
-        lResult = ExceptionToStatus(eE);
+        lResult = Utl_ExceptionToStatus(eE);
 
         OpenNet::Status lStatus = Stop();
         if ( OpenNet::STATUS_OK != lStatus )
@@ -484,7 +481,7 @@ OpenNet::Status System_Internal::Stop()
         mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
         mDebugLog.Log(eE);
 
-        return ExceptionToStatus(eE);
+        return Utl_ExceptionToStatus(eE);
     }
 
     #ifdef _KMS_WINDOWS_
@@ -650,7 +647,7 @@ OpenNet::Status System_Internal::Config_Apply(const Config & aConfig)
             mDebugLog.Log(__FILE__, __FUNCTION__, __LINE__);
             mDebugLog.Log(eE);
 
-            return ExceptionToStatus(eE);
+            return Utl_ExceptionToStatus(eE);
         }
     }
 
@@ -692,21 +689,6 @@ void System_Internal::Threads_Release()
 
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
-
-// aE [---;R--]
-//
-// Threads  Apps
-OpenNet::Status ExceptionToStatus(const KmsLib::Exception * aE)
-{
-    assert(NULL != aE);
-
-    switch (aE->GetCode())
-    {
-    case KmsLib::Exception::CODE_IOCTL_ERROR: return OpenNet::STATUS_IOCTL_ERROR;
-    }
-
-    return OpenNet::STATUS_EXCEPTION;
-}
 
 void SendLoopBackPackets(void * aThis, Adapter_Internal * aAdapter)
 {

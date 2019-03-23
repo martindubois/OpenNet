@@ -18,7 +18,7 @@
 #include "Adapter_Internal.h"
 #include "Processor_Internal.h"
 
-class Buffer_Data;
+class Buffer_Internal;
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
@@ -33,6 +33,8 @@ public:
     Thread(Processor_Internal * aProcessor, KmsLib::DebugLog * aDebugLog);
 
     void AddAdapter(Adapter_Internal * aAdapter);
+
+    Buffer_Internal * GetBuffer(Adapter_Internal * aAdapter, unsigned int aIndex);
 
     OpenNet::Kernel * GetKernel();
 
@@ -85,11 +87,11 @@ protected:
 
     virtual unsigned int Run();
 
-    Adapter_Vector       mAdapters    ;
-    Buffer_Data_Vector   mBuffers     ;
-    KmsLib::DebugLog   * mDebugLog    ;
-    OpenNet::Kernel    * mKernel      ;
-    Processor_Internal * mProcessor   ;
-    unsigned int         mQueueDepth  ;
+    Adapter_Vector         mAdapters  ;
+    Buffer_Internal_Vector mBuffers   ;
+    KmsLib::DebugLog     * mDebugLog  ;
+    OpenNet::Kernel      * mKernel    ;
+    Processor_Internal   * mProcessor ;
+    unsigned int           mQueueDepth;
 
 };

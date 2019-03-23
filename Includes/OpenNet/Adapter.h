@@ -62,6 +62,8 @@ namespace OpenNet
         typedef OpenNetK::Adapter_Info   Info  ;
         typedef OpenNetK::Adapter_State  State ;
 
+        typedef void(*Event_Callback)(void * aContext, const OpenNetK::Event_Type aType, uint64_t aTimestamp_us, uint32_t aData0, void * aData1);
+
         /// \cond en
         /// \brief  Display
         /// \param  aIn   The Config instance to display
@@ -277,11 +279,28 @@ namespace OpenNet
         /// \endcond
         /// \cond fr
         /// \brief  Afficher
-        /// \retval aOut  Le fichier de sortie
+        /// \param  aOut  Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         virtual Status Display(FILE * aOut) const = 0;
+
+        /// \cond en
+        /// \brief  Wait for event
+        /// \param  aCallback  The event processing function. Use NULL to
+        ///                    unregister.
+        /// \param  aContext   The context to pass to the function
+        /// \endcond
+        /// \cond fr
+        /// \brief  Attendre pour des evennements
+        /// \param  aCallback  La fonction de traitement des
+        ///                    &eacute;v&eacute;nements. Passer NULL pour
+        ///                    annuler l'enregistrement.
+        /// \param  aContext   La contexte pass&eacute; &agrave; la fonction
+        /// \endcond
+        /// \retval STATUS_OK
+        /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
+        virtual Status Event_RegisterCallback(Event_Callback aCallback, void * aContext) = 0;
 
         /// \cond en
         /// \brief  This methode send a packet.

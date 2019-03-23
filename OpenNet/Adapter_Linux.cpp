@@ -9,10 +9,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 
 // ===== Includes ===========================================================
@@ -48,7 +47,7 @@ Adapter_Linux::Adapter_Linux(KmsLib::DriverHandle * aHandle, KmsLib::DebugLog * 
 // aBuffers [---;RW-]
 //
 // Thread  Apps
-void Adapter_Linux::Buffers_Allocate( bool aProfiling, Buffer_Data_Vector * aBuffers )
+void Adapter_Linux::Buffers_Allocate( bool aProfiling, Buffer_Internal_Vector * aBuffers )
 {
     assert( NULL != aBuffers );
 
@@ -58,10 +57,10 @@ void Adapter_Linux::Buffers_Allocate( bool aProfiling, Buffer_Data_Vector * aBuf
 
         for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
         {
-            Buffer_Data * lBD = Buffer_Allocate(aProfiling);
-            assert(NULL != lBD);
+            Buffer_Inernal * lBuffer = Buffer_Allocate(aProfiling);
+            assert(NULL != lBuffer);
 
-            aBuffers->push_back(lBD);
+            aBuffers->push_back(lBuffer);
         }
     }
 }
@@ -111,6 +110,13 @@ void Adapter_Linux::SetInputFilter_Internal(OpenNet::Kernel * aKernel)
     assert( NULL != mModule );
 }
 
+void Adapter_Linux::Stop_Internal()
+{
+    assert(NULL != mHandle);
+
+    mHandle->Control(IOCTL_EVENT_WAIT_CANCEL, NULL, 0, NULL, 0);
+}
+
 Thread * Adapter_Linux::Thread_Prepare_Internal( OpenNet::Kernel * aKernel )
 {
     assert( NULL != aKernel );
@@ -133,7 +139,7 @@ Thread * Adapter_Linux::Thread_Prepare_Internal( OpenNet::Kernel * aKernel )
 // Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
 //                                 See Process_CUDA::Buffer_Allocate
 // Threads    Apps
-Buffer_Data * Adapter_Linux::Buffer_Allocate( bool aProfiling )
+Buffer_Internal * Adapter_Linux::Buffer_Allocate( bool aProfiling )
 {
     assert( OPEN_NET_BUFFER_QTY >= mBufferCount );
     assert( NULL                != mProcessor   );
@@ -147,7 +153,7 @@ Buffer_Data * Adapter_Linux::Buffer_Allocate( bool aProfiling )
     Processor_CUDA * lProcessor = dynamic_cast< Processor_CUDA * >( mProcessor );
     assert( NULL != lProcessor );
 
-    Buffer_Data * lResult = lProcessor->Buffer_Allocate( aProfiling, mConfig.mPacketSize_byte, mBuffers + mBufferCount );
+    Buffer_Internal * lResult = lProcessor->Buffer_Allocate( aProfiling, mConfig.mPacketSize_byte, mBuffers + mBufferCount );
     assert( NULL != lResult );
 
     mBufferCount ++;

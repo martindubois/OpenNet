@@ -7,10 +7,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 
 // ===== Windows ============================================================
@@ -44,7 +43,7 @@ Thread_OpenCL::Thread_OpenCL()
 // aAdapters  [---;RW-]
 // aKernel    [---;RW-]
 // aBuffers   [---;RW-]
-void Thread_OpenCL::Prepare(Processor_OpenCL * aProcessor, Adapter_Vector * aAdapters, OpenNet::Kernel * aKernel, Buffer_Data_Vector * aBuffers)
+void Thread_OpenCL::Prepare(Processor_OpenCL * aProcessor, Adapter_Vector * aAdapters, OpenNet::Kernel * aKernel, Buffer_Internal_Vector * aBuffers)
 {
     assert(NULL != aKernel   );
     assert(NULL != aProcessor);

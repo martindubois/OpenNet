@@ -2,8 +2,8 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2019 KMS. All rights reserved.
-/// \file       Includes/OpenNetK/Kernel.h
+/// \copyright  Copyright &copy; 2019 KMS. All rights reserved.
+/// \file       Includes/OpenNetK/Kernel.h (RT)
 
 #pragma once
 
@@ -52,7 +52,7 @@
 /// \endcond
 #define OPEN_NET_FUNCTION_BEGIN                                                                                                                     \
     OPEN_NET_GLOBAL_MEMORY_FENCE;                                                                                                                   \
-    if ( 0 == ( OPEN_NET_BUFFER_EVENT_PROCESSED & aBufferHeader->mEvents ) )                                                                        \
+    if ( 0 == ( OPEN_NET_BUFFER_PROCESSED & aBufferHeader->mEvents ) )                                                                              \
     {                                                                                                                                               \
         OPEN_NET_GLOBAL unsigned char      * lBase       = (OPEN_NET_GLOBAL unsigned char      *)( aBufferHeader );                                 \
         OPEN_NET_GLOBAL OpenNet_PacketInfo * lPacketInfo = (OPEN_NET_GLOBAL OpenNet_PacketInfo *)( lBase + aBufferHeader->mPacketInfoOffset_byte ); \
@@ -66,12 +66,12 @@
 /// \cond fr
 /// \brief  Fin d'une fonction de traitement de paquet
 /// \endcond
-#define OPEN_NET_FUNCTION_END                                         \
+#define OPEN_NET_FUNCTION_END(E)                                      \
         }                                                             \
         OPEN_NET_GLOBAL_MEMORY_FENCE;                                 \
         if ( 0 == OPEN_NET_PACKET_INDEX )                             \
         {                                                             \
-            aBufferHeader->mEvents = OPEN_NET_BUFFER_EVENT_PROCESSED; \
+            aBufferHeader->mEvents = (E) | OPEN_NET_BUFFER_PROCESSED; \
         }                                                             \
         OPEN_NET_GLOBAL_MEMORY_FENCE;                                 \
     }
@@ -95,7 +95,7 @@
 /// \endcond
 #define OPEN_NET_KERNEL_BEGIN                                                                                                                       \
     OPEN_NET_GLOBAL_MEMORY_FENCE;                                                                                                                   \
-    if ( 0 == ( OPEN_NET_BUFFER_EVENT_PROCESSED & aBufferHeader->mEvents ) )                                                                        \
+    if ( 0 == ( OPEN_NET_BUFFER_PROCESSED & aBufferHeader->mEvents ) )                                                                              \
     {                                                                                                                                               \
         OPEN_NET_GLOBAL unsigned char      * lBase       = (OPEN_NET_GLOBAL unsigned char      *)( aBufferHeader );                                 \
         OPEN_NET_GLOBAL OpenNet_PacketInfo * lPacketInfo = (OPEN_NET_GLOBAL OpenNet_PacketInfo *)( lBase + aBufferHeader->mPacketInfoOffset_byte ); \
@@ -109,12 +109,12 @@
 /// \cond fr
 /// \brief  Fin d'un kernel de traitement de paquet
 /// \endcond
-#define OPEN_NET_KERNEL_END                                           \
+#define OPEN_NET_KERNEL_END(E)                                        \
         }                                                             \
         OPEN_NET_GLOBAL_MEMORY_FENCE;                                 \
         if ( 0 == OPEN_NET_PACKET_INDEX )                             \
         {                                                             \
-            aBufferHeader->mEvents = OPEN_NET_BUFFER_EVENT_PROCESSED; \
+            aBufferHeader->mEvents = (E) | OPEN_NET_BUFFER_PROCESSED; \
         }                                                             \
         OPEN_NET_GLOBAL_MEMORY_FENCE;                                 \
     }

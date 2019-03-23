@@ -2,7 +2,7 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright (C) 2018-2019 KMS. All rights reserved.
+/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Adapter_WDF.h
 /// \brief      OpenNetK::Adapter_WDF (DDK, Windows)
 
@@ -92,13 +92,15 @@ namespace OpenNetK
 
     // internal:
 
+        void Event_Process();
+
         void SharedMemory_Release();
 
     private:
 
         NTSTATUS Connect(void * aIn);
 
-        void ProcessIoCtlResult(int aIoCtlResult);
+        void ProcessIoCtlResult(int aIoCtlResult, WDFREQUEST aRequest);
 
         NTSTATUS SharedMemory_ProbeAndLock();
         NTSTATUS SharedMemory_Translate   (void ** aSharedMemory);
@@ -110,6 +112,7 @@ namespace OpenNetK
         Hardware_WDF * mHardware_WDF    ;
         OpenNetK_OSDep mOSDep           ;
         MDL          * mSharedMemory_MDL;
+        WDFQUEUE       mWaiting         ;
 
         // ===== Zone 0 =====================================================
         SpinLock mZone0;

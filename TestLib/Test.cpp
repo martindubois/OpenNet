@@ -10,10 +10,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -612,10 +611,8 @@ namespace TestLib
     {
         assert(ADAPTER_QTY    >  aIndex);
         assert(BUFFER_QTY_MAX >= aQty  );
-        assert(BUFFER_QTY_MIN <= aQty  );
 
         assert(BUFFER_QTY_MAX >= mBufferQty[aIndex]);
-        assert(BUFFER_QTY_MIN <= mBufferQty[aIndex]);
 
         mBufferQty[aIndex] = aQty;
     }
@@ -895,7 +892,6 @@ namespace TestLib
         for (unsigned int i = 0; i < mAdapterCount0; i++)
         {
             assert(BUFFER_QTY_MAX >= mBufferQty[i]);
-            assert(BUFFER_QTY_MIN <= mBufferQty[i]);
 
             OpenNet::Adapter * lAdapter = mAdapters[i];
             assert(NULL != lAdapter);
@@ -1134,7 +1130,8 @@ namespace TestLib
             lResult = 0;
             break;
 
-        case CODE_NOTHING:
+        case CODE_NOTHING     :
+        case CODE_SIGNAL_EVENT:
             lResult = SetFunction(lAdapter, lF, lCI.mFunctionCodes[aAdapterIndex], lCI.mFunctionNames[aAdapterIndex], NULL);
             break;
 
@@ -1217,6 +1214,7 @@ namespace TestLib
 
         case CODE_NOTHING                :
         case CODE_REPLY_ON_SEQUENCE_ERROR:
+        case CODE_SIGNAL_EVENT           :
             lResult = SetKernel(lAdapter, lK, lCI.mKernelArgCount, lCI.mKernelCode, NULL);
             break;
 

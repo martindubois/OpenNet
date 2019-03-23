@@ -19,6 +19,13 @@ class TestE : public TestLib::Test
 
 public:
 
+    typedef struct
+    {
+        unsigned int mBufferEvent;
+        unsigned int mEvent      ;
+    }
+    Counters;
+
     TestE();
 
     // ===== TestLib::Test ==================================================
@@ -32,5 +39,9 @@ protected:
     virtual unsigned int Init ();
     virtual unsigned int Start( unsigned int aFlags );
     virtual unsigned int Stop ();
+
+private:
+
+    Counters mCounters;
 
 };

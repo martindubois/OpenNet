@@ -7,10 +7,7 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
-
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Windows ============================================================
 #include <Windows.h>
@@ -20,7 +17,7 @@
 
 // ===== OpenNet ============================================================
 #include "Adapter_Windows.h"
-#include "Buffer_Data_OpenCL.h"
+#include "Buffer_OpenCL.h"
 #include "OCLW.h"
 #include "Processor_OpenCL.h"
 
@@ -104,7 +101,7 @@ void Thread_Functions_OpenCL::Run_Start()
     {
         assert(NULL != mBuffers[i]);
 
-        Buffer_Data_OpenCL * lBuffer = dynamic_cast<Buffer_Data_OpenCL *>(mBuffers[i]);
+        Buffer_OpenCL * lBuffer = dynamic_cast<Buffer_OpenCL *>(mBuffers[i]);
         assert(NULL != lBuffer);
 
         assert(NULL != lBuffer->mMem);

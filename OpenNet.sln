@@ -15,6 +15,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{6D01BCC7-C19F-4709-A2C6-39FC2CAC8392}"
 	ProjectSection(SolutionItems) = preProject
 		Includes\OpenNet\Adapter.h = Includes\OpenNet\Adapter.h
+		Includes\OpenNet\Buffer.h = Includes\OpenNet\Buffer.h
 		Includes\OpenNet\Function.h = Includes\OpenNet\Function.h
 		Includes\OpenNet\Function_Forward.h = Includes\OpenNet\Function_Forward.h
 		Includes\OpenNet\Kernel.h = Includes\OpenNet\Kernel.h

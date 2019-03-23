@@ -31,7 +31,7 @@ protected:
 
     Thread_OpenCL();
 
-    void Prepare(Processor_OpenCL * aProcessor, Adapter_Vector * aAdapters, OpenNet::Kernel * aKernel, Buffer_Data_Vector * aBuffers);
+    void Prepare(Processor_OpenCL * aProcessor, Adapter_Vector * aAdapters, OpenNet::Kernel * aKernel, Buffer_Internal_Vector * aBuffers);
 
     void Processing_Queue(Event_OpenCL * aEvent, const size_t * aGlobalSize, const size_t * aLocalSize);
 

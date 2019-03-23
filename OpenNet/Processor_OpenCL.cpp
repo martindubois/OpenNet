@@ -7,10 +7,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 
 // ===== Windows ============================================================
@@ -24,7 +23,7 @@
 #include "../Common/Constants.h"
 
 // ===== OpenNet ============================================================
-#include "Buffer_Data_OpenCL.h"
+#include "Buffer_OpenCL.h"
 #include "Constants.h"
 #include "OCLW.h"
 #include "Thread_Functions_OpenCL.h"
@@ -78,7 +77,7 @@ Processor_OpenCL::Processor_OpenCL(cl_platform_id aPlatform, cl_device_id aDevic
 // aKernel       [---;R--]
 // aBuffer       [---;-W-]
 //
-// Return  This method returns a newly created Buffer_Data instance. The
+// Return  This method returns a newly created Buffer_Internal instance. The
 //         caller is responsible for releasing it when it is no longer
 //         needed.
 //
@@ -86,7 +85,7 @@ Processor_OpenCL::Processor_OpenCL(cl_platform_id aPlatform, cl_device_id aDevic
 //                                 See GetKernelWorkGroupInfo
 //                                 See OCLW_CreateBuffer
 // Threads  Apps
-Buffer_Data * Processor_OpenCL::Buffer_Allocate( bool aProfiling, unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer)
+Buffer_Internal * Processor_OpenCL::Buffer_Allocate( bool aProfiling, unsigned int aPacketSize_byte, cl_command_queue aCommandQueue, cl_kernel aKernel, OpenNetK::Buffer * aBuffer)
 {
     assert(NULL                 != aCommandQueue   );
     assert(NULL                 != aKernel         );
@@ -104,7 +103,7 @@ Buffer_Data * Processor_OpenCL::Buffer_Allocate( bool aProfiling, unsigned int a
     aBuffer->mSize_byte += aPacketSize_byte           * static_cast<unsigned int>(lPacketQty);
     aBuffer->mSize_byte += (aBuffer->mSize_byte / OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte) * aPacketSize_byte;
 
-    // OCLW_CreateBuffer ==> OCLW_ReleaseMemObject  See Buffer_Data::Release
+    // OCLW_CreateBuffer ==> OCLW_ReleaseMemObject  See Buffer_OpenCL::Release
     cl_mem lMem = OCLW_CreateBuffer(mContext, CL_MEM_BUS_ADDRESSABLE_AMD, aBuffer->mSize_byte);
     assert(NULL != lMem);
 
@@ -112,7 +111,7 @@ Buffer_Data * Processor_OpenCL::Buffer_Allocate( bool aProfiling, unsigned int a
 
     OCLW_EnqueueMakeBufferResident(aCommandQueue, 1, &lMem, CL_TRUE, &lBusAddress, 0, NULL, NULL);
 
-    Buffer_Data * lResult = new Buffer_Data_OpenCL( aProfiling, lMem, static_cast<unsigned int>(lPacketQty));
+    Buffer_Internal * lResult = new Buffer_OpenCL( aProfiling, lMem, aCommandQueue, static_cast<unsigned int>(lPacketQty));
 
     aBuffer->mBuffer_DA =                               0;
     aBuffer->mBuffer_PA = lBusAddress.surface_bus_address;

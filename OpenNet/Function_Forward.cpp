@@ -1,13 +1,15 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet/Function_Forward.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet/Function_Forward.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+#include "Component.h"
+
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -31,7 +33,7 @@ static const char * CODE =
                                                                               EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED | DESTINATIONS;"    EOL
                                                                               EOL
-"    OPEN_NET_FUNCTION_END"                                                   EOL
+"    OPEN_NET_FUNCTION_END( 0 )"                                              EOL
 "}"                                                                           EOL;
 
 namespace OpenNet

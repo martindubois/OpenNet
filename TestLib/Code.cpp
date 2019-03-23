@@ -7,6 +7,8 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
+#include "Component.h"
+
 // ===== C ==================================================================
 #include <stdlib.h>
 
@@ -53,7 +55,7 @@ static const char * FUNCTION_DO_NOT_REPLY_ON_ERROR_0 =
                                                                                            EOL
 "        lPacketInfo->mSendTo = lResult;"                                                  EOL
                                                                                            EOL
-"    OPEN_NET_FUNCTION_END"                                                                EOL
+"    OPEN_NET_FUNCTION_END( 0 )"                                                           EOL
 "}"                                                                                        EOL;
 
 static const char * FUNCTION_DO_NOT_REPLY_ON_ERROR_1 =
@@ -91,7 +93,7 @@ static const char * FUNCTION_DO_NOT_REPLY_ON_ERROR_1 =
                                                                                            EOL
 "        lPacketInfo->mSendTo = lResult;"                                                  EOL
                                                                                            EOL
-"    OPEN_NET_FUNCTION_END"                                                                EOL
+"    OPEN_NET_FUNCTION_END( 0 )"                                                           EOL
 "}"                                                                                        EOL;
 
 static const char * FUNCTION_FORWARD_0 =
@@ -101,7 +103,7 @@ static const char * FUNCTION_FORWARD_0 =
                                                                                      EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );" EOL
                                                                                      EOL
-"    OPEN_NET_FUNCTION_END"                                                          EOL
+"    OPEN_NET_FUNCTION_END( 0 )"                                                     EOL
 "}"                                                                                  EOL;
 
 static const char * FUNCTION_FORWARD_1 =
@@ -111,7 +113,7 @@ static const char * FUNCTION_FORWARD_1 =
                                                                                      EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );" EOL
                                                                                      EOL
-"    OPEN_NET_FUNCTION_END"                                                          EOL
+"    OPEN_NET_FUNCTION_END( 0 )"                                                     EOL
 "}"                                                                                  EOL;
 
 static const char * FUNCTION_NOTHING_0 =
@@ -121,7 +123,7 @@ static const char * FUNCTION_NOTHING_0 =
                                                             EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED;" EOL
                                                             EOL
-"    OPEN_NET_FUNCTION_END"                                 EOL
+"    OPEN_NET_FUNCTION_END( 0 )"                            EOL
 "}"                                                         EOL;
 
 static const char * FUNCTION_NOTHING_1 =
@@ -131,7 +133,7 @@ static const char * FUNCTION_NOTHING_1 =
                                                             EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED;" EOL
                                                             EOL
-"    OPEN_NET_FUNCTION_END"                                 EOL
+"    OPEN_NET_FUNCTION_END( 0 )"                            EOL
 "}"                                                         EOL;
 
 static const char * FUNCTION_REPLY_ON_ERROR_0 =
@@ -168,7 +170,7 @@ static const char * FUNCTION_REPLY_ON_ERROR_0 =
                                                                                            EOL
 "        lPacketInfo->mSendTo = lResult;"                                                  EOL
                                                                                            EOL
-"    OPEN_NET_FUNCTION_END"                                                                EOL
+"    OPEN_NET_FUNCTION_END( 0 )"                                                           EOL
 "}"                                                                                        EOL;
 
 static const char * FUNCTION_REPLY_ON_ERROR_1 =
@@ -205,8 +207,28 @@ static const char * FUNCTION_REPLY_ON_ERROR_1 =
                                                                                            EOL
 "        lPacketInfo->mSendTo = lResult;"                                                  EOL
                                                                                            EOL
-"    OPEN_NET_FUNCTION_END"                                                                EOL
+"    OPEN_NET_FUNCTION_END( 0 )"                                                           EOL
 "}"                                                                                        EOL;
+
+static const char * FUNCTION_SIGNAL_EVENT_0 =
+"OPEN_NET_FUNCTION_DECLARE( SignalEvent0 )"                 EOL
+"{"                                                         EOL
+"    OPEN_NET_FUNCTION_BEGIN"                               EOL
+                                                            EOL
+"        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED;" EOL
+                                                            EOL
+"    OPEN_NET_FUNCTION_END( OPEN_NET_BUFFER_EVENT )"        EOL
+"}"                                                         EOL;
+
+static const char * FUNCTION_SIGNAL_EVENT_1 =
+"OPEN_NET_FUNCTION_DECLARE( SignalEvent1 )"                 EOL
+"{"                                                         EOL
+"    OPEN_NET_FUNCTION_BEGIN"                               EOL
+                                                            EOL
+"        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED;" EOL
+                                                            EOL
+"    OPEN_NET_FUNCTION_END( OPEN_NET_BUFFER_EVENT )"        EOL
+"}"                                                         EOL;
 
 static const char * KERNEL_DO_NOT_REPLY_ON_ERROR =
 "#include <OpenNetK/Kernel.h>"                                                             EOL
@@ -245,7 +267,7 @@ static const char * KERNEL_DO_NOT_REPLY_ON_ERROR =
                                                                                            EOL
 "        lPacketInfo->mSendTo = lResult;"                                                  EOL
                                                                                            EOL
-"    OPEN_NET_KERNEL_END"                                                                  EOL
+"    OPEN_NET_KERNEL_END( 0 )"                                                             EOL
 "}"                                                                                        EOL;
 
 static const char * KERNEL_FORWARD =
@@ -257,7 +279,7 @@ static const char * KERNEL_FORWARD =
                                                                                      EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );" EOL
                                                                                      EOL
-"    OPEN_NET_KERNEL_END"                                                            EOL
+"    OPEN_NET_KERNEL_END( 0 )"                                                       EOL
 "}"                                                                                  EOL;
 
 static const char * KERNEL_NOTHING =
@@ -269,7 +291,7 @@ static const char * KERNEL_NOTHING =
                                                             EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED;" EOL
                                                             EOL
-"    OPEN_NET_KERNEL_END"                                   EOL
+"    OPEN_NET_KERNEL_END( 0 )"                              EOL
 "}"                                                         EOL;
 
 static const char * KERNEL_REPLY_ON_ERROR =
@@ -308,7 +330,7 @@ static const char * KERNEL_REPLY_ON_ERROR =
                                                                                            EOL
 "        lPacketInfo->mSendTo = lResult;"                                                  EOL
                                                                                            EOL
-"    OPEN_NET_KERNEL_END"                                                                  EOL
+"    OPEN_NET_KERNEL_END( 0 )"                                                             EOL
 "}"                                                                                        EOL;
 
 static const char * KERNEL_REPLY_ON_SEQUENCE_ERROR =
@@ -384,8 +406,20 @@ static const char * KERNEL_REPLY_ON_SEQUENCE_ERROR =
                                                                                                                                EOL
 "        lPacketInfo->mSendTo = lResult;"                                                                                      EOL
                                                                                                                                EOL
-"    OPEN_NET_KERNEL_END"                                                                                                      EOL
+"    OPEN_NET_KERNEL_END( 0 )"                                                                                                 EOL
 "}";
+
+static const char * KERNEL_SIGNAL_EVENT =
+"#include <OpenNetK/Kernel.h>"                              EOL
+                                                            EOL
+"OPEN_NET_KERNEL_DECLARE"                                   EOL
+"{"                                                         EOL
+"    OPEN_NET_KERNEL_BEGIN"                                 EOL
+                                                            EOL
+"        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED;" EOL
+                                                            EOL
+"    OPEN_NET_KERNEL_END( OPEN_NET_BUFFER_EVENT )"          EOL
+"}"                                                         EOL;
 
 // Global Constants
 /////////////////////////////////////////////////////////////////////////////
@@ -400,4 +434,5 @@ const CodeInfo CODES[TestLib::CODE_QTY] =
     { "REPLY"                  , 1, KERNEL_FORWARD                , { FUNCTION_FORWARD_0              , FUNCTION_FORWARD_1               }, { "Forward0"          , "Forward1"           } },
     { "REPLY_ON_ERROR"         , 1, KERNEL_REPLY_ON_ERROR         , { FUNCTION_REPLY_ON_ERROR_0       , FUNCTION_REPLY_ON_ERROR_1        }, { "ReplyOnError0"     , "ReplyOnError1"      } },
     { "REPLY_ON_SEQUENCE_ERROR", 2, KERNEL_REPLY_ON_SEQUENCE_ERROR, { NULL                            , NULL                             }, { NULL                , NULL                 } },
+    { "SIGNAL_EVENT"           , 1, KERNEL_SIGNAL_EVENT           , { FUNCTION_SIGNAL_EVENT_0         , FUNCTION_SIGNAL_EVENT_1          }, { "SignalEvent0"      , "SignalEvent1"       } },
 };

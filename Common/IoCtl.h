@@ -8,13 +8,6 @@
 // type used only to pass data in or out of IoCtl.
 
 // TODO  Common.IoCtl
-//       Normal (Feature) - Ajouter un IoCtl pour attendre sur un evennment
-//       du pilote comme un buffer pret a traiter. Il faut aussi que ce IoCtl
-//       retourne le nombre de fois que l'evenement est survenu depuis le
-//       dernier appel. Cet IoCtl pourra etre utiliser pour le mode KERNEL de
-//       CUDA.
-
-// TODO  Common.IoCtl
 //       Low (Cleanup) - Retirer IOCTL_STATISTICS_RESET
 
 #pragma once
@@ -141,6 +134,14 @@
 // Output  None
 #define IOCTL_TX_ENABLE                   IOCTL_CODE(145)
 
+// Input   IoCtl_Event_Wait_In
+// Output  OpenNetK::Event[ 0 .. N ]
+#define IOCTL_EVENT_WAIT                  IOCTL_CODE_RW(160, OpenNetK::Event[32])
+
+// Input   None
+// Output  None
+#define IOCTL_EVENT_WAIT_CANCEL           IOCTL_CODE(161)
+
 // Data types
 /////////////////////////////////////////////////////////////////////////////
 
@@ -166,6 +167,14 @@ typedef struct
     uint8_t mReserved[60];
 }
 IoCtl_Connect_Out;
+
+typedef struct
+{
+    uint32_t mOutputSize_byte;
+
+    uint8_t mReserved0[60];
+}
+IoCtl_Event_Wait_In;
 
 // mRepeatCount  The number of time the packet must be send
 // mSize_byte    The size of packet

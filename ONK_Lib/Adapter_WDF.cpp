@@ -31,6 +31,12 @@
 // ===== ONK_Lib ============================================================
 #include "OSDep_WDF.h"
 
+// Static function declaration
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== Entry point ========================================================
+static void ProcessEvent(void * aContext);
+
 namespace OpenNetK
 {
 
@@ -49,6 +55,14 @@ namespace OpenNetK
         mDevice       = aDevice      ;
         mHardware_WDF = aHardware_WDF;
 
+        WDF_IO_QUEUE_CONFIG lConfig;
+
+        WDF_IO_QUEUE_CONFIG_INIT(&lConfig, WdfIoQueueDispatchManual);
+
+        NTSTATUS lStatus = WdfIoQueueCreate(aDevice, &lConfig, WDF_NO_OBJECT_ATTRIBUTES, &mWaiting);
+        ASSERT(STATUS_SUCCESS == lStatus );
+        ASSERT(NULL           != mWaiting);
+
         WDF_OBJECT_ATTRIBUTES lAttr;
 
         WDF_OBJECT_ATTRIBUTES_INIT(&lAttr);
@@ -57,7 +71,7 @@ namespace OpenNetK
 
         WDFSPINLOCK lSpinLock;
 
-        NTSTATUS lStatus = WdfSpinLockCreate(&lAttr, &lSpinLock);
+        lStatus = WdfSpinLockCreate(&lAttr, &lSpinLock);
         ASSERT(STATUS_SUCCESS == lStatus  );
         ASSERT(NULL           != lSpinLock);
         (void)(lStatus);
@@ -67,6 +81,8 @@ namespace OpenNetK
 
         mAdapter->Init    (&mZone0);
         mAdapter->SetOSDep(&mOSDep);
+
+        mAdapter->Event_RegisterCallback(ProcessEvent, this);
     }
 
     void Adapter_WDF::FileCleanup(WDFFILEOBJECT aFileObject)
@@ -78,6 +94,7 @@ namespace OpenNetK
         mAdapter->FileCleanup( aFileObject );
     }
 
+    // CRITICAL PATH  BufferEvent
     void Adapter_WDF::IoDeviceControl(WDFREQUEST aRequest, size_t aOutSize_byte, size_t aInSize_byte, ULONG aCode)
     {
         ASSERT(NULL != aRequest);
@@ -108,7 +125,7 @@ namespace OpenNetK
                     {
                         int lRet = mAdapter->IoCtl(WdfRequestGetFileObject( aRequest ), aCode, lIn, static_cast<unsigned int>(aInSize_byte), lOut, static_cast<unsigned int>(aOutSize_byte));
 
-                        ProcessIoCtlResult(lRet);
+                        ProcessIoCtlResult(lRet, aRequest);
 
                         lStatus = ResultToStatus(aRequest, lRet);
                     }
@@ -116,8 +133,10 @@ namespace OpenNetK
             }
         }
 
-        ASSERT(STATUS_PENDING != lStatus);
-        WdfRequestComplete(aRequest, lStatus);
+        if (STATUS_PENDING != lStatus)
+        {
+            WdfRequestComplete(aRequest, lStatus);
+        }
     }
 
     void Adapter_WDF::IoInCallerContext(WDFREQUEST aRequest)
@@ -161,6 +180,28 @@ namespace OpenNetK
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
+    // CRITICAL PATH  BufferEvent
+    void Adapter_WDF::Event_Process()
+    {
+        ASSERT(NULL != mWaiting);
+
+        WDFREQUEST lRequest;
+
+        NTSTATUS lStatus = WdfIoQueueRetrieveNextRequest(mWaiting, &lRequest);
+        if (STATUS_SUCCESS == lStatus)
+        {
+            ASSERT(NULL != lRequest);
+
+            WDF_REQUEST_PARAMETERS lParameters;
+
+            WDF_REQUEST_PARAMETERS_INIT(&lParameters);
+
+            WdfRequestGetParameters(lRequest, &lParameters);
+
+            IoDeviceControl(lRequest, lParameters.Parameters.DeviceIoControl.OutputBufferLength, lParameters.Parameters.DeviceIoControl.InputBufferLength, lParameters.Parameters.DeviceIoControl.IoControlCode);
+        }
+    }
+
     // SharedMemory_Translate ==> SharedMemory_Release
     //
     // Level   PASSIVE
@@ -202,9 +243,14 @@ namespace OpenNetK
 
     // Level   DISPATCH
     // Thread  Queue
-    void Adapter_WDF::ProcessIoCtlResult(int aIoCtlResult)
+    //
+    // CRITICAL PATH  BufferEvent  1+ / IOCTL_EVENT_WAIT
+    void Adapter_WDF::ProcessIoCtlResult(int aIoCtlResult, WDFREQUEST aRequest)
     {
+        ASSERT(NULL != aRequest);
+
         ASSERT(NULL != mHardware_WDF);
+        ASSERT(NULL != mWaiting     );
 
         OpenNetK_IoCtl_Result lIoCtlResult = static_cast<OpenNetK_IoCtl_Result>(aIoCtlResult);
 
@@ -218,6 +264,10 @@ namespace OpenNetK
 
         case IOCTL_RESULT_PROCESSING_NEEDED:
             mHardware_WDF->TrigProcess2();
+            break;
+
+        case IOCTL_RESULT_WAIT:
+            WdfRequestForwardToIoQueue(aRequest, mWaiting);
             break;
         }
     }
@@ -292,6 +342,7 @@ namespace OpenNetK
         return lResult;
     }
 
+    // CRITICAL PATH  1+ / IOCTL_EVENT_WAIT
     NTSTATUS Adapter_WDF::ResultToStatus(WDFREQUEST aRequest, int aIoCtlResult)
     {
         ASSERT(NULL != aRequest);
@@ -321,6 +372,7 @@ namespace OpenNetK
         case IOCTL_RESULT_SYSTEM_ERROR     : lResult = STATUS_UNSUCCESSFUL            ; break;
         case IOCTL_RESULT_TOO_MANY_ADAPTER : lResult = STATUS_TOO_MANY_NODES          ; break;
         case IOCTL_RESULT_TOO_MANY_BUFFER  : lResult = STATUS_TOO_MANY_ADDRESSES      ; break;
+        case IOCTL_RESULT_WAIT             : lResult = STATUS_PENDING                 ; break;
 
         default:
             ASSERT(0 < lIoCtlResult);
@@ -332,4 +384,19 @@ namespace OpenNetK
         return lResult;
     }
 
+}
+
+// Static functions
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== Entry point ========================================================
+
+// CRITICAL PATH  BufferEvent  1 / Buffer event
+void ProcessEvent(void * aContext)
+{
+    ASSERT(NULL != aContext);
+
+    OpenNetK::Adapter_WDF * lThis = reinterpret_cast<OpenNetK::Adapter_WDF *>(aContext);
+
+    lThis->Event_Process();
 }

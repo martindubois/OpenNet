@@ -99,8 +99,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Adapter_Windows.cpp" />
-    <ClCompile Include="Buffer_Data.cpp" />
-    <ClCompile Include="Buffer_Data_OpenCL.cpp" />
+    <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="Buffer_Internal.cpp" />
+    <ClCompile Include="Buffer_OpenCL.cpp" />
     <ClCompile Include="CUW.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -152,14 +153,16 @@
     <ClCompile Include="UserBuffer.cpp" />
     <ClCompile Include="UserBuffer_Internal.cpp" />
     <ClCompile Include="UserBuffer_OpenCL.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VersionInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Adapter_Internal.h" />
     <ClInclude Include="Adapter_Linux.h" />
     <ClInclude Include="Adapter_Windows.h" />
-    <ClInclude Include="Buffer_Data_OpenCL.h" />
-    <ClInclude Include="Buffer_Data.h" />
+    <ClInclude Include="Buffer_Internal.h" />
+    <ClInclude Include="Buffer_OpenCL.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="EthernetAddress.h" />
     <ClInclude Include="Event_CUDA.h" />
@@ -182,6 +185,7 @@
     <ClInclude Include="Thread_OpenCL.h" />
     <ClInclude Include="UserBuffer_Internal.h" />
     <ClInclude Include="UserBuffer_OpenCL.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="VersionInfo.h" />
   </ItemGroup>
   <ItemGroup>

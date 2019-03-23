@@ -7,10 +7,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -41,7 +40,7 @@ static const char * CODE =
                                                                               EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED | DESTINATIONS;"    EOL
                                                                               EOL
-"    OPEN_NET_KERNEL_END"                                                     EOL
+"    OPEN_NET_KERNEL_END( 0 )"                                                EOL
 "}"                                                                           EOL;
 
 namespace OpenNet

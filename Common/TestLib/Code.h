@@ -22,6 +22,7 @@ namespace TestLib
         CODE_REPLY                  ,
         CODE_REPLY_ON_ERROR         ,
         CODE_REPLY_ON_SEQUENCE_ERROR,
+        CODE_SIGNAL_EVENT           ,
 
         CODE_QTY
     }

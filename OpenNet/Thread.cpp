@@ -9,10 +9,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 
 #ifdef _KMS_WINDOWS_
@@ -48,6 +47,39 @@ void Thread::AddAdapter(Adapter_Internal * aAdapter)
     assert(NULL != aAdapter);
 
     mAdapters.push_back(aAdapter);
+}
+
+// aAdapter  [---;---]  The requested buffer is associated to this Adapter
+// aIndex               The buffer index
+//
+// Return  The Buffer_Internal instance or NULL if the adapter or the index
+//         is not valid
+//
+// Thread  Event
+//
+// CRITICAL PATH  BufferEvent  1 / Buffer event
+Buffer_Internal * Thread::GetBuffer(Adapter_Internal * aAdapter, unsigned int aIndex)
+{
+    assert(NULL != aAdapter);
+
+    unsigned int lBase = 0;
+
+    for (Adapter_Vector::iterator lIt = mAdapters.begin(); lIt != mAdapters.end(); lIt++)
+    {
+        assert(NULL != (*lIt));
+
+        if (aAdapter == (*lIt))
+        {
+            unsigned int lIndex = lBase + aIndex;
+            assert(mBuffers.size() > lIndex);
+
+            return mBuffers[lIndex];
+        }
+
+        lBase += (*lIt)->GetBufferQty();
+    }
+
+    return NULL;
 }
 
 OpenNet::Kernel * Thread::GetKernel()

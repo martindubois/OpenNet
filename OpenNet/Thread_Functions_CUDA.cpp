@@ -9,17 +9,16 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 
 // ===== Commmon ============================================================
 #include "../Common/Constants.h"
 
 // ===== OpenNet ============================================================
-#include "Buffer_Data_CUDA.h"
+#include "Buffer_CUDA.h"
 #include "CUW.h"
 
 #include "Thread_Functions_CUDA.h"
@@ -98,7 +97,7 @@ void Thread_Functions_CUDA::Run_Start()
     {
         assert( NULL != mBuffers[ i] );
 
-        Buffer_Data_CUDA * lBuffer = dynamic_cast< Buffer_Data_CUDA * >( mBuffers[ i ] );
+        Buffer_CUDA * lBuffer = dynamic_cast< Buffer_CUDA * >( mBuffers[ i ] );
         assert( NULL != lBuffer );
 
         mArguments[ i ] = & lBuffer->mMemory_DA;

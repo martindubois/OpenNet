@@ -7,10 +7,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 
 // ===== Windows ============================================================
@@ -21,6 +20,7 @@
 #include "../Common/IoCtl.h"
 
 // ===== OpenNet ============================================================
+#include "Buffer_OpenCL.h"
 #include "OCLW.h"
 #include "Processor_OpenCL.h"
 #include "Thread_Kernel_OpenCL.h"
@@ -45,12 +45,12 @@ Adapter_Windows::Adapter_Windows(KmsLib::DriverHandle * aHandle, KmsLib::DebugLo
 // aCommandQueue [---;RW-]
 // aKernel       [---;R--]
 // aBuffers      [---;RW-] The caller is responsible to release the
-//                         Buffer_Data instances added to this queue when
+//                         Buffer_Internal instances added to this queue when
 //                         they are no longer needed.
 //
 // Exception  KmsLib::Exception *  See Adapter_Internal::Buffer_Allocate
 // Thread     Apps
-void Adapter_Windows::Buffers_Allocate( bool aProfiling, cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Data_Vector * aBuffers)
+void Adapter_Windows::Buffers_Allocate( bool aProfiling, cl_command_queue aCommandQueue, cl_kernel aKernel, Buffer_Internal_Vector * aBuffers)
 {
     assert(NULL != aCommandQueue);
     assert(NULL != aKernel      );
@@ -130,6 +130,13 @@ void Adapter_Windows::SetInputFilter_Internal(OpenNet::Kernel * aKernel)
     mProgram = lProcessor->Program_Create(aKernel, mConnect_Out.mAdapterNo );
 }
 
+void Adapter_Windows::Stop_Internal()
+{
+    assert(NULL != mHandle);
+
+    mHandle->CancelAll();
+}
+
 // Private
 /////////////////////////////////////////////////////////////////////////////
 
@@ -142,7 +149,7 @@ void Adapter_Windows::SetInputFilter_Internal(OpenNet::Kernel * aKernel)
 // Exception  KmsLib::Exception *  CODE_NOT_ENOUGH_MEMORY
 //                                 See Process_Internal::Buffer_Allocate
 // Threads    Apps
-Buffer_Data * Adapter_Windows::Buffer_Allocate( bool aProfiling, cl_command_queue aCommandQueue, cl_kernel aKernel)
+Buffer_Internal * Adapter_Windows::Buffer_Allocate( bool aProfiling, cl_command_queue aCommandQueue, cl_kernel aKernel)
 {
     assert(NULL != aCommandQueue);
     assert(NULL != aKernel      );
@@ -161,7 +168,7 @@ Buffer_Data * Adapter_Windows::Buffer_Allocate( bool aProfiling, cl_command_queu
     Processor_OpenCL * lProcessor = dynamic_cast<Processor_OpenCL *>(mProcessor);
     assert(NULL != lProcessor);
 
-    Buffer_Data * lResult = lProcessor->Buffer_Allocate( aProfiling, mConfig.mPacketSize_byte, aCommandQueue, aKernel, mBuffers + mBufferCount);
+    Buffer_Internal * lResult = lProcessor->Buffer_Allocate( aProfiling, mConfig.mPacketSize_byte, aCommandQueue, aKernel, mBuffers + mBufferCount);
 
     mBufferCount++;
 

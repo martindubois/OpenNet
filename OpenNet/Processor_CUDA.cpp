@@ -9,10 +9,9 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <KmsBase.h>
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdint.h>
 
 // ===== Includes ===========================================================
@@ -22,7 +21,7 @@
 #include "../Common/Constants.h"
 
 // ===== OpenNet ============================================================
-#include "Buffer_Data_CUDA.h"
+#include "Buffer_CUDA.h"
 #include "CUW.h"
 #include "NVRTCW.h"
 #include "Thread_Functions_CUDA.h"
@@ -67,7 +66,7 @@ Processor_CUDA::Processor_CUDA( int aDevice, KmsLib::DebugLog * aDebugLog )
 // Threads    Apps
 //
 // Processor_CUDA::Buffer_Allocate ==> delete
-Buffer_Data * Processor_CUDA::Buffer_Allocate( bool aProfiling, unsigned int aPacketSize_byte, OpenNetK::Buffer * aBuffer)
+Buffer_Internal * Processor_CUDA::Buffer_Allocate( bool aProfiling, unsigned int aPacketSize_byte, OpenNetK::Buffer * aBuffer)
 {
     assert(    0 <  aPacketSize_byte );
     assert( NULL != aBuffer          );
@@ -95,7 +94,7 @@ Buffer_Data * Processor_CUDA::Buffer_Allocate( bool aProfiling, unsigned int aPa
 
     CUdeviceptr lMem_DA;
 
-    // CUW_MemAlloc ==> CUW_MemFree  See Buffer_Data_CUDA::~Buffer_Data_CUDA
+    // CUW_MemAlloc ==> CUW_MemFree  See Buffer_CUDA::~Buffer_CUDA
     CUW_MemAlloc( & lMem_DA, aBuffer->mSize_byte );
     assert( 0 != lMem_DA );
 
@@ -104,7 +103,7 @@ Buffer_Data * Processor_CUDA::Buffer_Allocate( bool aProfiling, unsigned int aPa
     CUW_PointerSetAttribute( & lFlag, CU_POINTER_ATTRIBUTE_SYNC_MEMOPS, reinterpret_cast< CUdeviceptr >( lMem_DA ) );
 
     // new ==> delete
-    Buffer_Data * lResult = new Buffer_Data_CUDA( aProfiling, mContext, lMem_DA, lPacketQty );
+    Buffer_Internal * lResult = new Buffer_CUDA( aProfiling, mContext, lMem_DA, lPacketQty );
 
     aBuffer->mBuffer_DA = lMem_DA;
     aBuffer->mBuffer_PA = 0;
