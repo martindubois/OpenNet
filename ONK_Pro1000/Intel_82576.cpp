@@ -40,7 +40,7 @@ namespace Intel_82576
 
     // ===== OpenNetK::Adapter ==============================================
 
-    // NOT TESTED  ONK_Intel.Intel.ErrorHandling
+    // NOT TESTED  ONK_Hardware.Intel.ErrorHandling
     //             Memory 0 too small
     bool Intel_82576::SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int aSize_byte)
     {

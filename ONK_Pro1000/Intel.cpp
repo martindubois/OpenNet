@@ -64,7 +64,7 @@ void Intel::GetState(OpenNetK::Adapter_State * aState)
         aState->mFlags.mLinkUp     = lDeviceStatus.mFields.mLinkUp    ;
         aState->mFlags.mTx_Off     = lDeviceStatus.mFields.mTx_Off    ;
 
-        // TODO  ONK_Intel.Intel
+        // TODO  ONK_Hardware.Intel
         //       Normal (Issue) - Comprendre pourquoi la vitesse n'est pas
         //       indique correctement.
 
@@ -142,7 +142,7 @@ void Intel::SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA)
     mZone0->UnlockFromThread( lFlags );
 }
 
-// NOT TESTED  ONK_Intel.Intel.ErrorHandling
+// NOT TESTED  ONK_Hardware.Intel.ErrorHandling
 //             Memory 0 too small
 bool Intel::SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int aSize_byte)
 {
@@ -420,8 +420,8 @@ Intel::Intel(OpenNetK::Adapter_Type aType) : Hardware(aType, PACKET_SIZE_byte)
     mInfo.mCommonBufferSize_byte += (PACKET_SIZE_byte * PACKET_BUFFER_QTY); // Packet buffers
     mInfo.mCommonBufferSize_byte += (mInfo.mCommonBufferSize_byte / OPEN_NET_DANGEROUS_BOUNDARY_SIZE_byte) * PACKET_SIZE_byte; // Skip 64 KB boundaries
 
-    strcpy(mInfo.mComment                  , "ONK_Intel");
-    strcpy(mInfo.mVersion_Driver  .mComment, "ONK_Intel");
+    strcpy(mInfo.mComment                  , "ONK_Hardware");
+    strcpy(mInfo.mVersion_Driver  .mComment, "ONK_Hardware");
 
     memset((void *)(&mPacketBuffer_Counter), 0, sizeof(mPacketBuffer_Counter)); // volatile_cast
 }

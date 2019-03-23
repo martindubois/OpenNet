@@ -237,6 +237,7 @@ static void Remove( struct pci_dev * aDev )
 MODULE_LICENSE( "GPL" );
 
 MODULE_AUTHOR( "KMS - Martin Dubois <mdubois@kms-quebec.com>" );
-MODULE_DESCRIPTION( "ONK_Pro1000" );
+MODULE_DESCRIPTION( "ONK_Hardware" );
 
 MODULE_SUPPORTED_DEVICE( "Intel 82576" );
+MODULE_SUPPORTED_DEVICE( "Intel 82599" );

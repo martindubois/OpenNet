@@ -10,12 +10,12 @@ ADD Binaries/Release_64/OpenNet.dll
 ADD Binaries/Release_64/OpenNet_Tool.exe
 ADD DoxyFile_en.txt
 ADD DoxyFile_Fr.txt
-ADD Drivers/Debug_64/ONK_Intel/ONK_Pro1000.cat
-ADD Drivers/Debug_64/ONK_Intel/ONK_Pro1000.inf
-ADD Drivers/Debug_64/ONK_Intel/ONK_Pro1000.sys
-ADD Drivers/Release_64/ONK_Intel/ONK_Pro1000.cat
-ADD Drivers/Release_64/ONK_Intel/ONK_Pro1000.inf
-ADD Drivers/Release_64/ONK_Intel/ONK_Pro1000.sys
+ADD Drivers/Debug_64/ONK_Hardware/ONK_Pro1000.cat
+ADD Drivers/Debug_64/ONK_Hardware/ONK_Pro1000.inf
+ADD Drivers/Debug_64/ONK_Hardware/ONK_Pro1000.sys
+ADD Drivers/Release_64/ONK_Hardware/ONK_Pro1000.cat
+ADD Drivers/Release_64/ONK_Hardware/ONK_Pro1000.inf
+ADD Drivers/Release_64/ONK_Hardware/ONK_Pro1000.sys
 ADD Includes/OpenNet/Adapter.h
 ADD Includes/OpenNet/Function.h
 ADD Includes/OpenNet/Function_Forward.h
@@ -53,7 +53,7 @@ ADD Includes/OpenNetK/Types.h
 ADD Includes/OpenNetK/Windows.h
 ADD Libraries/Debug_64/ONK_Lib.lib
 ADD Libraries/Release_64/ONK_Lib.lib
-ADD ONK_Intel/ReadMe.txt
+ADD ONK_Hardware/ReadMe.txt
 ADD OpenNet/ReadMe.txt
 ADD OpenNet_Tool/ReadMe.txt
 ADD RunDoxygen.cmd

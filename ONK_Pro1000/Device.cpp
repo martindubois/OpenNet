@@ -3,7 +3,7 @@
 // Product  OpenNet
 // File     ONK_Pro1000/Device.cpp
 
-// TODO ONK_Intel
+// TODO ONK_Hardware
 //      Normal (Cleanup) - Move all what can be moved from Device.cpp to
 //      OpenNetK::Hardware_WDF.
 
@@ -74,7 +74,7 @@ extern "C"
 
 // Thread  PnP
 
-// NOT TESTED  ONK_Intel.Device.ErrorHandling
+// NOT TESTED  ONK_Hardware.Device.ErrorHandling
 //             WdfDeviceCreate fail<br>
 //             WdfDeviceCreateDeviceInterface fail
 NTSTATUS Device_Create(PWDFDEVICE_INIT aDeviceInit)
@@ -131,7 +131,7 @@ NTSTATUS Device_Create(PWDFDEVICE_INIT aDeviceInit)
 //
 // Thread  PnP
 
-// NOT TESTED  ONK_Intel.Device.ErrorHandling
+// NOT TESTED  ONK_Hardware.Device.ErrorHandling
 //             Hardware_WDF.Init fail
 NTSTATUS Init(DeviceContext * aThis, WDFDEVICE aDevice)
 {

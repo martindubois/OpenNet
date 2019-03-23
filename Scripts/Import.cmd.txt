@@ -25,12 +25,12 @@ Binaries/Release_64
     OpenNet.dll
     OpenNet_Tool.exe
 
-Drivers/Debug_64/ONK_Intel
+Drivers/Debug_64/ONK_Hardware
     onk_pro1000.cat
     ONK_Pro1000.inf
     ONK_Pro1000.sys
 
-Drivers/Release_64/ONK_Intel
+Drivers/Release_64/ONK_Hardware
     onk_pro1000.cat
     ONK_Pro1000.inf
     ONK_Pro1000.sys
@@ -70,7 +70,7 @@ Libraries/Release_64
 ONK_Lib
 	ReadMe.txt
 
-ONK_Intel
+ONK_Hardware
 	ReadMe.txt
 
 OpenNet
