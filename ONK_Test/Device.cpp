@@ -70,7 +70,7 @@ KMS_TEST_BEGIN(Device_SetupA)
     memset( lPacketSendExIn,    0, sizeof( IoCtl_Packet_Send_Ex_In ) );
 
     #ifdef _KMS_LINUX_
-        lDH0.Connect("/dev/OpenNet0", O_RDWR);
+        lDH0.Connect("/dev/OpenNet0", O_RDWR, 0);
     #endif
 
     #ifdef _KMS_WINDOWS_
@@ -156,7 +156,7 @@ KMS_TEST_BEGIN(Device_Hardware_SetupA)
     memset( lPacketSendExIn,    0, sizeof( IoCtl_Packet_Send_Ex_In ) );
 
     #ifdef _KMS_LINUX_
-        lDH0.Connect("/dev/OpenNet0", O_RDWR);
+        lDH0.Connect("/dev/OpenNet0", O_RDWR, 0);
     #endif
 
     #ifdef _KMS_WINDOWS_
@@ -185,7 +185,7 @@ KMS_TEST_BEGIN(Device_Tunnel_SetupA)
     memset( lPacketSendExIn,    0, sizeof( IoCtl_Packet_Send_Ex_In ) );
 
     #ifdef _KMS_LINUX_
-        lDH0.Connect("/dev/OpenNet0", O_RDWR);
+        lDH0.Connect("/dev/OpenNet0", O_RDWR, 0);
     #endif
 
     #ifdef _KMS_WINDOWS_
@@ -219,7 +219,7 @@ KMS_TEST_BEGIN(Device_Tunnel_IO_SetupA)
 
     #ifdef _KMS_LINUX_
 
-        lDH0.Connect("/dev/OpenNet0", O_RDWR);
+        lDH0.Connect("/dev/OpenNet0", O_RDWR, 0);
 
         KMS_TEST_ASSERT(0 > read(lDH0, lBuffer, 1));
 
@@ -260,8 +260,8 @@ KMS_TEST_BEGIN( Device_SetupB )
     memset( & lStatsGetIn  ,    0, sizeof( lStatsGetIn             ) );
 
     #ifdef _KMS_LINUX_
-        lDH0.Connect("/dev/OpenNet0", O_RDWR);
-        lDH1.Connect("/dev/OpenNet1", O_RDWR);
+        lDH0.Connect("/dev/OpenNet0", O_RDWR, 0);
+        lDH1.Connect("/dev/OpenNet1", O_RDWR, 0);
     #endif
 
     #ifdef _KMS_WINDOWS_

@@ -276,6 +276,11 @@ unsigned int Thread::Run()
         mDebugLog->Log(eE);
         lResult = __LINE__;
     }
+    catch (...)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Run", __LINE__);
+        lResult = __LINE__;
+    }
 
     // printf( __CLASS__ "Run - Return %u\n", lResult );
     return lResult;

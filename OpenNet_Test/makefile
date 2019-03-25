@@ -62,6 +62,7 @@ Base.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 Base.o: ../Import/Includes/WindowsToLinux.h Base.h
 Base.o: ../Import/Includes/KmsLib/ValueVector.h ../Includes/OpenNet/System.h
 Base.o: ../Includes/OpenNet/OpenNet.h ../Includes/OpenNet/Status.h
+Base.o: ../Includes/OpenNetK/Adapter_Types.h
 Base.o: ../Includes/OpenNetK/Hardware_Statistics.h
 Base.o: ../Common/OpenNet/Adapter_Statistics.h
 Base.o: ../Common/OpenNetK/Adapter_Statistics.h
@@ -100,14 +101,13 @@ System.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
 System.o: ../Import/Includes/WindowsToLinux.h
 System.o: ../Import/Includes/KmsLib/ThreadBase.h ../Import/Includes/KmsTest.h
 System.o: ../Includes/OpenNet/System.h ../Includes/OpenNet/OpenNet.h
-System.o: ../Includes/OpenNet/Status.h Base.h
-System.o: ../Import/Includes/KmsLib/ValueVector.h
+System.o: ../Includes/OpenNet/Status.h ../Includes/OpenNetK/Adapter_Types.h
+System.o: Base.h ../Import/Includes/KmsLib/ValueVector.h
 System.o: ../Includes/OpenNetK/Hardware_Statistics.h
 System.o: ../Common/OpenNet/Adapter_Statistics.h
 System.o: ../Common/OpenNetK/Adapter_Statistics.h SetupA.h
 System.o: ../Includes/OpenNet/Adapter.h ../Includes/OpenNet/Processor.h
 System.o: ../Includes/OpenNet/StatisticsProvider.h
-System.o: ../Includes/OpenNetK/Adapter_Types.h
 System.o: ../Includes/OpenNet/Kernel_Forward.h ../Includes/OpenNet/Kernel.h
 System.o: ../Includes/OpenNet/SourceCode.h SetupC.h
 OpenNet_Test.o: ../Import/Includes/KmsTest.h ../Import/Includes/KmsBase.h

@@ -57,7 +57,7 @@ void Adapter_Linux::Buffers_Allocate( bool aProfiling, Buffer_Internal_Vector * 
 
         for (unsigned int i = 0; i < mConfig.mBufferQty; i++)
         {
-            Buffer_Inernal * lBuffer = Buffer_Allocate(aProfiling);
+            Buffer_Internal * lBuffer = Buffer_Allocate(aProfiling);
             assert(NULL != lBuffer);
 
             aBuffers->push_back(lBuffer);

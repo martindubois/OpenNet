@@ -11,6 +11,9 @@
 
 #include "Component.h"
 
+// ===== C ==================================================================
+#include <stdint.h>
+
 #ifdef _KMS_WINDOWS_
     // ===== Windows ========================================================
     #include <Windows.h>
@@ -835,6 +838,10 @@ unsigned int Adapter_Internal::Run()
     {
         mDebugLog->Log(__FILE__, __CLASS__ "Run", __LINE__);
         mDebugLog->Log(eE);
+    }
+    catch (...)
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "Run", __LINE__);
     }
 
     return 0;

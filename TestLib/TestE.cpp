@@ -99,7 +99,13 @@ unsigned int TestE::Init()
         }
 
         lStatus = GetGenerator(0)->SetAdapter(mAdapters[1]);
-        assert(OpenNet::STATUS_OK == lStatus);
+        if (OpenNet::STATUS_OK != lStatus)
+        {
+            printf(__CLASS__ "PacketGenerator::SetAdapter(  ) failed - ");
+            OpenNet::Status_Display( lStatus, stdout );
+            printf("\n");
+            return __LINE__;
+        }
     }
 
     return lResult;
@@ -160,6 +166,8 @@ unsigned int TestE::Stop()
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMax = 1220000;
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_RX_HOST_packet].mMin =    9530;
 
+        mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID ].mMax = 45;
+
         lResult = VerifyAdapterStats(0);
 
         InitAdapterConstraints();
@@ -195,6 +203,8 @@ unsigned int TestE::Stop()
 
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMax = 1220000;
         mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_TX_HOST_packet].mMin =    9530;
+
+        mConstraints[TestLib::Test::HARDWARE_BASE + OpenNetK::HARDWARE_STATS_INTERRUPT_PROCESS_LAST_MESSAGE_ID ].mMax = 115;
 
         lResult += VerifyAdapterStats(1);
         if (0 == lResult)

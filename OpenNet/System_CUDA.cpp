@@ -117,7 +117,7 @@ void System_CUDA::FindAdapters()
 
             sprintf_s(lName, "/dev/OpenNet%d", lIndex);
 
-            lHandle->Connect(lName, O_RDWR);
+            lHandle->Connect(lName, O_RDWR, 0);
         }
         catch (KmsLib::Exception * eE)
         {

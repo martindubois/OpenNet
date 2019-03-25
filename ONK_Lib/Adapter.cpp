@@ -202,6 +202,15 @@ namespace OpenNetK
         mStatistics_Start_us = mOSDep->GetTimeStamp();
     }
 
+    // CRITICAL PATH  BufferEvent
+    unsigned int Adapter::Event_GetPendingCount() const
+    {
+        ASSERT( EVENT_QTY > mEvent_In  );
+        ASSERT( EVENT_QTY > mEvent_Out );
+
+        return ( mEvent_In + EVENT_QTY - mEvent_Out ) % EVENT_QTY;
+    }
+
     void Adapter::Event_RegisterCallback(Adapter::Event_Callback aCallback, void * aContext)
     {
         ASSERT(NULL != aCallback);
@@ -900,8 +909,6 @@ namespace OpenNetK
 
     void Adapter::Buffer_EventPending_Zone0(BufferInfo * aBufferInfo)
     {
-        TRACE_DEBUG "Buffer_EventPending_Zone0(  )" DEBUG_EOL TRACE_END;
-
         ASSERT(NULL != aBufferInfo            );
         ASSERT(NULL != aBufferInfo->mHeader_XA);
 

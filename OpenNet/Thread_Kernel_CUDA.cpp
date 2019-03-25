@@ -14,7 +14,7 @@
 
 // ===== OpenNet ============================================================
 #include "Adapter_Windows.h"
-#include "Buffer_Data_CUDA.h"
+#include "Buffer_CUDA.h"
 #include "CUDAW.h"
 #include "Processor_CUDA.h"
 
@@ -63,7 +63,7 @@ void Thread_Kernel_CUDA::Prepare()
 
     for ( unsigned int i = 0; i < mQueueDepth; i ++ )
     {
-        Buffer_Data_CUDA * lBuffer = dynamic_cast< Buffer_Data_CUDA * >( mBuffers[ i ] );
+        Buffer_CUDA * lBuffer = dynamic_cast< Buffer_CUDA * >( mBuffers[ i ] );
         assert( NULL != lBuffer             );
         assert(    0 != lBuffer->mMemory_DA );
 

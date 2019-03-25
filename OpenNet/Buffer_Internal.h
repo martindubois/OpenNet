@@ -33,7 +33,7 @@ public:
     uint32_t     GetMarkerValue();
     unsigned int GetPacketQty  () const;
 
-    void FetchBufferInfo();
+    virtual void FetchBufferInfo();
 
     void ResetMarkerValue();
 

@@ -46,7 +46,7 @@ Thread_CUDA::~Thread_CUDA()
 //                                 and Adapter_Linux::Buffers_Allocate
 //
 // Thread_CUDA::Prepare ==> Thread_CUDA::Release
-void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Data_Vector * aBuffers, bool aProfiling )
+void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Internal_Vector * aBuffers, bool aProfiling )
 {
     assert( NULL != aAdapters         );
     assert(    0 <  aAdapters->size() );

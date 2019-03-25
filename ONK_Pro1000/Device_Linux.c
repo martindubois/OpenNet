@@ -67,6 +67,8 @@ typedef struct
     spinlock_t mAdapterLock ;
     spinlock_t mHardwareLock;
 
+    wait_queue_head_t mWaitQueue;
+
     struct tasklet_struct mTasklet;
     struct timer_list     mTimer  ;
     struct work_struct    mWork   ;
@@ -172,6 +174,10 @@ static void     UnlockSpinlockFromThread( void * aLock, uint32_t aFlags );
 
 static void FreeCallback( void * aContext_XA );
 
+// ===== ONK_Lib callback ===================================================
+
+static void ProcessEvent( void * aContext );
+
 // Static variables
 /////////////////////////////////////////////////////////////////////////////
 
@@ -243,8 +249,12 @@ void * Device_Create( struct pci_dev * aPciDev, unsigned char aMajor, unsigned c
         timer_setup   ( & lResult->mTimer  , Timer  , 0 );
         INIT_WORK     ( & lResult->mWork   , Work   );
 
+        init_waitqueue_head( & lResult->mWaitQueue );
+
         // DeviceCpp_Init ==> DeviceCpp_Uninit  See Device_Delete
         DeviceCpp_Init( lResult->mDeviceCpp, & lResult->mOSDep, & lResult->mAdapterLock, & lResult->mHardwareLock, aPciDev->device );
+
+        DeviceCpp_Event_RegisterCallback( lResult->mDeviceCpp, ProcessEvent, lResult );
 
         lRet = pci_write_config_word( aPciDev, 6, 0x0800 );
         if ( 0 != lRet )
@@ -698,6 +708,17 @@ int IoCtl_ProcessResult( DeviceContext * aThis, int aIoCtlResult )
             lResult = IOCTL_RESULT_OK;
             break;
 
+        case IOCTL_RESULT_WAIT :
+            if ( 0 == wait_event_interruptible( aThis->mWaitQueue, ( 0 < DeviceCpp_Event_GetPendingCount( aThis->mDeviceCpp ) ) ) )
+            {
+                lResult = IOCTL_RESULT_RETRY;
+            }
+            else
+            {
+                lResult = IOCTL_RESULT_INTERRUPTED;
+            }
+            break;
+
         default:
             printk( KERN_ERR "%s - The IoCtl failed returning %d\n", __FUNCTION__, lResult );
         }
@@ -751,12 +772,23 @@ int IoCtl_WithArgument( DeviceContext * aThis, struct file * aFile, unsigned int
     lResult = Copy_FromUser( lInOut, lArg_UA, aInfo->mIn_MaxSize_byte, aInfo->mIn_MinSize_byte, & lInSize_byte );
     if ( 0 == lResult )
     {
-        int lRet = DeviceCpp_IoCtl( & aThis->mDeviceCpp, aFile, aCode, lInOut, lInSize_byte, lInOut, aInfo->mOut_MinSize_byte );
+        int lRet;
 
-        lResult = IoCtl_ProcessResult( aThis, lRet );
+        do
+        {
+            lRet = DeviceCpp_IoCtl( & aThis->mDeviceCpp, aFile, aCode, lInOut, lInSize_byte, lInOut, aInfo->mOut_MinSize_byte );
+
+            lResult = IoCtl_ProcessResult( aThis, lRet );
+        }
+        while ( IOCTL_RESULT_RETRY == lResult );
+
         if ( 0 < lResult )
         {
-            lResult = Copy_ToUser( lArg_UA, lInOut, ( aInfo->mOut_MinSize_byte < lResult ) ? aInfo->mOut_MinSize_byte : lResult );
+            lRet = Copy_ToUser( lArg_UA, lInOut, ( aInfo->mOut_MinSize_byte < lResult ) ? aInfo->mOut_MinSize_byte : lResult );
+            if ( 0 != lRet )
+            {
+                lResult = ( - __LINE__ );
+            }
         }
     }
 
@@ -1269,4 +1301,16 @@ void FreeCallback( void * aData_XA )
     ASSERT( OPEN_NET_BUFFER_QTY > lIndex );
 
     NvBuffer_Unmap( lThis->mBuffers + lIndex, lThis->mPciDev, false );
+}
+
+// ===== ONK_Lib callback ===================================================
+
+// CRITICAL PATH  BufferEvent  1 / Buffer event
+void ProcessEvent( void * aContext )
+{
+    DeviceContext * lThis = ( DeviceContext * )( aContext ); // reinterpret_cast
+
+    ASSERT( NULL != aContext );
+
+    wake_up_interruptible( & lThis->mWaitQueue );
 }

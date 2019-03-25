@@ -31,6 +31,9 @@ extern void         DeviceCpp_CommonBuffer_Set    ( void * aThis, uint64_t aPhys
 extern void DeviceCpp_D0_Entry( void * aThis );
 extern void DeviceCpp_D0_Exit ( void * aThis );
 
+extern unsigned int DeviceCpp_Event_GetPendingCount ( void * aThis );
+extern void         DeviceCpp_Event_RegisterCallback( void * aThis, void ( * aCallback )( void * ), void * aContext );
+
 extern void             DeviceCpp_Interrupt_Enable  ( void * aThis );
 extern ProcessIrqResult DeviceCpp_Interrupt_Process ( void * aThis, unsigned int aMessageId );
 extern void             DeviceCpp_Interrupt_Process2( void * aThis, bool * aNeedMoreProcessing );

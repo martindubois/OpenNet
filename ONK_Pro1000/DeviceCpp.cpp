@@ -169,6 +169,25 @@ void DeviceCpp_D0_Exit( void * aThis )
     lThis->mHardware->D0_Exit();
 }
 
+// CRITICAL PATH  BufferEvent
+unsigned int DeviceCpp_Event_GetPendingCount( void * aThis )
+{
+    ASSERT( NULL != aThis );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    return lThis->mAdapter.Event_GetPendingCount();
+}
+
+void DeviceCpp_Event_RegisterCallback( void * aThis, void (*aCallback)( void * ), void * aContext )
+{
+    ASSERT( NULL != aThis );
+
+    DeviceCppContext * lThis = reinterpret_cast< DeviceCppContext * >( aThis );
+
+    lThis->mAdapter.Event_RegisterCallback( aCallback, aContext );
+}
+
 // aThis [---;RW-]
 //
 // DeviceCpp_Interrupt_Enable ==> DeviceCpp_D0_Exit

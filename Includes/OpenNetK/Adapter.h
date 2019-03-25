@@ -102,6 +102,17 @@ namespace OpenNetK
         void SetOSDep( OpenNetK_OSDep * aOSDep );
 
         /// \cond en
+        /// \brief  Does some events pending?
+        /// \return This method returns the number of currently pending events.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Est-ce que des &eacute;v&eacute;nements sont en attente?
+        /// \return Cette m&eacute;thode retourne le nombre
+        ///         d'&eacute;v&eacute;nements en attente.
+        /// \endcond
+        unsigned int Event_GetPendingCount() const;
+
+        /// \cond en
         /// \brief  Register an event callback
         /// \param  aCallback  The function to call
         /// \param  aContext   The context to pass to the function
