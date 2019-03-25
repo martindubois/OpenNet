@@ -105,11 +105,11 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  Display
-        /// \param  aFile  The output stream
+        /// \param  aOut  The output stream
         /// \endcond
         /// \cond fr
         /// \brief  Afficher
-        /// \aOut   Le fichier de sortie
+        /// \param  aOut  Le fichier de sortie
         /// \endcond
         /// \retval STATUS_OK
         virtual OpenNet::Status Display(FILE * aOut) const = 0;

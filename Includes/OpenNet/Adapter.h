@@ -321,9 +321,9 @@ namespace OpenNet
 
         /// \cond en
         /// \brief  This methode read data from the driver.
-        /// \param  aOut        The output buffer
-        /// \param  aSize_byte  The size of the output buffer
-        /// \param  aInfo_byte  The method put the size of read data here
+        /// \param  aOut           The output buffer
+        /// \param  aOutSize_byte  The size of the output buffer
+        /// \param  aInfo_byte     The method put the size of read data here
         /// \endcond
         /// \cond fr
         /// \brief  Cette m&eacute;thode lit des donn&eacute;es du pilote.

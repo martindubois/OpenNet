@@ -82,7 +82,7 @@ mkdir Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc/OpenNetK
 
 cp _DocUser/ReadMe.txt               Packages/$PACKAGE_NAME_SDK
 cp Includes/OpenNet/*.h              Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc/OpenNet
-cp Includes/OpenNetK/Adapter_Types.h Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc/OpenNet
+cp Includes/OpenNetK/Adapter_Types.h Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION/inc/OpenNetK
 cp DoxyFile_*.txt                    Packages/$PACKAGE_NAME_SDK/usr/local/OpenNet_$VERSION
 
 mkdir Packages/$PACKAGE_NAME_SDK/DEBIAN

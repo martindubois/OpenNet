@@ -2,15 +2,15 @@ kmsquebe
 KateVoeg99
 binary
 cd public_html
-cd doxygen_en
-cd html
+cd en
+cd OpenNet
 mput doxygen_en\html\*.css
 mput doxygen_en\html\*.html
 mput doxygen_en\html\*.png
 cd ..
 cd ..
-cd doxygen_fr
-cd html
+cd fr
+cd OpenNet
 mput doxygen_fr\html\*.css
 mput doxygen_fr\html\*.html
 mput doxygen_fr\html\*.png

@@ -43,14 +43,14 @@ Version            ______ . ______ - ______
       Version Number"
     - Close the solution
 [ ] Tool "PowerShell" - In the product folder
-		    .\RunDoxygen.cmd
-		    .\Build.cmd
+        .\RunDoxygen.cmd
+        .\Build.cmd
 
-[ ] Tool "Git"
-	- Commetre les fichiers modifies
-	- Ajouter le tag {Major}.{Minor}.{Build}_{Type}_{Ubuntu|Windows}
-	- Pousser les sourses sur le serveur
+[ ] Git
+	- Commit modified files
+	- Add tag {Major}.{Minor}.{Build}_{Type}_{Linux|Windows}
+	- Push on the server
 
-Heure et duree     _____ : ______             ______ heures et ______ minutes
+Time and duration  _____ : ______              ______ hours et ______ minutes
 
 Signature          __________________________________________________________
