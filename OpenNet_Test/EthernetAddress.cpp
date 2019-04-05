@@ -1,16 +1,13 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Test/EthernetAddress.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Test/EthernetAddress.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== C ==================================================================
-#include <stdint.h>
-
-// ===== Import/Includes ====================================================
-#include <KmsTest.h>
+#include "Component.h"
 
 // ===== Common =============================================================
 #include "../Common/OpenNet/EthernetAddress.h"

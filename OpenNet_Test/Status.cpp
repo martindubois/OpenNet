@@ -1,13 +1,13 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Test/Status.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Test/Status.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== Import/Includes ====================================================
-#include <KmsTest.h>
+#include "Component.h"
 
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/Status.h>

@@ -101,12 +101,14 @@
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="SetupA.cpp" />
     <ClCompile Include="SetupC.cpp" />
+    <ClCompile Include="SetupTool.cpp" />
     <ClCompile Include="SourceCode.cpp" />
     <ClCompile Include="Status.cpp" />
     <ClCompile Include="System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="SetupA.h" />
     <ClInclude Include="SetupC.h" />
   </ItemGroup>

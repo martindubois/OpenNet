@@ -134,7 +134,6 @@ static OpenNet::Processor * sProcessor = NULL;
 int main(int aCount, const char ** aVector)
 {
     KMS_TOOL_BANNER("OpenNet", "OpenNet_Tool", VERSION_STR, VERSION_TYPE);
-    printf("Purchased by " VERSION_CLIENT "\n");
 
     try
     {

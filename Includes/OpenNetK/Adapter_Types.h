@@ -136,9 +136,8 @@ namespace OpenNetK
         uint8_t mBuild        ;
         uint8_t mCompatibility;
 
-        uint8_t mReserved0[44];
+        uint8_t mReserved0[108];
 
-        char mClient     [64];
         char mCompiled_At[32];
         char mCompiled_On[32];
         char mComment    [64];

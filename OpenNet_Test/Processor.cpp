@@ -1,16 +1,13 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Test/Processor.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Test/Processor.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== C ==================================================================
-#include <stdint.h>
-
-// ===== Import/Includes ====================================================
-#include <KmsTest.h>
+#include "Component.h"
 
 // ===== Includes/OpenNet ===================================================
 #include <OpenNet/Processor.h>

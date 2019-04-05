@@ -19,5 +19,3 @@
 #define VERSION_STR0 "0.0.13.0\0"
 
 #define VERSION_TYPE "KI"
-
-#define VERSION_CLIENT "KMS"

@@ -1,13 +1,13 @@
 
-// Author   KMS - Martin Dubois, ing.
-// Product  OpenNet
-// File     OpenNet_Test/OpenNet_Test.cpp
+// Author     KMS - Martin Dubois, ing.
+// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Product    OpenNet
+// File       OpenNet_Test/OpenNet_Test.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== Import/Includes ====================================================
-#include <KmsTest.h>
+#include "Component.h"
 
 // Tests
 /////////////////////////////////////////////////////////////////////////////
@@ -37,6 +37,8 @@ extern int Kernel_Forward_Display();
 
 extern int Processor_Base();
 
+extern int SetupTool_Base();
+
 extern int SourceCode_Base   ();
 extern int SourceCode_Display();
 
@@ -57,6 +59,7 @@ KMS_TEST_LIST_BEGIN
     KMS_TEST_LIST_ENTRY(Kernel_Forward_Base   , "Kernel_Forward - Base"         , 0, 0)
     KMS_TEST_LIST_ENTRY(Kernel_Forward_Display, "Kernel_Forward - Display"      , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(Processor_Base        , "Processor - Base"              , 0, 0)
+    KMS_TEST_LIST_ENTRY(SetupTool_Base        , "SetupTool - Base"              , 0, 0)
     KMS_TEST_LIST_ENTRY(SourceCode_Base       , "SourceCode - Base"             , 0, 0)
     KMS_TEST_LIST_ENTRY(SourceCode_Display    , "SourceCode - Display"          , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(Status_Base           , "Status - Base"                 , 0, 0)

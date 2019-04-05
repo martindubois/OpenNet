@@ -44,7 +44,6 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT aDriverObject, PUNICODE_STRING aRegistryPath
     DbgPrintEx(DEBUG_ID, DEBUG_INFO, PREFIX "OpenNet - ONK_Tunnel_IO"               DEBUG_EOL);
     DbgPrintEx(DEBUG_ID, DEBUG_INFO, PREFIX "Version " VERSION_STR " " VERSION_TYPE DEBUG_EOL);
     DbgPrintEx(DEBUG_ID, DEBUG_INFO, PREFIX "Compiled at " __TIME__ " on " __DATE__ DEBUG_EOL);
-    DbgPrintEx(DEBUG_ID, DEBUG_INFO, PREFIX "Purchased by " VERSION_CLIENT          DEBUG_EOL);
 
     ASSERT(NULL != aDriverObject);
     ASSERT(NULL != aRegistryPath);

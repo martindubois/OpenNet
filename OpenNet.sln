@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{6D01
 		Includes\OpenNet\OpenNet.h = Includes\OpenNet\OpenNet.h
 		Includes\OpenNet\PacketGenerator.h = Includes\OpenNet\PacketGenerator.h
 		Includes\OpenNet\Processor.h = Includes\OpenNet\Processor.h
+		Includes\OpenNet\SetupTool.h = Includes\OpenNet\SetupTool.h
 		Includes\OpenNet\SourceCode.h = Includes\OpenNet\SourceCode.h
 		Includes\OpenNet\StatisticsProvider.h = Includes\OpenNet\StatisticsProvider.h
 		Includes\OpenNet\Status.h = Includes\OpenNet\Status.h
@@ -71,7 +72,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenNet", "OpenNet\OpenNet.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenNet_Test", "OpenNet_Test\OpenNet_Test.vcxproj", "{412545E0-4103-4A09-B75E-A1E20258258C}"
 	ProjectSection(ProjectDependencies) = postProject
-		{1EEE4967-EAE8-4799-A368-E5495B1021F1} = {1EEE4967-EAE8-4799-A368-E5495B1021F1}
 		{2F3A6ADE-B691-467A-A358-4DA35BCB9918} = {2F3A6ADE-B691-467A-A358-4DA35BCB9918}
 	EndProjectSection
 EndProject
@@ -90,6 +90,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Export.cmd = Export.cmd
 		Export.cmd.txt = Export.cmd.txt
 		Import.cmd = Import.cmd
+		OpenNet.iss = OpenNet.iss
 		README.md = README.md
 		RunDoxygen.cmd = RunDoxygen.cmd
 		Test.cmd = Test.cmd
@@ -172,6 +173,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Tunnel_IO", "ONK_Tunnel_IO\ONK_Tunnel_IO.vcxproj", "{FFD857EA-C6AE-4E09-8C5E-CC85C77D1E3B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{03ADF26E-74F0-4F2A-989B-F408B0AAC441} = {03ADF26E-74F0-4F2A-989B-F408B0AAC441}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenNet_Setup", "OpenNet_Setup\OpenNet_Setup.vcxproj", "{72B42699-09A3-430C-8774-F431712ABE68}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2F3A6ADE-B691-467A-A358-4DA35BCB9918} = {2F3A6ADE-B691-467A-A358-4DA35BCB9918}
 	EndProjectSection
 EndProject
 Global
@@ -314,6 +320,18 @@ Global
 		{FFD857EA-C6AE-4E09-8C5E-CC85C77D1E3B}.Release|x86.ActiveCfg = Release|Win32
 		{FFD857EA-C6AE-4E09-8C5E-CC85C77D1E3B}.Release|x86.Build.0 = Release|Win32
 		{FFD857EA-C6AE-4E09-8C5E-CC85C77D1E3B}.Release|x86.Deploy.0 = Release|Win32
+		{72B42699-09A3-430C-8774-F431712ABE68}.Debug|ARM.ActiveCfg = Debug|Win32
+		{72B42699-09A3-430C-8774-F431712ABE68}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{72B42699-09A3-430C-8774-F431712ABE68}.Debug|x64.ActiveCfg = Debug|x64
+		{72B42699-09A3-430C-8774-F431712ABE68}.Debug|x64.Build.0 = Debug|x64
+		{72B42699-09A3-430C-8774-F431712ABE68}.Debug|x86.ActiveCfg = Debug|Win32
+		{72B42699-09A3-430C-8774-F431712ABE68}.Debug|x86.Build.0 = Debug|Win32
+		{72B42699-09A3-430C-8774-F431712ABE68}.Release|ARM.ActiveCfg = Release|Win32
+		{72B42699-09A3-430C-8774-F431712ABE68}.Release|ARM64.ActiveCfg = Release|Win32
+		{72B42699-09A3-430C-8774-F431712ABE68}.Release|x64.ActiveCfg = Release|x64
+		{72B42699-09A3-430C-8774-F431712ABE68}.Release|x64.Build.0 = Release|x64
+		{72B42699-09A3-430C-8774-F431712ABE68}.Release|x86.ActiveCfg = Release|Win32
+		{72B42699-09A3-430C-8774-F431712ABE68}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

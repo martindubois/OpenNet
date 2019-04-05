@@ -29,6 +29,7 @@ Includes/OpenNet
 	OpenNet.h
 	PacketGenerator.h
 	Processor.h
+	SetupTool.h
 	SourceCode.h
 	StatisticsProvider.h
 	Status.h
@@ -57,6 +58,10 @@ Includes/OpenNetK
 	StdInt.h
 	Types.h
 	Windows.h
+
+Installer:
+# KmsVersion "OpenNet_" ".exe" 3
+	OpenNet_0.0.0.exe
 
 ONK_Lib/_DocUser ONK_Lib
 	ReadMe.txt

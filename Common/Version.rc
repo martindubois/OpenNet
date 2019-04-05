@@ -34,7 +34,7 @@ BEGIN
 		BLOCK "040904E4"
 		BEGIN
 			VALUE "CompanyName"     , "KMS"
-			VALUE "FileDescription" , "Purchased by " VERSION_CLIENT
+			VALUE "FileDescription" , "OpenNet"
 			VALUE "FileVersion"     , VERSION_STR0
 			VALUE "InternalName"    , "OpenNet"
 			VALUE "LegalCopyright"  , "Copyright (C) 2018-2019 KMS."

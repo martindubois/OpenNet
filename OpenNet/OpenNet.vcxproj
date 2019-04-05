@@ -64,7 +64,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\Import\Libraries\Debug_64_DLL;C:\Program Files (x86)\AMD APP SDK\3.0-0-Beta\lib\x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>KmsLib.lib;OpenCL.lib;SetupAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>KmsLib.lib;OpenCL.lib;Newdev.lib;SetupAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -85,7 +85,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\Import\Libraries\Release_64_DLL;C:\Program Files (x86)\AMD APP SDK\3.0-0-Beta\lib\x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>KmsLib.lib;OpenCL.lib;SetupAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>KmsLib.lib;OpenCL.lib;Newdev.lib;SetupAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -113,6 +113,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Event_OpenCL.cpp" />
+    <ClCompile Include="FolderFinder_Windows.cpp" />
+    <ClCompile Include="FolderFindex.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="Function_Forward.cpp" />
     <ClCompile Include="Kernel_Forward.cpp" />
@@ -129,6 +131,9 @@
     </ClCompile>
     <ClCompile Include="Processor_Internal.cpp" />
     <ClCompile Include="Processor_OpenCL.cpp" />
+    <ClCompile Include="SetupTool.cpp" />
+    <ClCompile Include="SetupTool_Internal.cpp" />
+    <ClCompile Include="SetupTool_Windows.cpp" />
     <ClCompile Include="SourceCode.cpp" />
     <ClCompile Include="SourceCode_Forward.cpp" />
     <ClCompile Include="StatisticsProvider.cpp" />
@@ -167,9 +172,12 @@
     <ClInclude Include="EthernetAddress.h" />
     <ClInclude Include="Event_CUDA.h" />
     <ClInclude Include="Event_OpenCL.h" />
+    <ClInclude Include="FolderFinder.h" />
     <ClInclude Include="PacketGenerator_Internal.h" />
     <ClInclude Include="Processor_CUDA.h" />
     <ClInclude Include="Processor_OpenCL.h" />
+    <ClInclude Include="SetupTool_Internal.h" />
+    <ClInclude Include="SetupTool_Windows.h" />
     <ClInclude Include="SourceCode_Forward.h" />
     <ClInclude Include="System_OpenCL.h" />
     <ClInclude Include="Thread.h" />
