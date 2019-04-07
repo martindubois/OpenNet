@@ -25,6 +25,7 @@
 // ===== OpenNet ============================================================
 #include "Buffer_OpenCL.h"
 #include "Constants.h"
+#include "FolderFinder.h"
 #include "OCLW.h"
 #include "Thread_Functions_OpenCL.h"
 #include "UserBuffer_OpenCL.h"
@@ -149,6 +150,8 @@ cl_program Processor_OpenCL::Program_Create(OpenNet::Kernel * aKernel, unsigned 
     assert(NULL != mDebugLog);
     assert(   0 != mDevice  );
 
+    assert(NULL != gFolderFinder);
+
     // OCLW_CreateProgramWithSource ==> OCLW_ReleaseProgram
     cl_program lResult = OCLW_CreateProgramWithSource(mContext, aKernel->GetCodeLineCount(), aKernel->GetCodeLines(), NULL);
     assert(NULL != lResult);
@@ -164,11 +167,11 @@ cl_program Processor_OpenCL::Program_Create(OpenNet::Kernel * aKernel, unsigned 
 
     if (ADAPTER_NO_UNKNOWN == aAdapterNo)
     {
-        sprintf_s(lArgs, "-D _OPEN_NET_OPEN_CL_ -I V:/OpenNet/Includes");
+        sprintf_s(lArgs, "-D _OPEN_NET_OPEN_CL_ -I %s", gFolderFinder->GetIncludeFolder());
     }
     else
     {
-        sprintf_s(lArgs, "-D OPEN_NET_ADAPTER_NO=(%u) -D _OPEN_NET_OPEN_CL_ -I V:/OpenNet/Includes", aAdapterNo);
+        sprintf_s(lArgs, "-D OPEN_NET_ADAPTER_NO=(%u) -D _OPEN_NET_OPEN_CL_ -I %s", aAdapterNo, gFolderFinder->GetIncludeFolder());
     }
 
     try
