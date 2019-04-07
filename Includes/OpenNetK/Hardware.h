@@ -477,7 +477,7 @@ namespace OpenNetK
         /// \endcond
         /// \cond fr
         /// \brief  Le constructeur par d&eacute;faut
-        /// \param  aType  Type de l'adaptateur
+        /// \param  aType             Type de l'adaptateur
         /// \param  aPacketSize_byte  La taille maximale des paquets et la
         ///                           valeur par defaut pour la configuration
         ///                           de la taille maximale des paquets

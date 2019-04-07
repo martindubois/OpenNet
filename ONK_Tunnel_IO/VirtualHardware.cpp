@@ -84,7 +84,7 @@ void VirtualHardware::GetState(OpenNetK::Adapter_State * aState)
     aState->mFlags.mFullDuplex = false;
     aState->mFlags.mLinkUp     = true ;
     aState->mFlags.mTx_Off     = false;
-    aState->mSpeed_MB_s        =  1000;
+    aState->mSpeed_Mb_s        =  1000;
 }
 
 bool VirtualHardware::Packet_Drop()

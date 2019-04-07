@@ -35,6 +35,8 @@ namespace Intel_82599
         mInfo.mCommonBufferSize_byte += (sizeof(Intel_Rx_Descriptor) * 8192); // Rx packet descriptors
         mInfo.mCommonBufferSize_byte += (sizeof(Intel_Tx_Descriptor) * 8192); // Tx packet descriptors
 
+        mInfo.mMaxSpeed_Mb_s = 10000;
+
         strcpy(mInfo.mVersion_Hardware.mComment, "Intel 10 Gb Ethernet Adapter (82599)");
     }
 

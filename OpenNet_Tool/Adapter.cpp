@@ -154,7 +154,7 @@ void Select(KmsLib::ToolBase * aToolBase, const char * aArg)
     }
 
     gAdapter = gSystem->Adapter_Get(lIndex);
-    if (NULL != gAdapter)
+    if (NULL == gAdapter)
     {
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_USER_ERROR, "OpenNet::System::Adapter_Get(  ) failed");
         return;

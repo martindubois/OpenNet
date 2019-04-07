@@ -112,9 +112,13 @@ namespace OpenNetK
                 aInfo->mOut_MinSize_byte = sizeof(OpenNetK::Event);
             #endif
             break;
-
         case IOCTL_INFO_GET        :
             aInfo->mOut_MinSize_byte = sizeof(Adapter_Info);
+            break;
+        case IOCTL_LICENSE_SET     :
+            aInfo->mIn_MaxSize_byte  = sizeof(IoCtl_License_Set_In );
+            aInfo->mIn_MinSize_byte  = sizeof(IoCtl_License_Set_In );
+            aInfo->mOut_MinSize_byte = sizeof(IoCtl_License_Set_Out);
             break;
         case IOCTL_PACKET_SEND_EX  :
             aInfo->mIn_MaxSize_byte  = sizeof(IoCtl_Packet_Send_Ex_In) + PACKET_SIZE_MAX_byte;
@@ -529,6 +533,8 @@ namespace OpenNetK
         case IOCTL_TX_DISABLE                 : lResult = IoCtl_Tx_Disable                (); break;
         case IOCTL_TX_ENABLE                  : lResult = IoCtl_Tx_Enable                 (); break;
 
+        case IOCTL_LICENSE_SET                : lResult = IoCtl_License_Set               (aIn, aOut); break;
+
         case IOCTL_PACKET_SEND_EX             : lResult = IoCtl_Packet_Send_Ex            (aIn, aInSize_byte ); break;
 
         case IOCTL_PACKET_GENERATOR_CONFIG_GET: lResult = IoCtl_PacketGenerator_Config_Get(reinterpret_cast<PacketGenerator_Config *>(aOut)); break;
@@ -549,6 +555,11 @@ namespace OpenNetK
     void Adapter::Tick()
     {
         mPacketGenerator_Counter = 0;
+
+        if (0 < mEvaluation_ms)
+        {
+            mEvaluation_ms -= 100;
+        }
     }
 
     // Private
@@ -1052,7 +1063,7 @@ namespace OpenNetK
 
         if (0 == aBufferInfo->mTx_Counter)
         {
-            if (aBufferInfo->mFlags.mStopRequested)
+            if (aBufferInfo->mFlags.mStopRequested || ((!mLicenseOk) && (0 >= mEvaluation_ms)))
             {
                 Buffer_Enter_Stopped_Zone0(aBufferInfo, mBuffer.mTx, "TX_RUNNING");
 
@@ -1297,6 +1308,41 @@ namespace OpenNetK
         return sizeof(Adapter_Info);
     }
 
+    int Adapter::IoCtl_License_Set(const void * aIn, void * aOut)
+    {
+        // TRACE_DEBUG "%s( ,  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
+
+        ASSERT(NULL != aIn );
+        ASSERT(NULL != aOut);
+
+        const IoCtl_License_Set_In * lIn = reinterpret_cast<const IoCtl_License_Set_In *>(aIn);
+
+        mHardware->GetInfo(&mInfo);
+
+        uint64_t lKey = 713705;
+
+        lKey *= mInfo.mMaxSpeed_Mb_s;
+
+        for (unsigned int i = 0; i < sizeof(mInfo.mEthernetAddress.mAddress); i++)
+        {
+            lKey +=  mInfo.mEthernetAddress.mAddress[i];
+            lKey *= (mInfo.mEthernetAddress.mAddress[i] + 1);
+        }
+
+        lKey /= 1024;
+        lKey &= 0xffffffff;
+
+        mLicenseOk = (lIn->mKey == lKey);
+
+        IoCtl_License_Set_Out * lOut = reinterpret_cast<IoCtl_License_Set_Out *>(aOut);
+
+        memset(lOut, 0, sizeof(IoCtl_License_Set_Out));
+
+        lOut->mFlags.mLicenseOk = mLicenseOk;
+
+        return sizeof(IoCtl_License_Set_Out);
+    }
+
     int Adapter::IoCtl_Packet_Drop()
     {
         // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
@@ -1472,6 +1518,11 @@ namespace OpenNetK
 
                 if ( 0 < mBuffer.mCount )
                 {
+                    if (!mLicenseOk)
+                    {
+                        mEvaluation_ms = 5 * 60 * 1000; // 5 minutes
+                    }
+
                     lResult = IOCTL_RESULT_PROCESSING_NEEDED;
                 }
                 else
@@ -1501,10 +1552,12 @@ namespace OpenNetK
 
         memset(aOut, 0, sizeof(Adapter_State));
 
-        aOut->mAdapterNo   = mAdapterNo    ;
-        aOut->mBufferCount = mBuffer.mCount;
-        aOut->mSystemId    = mSystemId     ;
+        aOut->mAdapterNo     = mAdapterNo    ;
+        aOut->mBufferCount   = mBuffer.mCount;
+        aOut->mEvaluation_ms = mEvaluation_ms;
+        aOut->mSystemId      = mSystemId     ;
 
+        aOut->mFlags.mLicenseOk  = mLicenseOk;
         aOut->mFlags.mTx_Enabled = mHardware->Tx_IsEnabled();
 
         mHardware->GetState(aOut);

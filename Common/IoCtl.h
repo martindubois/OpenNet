@@ -63,6 +63,8 @@
 
 // ===== IoCtl ==============================================================
 
+// ----- 0 - 15  Config -----------------------------------------------------
+
 // Input   None
 // Output  OpenNetK::Adapter_Config
 #define IOCTL_CONFIG_GET        IOCTL_CODE_R(0,OpenNetK::Adapter_Config)
@@ -71,26 +73,42 @@
 // Output  OpenNetK::Adapter_Config
 #define IOCTL_CONFIG_SET        IOCTL_CODE_RW(1, OpenNetK::Adapter_Config)
 
+// ----- 16 - 31  Connect ---------------------------------------------------
+
 // Input   IoCtl_Connect_In
 // Output  IoCtl_Connect_Out
 #define IOCTL_CONNECT           IOCTL_CODE_RW(16, IoCtl_Connect_In)
 
+// ----- 32 - 47  Info ------------------------------------------------------
+
 // Input   None
 // Output  OpenNetK::Adatper_Info
 #define IOCTL_INFO_GET          IOCTL_CODE_R(32, OpenNetK::Adapter_Info)
+
+// ----- 48 - 63  Packet ----------------------------------------------------
 
 // Input   IoCtl_Packet_Send_Ex_In
 //         The packet
 // Output  None
 #define IOCTL_PACKET_SEND_EX    IOCTL_CODE_W2(49, sizeof(IoCtl_Packet_Send_Ex_In) + (16 * 1024))
 
+// Input   None
+// Output  None
+#define IOCTL_PACKET_DROP                  IOCTL_CODE(50)
+
+// ----- 64 - 79  Start -----------------------------------------------------
+
 // Input   OpenNetK::Buffer[ 1 .. N ]
 // Output  None
 #define IOCTL_START             IOCTL_CODE_W(64, OpenNetK::Buffer[128])
 
+// ----- 80 - 95  State -----------------------------------------------------
+
 // Input   None
 // Output  OpenNetK::Adapter_State
 #define IOCTL_STATE_GET         IOCTL_CODE_R(80, OpenNetK::Adapter_State)
+
+// ----- 96 - 111  Statistics -----------------------------------------------
 
 // Input   IoCtl_Statistics_Get_In
 // Output  uint32_t[ 0 .. N ]
@@ -100,15 +118,13 @@
 // Output  None
 #define IOCTL_STATISTICS_RESET  IOCTL_CODE(97)
 
+// ----- 112 - 127  Stop ----------------------------------------------------
+
 // Input   None
 // Output  None
 #define IOCTL_STOP              IOCTL_CODE(112)
 
-// ===== 0.0.7 ==============================================================
-
-// Input   None
-// Output  None
-#define IOCTL_PACKET_DROP                  IOCTL_CODE(50)
+// ----- 128 - 143  Packet Generator ----------------------------------------
 
 // Input   None
 // Output  OpenNetK::Generator_Config
@@ -126,6 +142,8 @@
 // Output  None
 #define IOCTL_PACKET_GENERATOR_STOP       IOCTL_CODE(131)
 
+// ----- 144 - 159  Tx ------------------------------------------------------
+
 // Input   None
 // Output  None
 #define IOCTL_TX_DISABLE                  IOCTL_CODE(144)
@@ -134,6 +152,8 @@
 // Output  None
 #define IOCTL_TX_ENABLE                   IOCTL_CODE(145)
 
+// ----- 160 - 175  Event ---------------------------------------------------
+
 // Input   IoCtl_Event_Wait_In
 // Output  OpenNetK::Event[ 0 .. N ]
 #define IOCTL_EVENT_WAIT                  IOCTL_CODE_RW(160, OpenNetK::Event[32])
@@ -141,6 +161,12 @@
 // Input   None
 // Output  None
 #define IOCTL_EVENT_WAIT_CANCEL           IOCTL_CODE(161)
+
+// ----- 176 - 192  License -------------------------------------------------
+
+// Input   IoCtl_License_Set_In
+// Output  IoCtl_License_Set_Out
+#define IOCTL_LICENSE_SET       IOCTL_CODE_RW(176, IoCtl_License_Set_In)
 
 // Data types
 /////////////////////////////////////////////////////////////////////////////
@@ -175,6 +201,28 @@ typedef struct
     uint8_t mReserved0[60];
 }
 IoCtl_Event_Wait_In;
+
+typedef struct
+{
+    uint32_t mKey;
+
+    uint8_t mReserved0[60];
+}
+IoCtl_License_Set_In;
+
+typedef struct
+{
+    struct
+    {
+        unsigned mLicenseOk : 1;
+
+        unsigned mReserved0 : 31;
+    }
+    mFlags;
+
+    uint8_t mReserved0[60];
+}
+IoCtl_License_Set_Out;
 
 // mRepeatCount  The number of time the packet must be send
 // mSize_byte    The size of packet

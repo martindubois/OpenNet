@@ -25,6 +25,7 @@
 // ===== OpenNet ============================================================
 #include "Buffer_Internal.h"
 #include "EthernetAddress.h"
+#include "FolderFinder.h"
 #include "Thread_Functions.h"
 #include "Utils.h"
 
@@ -898,6 +899,8 @@ Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::Debug
     }
 
     OpenNet::EthernetAddress_GetText(mInfo.mEthernetAddress, mName + strlen(mName), sizeof(mName) - lOffset_byte);
+
+    License_Verify();
 }
 
 // aIn        [--O;R--]
@@ -985,5 +988,73 @@ void Adapter_Internal::Event_Process(const OpenNetK::Event & aEvent)
         break;
 
     default: assert(false);
+    }
+}
+
+void Adapter_Internal::License_Verify()
+{
+    assert(NULL != mDebugLog);
+
+    assert(NULL != gFolderFinder);
+
+    char lFileName[1024];
+
+    sprintf_s(lFileName, "%s" SLASH "License.txt", gFolderFinder->GetBinaryFolder());
+    printf("%s\n", lFileName);
+
+    FILE * lFile;
+
+    if (0 == fopen_s(&lFile, lFileName, "r"))
+    {
+        char lLine[1024];
+
+        while (NULL != fgets(lLine, sizeof(lLine), lFile))
+        {
+            unsigned int lAddr[6];
+            unsigned int lKey;
+
+            printf("%s\n", lLine);
+
+            if (7 == sscanf_s(lLine, "%x %x %x %x %x %x %x", lAddr + 0, lAddr + 1, lAddr + 2, lAddr + 3, lAddr + 4, lAddr + 5, &lKey))
+            {
+                bool lFound = true;
+
+                printf("%x %x %x %x %x %x %x\n", lAddr[0], lAddr[1], lAddr[2], lAddr[3], lAddr[4], lAddr[5], lKey);
+
+                for (unsigned int i = 0; i < 6; i++)
+                {
+                    if (mInfo.mEthernetAddress.mAddress[i] != lAddr[i])
+                    {
+                        printf("false\n");
+                        lFound = false;
+                        break;
+                    }
+
+                    printf("true\n");
+                }
+
+                if (lFound)
+                {
+                    IoCtl_License_Set_In  lIn ;
+                    IoCtl_License_Set_Out lOut;
+
+                    memset(&lIn , 0, sizeof(lIn ));
+                    memset(&lOut, 0, sizeof(lOut));
+
+                    lIn.mKey = lKey;
+
+                    mHandle->Control(IOCTL_LICENSE_SET, &lIn, sizeof(lIn), &lOut, sizeof(lOut));
+
+                    if (!lOut.mFlags.mLicenseOk)
+                    {
+                        mDebugLog->Log(__FILE__, __CLASS__ "License_Verify", __LINE__);
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        mDebugLog->Log(__FILE__, __CLASS__ "License_Verify", __LINE__);
     }
 }

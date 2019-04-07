@@ -229,6 +229,7 @@ namespace OpenNetK
         Adapter_Type mAdapterType;
 
         uint32_t mCommonBufferSize_byte;
+        uint32_t mMaxSpeed_Mb_s        ;
         uint32_t mPacketSize_byte      ;
         uint32_t mRx_Descriptors       ;
         uint32_t mTx_Descriptors       ;
@@ -265,16 +266,19 @@ namespace OpenNetK
             unsigned mTx_Enabled : 1;
             unsigned mTx_Off     : 1;
 
-            unsigned mReserved0 : 29;
+            unsigned mReserved0 : 27;
+
+            unsigned mLicenseOk : 1;
         }
         mFlags;
 
-        uint32_t mAdapterNo  ;
-        uint32_t mBufferCount;
-        uint32_t mSpeed_MB_s ;
-        uint32_t mSystemId   ;
+        uint32_t mAdapterNo    ;
+        uint32_t mBufferCount  ;
+        uint32_t mEvaluation_ms;
+        uint32_t mSpeed_Mb_s   ;
+        uint32_t mSystemId     ;
 
-        uint32_t mReserved0[123];
+        uint8_t mReserved0[40];
     }
     Adapter_State;
 

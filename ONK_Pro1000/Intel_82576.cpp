@@ -35,6 +35,8 @@ namespace Intel_82576
         mInfo.mCommonBufferSize_byte += (sizeof(Intel_Rx_Descriptor) * RX_DESCRIPTOR_QTY); // Rx packet descriptors
         mInfo.mCommonBufferSize_byte += (sizeof(Intel_Tx_Descriptor) * TX_DESCRIPTOR_QTY); // Tx packet descriptors
 
+        mInfo.mMaxSpeed_Mb_s = 1000;
+
         strcpy(mInfo.mVersion_Hardware.mComment, "Intel 1 Gb Ethernet Adapter (82576)");
     }
 

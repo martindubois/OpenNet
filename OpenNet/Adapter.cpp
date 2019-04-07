@@ -244,6 +244,7 @@ namespace OpenNet
         fprintf(aOut, "    Adapter Type       = %u - %s\n" , aIn.mAdapterType, GetAdapterTypeName(aIn.mAdapterType));
         fprintf(aOut, "    Comment            = %s\n"      , aIn.mComment);
         fprintf(aOut, "    Common Buffer Size = %u bytes\n", aIn.mCommonBufferSize_byte);
+        fprintf(aOut, "    Max Speed          = %u Mb/s\n" , aIn.mMaxSpeed_Mb_s);
 
         if ((PACKET_SIZE_MAX_byte >= aIn.mPacketSize_byte) && (PACKET_SIZE_MIN_byte <= aIn.mPacketSize_byte))
         {
@@ -297,7 +298,9 @@ namespace OpenNet
         fprintf(aOut, "    Link Up     = %s\n"     , aIn.mFlags.mLinkUp     ? "true" : "false");
         fprintf(aOut, "    Tx Enabled  = %s\n"     , aIn.mFlags.mTx_Enabled ? "true" : "false");
         fprintf(aOut, "    Tx Off      = %s\n"     , aIn.mFlags.mTx_Off     ? "true" : "false");
-        fprintf(aOut, "    Speed       = %u MB/s\n", aIn.mSpeed_MB_s);
+        fprintf(aOut, "    License OK  = %s\n"     , aIn.mFlags.mLicenseOk  ? "true" : "false");
+        fprintf(aOut, "    Evaluation  = %u ms\n"  , aIn.mEvaluation_ms);
+        fprintf(aOut, "    Speed       = %u Mb/s\n", aIn.mSpeed_Mb_s);
 
         return STATUS_OK;
     }

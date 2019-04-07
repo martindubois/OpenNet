@@ -136,7 +136,7 @@ void Set_Bandwidth(KmsLib::ToolBase * aToolBase, const char * aArg)
 {
     double lBandwidth_MiB_s;
 
-    UTL_PARSE_ARGUMENT("%d", &lBandwidth_MiB_s)
+    UTL_PARSE_ARGUMENT("%lf", &lBandwidth_MiB_s)
 
     VERIFY_SELECTED
 

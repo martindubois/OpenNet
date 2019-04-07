@@ -16,7 +16,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #define UTL_PARSE_ARGUMENT(F,A)                                                           \
-    if (1 != scanf_s(aArg, (F), (A)))                                                     \
+    if (1 != sscanf_s(aArg, (F), (A)))                                                    \
     {                                                                                     \
         KmsLib::ToolBase::Report(KmsLib::ToolBase::REPORT_ERROR, "Invalid command line"); \
         return;                                                                           \

@@ -141,6 +141,8 @@ private:
 
     void Event_Process(const OpenNetK::Event & aEvent);
 
+    void License_Verify();
+
     OpenNetK::Adapter_Config        mDriverConfig;
     Event_Callback                  mEvent_Callback;
     void                          * mEvent_Context ;

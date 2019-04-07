@@ -223,25 +223,36 @@ namespace OpenNetK
         void Buffer_Enter_Stopped_Zone0      (BufferInfo * aBufferInfo, unsigned int aIndex, const char * aFrom);
 
         // ===== IoCtl ======================================================
-        int IoCtl_Config_Get      (      Adapter_Config * aOut);
-        int IoCtl_Config_Set      (const Adapter_Config * aIn , Adapter_Config * aOut);
-        int IoCtl_Connect         (const void           * aIn , void           * aOut, void * aFileObject );
-        int IoCtl_Event_Wait      (const void           * aIn , Event * aOut, unsigned int aOutSize_byte);
-        int IoCtl_Event_Wait_Cancel();
-        int IoCtl_Info_Get        (      Adapter_Info   * aOut) const;
-        int IoCtl_Packet_Drop     ();
-        int IoCtl_Packet_Send_Ex  (const void           * aIn , unsigned int aInSize_byte );
-        int IoCtl_PacketGenerator_Config_Get(      PacketGenerator_Config * aOut);
-        int IoCtl_PacketGenerator_Config_Set(const PacketGenerator_Config * aIn , PacketGenerator_Config * aOut);
-        int IoCtl_PacketGenerator_Start     ( void * aFileObject );
-        int IoCtl_PacketGenerator_Stop      ();
-        int IoCtl_Start           (const Buffer         * aIn , unsigned int aInSize_byte );
-        int IoCtl_State_Get       (      Adapter_State  * aOut);
-        int IoCtl_Statistics_Get  (const void           * aIn , uint32_t * aOut, unsigned int aOutSize_byte) const;
-        int IoCtl_Statistics_Reset();
-        int IoCtl_Stop            ();
-        int IoCtl_Tx_Disable      ();
-        int IoCtl_Tx_Enable       ();
+
+        int IoCtl_Config_Get(Adapter_Config * aOut);
+        int IoCtl_Info_Get  (Adapter_Info   * aOut) const;
+
+        int IoCtl_Config_Set                (const Adapter_Config         * aIn, Adapter_Config         * aOut);
+        int IoCtl_PacketGenerator_Config_Set(const PacketGenerator_Config * aIn, PacketGenerator_Config * aOut);
+
+        int IoCtl_Connect(const void * aIn, void * aOut, void * aFileObject);
+
+        int IoCtl_Event_Wait    (const void * aIn, Event    * aOut, unsigned int aOutSize_byte);
+        int IoCtl_Statistics_Get(const void * aIn, uint32_t * aOut, unsigned int aOutSize_byte) const;
+
+        int IoCtl_Event_Wait_Cancel   ();
+        int IoCtl_Packet_Drop         ();
+        int IoCtl_PacketGenerator_Stop();
+        int IoCtl_Statistics_Reset    ();
+        int IoCtl_Stop                ();
+        int IoCtl_Tx_Disable          ();
+        int IoCtl_Tx_Enable           ();
+
+        int IoCtl_License_Set(const void * aIn, void * aOut);
+
+        int IoCtl_Packet_Send_Ex(const void * aIn, unsigned int aInSize_byte);
+
+        int IoCtl_PacketGenerator_Config_Get(PacketGenerator_Config * aOut);
+        int IoCtl_State_Get                 (Adapter_State          * aOut);
+
+        int IoCtl_PacketGenerator_Start(void * aFileObject);
+
+        int IoCtl_Start(const Buffer * aIn, unsigned int aInSize_byte);
 
         Adapter   ** mAdapters ;
         unsigned int mAdapterNo;
@@ -260,6 +271,11 @@ namespace OpenNetK
         OpenNetK_OSDep * mOSDep;
 
         mutable uint64_t mStatistics_Start_us;
+
+        uint32_t mEvaluation_ms;
+        bool     mLicenseOk    ;
+
+        Adapter_Info mInfo;
 
         // ===== Zone 0 =====================================================
         SpinLock * mZone0;

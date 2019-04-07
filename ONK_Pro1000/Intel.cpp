@@ -68,19 +68,7 @@ void Intel::GetState(OpenNetK::Adapter_State * aState)
         //       Normal (Issue) - Comprendre pourquoi la vitesse n'est pas
         //       indique correctement.
 
-        switch (lDeviceStatus.mFields.mSpeed)
-        {
-        case 0x0: aState->mSpeed_MB_s =  10; break;
-        case 0x1: aState->mSpeed_MB_s = 100; break;
-
-        case 0x2:
-        case 0x3:
-            aState->mSpeed_MB_s = 1000;
-            break;
-
-        default:
-            ASSERT(false);
-        }
+        aState->mSpeed_Mb_s = mInfo.mMaxSpeed_Mb_s;
 
     mZone0->UnlockFromThread( lFlags );
 }
