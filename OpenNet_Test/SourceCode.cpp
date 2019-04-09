@@ -58,7 +58,7 @@ KMS_TEST_BEGIN(SourceCode_Base)
 
         KMS_TEST_COMPARE(OpenNet::STATUS_OK, lSC0.SetCode("OpenNet_Test/SourceCode.cpp"));
 
-        KMS_TEST_COMPARE(5372, lSC0.GetCodeSize());
+        KMS_TEST_COMPARE(5193, lSC0.GetCodeSize());
 
         KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET, lSC0.SetCode(" ", 1));
         KMS_TEST_COMPARE(OpenNet::STATUS_CODE_ALREADY_SET, lSC0.SetCode("OpenNet_Test/Kernel.cpp"));
@@ -68,9 +68,9 @@ KMS_TEST_BEGIN(SourceCode_Base)
         KMS_TEST_COMPARE(   0, lSC0.Edit_Replace("A\tB", ""));
         KMS_TEST_COMPARE(   3, lSC0.Edit_Replace("Found", "FOUND"));
         KMS_TEST_COMPARE(   5, lSC0.Edit_Replace("FOUND", "FOUN"));
-        KMS_TEST_COMPARE(5367, lSC0.GetCodeSize ());
+        KMS_TEST_COMPARE(5188, lSC0.GetCodeSize ());
         KMS_TEST_COMPARE(   7, lSC0.Edit_Replace("FOUN", "Found"));
-        KMS_TEST_COMPARE(5374, lSC0.GetCodeSize ());
+        KMS_TEST_COMPARE(5195, lSC0.GetCodeSize ());
         KMS_TEST_COMPARE(   0, lSC0.Edit_Search (""));
         KMS_TEST_COMPARE(   7, lSC0.Edit_Search ("Found"));
 

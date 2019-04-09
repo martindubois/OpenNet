@@ -469,8 +469,6 @@ void SetupTool_Windows::VerifyConfigRet(DWORD aRet, const char * aFunction)
 
         printf("\n");
     }
-
-    assert(CR_SUCCESS == aRet);
 }
 
 // aRet

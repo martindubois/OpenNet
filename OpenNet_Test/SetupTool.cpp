@@ -17,7 +17,7 @@
 
 KMS_TEST_BEGIN(SetupTool_Base)
 {
-    OpenNet::SetupTool * lST0 = OpenNet::SetupTool::Create();
+    OpenNet::SetupTool * lST0 = OpenNet::SetupTool::Create(true);
 
     KMS_TEST_ASSERT(NULL != lST0->GetBinaryFolder ());
     KMS_TEST_ASSERT(NULL != lST0->GetIncludeFolder());
@@ -32,7 +32,9 @@ KMS_TEST_BEGIN(SetupTool_Base)
 
     KMS_TEST_ASSERT(NULL == lST0->Interactif_GetCommandText(0));
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_PAGE_INDEX, lST0->Wizard_ExecutePage       (0, 0));
+    unsigned int lPage = 0;
+
+    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_PAGE_INDEX, lST0->Wizard_ExecutePage       (&lPage, 0));
     KMS_TEST_COMPARE(                                 0, lST0->Wizard_GetPageButtonCount(0));
     KMS_TEST_COMPARE(                                 0, lST0->Wizard_GetPageCount      ());
 

@@ -59,9 +59,9 @@ Includes/OpenNetK
 	Types.h
 	Windows.h
 
-Installer:
+Installer
 # KmsVersion "OpenNet_" ".exe" 3
-	OpenNet_0.0.0.exe
+	OpenNet_0.0.15.exe
 
 ONK_Lib/_DocUser ONK_Lib
 	ReadMe.txt

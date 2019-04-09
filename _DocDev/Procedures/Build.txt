@@ -38,9 +38,13 @@ Version            ______ . ______ - ______
 ===== Windows seulement =====================================================
 [ ] Tool "Visual Studio 2017"
     - Open the solution
+    - Project ONK_Connect - Edit the property "Stampinf - General - Driver
+      Version Number"
     - Project ONK_NDIS - Edit the property "Stampinf - General - Driver
       Version Number"
     - Project ONK_Pro1000 - Edit the property  "Stampinf - General - Driver
+      Version Number"
+    - Project ONK_Tunnel_IO - Edit the property "Stampinf - General - Driver
       Version Number"
     - Close the solution
 [ ] Tool "PowerShell" - In the product folder
