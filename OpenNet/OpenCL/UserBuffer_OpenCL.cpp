@@ -2,17 +2,17 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/UserBuffer_OpenCL.cpp
+// File       OpenNet/OpenCL/UserBuffer_OpenCL.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include "Component.h"
+#include "../Component.h"
 
 // ===== C ==================================================================
 #include <memory.h>
 
-// ===== OpenNet ============================================================
+// ===== OpenNet/OpenCL =====================================================
 #include "OCLW.h"
 
 #include "UserBuffer_OpenCL.h"

@@ -2,18 +2,20 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) KMS 2019. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/Thread_Kernel_OpenCL.h
+// File       OpenNet/OpenCL/Thread_Kernel_OpenCL.h
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include "Component.h"
+#include "../Component.h"
 
 // ===== Windows ============================================================
 #include <Windows.h>
 
-// ===== OpenNet ============================================================
-#include "Adapter_Windows.h"
+// ===== OpenNet/OpenCL =====================================================
+
+#include "../Windows/Adapter_Windows.h"
+
 #include "Buffer_OpenCL.h"
 #include "OCLW.h"
 #include "Processor_OpenCL.h"

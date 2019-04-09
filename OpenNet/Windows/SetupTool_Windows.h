@@ -2,7 +2,7 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/SetupTool_Windows.h
+// File       OpenNet/Windows/SetupTool_Windows.h
 
 #pragma once
 
@@ -14,8 +14,8 @@
 #include <string>
 #include <vector>
 
-// ===== OpenNet ============================================================
-#include "SetupTool_Internal.h"
+// ===== OpenNet/Windows ====================================================
+#include "../Internal/SetupTool_Internal.h"
 
 // Class
 /////////////////////////////////////////////////////////////////////////////

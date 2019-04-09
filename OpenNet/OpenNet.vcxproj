@@ -93,108 +93,149 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Adapter.cpp" />
-    <ClCompile Include="Adapter_Internal.cpp" />
-    <ClCompile Include="Adapter_Linux.cpp">
+    <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="CUDA\Buffer_CUDA.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Adapter_Windows.cpp" />
-    <ClCompile Include="Buffer.cpp" />
-    <ClCompile Include="Buffer_Internal.cpp" />
-    <ClCompile Include="Buffer_OpenCL.cpp" />
-    <ClCompile Include="CUW.cpp">
+    <ClCompile Include="CUDA\CUDAW.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CUDA\CUW.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CUDA\Event_CUDA.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CUDA\NVRTCW.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CUDA\Processor_CUDA.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CUDA\System_CUDA.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CUDA\Thread_CUDA.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CUDA\Thread_Functions_CUDA.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CUDA\Thread_Kernel_CUDA.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CUDA\UserBuffer_CUDA.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="EthernetAddress.cpp" />
     <ClCompile Include="Event.cpp" />
-    <ClCompile Include="Event_CUDA.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Event_OpenCL.cpp" />
-    <ClCompile Include="FolderFinder_Windows.cpp" />
-    <ClCompile Include="FolderFindex.cpp" />
+    <ClCompile Include="FolderFinder.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="Function_Forward.cpp" />
+    <ClCompile Include="Internal\Adapter_Internal.cpp" />
+    <ClCompile Include="Internal\Buffer_Internal.cpp" />
+    <ClCompile Include="Internal\PacketGenerator_Internal.cpp" />
+    <ClCompile Include="Internal\Processor_Internal.cpp" />
+    <ClCompile Include="Internal\SetupTool_Internal.cpp" />
+    <ClCompile Include="Internal\System_Internal.cpp" />
+    <ClCompile Include="Internal\UserBuffer_Internal.cpp" />
     <ClCompile Include="Kernel_Forward.cpp" />
     <ClCompile Include="Kernel.cpp" />
     <ClCompile Include="Kernel_Functions.cpp" />
-    <ClCompile Include="OCLW.cpp" />
-    <ClCompile Include="OpenNet.cpp" />
-    <ClCompile Include="PacketGenerator.cpp" />
-    <ClCompile Include="PacketGenerator_Internal.cpp" />
-    <ClCompile Include="Processor.cpp" />
-    <ClCompile Include="Processor_CUDA.cpp">
+    <ClCompile Include="Linux\Adapter_Linux.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Processor_Internal.cpp" />
-    <ClCompile Include="Processor_OpenCL.cpp" />
+    <ClCompile Include="Linux\FolderFinder_Linux.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Linux\SetupTool_Linux.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="OpenCL\Buffer_OpenCL.cpp" />
+    <ClCompile Include="OpenCL\Event_OpenCL.cpp" />
+    <ClCompile Include="OpenCL\OCLW.cpp" />
+    <ClCompile Include="OpenCL\Processor_OpenCL.cpp" />
+    <ClCompile Include="OpenCL\System_OpenCL.cpp" />
+    <ClCompile Include="OpenCL\Thread_Functions_OpenCL.cpp" />
+    <ClCompile Include="OpenCL\Thread_Kernel_OpenCL.cpp" />
+    <ClCompile Include="OpenCL\Thread_OpenCL.cpp" />
+    <ClCompile Include="OpenCL\UserBuffer_OpenCL.cpp" />
+    <ClCompile Include="OpenNet.cpp" />
+    <ClCompile Include="PacketGenerator.cpp" />
+    <ClCompile Include="Processor.cpp" />
     <ClCompile Include="SetupTool.cpp" />
-    <ClCompile Include="SetupTool_Internal.cpp" />
-    <ClCompile Include="SetupTool_Windows.cpp" />
     <ClCompile Include="SourceCode.cpp" />
     <ClCompile Include="SourceCode_Forward.cpp" />
     <ClCompile Include="StatisticsProvider.cpp" />
     <ClCompile Include="Status.cpp" />
     <ClCompile Include="System.cpp" />
-    <ClCompile Include="System_CUDA.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="System_Internal.cpp" />
-    <ClCompile Include="System_OpenCL.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="Thread_Functions.cpp" />
-    <ClCompile Include="Thread_Functions_CUDA.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Thread_Functions_OpenCL.cpp" />
     <ClCompile Include="Thread_Kernel.cpp" />
-    <ClCompile Include="Thread_Kernel_OpenCL.cpp" />
-    <ClCompile Include="Thread_OpenCL.cpp" />
     <ClCompile Include="UserBuffer.cpp" />
-    <ClCompile Include="UserBuffer_Internal.cpp" />
-    <ClCompile Include="UserBuffer_OpenCL.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VersionInfo.cpp" />
+    <ClCompile Include="Windows\Adapter_Windows.cpp" />
+    <ClCompile Include="Windows\FolderFinder_Windows.cpp" />
+    <ClCompile Include="Windows\SetupTool_Windows.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Adapter_Internal.h" />
-    <ClInclude Include="Adapter_Linux.h" />
-    <ClInclude Include="Adapter_Windows.h" />
-    <ClInclude Include="Buffer_Internal.h" />
-    <ClInclude Include="Buffer_OpenCL.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="CUDA\Buffer_CUDA.h" />
+    <ClInclude Include="CUDA\CUDAW.h" />
+    <ClInclude Include="CUDA\CUW.h" />
+    <ClInclude Include="CUDA\Event_CUDA.h" />
+    <ClInclude Include="CUDA\NVRTCW.h" />
+    <ClInclude Include="CUDA\Processor_CUDA.h" />
+    <ClInclude Include="CUDA\System_CUDA.h" />
+    <ClInclude Include="CUDA\Thread_CUDA.h" />
+    <ClInclude Include="CUDA\Thread_Functions_CUDA.h" />
+    <ClInclude Include="CUDA\Thread_Kernel_CUDA.h" />
+    <ClInclude Include="CUDA\UserBuffer_CUDA.h" />
     <ClInclude Include="EthernetAddress.h" />
-    <ClInclude Include="Event_CUDA.h" />
-    <ClInclude Include="Event_OpenCL.h" />
     <ClInclude Include="FolderFinder.h" />
-    <ClInclude Include="PacketGenerator_Internal.h" />
-    <ClInclude Include="Processor_CUDA.h" />
-    <ClInclude Include="Processor_OpenCL.h" />
-    <ClInclude Include="SetupTool_Internal.h" />
-    <ClInclude Include="SetupTool_Windows.h" />
+    <ClInclude Include="Internal\Adapter_Internal.h" />
+    <ClInclude Include="Internal\Buffer_Internal.h" />
+    <ClInclude Include="Internal\PacketGenerator_Internal.h" />
+    <ClInclude Include="Internal\Processor_Internal.h" />
+    <ClInclude Include="Internal\SetupTool_Internal.h" />
+    <ClInclude Include="Internal\System_Internal.h" />
+    <ClInclude Include="Internal\UserBuffer_Internal.h" />
+    <ClInclude Include="Linux\Adapter_Linux.h" />
+    <ClInclude Include="Linux\SetupTool_Linux.h" />
+    <ClInclude Include="OpenCL\Buffer_OpenCL.h" />
+    <ClInclude Include="OpenCL\Event_OpenCL.h" />
+    <ClInclude Include="OpenCL\OCLW.h" />
+    <ClInclude Include="OpenCL\Processor_OpenCL.h" />
+    <ClInclude Include="OpenCL\System_OpenCL.h" />
+    <ClInclude Include="OpenCL\Thread_Functions_OpenCL.h" />
+    <ClInclude Include="OpenCL\Thread_Kernel_OpenCL.h" />
+    <ClInclude Include="OpenCL\Thread_OpenCL.h" />
+    <ClInclude Include="OpenCL\UserBuffer_OpenCL.h" />
     <ClInclude Include="SourceCode_Forward.h" />
-    <ClInclude Include="System_OpenCL.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="Kernel_Functions.h" />
-    <ClInclude Include="OCLW.h" />
-    <ClInclude Include="Processor_Internal.h" />
-    <ClInclude Include="System_Internal.h" />
     <ClInclude Include="Thread_Functions.h" />
-    <ClInclude Include="Thread_Functions_CUDA.h" />
-    <ClInclude Include="Thread_Functions_OpenCL.h" />
     <ClInclude Include="Thread_Kernel.h" />
-    <ClInclude Include="Thread_Kernel_OpenCL.h" />
-    <ClInclude Include="Thread_OpenCL.h" />
-    <ClInclude Include="UserBuffer_Internal.h" />
-    <ClInclude Include="UserBuffer_OpenCL.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VersionInfo.h" />
+    <ClInclude Include="Windows\Adapter_Windows.h" />
+    <ClInclude Include="Windows\SetupTool_Windows.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="_DocUser\ReadMe.txt" />

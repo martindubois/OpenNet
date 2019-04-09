@@ -2,7 +2,7 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2018-2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/Adapter_Windows.h
+// File       OpenNet/Windows/Adapter_Windows.h
 
 #pragma once
 
@@ -12,8 +12,8 @@
 // ===== OpenCL =============================================================
 #include <CL/opencl.h>
 
-// ===== OpenNet ============================================================
-#include "Adapter_Internal.h"
+// ===== OpenNet/Windows ====================================================
+#include "../Internal/Adapter_Internal.h"
 
 // Class
 /////////////////////////////////////////////////////////////////////////////

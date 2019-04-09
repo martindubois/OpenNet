@@ -2,17 +2,17 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2018-2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/OCLW.h
+// File       OpenNet/OpenCL/OCLW.h
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include "Component.h"
+#include "../Component.h"
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/Exception.h>
 
-// ===== OpenNet ============================================================
+// ===== OpenNet/OpenCL =====================================================
 #include "OCLW.h"
 
 // Static variables

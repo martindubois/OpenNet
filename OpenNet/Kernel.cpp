@@ -35,8 +35,8 @@
 #endif
 
 #ifdef _KMS_WINDOWS_
-    #include "OCLW.h"
-    #include "UserBuffer_OpenCL.h"
+    #include "OpenCL/OCLW.h"
+    #include "OpenCL/UserBuffer_OpenCL.h"
 #endif
 
 // Constants

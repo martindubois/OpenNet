@@ -2,7 +2,7 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/Processor_OpenCL.h
+// File       OpenNet/OpenCL/Processor_OpenCL.h
 
 #pragma once
 
@@ -12,8 +12,8 @@
 // ===== OpenCL =============================================================
 #include <CL/opencl.h>
 
-// ===== OpenNet ============================================================
-#include "Processor_Internal.h"
+// ===== OpenNet/OpenCL =====================================================
+#include "../Internal/Processor_Internal.h"
 
 // Class
 /////////////////////////////////////////////////////////////////////////////

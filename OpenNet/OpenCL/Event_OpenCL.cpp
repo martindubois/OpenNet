@@ -2,17 +2,17 @@
 // Author     KMS - Martin Dubois, ing.
 // Copywrite  (C) 2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/Event_OpenCL.cpp
+// File       OpenNet/OpenCL/Event_OpenCL.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include "Component.h"
+#include "../Component.h"
 
 // ===== C ==================================================================
 #include <stdint.h>
 
-// ===== OpenNet ============================================================
+// ===== OpenNet/OpenCL =====================================================
 #include "OCLW.h"
 
 #include "Event_OpenCL.h"

@@ -2,15 +2,15 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2018-2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/System_OpenCL.h
+// File       OpenNet/OpenCL/System_OpenCL.h
 
 #pragma once
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-// ===== OpenNet ============================================================
-#include "System_Internal.h"
+// ===== OpenNet/OpenCL =====================================================
+#include "../Internal/System_Internal.h"
 
 // Class
 /////////////////////////////////////////////////////////////////////////////

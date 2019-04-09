@@ -2,12 +2,12 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/FolderFinder_Windows.cpp
+// File       OpenNet/Windows/FolderFinder_Windows.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include "Component.h"
+#include "../Component.h"
 
 // ===== C ==================================================================
 #include <stdio.h>
@@ -15,8 +15,8 @@
 // ===== Windows ============================================================
 #include <Windows.h>
 
-// ===== OpenNet ============================================================
-#include "FolderFinder.h"
+// ===== OpenNet/Windows ====================================================
+#include "../FolderFinder.h"
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
@@ -28,18 +28,13 @@ public:
 
     FolderFinder_Windows();
 
+    virtual const char * GetDriverFolder() const;
+
 private:
 
     char mDriverFolder[ 1024 ];
     
 };
-
-// ===== FolderFinder =======================================================
-
-const char * FolderFinder_Windows::GetDriverFolder() const
-{
-    return mDriverFolder;
-}
 
 // Static variable
 /////////////////////////////////////////////////////////////////////////////
@@ -68,4 +63,11 @@ FolderFinder_Windows::FolderFinder_Windows()
     sprintf_s(mLibraryFolder, "%s\\Libraries", mInstallFolder);
 
     gFolderFinder = this;
+}
+
+// ===== FolderFinder =======================================================
+
+const char * FolderFinder_Windows::GetDriverFolder() const
+{
+    return mDriverFolder;
 }

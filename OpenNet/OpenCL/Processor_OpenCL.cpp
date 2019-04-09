@@ -2,12 +2,12 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/Processor_OpenCL.cpp
+// File       OpenNet/OpenCL/Processor_OpenCL.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include "Component.h"
+#include "../Component.h"
 
 // ===== C ==================================================================
 #include <stdint.h>
@@ -22,10 +22,12 @@
 // ===== Common =============================================================
 #include "../Common/Constants.h"
 
-// ===== OpenNet ============================================================
+// ===== OpenNet/OpenCL =====================================================
+
+#include "../Constants.h"
+#include "../FolderFinder.h"
+
 #include "Buffer_OpenCL.h"
-#include "Constants.h"
-#include "FolderFinder.h"
 #include "OCLW.h"
 #include "Thread_Functions_OpenCL.h"
 #include "UserBuffer_OpenCL.h"

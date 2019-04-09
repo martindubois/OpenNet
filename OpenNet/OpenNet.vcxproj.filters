@@ -125,83 +125,107 @@
     <ClCompile Include="SetupTool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FolderFindex.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="CUDA\Buffer_CUDA.cpp">
+      <Filter>Source Files\CUDA</Filter>
     </ClCompile>
-    <ClCompile Include="Adapter_Internal.cpp">
+    <ClCompile Include="CUDA\CUDAW.cpp">
+      <Filter>Source Files\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDA\CUW.cpp">
+      <Filter>Source Files\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDA\Event_CUDA.cpp">
+      <Filter>Source Files\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDA\NVRTCW.cpp">
+      <Filter>Source Files\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDA\Processor_CUDA.cpp">
+      <Filter>Source Files\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDA\System_CUDA.cpp">
+      <Filter>Source Files\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDA\Thread_CUDA.cpp">
+      <Filter>Source Files\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDA\Thread_Functions_CUDA.cpp">
+      <Filter>Source Files\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDA\Thread_Kernel_CUDA.cpp">
+      <Filter>Source Files\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDA\UserBuffer_CUDA.cpp">
+      <Filter>Source Files\CUDA</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\Adapter_Internal.cpp">
       <Filter>Source Files\Internal</Filter>
     </ClCompile>
-    <ClCompile Include="Adapter_Linux.cpp">
+    <ClCompile Include="Internal\Buffer_Internal.cpp">
+      <Filter>Source Files\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\PacketGenerator_Internal.cpp">
+      <Filter>Source Files\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\Processor_Internal.cpp">
+      <Filter>Source Files\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\SetupTool_Internal.cpp">
+      <Filter>Source Files\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\System_Internal.cpp">
+      <Filter>Source Files\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\UserBuffer_Internal.cpp">
+      <Filter>Source Files\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Linux\Adapter_Linux.cpp">
       <Filter>Source Files\Linux</Filter>
     </ClCompile>
-    <ClCompile Include="Adapter_Windows.cpp">
+    <ClCompile Include="Linux\FolderFinder_Linux.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="Linux\SetupTool_Linux.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCL\Buffer_OpenCL.cpp">
+      <Filter>Source Files\OpenCL</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCL\Event_OpenCL.cpp">
+      <Filter>Source Files\OpenCL</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCL\OCLW.cpp">
+      <Filter>Source Files\OpenCL</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCL\Processor_OpenCL.cpp">
+      <Filter>Source Files\OpenCL</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCL\System_OpenCL.cpp">
+      <Filter>Source Files\OpenCL</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCL\Thread_Functions_OpenCL.cpp">
+      <Filter>Source Files\OpenCL</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCL\Thread_Kernel_OpenCL.cpp">
+      <Filter>Source Files\OpenCL</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCL\Thread_OpenCL.cpp">
+      <Filter>Source Files\OpenCL</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCL\UserBuffer_OpenCL.cpp">
+      <Filter>Source Files\OpenCL</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\Adapter_Windows.cpp">
       <Filter>Source Files\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="Buffer_Internal.cpp">
-      <Filter>Source Files\Internal</Filter>
-    </ClCompile>
-    <ClCompile Include="Buffer_OpenCL.cpp">
-      <Filter>Source Files\OpenCL</Filter>
-    </ClCompile>
-    <ClCompile Include="Event_CUDA.cpp">
-      <Filter>Source Files\CUDA</Filter>
-    </ClCompile>
-    <ClCompile Include="Event_OpenCL.cpp">
-      <Filter>Source Files\OpenCL</Filter>
-    </ClCompile>
-    <ClCompile Include="FolderFinder_Windows.cpp">
+    <ClCompile Include="Windows\FolderFinder_Windows.cpp">
       <Filter>Source Files\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="PacketGenerator_Internal.cpp">
-      <Filter>Source Files\Internal</Filter>
-    </ClCompile>
-    <ClCompile Include="Processor_CUDA.cpp">
-      <Filter>Source Files\CUDA</Filter>
-    </ClCompile>
-    <ClCompile Include="Processor_Internal.cpp">
-      <Filter>Source Files\Internal</Filter>
-    </ClCompile>
-    <ClCompile Include="Processor_OpenCL.cpp">
-      <Filter>Source Files\OpenCL</Filter>
-    </ClCompile>
-    <ClCompile Include="SetupTool_Internal.cpp">
-      <Filter>Source Files\Internal</Filter>
-    </ClCompile>
-    <ClCompile Include="SetupTool_Windows.cpp">
+    <ClCompile Include="Windows\SetupTool_Windows.cpp">
       <Filter>Source Files\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="System_CUDA.cpp">
-      <Filter>Source Files\CUDA</Filter>
-    </ClCompile>
-    <ClCompile Include="System_Internal.cpp">
-      <Filter>Source Files\Internal</Filter>
-    </ClCompile>
-    <ClCompile Include="System_OpenCL.cpp">
-      <Filter>Source Files\OpenCL</Filter>
-    </ClCompile>
-    <ClCompile Include="Thread_Functions_CUDA.cpp">
-      <Filter>Source Files\CUDA</Filter>
-    </ClCompile>
-    <ClCompile Include="Thread_Functions_OpenCL.cpp">
-      <Filter>Source Files\OpenCL</Filter>
-    </ClCompile>
-    <ClCompile Include="Thread_Kernel_OpenCL.cpp">
-      <Filter>Source Files\OpenCL</Filter>
-    </ClCompile>
-    <ClCompile Include="Thread_OpenCL.cpp">
-      <Filter>Source Files\OpenCL</Filter>
-    </ClCompile>
-    <ClCompile Include="UserBuffer_Internal.cpp">
-      <Filter>Source Files\Internal</Filter>
-    </ClCompile>
-    <ClCompile Include="UserBuffer_OpenCL.cpp">
-      <Filter>Source Files\OpenCL</Filter>
-    </ClCompile>
-    <ClCompile Include="CUW.cpp">
-      <Filter>Source Files\CUDA</Filter>
-    </ClCompile>
-    <ClCompile Include="OCLW.cpp">
-      <Filter>Source Files\OpenCL</Filter>
+    <ClCompile Include="FolderFinder.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -238,71 +262,98 @@
     <ClInclude Include="FolderFinder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Adapter_Internal.h">
+    <ClInclude Include="CUDA\Buffer_CUDA.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDA\CUDAW.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDA\CUW.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDA\Event_CUDA.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDA\NVRTCW.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDA\Processor_CUDA.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDA\System_CUDA.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDA\Thread_CUDA.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDA\Thread_Functions_CUDA.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDA\Thread_Kernel_CUDA.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDA\UserBuffer_CUDA.h">
+      <Filter>Header Files\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal\Adapter_Internal.h">
       <Filter>Header Files\Internal</Filter>
     </ClInclude>
-    <ClInclude Include="Adapter_Linux.h">
+    <ClInclude Include="Internal\Buffer_Internal.h">
+      <Filter>Header Files\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal\PacketGenerator_Internal.h">
+      <Filter>Header Files\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal\Processor_Internal.h">
+      <Filter>Header Files\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal\SetupTool_Internal.h">
+      <Filter>Header Files\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal\System_Internal.h">
+      <Filter>Header Files\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal\UserBuffer_Internal.h">
+      <Filter>Header Files\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="Linux\Adapter_Linux.h">
       <Filter>Header Files\Linux</Filter>
     </ClInclude>
-    <ClInclude Include="Adapter_Windows.h">
+    <ClInclude Include="Linux\SetupTool_Linux.h">
+      <Filter>Header Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCL\Buffer_OpenCL.h">
+      <Filter>Header Files\OpenCL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCL\Event_OpenCL.h">
+      <Filter>Header Files\OpenCL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCL\OCLW.h">
+      <Filter>Header Files\OpenCL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCL\Processor_OpenCL.h">
+      <Filter>Header Files\OpenCL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCL\System_OpenCL.h">
+      <Filter>Header Files\OpenCL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCL\Thread_Functions_OpenCL.h">
+      <Filter>Header Files\OpenCL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCL\Thread_Kernel_OpenCL.h">
+      <Filter>Header Files\OpenCL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCL\Thread_OpenCL.h">
+      <Filter>Header Files\OpenCL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCL\UserBuffer_OpenCL.h">
+      <Filter>Header Files\OpenCL</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\Adapter_Windows.h">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Buffer_Internal.h">
-      <Filter>Header Files\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="Buffer_OpenCL.h">
-      <Filter>Header Files\OpenCL</Filter>
-    </ClInclude>
-    <ClInclude Include="Event_CUDA.h">
-      <Filter>Header Files\CUDA</Filter>
-    </ClInclude>
-    <ClInclude Include="Event_OpenCL.h">
-      <Filter>Header Files\OpenCL</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketGenerator_Internal.h">
-      <Filter>Header Files\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="Processor_CUDA.h">
-      <Filter>Header Files\CUDA</Filter>
-    </ClInclude>
-    <ClInclude Include="Processor_Internal.h">
-      <Filter>Header Files\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="Processor_OpenCL.h">
-      <Filter>Header Files\OpenCL</Filter>
-    </ClInclude>
-    <ClInclude Include="SetupTool_Internal.h">
-      <Filter>Header Files\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="SetupTool_Windows.h">
+    <ClInclude Include="Windows\SetupTool_Windows.h">
       <Filter>Header Files\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="System_Internal.h">
-      <Filter>Header Files\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="System_OpenCL.h">
-      <Filter>Header Files\OpenCL</Filter>
-    </ClInclude>
-    <ClInclude Include="Thread_Functions_CUDA.h">
-      <Filter>Header Files\CUDA</Filter>
-    </ClInclude>
-    <ClInclude Include="Thread_Functions_OpenCL.h">
-      <Filter>Header Files\OpenCL</Filter>
-    </ClInclude>
-    <ClInclude Include="Thread_Kernel_OpenCL.h">
-      <Filter>Header Files\OpenCL</Filter>
-    </ClInclude>
-    <ClInclude Include="Thread_OpenCL.h">
-      <Filter>Header Files\OpenCL</Filter>
-    </ClInclude>
-    <ClInclude Include="UserBuffer_Internal.h">
-      <Filter>Header Files\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="UserBuffer_OpenCL.h">
-      <Filter>Header Files\OpenCL</Filter>
-    </ClInclude>
-    <ClInclude Include="OCLW.h">
-      <Filter>Header Files\OpenCL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -31,7 +31,7 @@
 #endif
 
 #ifdef _KMS_WINDOWS_
-    #include "SetupTool_Windows.h"
+    #include "Windows/SetupTool_Windows.h"
 #endif
 
 namespace OpenNet

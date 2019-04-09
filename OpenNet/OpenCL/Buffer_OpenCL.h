@@ -12,8 +12,9 @@
 // ===== OpenCL =============================================================
 #include <CL/opencl.h>
 
-// ===== OpenNet ============================================================
-#include "Buffer_Internal.h"
+// ===== OpenNet/OpenCL =====================================================
+#include "../Internal/Buffer_Internal.h"
+
 #include "Event_OpenCL.h"
 
 // Class

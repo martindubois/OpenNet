@@ -2,12 +2,12 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/SetupTool_Windows.cpp
+// File       OpenNet/Windows/SetupTool_Windows.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include "Component.h"
+#include "../Component.h"
 
 // ===== Windows ============================================================
 
@@ -23,8 +23,8 @@
 // ===== Includes ===========================================================
 #include <OpenNetK/Interface.h>
 
-// ===== OpenNet ============================================================
-#include "FolderFinder.h"
+// ===== OpenNet/Windows ====================================================
+#include "../FolderFinder.h"
 
 #include "SetupTool_Windows.h"
 

@@ -2,12 +2,12 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2018-2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/System_OpenCL.cpp
+// File       OpenNet/OpenCL/System_OpenCL.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include "Component.h"
+#include "../Component.h"
 
 // ===== Windows ============================================================
 #include <Windows.h>
@@ -15,8 +15,10 @@
 // ===== Common =============================================================
 #include "../Common/Constants.h"
 
-// ===== OpenNet ============================================================
-#include "Adapter_Windows.h"
+// ===== OpenNet/OpenCL =====================================================
+
+#include "../Windows/Adapter_Windows.h"
+
 #include "OCLW.h"
 #include "Processor_OpenCL.h"
 

@@ -2,12 +2,12 @@
 // Author     KMS - Martin Dubois, ing.
 // Copyright  (C) 2018-2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/Adapter_Windows.cpp
+// File       OpenNet/Windows/Adapter_Windows.cpp
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include "Component.h"
+#include "../Component.h"
 
 // ===== C ==================================================================
 #include <stdint.h>
@@ -19,11 +19,11 @@
 #include "../Common/Constants.h"
 #include "../Common/IoCtl.h"
 
-// ===== OpenNet ============================================================
-#include "Buffer_OpenCL.h"
-#include "OCLW.h"
-#include "Processor_OpenCL.h"
-#include "Thread_Kernel_OpenCL.h"
+// ===== OpenNet/Windows ====================================================
+#include "../OpenCL/Buffer_OpenCL.h"
+#include "../OpenCL/OCLW.h"
+#include "../OpenCL/Processor_OpenCL.h"
+#include "../OpenCL/Thread_Kernel_OpenCL.h"
 
 #include "Adapter_Windows.h"
 

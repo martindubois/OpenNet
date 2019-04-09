@@ -2,7 +2,7 @@
 // Author     KMS - Martin Dubois, ing.
 // Copywrite  (C) 2019 KMS. All rights reserved.
 // Product    OpenNet
-// File       OpenNet/Event_OpenCL.h
+// File       OpenNet/OpenCL/Event_OpenCL.h
 
 #pragma once
 
@@ -12,8 +12,8 @@
 // ===== OpenCL =============================================================
 #include <CL/opencl.h>
 
-// ===== OpenNet ============================================================
-#include "Event.h"
+// ===== OpenNet/OpenCL =====================================================
+#include "../Event.h"
 
 // Class
 /////////////////////////////////////////////////////////////////////////////

@@ -41,7 +41,7 @@
 #endif
 
 #ifdef _KMS_WINDOWS_
-    #include "System_OpenCL.h"
+    #include "OpenCL/System_OpenCL.h"
 #endif
 
 namespace OpenNet
