@@ -20,7 +20,6 @@ KMS_TEST_BEGIN(SetupTool_Base)
     OpenNet::SetupTool * lST0 = OpenNet::SetupTool::Create();
 
     KMS_TEST_ASSERT(NULL != lST0->GetBinaryFolder ());
-    KMS_TEST_ASSERT(NULL != lST0->GetDriverFolder ());
     KMS_TEST_ASSERT(NULL != lST0->GetIncludeFolder());
     KMS_TEST_ASSERT(NULL != lST0->GetInstallFolder());
     KMS_TEST_ASSERT(NULL != lST0->GetLibraryFolder());

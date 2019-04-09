@@ -1,0 +1,8 @@
+Package: kms-opennet
+Version: 0.0-1
+Section: base
+Priority: optional
+Architecture: amd64
+Maintainer: KMS <opennet@kms-quebec.com>
+Description: OpenNet
+ OpenNet 0.0.14

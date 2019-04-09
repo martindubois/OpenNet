@@ -40,11 +40,19 @@ if [ 0 != $? ] ; then
 fi
 cd ..
 
+cd OpenNet_Setup
+make depend > /dev/null 2> /dev/null
+if [ 0 != $? ] ; then
+    echo ERROR  OpenNet_Setup - make depend  failed - $?
+    RESULT=4
+fi
+cd ..
+
 cd OpenNet_Test
 make depend > /dev/null 2> /dev/null
 if [ 0 != $? ] ; then
     echo ERROR  OpenNet_Test - make depend  failed - $?
-    RESULT=4
+    RESULT=5
 fi
 cd ..
 
@@ -52,7 +60,7 @@ cd OpenNet_Tool
 make depend > /dev/null 2> /dev/null
 if [ 0 != $? ] ; then
     echo ERROR  OpenNet_Tool - make depend  failed - $?
-    RESULT=5
+    RESULT=6
 fi
 cd ..
 
@@ -60,7 +68,7 @@ cd TestLib
 make depend > /dev/null 2> /dev/null
 if [ 0 != $? ] ; then
     echo ERROR  TestLib - make depend  failed - $?
-    RESULT=6
+    RESULT=7
 fi
 cd ..
 

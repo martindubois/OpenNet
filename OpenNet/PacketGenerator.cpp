@@ -20,7 +20,7 @@
 #include <KmsLib/ValueVector.h>
 
 // ===== OpenNet ============================================================
-#include "PacketGenerator_Internal.h"
+#include "Internal/PacketGenerator_Internal.h"
 
 namespace OpenNet
 {

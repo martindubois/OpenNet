@@ -55,12 +55,21 @@ if [ 0 != $? ] ; then
 fi
 cd ..
 
+echo Building OpenNet_Setup ...
+cd OpenNet_Setup
+make
+if [ 0 != $? ] ; then
+    echo ERROR  OpenNet_Setup - make  failed
+    exit 6
+fi
+cd ..
+
 echo Building OpenNet_Test ...
 cd OpenNet_Test
 make
 if [ 0 != $? ] ; then
     echo ERROR  OpenNet_Test - make  failed
-    exit 6
+    exit 7
 fi
 cd ..
 
@@ -69,7 +78,7 @@ cd TestLib
 make
 if [ 0 != $? ] ; then
     echo ERROR  TestLib - make  failed
-    exit 7
+    exit 8
 fi
 cd ..
 
@@ -78,7 +87,7 @@ cd OpenNet_Tool
 make
 if [ 0 != $? ] ; then
     echo ERROR  OpenNet_Tool - make  failed
-    exit 8
+    exit 9
 fi
 cd ..
 

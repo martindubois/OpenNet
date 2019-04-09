@@ -37,7 +37,7 @@ cp _DocUser/ReadMe.txt               $DST_FOLDER
 cp Binaries/ONK_Test                 $DST_FOLDER/Binaries
 cp Binaries/OpenNet_Test             $DST_FOLDER/Binaries
 cp Binaries/OpenNet_Tool             $DST_FOLDER/Binaries
-cp Binaries/OpenNet.so               $DST_FOLDER/Binaries
+cp Binaries/libOpenNet.so            $DST_FOLDER/Binaries
 cp Includes/OpenNet/*.h              $DST_FOLDER/Includes/OpenNet
 cp Includes/OpenNetK/*.h             $DST_FOLDER/Includes/OpenNetK
 cp Libraries/ONK_Lib.a               $DST_FOLDER/Libraries
@@ -45,7 +45,6 @@ cp Libraries/TestLib.a               $DST_FOLDER/Libraries
 cp ONK_Lib/_DocUser/ReadMe.txt       $DST_FOLDER/ONK_Lib
 cp ONK_Pro1000/_DocUser/ReadMe.txt   $DST_FOLDER/ONK_Intel
 cp ONK_Pro1000/ONK_Pro1000.ko        $DST_FOLDER/Modules
-cp ONK_Tunnel_IO/_DocUser/ReadMe.txt $DST_FOLDER/ONK_Tunnel_IO
 cp ONK_Tunnel_IO/ONK_Tunnel_IO.ko    $DST_FOLDER/Modules
 cp OpenNet/_DocUser/ReadMe.txt       $DST_FOLDER/OpenNet
 cp OpenNet_Tool/_DocUser/ReadMe.txt  $DST_FOLDER/OpenNet_Tool

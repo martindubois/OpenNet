@@ -1,8 +1,0 @@
-Package: kms-opennet-rt
-Version: 0.0-0
-Section: base
-Priority: optional
-Architecture: amd64
-Maintainer: KMS <opennet@kms-quebec.com>
-Description: OpenNet Run-Time
- OpenNet 0.0.12 Run-Time

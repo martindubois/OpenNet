@@ -34,10 +34,10 @@
 #include "../Common/OpenNet/System_Statistics.h"
 
 // ===== OpenNet ============================================================
-#include "Adapter_Internal.h"
+#include "Internal/Adapter_Internal.h"
 
 #ifdef _KMS_LINUX_
-    #include "System_CUDA.h"
+    #include "CUDA/System_CUDA.h"
 #endif
 
 #ifdef _KMS_WINDOWS_

@@ -18,6 +18,12 @@ if [ 0 != $? ] ; then
     exit 1
 fi
 
+./CreatePackages.sh
+if [ 0 != $? ] ; then
+    echo ERROR  ./CreatePackages.sh  failed
+    exit 1
+fi
+
 ./Export.sh $1
 if [ 0 != $? ] ; then
     echo ERROR  ./Export.sh $1  failed

@@ -30,6 +30,10 @@ cd OpenNet
 ./Clean.sh
 cd ..
 
+cd OpenNet_Setup
+./Clean.sh
+cd ..
+
 cd OpenNet_Test
 ./Clean.sh
 cd ..

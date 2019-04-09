@@ -31,7 +31,7 @@
 #include "Event.h"
 
 #ifdef _KMS_LINUX_
-    #include "UserBuffer_CUDA.h"
+    #include "CUDA/UserBuffer_CUDA.h"
 #endif
 
 #ifdef _KMS_WINDOWS_

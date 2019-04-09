@@ -12,7 +12,13 @@ echo Excuting  OpenNet/Clean.sh  ...
 
 rm *.o 2> /dev/null
 
-rm ../Binaries/OpenNet.so 2> /dev/null
+rm CUDA/*.o 2> /dev/null
+
+rm Internal/*.o 2> /dev/null
+
+rm Linux/*.o 2> /dev/null
+
+rm ../Binaries/libOpenNet.so 2> /dev/null
 
 # ===== End =================================================================
 

@@ -27,7 +27,7 @@
 // ===== OpenNet ============================================================
 
 #ifdef _KMS_LINUX_
-    #include "SetupTool_Linux.h"
+    #include "Linux/SetupTool_Linux.h"
 #endif
 
 #ifdef _KMS_WINDOWS_

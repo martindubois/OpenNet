@@ -8,7 +8,7 @@ include ../User.mk
 
 INCLUDES = -I ../Includes $(INCLUDE_IMPORT)
 
-LIBRARIES = ../Binaries/OpenNet.so ../Libraries/TestLib.a $(KMS_LIB_A)
+LIBRARIES = ../Libraries/TestLib.a $(KMS_LIB_A)
 
 OUTPUT = ../Binaries/OpenNet_Tool
 
@@ -32,7 +32,7 @@ OBJECTS = $(SOURCES:.cpp=.o)
 # ===== Targets / Cibles ====================================================
 
 $(OUTPUT) : $(OBJECTS) $(LIBRARIES)
-	g++ -pthread -o $@ $^  -L $(CUDA_FOLDER)/lib64 -L $(CUDA_FOLDER)/lib64/stubs -l cudart -l cuda -l nvrtc
+	g++ -pthread -o $@ $^ -L ../Binaries -L $(CUDA_FOLDER)/lib64 -L $(CUDA_FOLDER)/lib64/stubs -l OpenNet -l cudart -l cuda -l nvrtc
 
 depend:
 	makedepend -Y $(INCLUDES) $(SOURCES)

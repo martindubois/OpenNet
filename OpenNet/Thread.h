@@ -15,8 +15,8 @@
 #include <KmsLib/ThreadBase.h>
 
 // ===== OpenNet ============================================================
-#include "Adapter_Internal.h"
-#include "Processor_Internal.h"
+#include "Internal/Adapter_Internal.h"
+#include "Internal/Processor_Internal.h"
 
 class Buffer_Internal;
 

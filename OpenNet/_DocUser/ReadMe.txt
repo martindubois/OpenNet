@@ -4,5 +4,5 @@ Copyright  (C) 2019 KMS. All rights reserved
 Product    OpenNet
 File       OpenNet/_DocUser/ReadMe.txt
 
-0.0.13
+0.0.14
 - Class UserBuffer and method Processor::AllocateUserBuffer

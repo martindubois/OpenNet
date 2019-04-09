@@ -64,18 +64,6 @@ namespace OpenNet
         virtual const char * GetBinaryFolder() const = 0;
 
         /// \cond   en
-        /// \brief  Retrieve the name of the folder containing driver files.
-        /// \return This method returns the address of an internal buffer.
-        /// \endcond
-        /// \cond   fr
-        /// \brief  Obtenir le nom du r&eacute;pertoire contenant les
-        ///         pilotes.
-        /// \return Cette m&eacute;thode retourne l'adresse d'un espace de
-        ///         m&eacute;moire interne.
-        /// \endcond
-        virtual const char * GetDriverFolder() const = 0;
-
-        /// \cond   en
         /// \brief  Retrieve the name of the folder containing header files.
         /// \return This method returns the address of an internal buffer.
         /// \endcond

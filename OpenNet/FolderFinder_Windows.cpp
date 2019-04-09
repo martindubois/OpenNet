@@ -28,7 +28,18 @@ public:
 
     FolderFinder_Windows();
 
+private:
+
+    char mDriverFolder[ 1024 ];
+    
 };
+
+// ===== FolderFinder =======================================================
+
+const char * FolderFinder_Windows::GetDriverFolder() const
+{
+    return mDriverFolder;
+}
 
 // Static variable
 /////////////////////////////////////////////////////////////////////////////
@@ -40,6 +51,8 @@ static FolderFinder_Windows sFolderFinder_Windows;
 
 FolderFinder_Windows::FolderFinder_Windows()
 {
+    memset(&mBinaryFolder , 0, sizeof(mDriverFolder ));
+
     DWORD lRet = GetModuleFileNameA(NULL, mBinaryFolder, sizeof(mBinaryFolder));
     assert(0 < lRet);
 

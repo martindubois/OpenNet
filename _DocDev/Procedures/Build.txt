@@ -14,12 +14,11 @@ Operating system   [ ] Ubuntu 18.04                            [ ] Windows 10
 
 Version            _____ . _____ . _____ . _____ - __________________________
 
-Client             _______________________, ______ RT, ______ SDK, ______ DDK
-
 [ ] File "_DocUser/ReadMe.txt"
 [ ] File "ONK_Lib/_DocUser/ReadMe.txt"
 [ ] File "ONK_Pro1000/_DocUser/ReadMe.txt"
 [ ] File "OpenNet/_DocUser/ReadMe.txt"
+[ ] File "OpenNet_Setup/_DocUser/ReadMe.txt"
 [ ] File "OpenNet_Tool/_DocUser/ReadMe.txt"
 
 ===== Ubuntu seulement ======================================================
@@ -27,9 +26,11 @@ Client             _______________________, ______ RT, ______ SDK, ______ DDK
 
 Version            ______ . ______ - ______
 
+[ ] File "Scripts/control" - Edit the version
 [ ] File "Scripts/control_DDK" - Edit the version
-[ ] File "Scripts/control_RT" - Edit the version
-[ ] File "Scripts/control_SDK" - Edit the version
+[ ] File "Scripts/OpenNet_Setup.sh - Edit the version
+[ ] File "Scripts/postinst.sh" - Edit the version
+[ ] File "Scripts/preinst.sh" - Edit the version
 [ ] Tool "Terminal" - In the product folder
         ./Build.sh {Major.Minor.Build_Type}
 [ ] Copy the exported file on the server

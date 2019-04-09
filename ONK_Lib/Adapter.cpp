@@ -1310,7 +1310,7 @@ namespace OpenNetK
 
     int Adapter::IoCtl_License_Set(const void * aIn, void * aOut)
     {
-        // TRACE_DEBUG "%s( ,  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
+        TRACE_DEBUG "%s( ,  )" DEBUG_EOL, __FUNCTION__ TRACE_END;
 
         ASSERT(NULL != aIn );
         ASSERT(NULL != aOut);
@@ -1319,7 +1319,7 @@ namespace OpenNetK
 
         mHardware->GetInfo(&mInfo);
 
-        uint64_t lKey = 713705;
+        uint64_t lKey = 26;
 
         lKey *= mInfo.mMaxSpeed_Mb_s;
 
@@ -1331,6 +1331,8 @@ namespace OpenNetK
 
         lKey /= 1024;
         lKey &= 0xffffffff;
+
+        TRACE_DEBUG "IoCtl_License_Set - 0x%08x == 0x%08x" DEBUG_EOL, lIn->mKey, lKey TRACE_END;
 
         mLicenseOk = (lIn->mKey == lKey);
 
