@@ -16,7 +16,7 @@
 /// \cond    fr
 /// \brief   Le type Ethernet des paquets ARP
 /// \endcond
-#define ARP_ETHERNET_TYPE (0x0608)
+#define ARP_ETHERNET_TYPE_nh (0x0608)
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@
 /// \return  Cette fonction retourne un pointeur vers l'adresse
 ///          questionn&eacute;e.
 /// \endcond
-__global unsigned char * ARP_Destination(__global unsigned char * aData)
+OPEN_NET_GLOBAL unsigned char * ARP_Destination(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return (aData + 24);
 }
@@ -50,7 +50,7 @@ __global unsigned char * ARP_Destination(__global unsigned char * aData)
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          provenance.
 /// \endcond
-__global unsigned char * ARP_Source(__global unsigned char * aData)
+OPEN_NET_GLOBAL unsigned char * ARP_Source(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return (aData + 14);
 }

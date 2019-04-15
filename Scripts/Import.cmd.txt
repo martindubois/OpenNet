@@ -37,6 +37,7 @@ Drivers/Release_64/ONK_Hardware
 
 Includes/OpenNet
 	Adapter.h
+	Buffer.h
 	Function.h
 	Function_Forward.h
 	Kernel.h
@@ -55,10 +56,13 @@ Includes/OpenNetK
 	ARP.h
 	Ethernet.h
 	IPv4.h
+	IPv6.h
 	Kernel.h
 	Kernel_OpenCL.h
 	StdInt.h
+	TCP.h
 	Types.h
+	UDP.h
 
 Libraries/Debug_64
     ONK_Lib.lib

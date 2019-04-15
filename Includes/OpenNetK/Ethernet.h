@@ -7,6 +7,11 @@
 
 #pragma once
 
+// Constant
+/////////////////////////////////////////////////////////////////////////////
+
+#define ETHERNET_VLAN_TAG_ID_nh (0x8100)
+
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
@@ -26,9 +31,11 @@
 /// \return  Cette fonction retourne un pointeur vers la charge utile du
 ///          paquet Ethernet.
 /// \endcond
-__global unsigned char * Ethernet_Data(__global unsigned char * aBase, __global const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_GLOBAL unsigned char * Ethernet_Data( OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
-    return (aBase + aPacketInfo->mOffset_byte + 14);
+    unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
+
+    return (aBase + aPacketInfo.mOffset_byte + ((ETHERNET_VLAN_TAG_ID_nh == lType) ? 18 : 14));
 }
 
 /// \cond    en
@@ -47,5 +54,7 @@ __global unsigned char * Ethernet_Data(__global unsigned char * aBase, __global 
 /// \endcond
 unsigned short Ethernet_Type(__global const unsigned char * aBase, __global const OpenNet_PacketInfo * aPacketInfo)
 {
-    return (*((__global const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12)));
+    unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
+
+    return (ETHERNET_VLAN_TAG_ID_nh == lType_nh) ? (*((__global const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 16))) : lType_nh;
 }

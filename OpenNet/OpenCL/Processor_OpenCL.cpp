@@ -158,22 +158,20 @@ cl_program Processor_OpenCL::Program_Create(OpenNet::Kernel * aKernel, unsigned 
     cl_program lResult = OCLW_CreateProgramWithSource(mContext, aKernel->GetCodeLineCount(), aKernel->GetCodeLines(), NULL);
     assert(NULL != lResult);
 
-    // TODO  OpenNet::Processor_Internal
-    //       High (Feature) - Utiliser un technique de recherche pour trouver
-    //       le repertoire Includes. Il faut trouver un repertoire qui
-    //       contient le fichier "OpenNetK/Kernel.h". Essayer en premier la
-    //       variable d'environnement OPEN_NET_INCLUDES. Essayer en dernier
-    //       "V:/OpenNet/Includes".
+    const char * lIncludeFolder = gFolderFinder->GetIncludeFolder();
+
+    mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+    mDebugLog->Log(lIncludeFolder);
 
     char lArgs[1024];
 
     if (ADAPTER_NO_UNKNOWN == aAdapterNo)
     {
-        sprintf_s(lArgs, "-D _OPEN_NET_OPEN_CL_ -I %s", gFolderFinder->GetIncludeFolder());
+        sprintf_s(lArgs, "-D _OPEN_NET_OPEN_CL_ -I \"%s\"", lIncludeFolder);
     }
     else
     {
-        sprintf_s(lArgs, "-D OPEN_NET_ADAPTER_NO=(%u) -D _OPEN_NET_OPEN_CL_ -I %s", aAdapterNo, gFolderFinder->GetIncludeFolder());
+        sprintf_s(lArgs, "-D OPEN_NET_ADAPTER_NO=(%u) -D _OPEN_NET_OPEN_CL_ -I \"%s\"", aAdapterNo, lIncludeFolder);
     }
 
     try

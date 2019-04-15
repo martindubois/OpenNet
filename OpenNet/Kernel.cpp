@@ -114,6 +114,11 @@ namespace OpenNet
         return STATUS_OK;
     }
 
+    const char * Kernel::GetBuildLog() const
+    {
+        return mBuildLog;
+    }
+
     unsigned int Kernel::GetCodeLineCount()
     {
         if (0 >= mCodeLineCount)

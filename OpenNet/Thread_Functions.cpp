@@ -4,7 +4,7 @@
 // Product    OpenNet
 // File       OpenNet/Thread_Functions.h
 
-#define __CLASS__ "Thread_Function::"
+#define __CLASS__ "Thread_Functions::"
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -64,6 +64,8 @@ void Thread_Functions::AddAdapter(Adapter_Internal * aAdapter, const OpenNet::Fu
 
 void Thread_Functions::AddDispatchCode()
 {
+    mDebugLog->Log(__FILE__, __CLASS__ "AddDispatchCode", __LINE__);
+
     unsigned int lAdapterCount = static_cast<unsigned int>(mAdapters.size());
     assert(0 < lAdapterCount);
 
@@ -82,6 +84,8 @@ void Thread_Functions::AddDispatchCode()
     // printf( __CLASS__ "AddDispatchCode - delete [] 0x%lx (lBufferQty)\n", reinterpret_cast< uint64_t >( lBufferQty ) );
 
     delete[] lBufferQty;
+
+    mDebugLog->Log(__FILE__, __CLASS__ "AddDispatchCode", __LINE__);
 }
 
 // ===== Thread =============================================================

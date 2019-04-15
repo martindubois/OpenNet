@@ -48,6 +48,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC
 		Includes\OpenNetK\Interface.h = Includes\OpenNetK\Interface.h
 		Includes\OpenNetK\IoCtl.h = Includes\OpenNetK\IoCtl.h
 		Includes\OpenNetK\IPv4.h = Includes\OpenNetK\IPv4.h
+		Includes\OpenNetK\IPv6.h = Includes\OpenNetK\IPv6.h
 		Includes\OpenNetK\Kernel.h = Includes\OpenNetK\Kernel.h
 		Includes\OpenNetK\Kernel_CUDA.h = Includes\OpenNetK\Kernel_CUDA.h
 		Includes\OpenNetK\Kernel_OpenCL.h = Includes\OpenNetK\Kernel_OpenCL.h
@@ -59,8 +60,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNetK", "OpenNetK", "{CC
 		Includes\OpenNetK\PacketGenerator_Types.h = Includes\OpenNetK\PacketGenerator_Types.h
 		Includes\OpenNetK\SpinLock.h = Includes\OpenNetK\SpinLock.h
 		Includes\OpenNetK\StdInt.h = Includes\OpenNetK\StdInt.h
+		Includes\OpenNetK\TCP.h = Includes\OpenNetK\TCP.h
 		Includes\OpenNetK\Tunnel.h = Includes\OpenNetK\Tunnel.h
 		Includes\OpenNetK\Types.h = Includes\OpenNetK\Types.h
+		Includes\OpenNetK\UDP.h = Includes\OpenNetK\UDP.h
 		Includes\OpenNetK\Windows.h = Includes\OpenNetK\Windows.h
 	EndProjectSection
 EndProject
@@ -149,10 +152,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{DDC8
 	ProjectSection(SolutionItems) = preProject
 		Scripts\Import.cmd = Scripts\Import.cmd
 		Scripts\Import.cmd.txt = Scripts\Import.cmd.txt
-		Scripts\Package.cmd = Scripts\Package.cmd
-		Scripts\Package_RunTime.txt = Scripts\Package_RunTime.txt
-		Scripts\Package_SDK.txt = Scripts\Package_SDK.txt
-		Scripts\Package_SDK_DDK.txt = Scripts\Package_SDK_DDK.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet_Tool", "OpenNet_Tool", "{7A086992-CDEA-4B24-96B1-404A882FE13A}"

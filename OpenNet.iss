@@ -12,13 +12,13 @@ AppName=OpenNet
 AppPublisher=KMS
 AppPublisherURL=http://www.kms-quebec.com
 AppSupportURL=http://www.kms-quebec.com
-AppVersion=0.0.15
+AppVersion=0.0.16
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 DefaultDirName={pf}\OpenNet
 LicenseFile=License.txt
 MinVersion=10.0
-OutputBaseFilename=OpenNet_0.0.15
+OutputBaseFilename=OpenNet_0.0.16
 OutputDir=Installer
 
 [Files]
@@ -42,10 +42,13 @@ Source: "Includes\OpenNetK\Adapter_Types.h";         DestDir: "{app}\Includes\Op
 Source: "Includes\OpenNetK\ARP.h";                   DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\Ethernet.h";              DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\IPv4.h";                  DestDir: "{app}\Includes\OpenNetK"
+Source: "Includes\OpenNetK\IPv6.h";                  DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\Kernel.h";                DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\Kernel_OpenCL.h";         DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\PacketGenerator_Types.h"; DestDir: "{app}\Includes\OpenNetK"
+Source: "Includes\OpenNetK\TCP.h";                   DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\Types.h";                 DestDir: "{app}\Includes\OpenNetK"
+Source: "Includes\OpenNetK\UDP.h";                   DestDir: "{app}\Includes\OpenNetK"
 Source: "x64\Release\ONK_Pro1000\onk_pro1000.cat";   DestDir: "{app}\Drivers\ONK_Hardware"
 Source: "x64\Release\ONK_Pro1000\ONK_Pro1000.inf";   DestDir: "{app}\Drivers\ONK_Hardware"
 Source: "x64\Release\ONK_Pro1000\ONK_Pro1000.sys";   DestDir: "{app}\Drivers\ONK_Hardware"

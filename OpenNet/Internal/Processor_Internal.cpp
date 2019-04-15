@@ -45,6 +45,8 @@ Thread * Processor_Internal::Thread_Prepare()
 {
     // printf( __CLASS__ "Thread_Prepare()\n" );
 
+    mDebugLog->Log(__FILE__, __CLASS__ "Thread_Prepare", __LINE__);
+
     if (NULL != mThread)
     {
         mThread->AddDispatchCode();

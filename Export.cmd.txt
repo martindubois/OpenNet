@@ -22,6 +22,7 @@ _DocUser .
 
 Includes/OpenNet
 	Adapter.h
+	Buffer.h
 	Function.h
 	Function_Forward.h
 	Kernel.h
@@ -48,6 +49,7 @@ Includes/OpenNetK
 	Hardware_WDF.h
     Interface.h
 	IPv4.h
+	IPv6.h
 	Kernel.h
 	Kernel_OpenCL.h
 	OS.h
@@ -56,12 +58,14 @@ Includes/OpenNetK
 	PacketGenerator_Types.h
 	SpinLock.h
 	StdInt.h
+	TCP.h
 	Types.h
+	UDP.h
 	Windows.h
 
 Installer
 # KmsVersion "OpenNet_" ".exe" 3
-	OpenNet_0.0.15.exe
+	OpenNet_0.0.16.exe
 
 ONK_Lib/_DocUser ONK_Lib
 	ReadMe.txt
@@ -78,10 +82,6 @@ OpenNet_Tool/_DocUser OpenNet_Tool
 Scripts .
 	Import.cmd
 	Import.cmd.txt
-	Package.cmd
-	Package_RunTime.txt
-	Package_SDK.txt
-	Package_SDK_DDK.txt
 
 x64/Debug Binaries/Debug_64
     OpenNet.dll
