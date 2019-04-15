@@ -35,7 +35,7 @@ OPEN_NET_GLOBAL unsigned char * Ethernet_Data( OPEN_NET_GLOBAL unsigned char * a
 {
     unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
-    return (aBase + aPacketInfo.mOffset_byte + ((ETHERNET_VLAN_TAG_ID_nh == lType) ? 18 : 14));
+    return (aBase + aPacketInfo->mOffset_byte + ((ETHERNET_VLAN_TAG_ID_nh == lType_nh) ? 18 : 14));
 }
 
 /// \cond    en

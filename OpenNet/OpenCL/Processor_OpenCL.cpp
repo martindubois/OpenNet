@@ -178,9 +178,10 @@ cl_program Processor_OpenCL::Program_Create(OpenNet::Kernel * aKernel, unsigned 
     {
         OCLW_BuildProgram(lResult, 1, &mDevice, lArgs, NULL, NULL);
     }
-    catch (...)
+    catch ( KmsLib::Exception * eE )
     {
         mDebugLog->Log(__FILE__, __FUNCTION__, __LINE__);
+        mDebugLog->Log(eE);
 
         OCLW_GetProgramBuildInfo(lResult, mDevice, CL_PROGRAM_BUILD_LOG, BUILD_LOG_MAX_SIZE_byte, aKernel->AllocateBuildLog());
 

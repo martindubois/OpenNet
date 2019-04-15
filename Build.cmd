@@ -40,8 +40,6 @@ if not exist %MSBUILD% (
 
 rem ===== Execution =========================================================
 
-goto TOTO
-
 %MSBUILD% %OPTIONS% /property:Configuration=Debug /property:Platform=x64
 if ERRORLEVEL 1 (
 	echo ERROR  %MSBUILD% %OPTIONS% /property:Configuration=Debug /property:Platform=x64  failed - %ERRORLEVEL%
@@ -62,8 +60,6 @@ if ERRORLEVEL 1 (
 	pause
 	exit /B 6
 )
-
-:TOTO
 
 %KMS_VERSION% Common\Version.h Export.cmd.txt OpenNet.iss
 if ERRORLEVEL 1 (

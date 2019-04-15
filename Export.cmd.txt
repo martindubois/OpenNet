@@ -65,7 +65,7 @@ Includes/OpenNetK
 
 Installer
 # KmsVersion "OpenNet_" ".exe" 3
-	OpenNet_0.0.16.exe
+	OpenNet_0.0.17.exe
 
 ONK_Lib/_DocUser ONK_Lib
 	ReadMe.txt

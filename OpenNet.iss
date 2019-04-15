@@ -12,13 +12,13 @@ AppName=OpenNet
 AppPublisher=KMS
 AppPublisherURL=http://www.kms-quebec.com
 AppSupportURL=http://www.kms-quebec.com
-AppVersion=0.0.16
+AppVersion=0.0.17
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 DefaultDirName={pf}\OpenNet
 LicenseFile=License.txt
 MinVersion=10.0
-OutputBaseFilename=OpenNet_0.0.16
+OutputBaseFilename=OpenNet_0.0.17
 OutputDir=Installer
 
 [Files]
@@ -58,7 +58,7 @@ Source: "x64\Release\OpenNet_Setup.exe";             DestDir: "{app}"
 Source: "x64\Release\OpenNet_Tool.exe";              DestDir: "{app}"
 
 [Run]
-Filename: "{app}\OpenNet_Setup.exe"; Parameters: "-i"
+Filename: "{app}\OpenNet_Setup.exe"; Parameters: "install"
 
 [UninstallRun]
-Filename: "{app}\OpenNet_Setup.exe"; Parameters: "-u"
+Filename: "{app}\OpenNet_Setup.exe"; Parameters: "uninstall"
