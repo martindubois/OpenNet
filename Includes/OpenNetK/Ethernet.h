@@ -14,6 +14,8 @@
 
 #define ETHERNET_VLAN_TAG_ID_nh (0x8100)
 
+#ifndef _OPEN_NET_NO_FUNCTION_
+
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
@@ -148,3 +150,5 @@ unsigned short Ethernet_VlanTag(OPEN_NET_GLOBAL const unsigned char * aBase, OPE
 
 	return (ETHERNET_VLAN_TAG_ID_nh == lType_nh) ? (*((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 14))) : 0;
 }
+
+#endif // ! _OPEN_NET_NO_FUNCTION_

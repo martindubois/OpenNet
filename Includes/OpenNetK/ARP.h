@@ -20,6 +20,8 @@
 /// \endcond
 #define ARP_ETHERNET_TYPE_nh (0x0608)
 
+#ifndef _OPEN_NET_NO_FUNCTION_
+
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
@@ -71,3 +73,5 @@ OPEN_NET_GLOBAL unsigned short * ARP_Source(OPEN_NET_GLOBAL unsigned char * aDat
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 14));
 }
+
+#endif // ! _OPEN_NET_NO_FUNCTION_

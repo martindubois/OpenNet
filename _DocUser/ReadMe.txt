@@ -4,6 +4,9 @@ Copyright  (C) 2018-2019 KMS. All rights reserved.
 Product    OpenNet
 File       _DocUser/ReadMe.txt
 
+- Defining _OPEN_NET_NO_FUNCTION_ disable function definition in CUDA or
+  OpenCL header file
+
 0.0.18
 - Buffer event
 

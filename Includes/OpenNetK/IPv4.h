@@ -20,6 +20,8 @@
 /// \endcond
 #define IPv4_ETHERNET_TYPE_nh (0x0008)
 
+#ifndef _OPEN_NET_NO_FUNCTION_
+
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
@@ -86,3 +88,5 @@ OPEN_NET_GLOBAL unsigned short * IPv4_Source(OPEN_NET_GLOBAL unsigned char * aDa
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 12));
 }
+
+#endif // ! _OPEN_NET_NO_FUNCTION_

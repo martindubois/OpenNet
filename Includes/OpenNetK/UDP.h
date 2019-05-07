@@ -20,6 +20,8 @@
 /// \endcond
 #define UDP_IP_PROTOCOL (0x11)
 
+#ifndef _OPEN_NET_NO_FUNCTION_
+
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
@@ -52,3 +54,5 @@ unsigned short UDP_SourcePort(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return (*((OPEN_NET_GLOBAL unsigned short *)(aData + 0)));
 }
+
+#endif // ! _OPEN_NET_NO_FUNCTION_

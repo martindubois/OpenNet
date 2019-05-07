@@ -106,6 +106,8 @@ typedef struct
 }
 RegEx;
 
+#ifndef _OPEN_NET_NO_FUNCTION_
+
 // Internal
 /////////////////////////////////////////////////////////////////////////////
 
@@ -568,3 +570,5 @@ int RegEx_Execute(RegEx * aThis, char aInput)
 
     return 0;
 }
+
+#endif // ! _OPEN_NET_NO_FUNCTION_

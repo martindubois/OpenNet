@@ -20,6 +20,8 @@
 /// \endcond
 #define IPv6_ETHERNET_TYPE_nh (0xdd86)
 
+#ifndef _OPEN_NET_NO_FUNCTION_
+
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
@@ -87,3 +89,5 @@ OPEN_NET_GLOBAL unsigned char * IPv6_Source(OPEN_NET_GLOBAL unsigned char * aDat
 {
     return (aData + 8);
 }
+
+#endif // ! _OPEN_NET_NO_FUNCTION_

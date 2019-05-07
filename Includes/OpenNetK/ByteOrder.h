@@ -10,6 +10,8 @@
 
 #pragma once
 
+#ifndef _OPEN_NET_NO_FUNCTION_
+
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
@@ -44,3 +46,5 @@ unsigned int ByteOrder_Swap32(unsigned int aIn)
 {
     return ((aIn >> 24) | ((aIn >> 8) & 0x0000ff00) | ((aIn << 8) & 0x00ff0000) | (aIn << 24));
 }
+
+#endif // ! _OPEN_NET_NO_FUNCTION_
