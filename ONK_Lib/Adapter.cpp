@@ -406,12 +406,20 @@ namespace OpenNetK
 
                 if (0 < mBuffer.mCount)
                 {
-                    switch (mBuffers[mBuffer.mCount - 1].mState)
+                    const OpenNetK::Adapter::BufferInfo & lBI = mBuffers[mBuffer.mCount - 1];
+
+                    switch (lBI.mState)
                     {
                     case BUFFER_STATE_STOPPED: Buffer_Release_Zone0(); break;
 
                     case BUFFER_STATE_EVENT_PENDING :
                     case BUFFER_STATE_PX_RUNNING    :
+                        if (lBI.mFlags.mStopRequested)
+                        {
+                            Buffer_Release_Zone0();
+                        }
+                        break;
+
                     case BUFFER_STATE_RX_PROGRAMMING:
                     case BUFFER_STATE_RX_RUNNING    :
                     case BUFFER_STATE_TX_PROGRAMMING:
@@ -482,7 +490,7 @@ namespace OpenNetK
                 (*reinterpret_cast<uint32_t *>(mPacketGenerator_Config.mPacket + mPacketGenerator_Config.mIndexOffset_byte))++;
             }
 
-            if (!mHardware->Packet_Send(mPacketGenerator_Config.mPacket, mPacketGenerator_Config.mPacketSize_byte, lRepeatCount))
+            if (!mHardware->Packet_Send(mPacketGenerator_Config.mPacket, mPacketGenerator_Config.mPacketSize_byte, false, lRepeatCount))
             {
                 mStatistics[ADAPTER_STATS_PACKET_GENERATOR_BREAK] ++;
                 break;
@@ -851,6 +859,13 @@ namespace OpenNetK
                 break;
 
             case BUFFER_STATE_PX_RUNNING     :
+                if (mBuffers[mBuffer.mRx].mFlags.mStopRequested)
+                {
+                    Buffer_Enter_Stopped_Zone0(mBuffers + mBuffer.mRx, mBuffer.mRx, "PX_RUNNING");
+                    mBuffer.mRx = (mBuffer.mRx + 1) % mBuffer.mCount;
+                }
+                break;
+
             case BUFFER_STATE_RX_PROGRAMMING :
             case BUFFER_STATE_TX_PROGRAMMING :
             case BUFFER_STATE_TX_RUNNING     :
@@ -881,6 +896,13 @@ namespace OpenNetK
                 break;
 
             case BUFFER_STATE_PX_RUNNING     :
+                if (mBuffers[mBuffer.mTx].mFlags.mStopRequested)
+                {
+                    Buffer_Enter_Stopped_Zone0(mBuffers + mBuffer.mTx, mBuffer.mTx, "PX_RUNNING");
+                    mBuffer.mTx = (mBuffer.mTx + 1) % mBuffer.mCount;
+                }
+                break;
+
             case BUFFER_STATE_RX_PROGRAMMING :
             case BUFFER_STATE_RX_RUNNING     :
             case BUFFER_STATE_TX_PROGRAMMING :
@@ -1003,7 +1025,7 @@ namespace OpenNetK
                     // release the gate to avoid deadlock with the other adapter's
                     // gates.
 
-                    TRACE_BUFFER_STATE_CHANGE(mBuffer.mPx, "PX_COMPLETED", "TX_PROGRAMMING");
+                    TRACE_BUFFER_STATE_CHANGE(mBuffer.mPx, "PX_RUNNING", "TX_PROGRAMMING");
                     aBufferInfo->mState = BUFFER_STATE_TX_PROGRAMMING;
 
                     Buffer_Send_Zone0(aBufferInfo);
@@ -1382,7 +1404,7 @@ namespace OpenNetK
             lSize_byte = lIn->mSize_byte;
         }
 
-        if (!mHardware->Packet_Send(lIn + 1, lSize_byte, lIn->mRepeatCount))
+        if (!mHardware->Packet_Send(lIn + 1, lSize_byte, true, lIn->mRepeatCount))
         {
             TRACE_ERROR "IoCtl_Packet_Send_Ex - Hardware::PacketSend( , %u byte, %u ) failed\n", lSize_byte, lIn->mRepeatCount TRACE_END;
             return IOCTL_RESULT_CANNOT_SEND;

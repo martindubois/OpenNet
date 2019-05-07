@@ -54,11 +54,13 @@ Includes/OpenNet
 Includes/OpenNetK
 	Adapter_Types.h
 	ARP.h
+	ByteOrder.h
 	Ethernet.h
 	IPv4.h
 	IPv6.h
 	Kernel.h
 	Kernel_OpenCL.h
+	RegEx.h
 	StdInt.h
 	TCP.h
 	Types.h

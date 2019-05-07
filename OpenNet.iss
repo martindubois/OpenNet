@@ -12,13 +12,13 @@ AppName=OpenNet
 AppPublisher=KMS
 AppPublisherURL=http://www.kms-quebec.com
 AppSupportURL=http://www.kms-quebec.com
-AppVersion=0.0.17
+AppVersion=0.0.18
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 DefaultDirName={pf}\OpenNet
 LicenseFile=License.txt
 MinVersion=10.0
-OutputBaseFilename=OpenNet_0.0.17
+OutputBaseFilename=OpenNet_0.0.18
 OutputDir=Installer
 
 [Files]
@@ -40,12 +40,14 @@ Source: "Includes\OpenNet\System.h";                 DestDir: "{app}\Includes\Op
 Source: "Includes\OpenNet\UserBuffer.h";             DestDir: "{app}\Includes\OpenNet"
 Source: "Includes\OpenNetK\Adapter_Types.h";         DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\ARP.h";                   DestDir: "{app}\Includes\OpenNetK"
+Source: "Includes\OpenNetK\ByteOrder.h";             DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\Ethernet.h";              DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\IPv4.h";                  DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\IPv6.h";                  DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\Kernel.h";                DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\Kernel_OpenCL.h";         DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\PacketGenerator_Types.h"; DestDir: "{app}\Includes\OpenNetK"
+Source: "Includes\OpenNetK\RegEx.h";                 DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\TCP.h";                   DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\Types.h";                 DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\UDP.h";                   DestDir: "{app}\Includes\OpenNetK"

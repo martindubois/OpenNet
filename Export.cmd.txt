@@ -41,6 +41,7 @@ Includes/OpenNetK
 	Adapter_Types.h
 	Adapter_WDF.h
 	ARP.h
+	ByteOrder.h
 	Constants.h
 	Debug.h
 	Ethernet.h
@@ -56,6 +57,7 @@ Includes/OpenNetK
 	OSDep.h
 	Packet.h
 	PacketGenerator_Types.h
+	RegEx.h
 	SpinLock.h
 	StdInt.h
 	TCP.h
@@ -65,7 +67,7 @@ Includes/OpenNetK
 
 Installer
 # KmsVersion "OpenNet_" ".exe" 3
-	OpenNet_0.0.17.exe
+	OpenNet_0.0.18.exe
 
 ONK_Lib/_DocUser ONK_Lib
 	ReadMe.txt

@@ -41,4 +41,8 @@ protected:
     cl_kernel        mKernel_CL   ;
     cl_program       mProgram     ;
 
+private:
+
+    cl_command_queue mCommandQueue_RW;
+
 };

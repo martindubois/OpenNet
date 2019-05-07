@@ -331,9 +331,9 @@ void Intel::Packet_Send_NoLock(uint64_t aData_PA, const void *, unsigned int aSi
     mTx_In = (mTx_In + 1) % mInfo.mTx_Descriptors;
 }
 
-bool Intel::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
+bool Intel::Packet_Send(const void * aPacket, unsigned int aSize_byte, bool aPriority, unsigned int aRepeatCount)
 {
-    // TRACE_DEBUG "%s( 0x%p, %u bytes, %u )" DEBUG_EOL, __FUNCTION__, aPacket, aSize_byte, aRepeatCount TRACE_END;
+    // TRACE_DEBUG "%s( 0x%p, %u bytes, %s, %u )" DEBUG_EOL, __FUNCTION__, aPacket, aSize_byte, aPriority ? "true" : "false", aRepeatCount TRACE_END;
 
     ASSERT( NULL != aPacket      );
     ASSERT(    0 <  aSize_byte   );
@@ -350,7 +350,9 @@ bool Intel::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned 
     ASSERT(PACKET_BUFFER_QTY >  mPacketBuffer_In                  );
     ASSERT(NULL              != mPacketBuffer_CA[mPacketBuffer_In]);
 
-    lResult = ((0 >= mPacketBuffer_Counter[mPacketBuffer_In]) && (Tx_GetAvailableDescriptor_Zone0() >= aRepeatCount));
+    unsigned int lNext = (mPacketBuffer_In + 1) % PACKET_BUFFER_QTY;
+
+    lResult = ((0 >= mPacketBuffer_Counter[mPacketBuffer_In]) && (aPriority || (0 >= mPacketBuffer_Counter[lNext])) && (Tx_GetAvailableDescriptor_Zone0() >= aRepeatCount));
     if (lResult)
     {
         memcpy(mPacketBuffer_CA[mPacketBuffer_In], aPacket, aSize_byte);
@@ -363,7 +365,7 @@ bool Intel::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned 
             Packet_Send_NoLock(lPacket_PA, NULL, aSize_byte, lCounter);
         }
 
-        mPacketBuffer_In = (mPacketBuffer_In + 1) % PACKET_BUFFER_QTY;
+        mPacketBuffer_In = lNext;
 
         Unlock_AfterSend_FromThread(lCounter, aRepeatCount, lFlags);
     }

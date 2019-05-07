@@ -5,6 +5,8 @@
 /// \copyright  Copyright &copy; 1029 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/IPv6.h
 
+// TEST COVERAGE  2019-05-03  KMS - Martin Dubois, ing.
+
 #pragma once
 
 // Constants

@@ -364,6 +364,7 @@ namespace OpenNetK
         /// \brief  Add the packet to the send queue.
         /// \param  aPacket       The packet
         /// \param  aSize_byte    The packet size
+        /// \param  aPriority     Set to true for packet with high priority
         /// \param  aRepeatCount  The repeat count
         /// \retval false  Error
         /// \endcond
@@ -371,12 +372,13 @@ namespace OpenNetK
         /// \brief  Ajouter le paquet &agrave; la queue de transmission
         /// \param  aPacket       Le paquet
         /// \param  aSize_byte    La taille du paquet
+        /// \param  aPriority     A vrai pour les paquets prioritaire
         /// \param  aRepeatCount  Le nombre de r&eacute;p&eacute;tition
         /// \retval false  Erreur
         /// \endcond
         /// \note   Level = SoftInt or Thread, Thread = Users
         /// \retval true  OK
-        virtual bool Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1) = 0;
+        virtual bool Packet_Send(const void * aPacket, unsigned int aSize_byte, bool aPriority, unsigned int aRepeatCount = 1) = 0;
 
         /// \cond en
         /// \brief  Retrieve statistics

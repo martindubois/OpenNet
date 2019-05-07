@@ -134,7 +134,17 @@ void Adapter_Windows::Stop_Internal()
 {
     assert(NULL != mHandle);
 
-    mHandle->CancelAll();
+    try
+    {
+        mHandle->CancelAll();
+    }
+    catch (KmsLib::Exception * eE)
+    {
+        if (ERROR_NOT_FOUND != eE->GetLastError())
+        {
+            throw eE;
+        }
+    }
 }
 
 // Private

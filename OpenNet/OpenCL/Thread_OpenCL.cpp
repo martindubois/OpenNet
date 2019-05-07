@@ -36,6 +36,7 @@ Thread_OpenCL::~Thread_OpenCL()
 
 Thread_OpenCL::Thread_OpenCL()
     : mCommandQueue(NULL)
+    , mCommandQueue_RW(NULL)
     , mKernel_CL   (NULL)
     , mProgram     (NULL)
 {
@@ -54,6 +55,9 @@ void Thread_OpenCL::Prepare(Processor_OpenCL * aProcessor, Adapter_Vector * aAda
     mCommandQueue = aProcessor->CommandQueue_Create(aKernel->IsProfilingEnabled());
     assert(NULL != mCommandQueue);
 
+    mCommandQueue_RW = aProcessor->CommandQueue_Create(false);
+    assert(NULL != mCommandQueue_RW);
+
     aKernel->SetCommandQueue(mCommandQueue);
 
     // OCLW_CreateKernel ==> OCLW_ReleaseKernel  See Release
@@ -67,7 +71,7 @@ void Thread_OpenCL::Prepare(Processor_OpenCL * aProcessor, Adapter_Vector * aAda
         Adapter_Windows * lAdapter = dynamic_cast<Adapter_Windows *>((*aAdapters)[i]);
         assert(NULL != lAdapter);
 
-        lAdapter->Buffers_Allocate( aKernel->IsProfilingEnabled(), mCommandQueue, mKernel_CL, aBuffers);
+        lAdapter->Buffers_Allocate( aKernel->IsProfilingEnabled(), mCommandQueue_RW, mKernel_CL, aBuffers);
     }
 }
 
@@ -102,11 +106,21 @@ void Thread_OpenCL::Release(OpenNet::Kernel * aKernel)
 
     if (NULL != mCommandQueue)
     {
+        assert(NULL != mCommandQueue_RW);
+
         aKernel->ResetCommandQueue();
 
         try
         {
             OCLW_ReleaseCommandQueue(mCommandQueue);
+        }
+        catch (...)
+        {
+        }
+
+        try
+        {
+            OCLW_ReleaseCommandQueue(mCommandQueue_RW);
         }
         catch (...)
         {

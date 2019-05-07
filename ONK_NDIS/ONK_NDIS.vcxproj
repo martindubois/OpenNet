@@ -70,7 +70,7 @@
       <PreprocessorDefinitions>_KMS_WINDOWS_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Inf>
-      <TimeStamp>0.0.17.0</TimeStamp>
+      <TimeStamp>0.0.18.0</TimeStamp>
     </Inf>
     <Link>
       <AdditionalDependencies>ONK_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>

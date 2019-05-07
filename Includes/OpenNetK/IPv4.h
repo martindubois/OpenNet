@@ -5,6 +5,8 @@
 /// \copyright  Copyright &copy; 2018-1029 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/IPv4.h
 
+// TEST COVERAGE  2019-05-03  KMS - Martin Dubois, ing.
+
 #pragma once
 
 // Constants
@@ -31,9 +33,9 @@
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne un pointeur vers la charge utile.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * IPv6_Data(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned char * IPv4_Data(OPEN_NET_GLOBAL unsigned char * aData)
 {
-    unsigned char lHeaderLen = ( aData[0] >> 4 ) * 4;
+    unsigned char lHeaderLen = ( aData[0] & 0x0f ) * 4;
 
     return aData + lHeaderLen;
 }
@@ -50,9 +52,9 @@ OPEN_NET_GLOBAL unsigned char * IPv6_Data(OPEN_NET_GLOBAL unsigned char * aData)
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          destination.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * IPv4_Destination(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned short * IPv4_Destination(OPEN_NET_GLOBAL unsigned char * aData)
 {
-    return (aData + 16);
+    return ((OPEN_NET_GLOBAL unsigned short *)(aData + 16));
 }
 
 /// \cond    en
@@ -80,7 +82,7 @@ unsigned char IPv4_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv4
 /// \return  Cette fonction retourne un pointeur vers l'adresse de provenance.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * IPv4_Source(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned short * IPv4_Source(OPEN_NET_GLOBAL unsigned char * aData)
 {
-    return (aData + 12);
+    return ((OPEN_NET_GLOBAL unsigned short *)(aData + 12));
 }

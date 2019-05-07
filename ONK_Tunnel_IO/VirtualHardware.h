@@ -30,7 +30,7 @@ public:
     virtual void GetState                    (OpenNetK::Adapter_State * aStats);
     virtual bool Packet_Drop                 ();
     virtual void Packet_Receive_NoLock       (OpenNetK::Packet * aPacket, volatile long * aCounter);
-    virtual bool Packet_Send                 (const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount = 1);
+    virtual bool Packet_Send                 (const void * aPacket, unsigned int aSize_byte, bool aPriority, unsigned int aRepeatCount = 1);
     virtual void Packet_Send_NoLock          (uint64_t aPacket_PA, const void * aPacket_XA, unsigned int aSize_byte, volatile long * aCounter);
     virtual void Tx_Disable                  ();
     virtual void Unlock_AfterReceive_Internal();

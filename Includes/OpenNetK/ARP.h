@@ -5,6 +5,8 @@
 /// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/ARP.h
 
+// TEST COVERAGE  2019-05-03  KMS - Martin Dubois, ing.
+
 #pragma once
 
 // Constants
@@ -33,9 +35,24 @@
 /// \return  Cette fonction retourne un pointeur vers l'adresse
 ///          questionn&eacute;e.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * ARP_Destination(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned short * ARP_Destination(OPEN_NET_GLOBAL unsigned char * aData)
 {
-    return (aData + 24);
+    return ((OPEN_NET_GLOBAL unsigned short *)(aData + 24));
+}
+
+/// \cond    en
+/// \brief   This function returns the protocol.
+/// \param   aData  A pointer to the ARP header
+/// \return  This function returns the protocol.
+/// \endcond
+/// \cond    fr
+/// \brief   Cette fonction retourne le protocole.
+/// \param   aData  Un pointeur vers l'ent&ecirc;te ARP
+/// \return  Cette fonction retourne le protocole.
+/// \endcond
+unsigned short ARP_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
+{
+	return (*((OPEN_NET_GLOBAL unsigned short *)(aData + 2)));
 }
 
 /// \cond    en
@@ -50,7 +67,7 @@ OPEN_NET_GLOBAL unsigned char * ARP_Destination(OPEN_NET_GLOBAL unsigned char * 
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          provenance.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * ARP_Source(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned short * ARP_Source(OPEN_NET_GLOBAL unsigned char * aData)
 {
-    return (aData + 14);
+    return ((OPEN_NET_GLOBAL unsigned short *)(aData + 14));
 }

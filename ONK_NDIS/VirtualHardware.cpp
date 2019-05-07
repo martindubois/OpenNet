@@ -179,9 +179,9 @@ void VirtualHardware::Packet_Send_NoLock(uint64_t, const void * aVirtualAddress,
     InterlockedDecrement(aCounter);
 }
 
-bool VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
+bool VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte, bool aPriority, unsigned int aRepeatCount)
 {
-    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes, %u )" DEBUG_EOL, aSize_byte, aRepeatCount);
+    DbgPrintEx(DEBUG_ID, DEBUG_METHOD, PREFIX __FUNCTION__ "( , %u bytes, %s, %u )" DEBUG_EOL, aSize_byte, aPriority ? "true" : "false", aRepeatCount);
 
     ASSERT(NULL != aPacket     );
     ASSERT(   0 <  aSize_byte  );

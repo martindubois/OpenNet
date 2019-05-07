@@ -97,6 +97,7 @@
     <ClCompile Include="EthernetAddress.cpp" />
     <ClCompile Include="Kernel.cpp" />
     <ClCompile Include="Kernel_Forward.cpp" />
+    <ClCompile Include="OpenNetK.cpp" />
     <ClCompile Include="OpenNet_Test.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="SetupA.cpp" />

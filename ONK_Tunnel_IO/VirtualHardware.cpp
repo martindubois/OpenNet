@@ -104,9 +104,9 @@ void VirtualHardware::Packet_Receive_NoLock(OpenNetK::Packet * aPacket, volatile
     ASSERT(false);
 }
 
-bool VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte, unsigned int aRepeatCount)
+bool VirtualHardware::Packet_Send(const void * aPacket, unsigned int aSize_byte, bool aPriority, unsigned int aRepeatCount)
 {
-    TRACE_DEBUG "Packet_Send( 0x%p, %u bytes, %u )" DEBUG_EOL, aPacket, aSize_byte, aRepeatCount TRACE_END;
+    TRACE_DEBUG "Packet_Send( 0x%p, %u bytes, %s, %u )" DEBUG_EOL, aPacket, aSize_byte, aPriority ? "true" : "false", aRepeatCount TRACE_END;
 
     ASSERT(NULL != aPacket     );
     ASSERT(   0 <  aSize_byte  );
