@@ -139,7 +139,7 @@
       <AdditionalDependencies>Ndis.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Inf>
-      <TimeStamp>0.0.18.0</TimeStamp>
+      <TimeStamp>0.0.19.0</TimeStamp>
     </Inf>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -147,7 +147,7 @@
       <AdditionalDependencies>Ndis.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Inf>
-      <TimeStamp>0.0.17.0</TimeStamp>
+      <TimeStamp>0.0.19.0</TimeStamp>
     </Inf>
   </ItemDefinitionGroup>
   <ItemGroup>
