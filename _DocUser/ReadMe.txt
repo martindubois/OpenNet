@@ -4,7 +4,7 @@ Copyright  (C) 2018-2019 KMS. All rights reserved.
 Product    OpenNet
 File       _DocUser/ReadMe.txt
 
-0.0.20
+0.0.21
 - OPEN_NET_ASSERT
 
 0.0.19
