@@ -4,4 +4,5 @@ Copyright  (C) 2019 KMS. All rights reserved.
 Product    OpenNet
 File       ONK_Lib/_DocUser/ReadMe.txt
 
-0.0.19
+0.0.20
+- Support OPEN_NET_ASSERT

@@ -4,6 +4,7 @@ Copyright  (C) 2018-2019 KMS. All rights reserved.
 Product    OpenNet
 File       _DocUser/ReadMe.txt
 
+0.0.20
 - OPEN_NET_ASSERT and OPEN_NET_BUFFER_EVENT_ON_PACKET_EVENT
 
 0.0.19
