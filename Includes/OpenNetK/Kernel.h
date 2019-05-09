@@ -41,33 +41,6 @@
 /// \endcond
 #define OPEN_NET_ASSERT(C) if (!(C)) { lEvents |= OPEN_NET_BUFFER_ASSERT_FAILURE; }
 
-// ===== Event ==============================================================
-
-// TODO  OpenNetK.Kernel.PacketEventReduction
-//       Normal (Optimisation) - Better reduction
-
-/// \cond en
-/// \brief  Raise a buffer event if at lest on packet event is signaled
-/// \endcond
-/// \cond fr
-/// \brief  Genere un &eacute;venement de buffer si au moins une
-///         &eacute;venement de paquet et signal&eacute;
-/// \endcond
-#define OPEN_NET_BUFFER_EVENT_ON_PACKET_EVENT                                \
-    OPEN_NET_GLOBAL_MEMORY_FENCE;                                            \
-    if ( 0 == OPEN_NET_PACKET_INDEX )                                        \
-    {                                                                        \
-        unsigned int i;                                                      \
-        for ( i = 0; i < aBufferHeader->mPacketQty; i ++ )                   \
-        {                                                                    \
-            if ( 0 != ( lPacketInfo[ i ].mSendTo & OPEN_NET_PACKET_EVENT ) ) \
-            {                                                                \
-                lEvents |= OPEN_NET_BUFFER_EVENT;                            \
-                break;                                                       \
-            }                                                                \
-        }                                                                    \
-    }
-
 // ===== Function ===========================================================
 
 /// \cond en
@@ -91,9 +64,10 @@
     OPEN_NET_GLOBAL_MEMORY_FENCE;                                                                                                                   \
     if ( 0 == ( OPEN_NET_BUFFER_PROCESSED & aBufferHeader->mEvents ) )                                                                              \
     {                                                                                                                                               \
-        unsigned int lEvents = 0;                                                                                                                   \
+        OPEN_NET_SHARED unsigned int         lEvents;                                                                                               \
         OPEN_NET_GLOBAL unsigned char      * lBase       = (OPEN_NET_GLOBAL unsigned char      *)( aBufferHeader );                                 \
         OPEN_NET_GLOBAL OpenNet_PacketInfo * lPacketInfo = (OPEN_NET_GLOBAL OpenNet_PacketInfo *)( lBase + aBufferHeader->mPacketInfoOffset_byte ); \
+        lEvents = 0;
         lPacketInfo += OPEN_NET_PACKET_INDEX;                                                                                                       \
         if ( 0 == lPacketInfo->mSendTo )                                                                                                            \
         {
@@ -135,9 +109,10 @@
     OPEN_NET_GLOBAL_MEMORY_FENCE;                                                                                                                   \
     if ( 0 == ( OPEN_NET_BUFFER_PROCESSED & aBufferHeader->mEvents ) )                                                                              \
     {                                                                                                                                               \
-        unsigned int lEvents = 0;                                                                                                                   \
+        OPEN_NET_SHARED unsigned int         lEvents;                                                                                               \
         OPEN_NET_GLOBAL unsigned char      * lBase       = (OPEN_NET_GLOBAL unsigned char      *)( aBufferHeader );                                 \
         OPEN_NET_GLOBAL OpenNet_PacketInfo * lPacketInfo = (OPEN_NET_GLOBAL OpenNet_PacketInfo *)( lBase + aBufferHeader->mPacketInfoOffset_byte ); \
+        lEvents = 0;
         lPacketInfo += OPEN_NET_PACKET_INDEX;                                                                                                       \
         if ( 0 == lPacketInfo->mSendTo )                                                                                                            \
         {

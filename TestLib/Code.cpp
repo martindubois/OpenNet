@@ -216,7 +216,11 @@ static const char * FUNCTION_SIGNAL_EVENT_0 =
 "    OPEN_NET_FUNCTION_BEGIN"                               EOL
                                                             EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED;" EOL
-"        lEvents = OPEN_NET_BUFFER_EVENT"                   EOL
+                                                            EOL
+"        if ( 0 == OPEN_NET_PACKET_INDEX )"                 EOL
+"        {"                                                 EOL
+"            lEvents = OPEN_NET_BUFFER_EVENT"               EOL
+"        }"                                                 EOL
                                                             EOL
 "    OPEN_NET_FUNCTION_END"                                 EOL
 "}"                                                         EOL;
@@ -227,7 +231,11 @@ static const char * FUNCTION_SIGNAL_EVENT_1 =
 "    OPEN_NET_FUNCTION_BEGIN"                               EOL
                                                             EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED;" EOL
-"        lEvents = OPEN_NET_BUFFER_EVENT"                   EOL
+                                                            EOL
+"        if ( 0 == OPEN_NET_PACKET_INDEX )"                 EOL
+"        {"                                                 EOL
+"            lEvents = OPEN_NET_BUFFER_EVENT"               EOL
+"        }"                                                 EOL
                                                             EOL
 "    OPEN_NET_FUNCTION_END"                                 EOL
 "}"                                                         EOL;
@@ -420,7 +428,12 @@ static const char * KERNEL_SIGNAL_EVENT =
                                                             EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED;" EOL
                                                             EOL
-"    OPEN_NET_KERNEL_END( OPEN_NET_BUFFER_EVENT )"          EOL
+"        if ( 0 == OPEN_NET_PACKET_INDEX )"                 EOL
+"        {"                                                 EOL
+"            lEvents |= OPEN_NET_BUFFER_EVENT;"             EOL
+"        }"                                                 EOL
+                                                            EOL
+"    OPEN_NET_KERNEL_END"                                   EOL
 "}"                                                         EOL;
 
 // Global Constants

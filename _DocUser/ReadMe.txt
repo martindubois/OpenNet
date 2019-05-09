@@ -5,7 +5,7 @@ Product    OpenNet
 File       _DocUser/ReadMe.txt
 
 0.0.20
-- OPEN_NET_ASSERT and OPEN_NET_BUFFER_EVENT_ON_PACKET_EVENT
+- OPEN_NET_ASSERT
 
 0.0.19
 - Defining _OPEN_NET_NO_FUNCTION_ disable function definition in CUDA or

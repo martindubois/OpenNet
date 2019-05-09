@@ -19,3 +19,4 @@
 #define OPEN_NET_KERNEL               __kernel
 #define OPEN_NET_PACKET_INDEX         get_local_id(0)
 #define OPEN_NET_PACKET_QTY           get_local_size(0)
+#define OPEN_NET_SHARED               __Local

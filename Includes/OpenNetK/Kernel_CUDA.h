@@ -19,3 +19,4 @@
 #define OPEN_NET_KERNEL              extern "C" __global__
 #define OPEN_NET_PACKET_INDEX        threadIdx.x
 #define OPEN_NET_PACKET_QTY          blockDim.x
+#define OPEN_NET_SHARED              __shared__
