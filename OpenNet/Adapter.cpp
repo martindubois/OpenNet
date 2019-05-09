@@ -86,9 +86,7 @@ const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCRIPTIONS
     { "OpenNetK::Adapter - IOCTL - CONNECT         ", ""      , 0 },
     { "OpenNetK::Adapter - IOCTL - INFO_GET        ", ""      , 0 },
     { "OpenNetK::Adapter - IOCTL - PACKET_SEND     ", ""      , 1 },
-
-    VALUE_VECTOR_DESCRIPTION_RESERVED,
-
+    { "OpenNetK::Adapter - ASSERT_FAILURE          ", ""      , 0 },
     { "OpenNetK::Adapter - IOCTL - STATE_GET       ", ""      , 0 }, // 45
     { "OpenNetK::Adapter - IOCTL - STATISTICS - GET", ""      , 0 },
 

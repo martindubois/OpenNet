@@ -33,7 +33,7 @@ static const char * CODE =
                                                                               EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED | DESTINATIONS;"    EOL
                                                                               EOL
-"    OPEN_NET_FUNCTION_END( 0 )"                                              EOL
+"    OPEN_NET_FUNCTION_END"                                                   EOL
 "}"                                                                           EOL;
 
 namespace OpenNet

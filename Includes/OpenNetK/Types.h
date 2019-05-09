@@ -11,9 +11,10 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-#define OPEN_NET_BUFFER_PROCESSED (0x00000001)
-#define OPEN_NET_BUFFER_EVENT     (0x00000002)
-#define OPEN_NET_BUFFER_RESERVED  (0xfffffffc)
+#define OPEN_NET_BUFFER_PROCESSED      (0x00000001)
+#define OPEN_NET_BUFFER_EVENT          (0x00000002)
+#define OPEN_NET_BUFFER_ASSERT_FAILURE (0x00000004)
+#define OPEN_NET_BUFFER_RESERVED       (0xfffffff8)
 
 #define OPEN_NET_PACKET_PROCESSED (0x80000000)
 #define OPEN_NET_PACKET_EVENT     (0x40000000)

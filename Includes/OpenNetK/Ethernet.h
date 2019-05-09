@@ -100,7 +100,7 @@ OPEN_NET_GLOBAL unsigned short * Ethernet_Source(OPEN_NET_GLOBAL unsigned char *
 /// \endcond
 unsigned short Ethernet_Type(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
-    unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
+    unsigned short lType_nh = *((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
     return (ETHERNET_VLAN_TAG_ID_nh == lType_nh) ? (*((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 16))) : lType_nh;
 }
@@ -123,7 +123,7 @@ unsigned short Ethernet_Type(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_N
 /// \endcond
 int Ethernet_Vlan(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
-	unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
+	unsigned short lType_nh = *((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
 	return (ETHERNET_VLAN_TAG_ID_nh == lType_nh);
 }
@@ -146,7 +146,7 @@ int Ethernet_Vlan(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL c
 /// \endcond
 unsigned short Ethernet_VlanTag(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
-	unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
+	unsigned short lType_nh = *((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
 	return (ETHERNET_VLAN_TAG_ID_nh == lType_nh) ? (*((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 14))) : 0;
 }

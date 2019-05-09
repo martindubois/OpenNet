@@ -1013,6 +1013,11 @@ namespace OpenNetK
                     Event_Report_Zone0(OpenNetK::EVENT_TYPE_BUFFER, mBuffer.mPx);
                 }
 
+                if (0 != (OPEN_NET_BUFFER_ASSERT_FAILURE & aBufferInfo->mEvents))
+                {
+                    mStatistics[ADAPTER_STATS_ASSERT_FAILURE] ++;
+                }
+
                 if (NULL == mAdapters)
                 {
                     Buffer_Enter_Stopped_Zone0(aBufferInfo, mBuffer.mPx, "PX_RUNNING");

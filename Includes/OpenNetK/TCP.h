@@ -35,9 +35,9 @@
 /// \param   aData  Un pointeur vers l'ent&ecirc;te UDP
 /// \return  Cette fonction retourne le port de destination.
 /// \endcond
-unsigned short TCP_DestinationPort(OPEN_NET_GLOBAL unsigned char * aData)
+unsigned short TCP_DestinationPort(OPEN_NET_GLOBAL const unsigned char * aData)
 {
-    return (*((OPEN_NET_GLOBAL unsigned short *)(aData + 2)));
+    return (*((OPEN_NET_GLOBAL const unsigned short *)(aData + 2)));
 }
 
 /// \cond    en
@@ -50,9 +50,9 @@ unsigned short TCP_DestinationPort(OPEN_NET_GLOBAL unsigned char * aData)
 /// \param   aData  Un pointeur vers l'ent&ecirc;te UDP
 /// \return  Cette fonction retourne le port de source.
 /// \endcond
-unsigned short TCP_SourcePort(OPEN_NET_GLOBAL unsigned char * aData)
+unsigned short TCP_SourcePort(OPEN_NET_GLOBAL const unsigned char * aData)
 {
-    return (*((OPEN_NET_GLOBAL unsigned short *)(aData + 0)));
+    return (*((OPEN_NET_GLOBAL const unsigned short *)(aData + 0)));
 }
 
 #endif // ! _OPEN_NET_NO_FUNCTION_
