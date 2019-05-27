@@ -5,12 +5,20 @@
 /// \copyright  Copyright &copy; 1029 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/TCP.h
 
-// TEST COVERAGE  2019-05-03  KMS - Martin Dubois, ing.
+// TEST COVERAGE  2019-05-10  KMS - Martin Dubois, ing.
 
 #pragma once
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
+
+/// \cond    en
+/// \brief   The size of the TCP header
+/// \endcond
+/// \cond    fr
+/// \brief   La taille de l'ent&ecirc;te TCP
+/// \endcond
+#define TCP_HEADER_SIZE_byte (20)
 
 /// \cond    en
 /// \brief   The IP protocol of TCP packets
@@ -24,6 +32,21 @@
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
+
+/// \cond    en
+/// \brief   This function returns a pointer to the payload.
+/// \param   aData  A pointer to the TCP header
+/// \return  This function returns a pointer to the payload.
+/// \endcond
+/// \cond    fr
+/// \brief   Cette fonction retourne l'adresse de la charge utile.
+/// \param   aData  Un pointeur vers l'ent&ecirc;te TCP
+/// \return  Cette fonction retourne l'adresse de la charge utile.
+/// \endcond
+OPEN_NET_GLOBAL unsigned char * TCP_Data(OPEN_NET_GLOBAL unsigned char * aData)
+{
+    return (aData + TCP_HEADER_SIZE_byte);
+}
 
 /// \cond    en
 /// \brief   This function returns the destination port.

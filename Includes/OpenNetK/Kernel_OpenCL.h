@@ -12,6 +12,7 @@
 // Macros
 /////////////////////////////////////////////////////////////////////////////
 
+#define OPEN_NET_CONSTANT             __constant
 #define OPEN_NET_DEVICE
 #define OPEN_NET_GLOBAL               __global
 #define OPEN_NET_GLOBAL_MEMORY_FENCE  write_mem_fence(CLK_GLOBAL_MEM_FENCE)
@@ -19,4 +20,4 @@
 #define OPEN_NET_KERNEL               __kernel
 #define OPEN_NET_PACKET_INDEX         get_local_id(0)
 #define OPEN_NET_PACKET_QTY           get_local_size(0)
-#define OPEN_NET_SHARED               __Local
+#define OPEN_NET_SHARED               __local

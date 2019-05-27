@@ -43,7 +43,7 @@ static int RegEx_TestString_End(RegEx * aRegEx, const char * aStr);
 
 KMS_TEST_BEGIN(OpenNetK_Base)
 {
-    unsigned char lBuffer[] = { 0x05, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe };
+    unsigned char lBuffer[] = { 0x45, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe };
 
     // ===== Arp.h ==========================================================
 
@@ -60,18 +60,21 @@ KMS_TEST_BEGIN(OpenNetK_Base)
 
     OpenNet_PacketInfo lPacketInfo;
 
-    lPacketInfo.mOffset_byte = 0;
+    lPacketInfo.mOffset_byte =  0;
+    lPacketInfo.mSize_byte   = 20;
 
     KMS_TEST_COMPARE(0x0e0d, Ethernet_Type   (lBuffer, &lPacketInfo));
     KMS_TEST_COMPARE(     0, Ethernet_Vlan   (lBuffer, &lPacketInfo));
     KMS_TEST_COMPARE(     0, Ethernet_VlanTag(lBuffer, &lPacketInfo));
 
     KMS_TEST_ASSERT(                                  (lBuffer + 14) == Ethernet_Data       (lBuffer, &lPacketInfo));
+    KMS_TEST_ASSERT(                                               6 == Ethernet_DataSize   (lBuffer, &lPacketInfo));
     KMS_TEST_ASSERT(reinterpret_cast<unsigned short *>(lBuffer +  0) == Ethernet_Destination(lBuffer, &lPacketInfo));
     KMS_TEST_ASSERT(reinterpret_cast<unsigned short *>(lBuffer +  6) == Ethernet_Source     (lBuffer, &lPacketInfo));
 
     // ===== IPv4.h =========================================================
 
+    KMS_TEST_COMPARE(752, IPv4_DataSize(lBuffer));
     KMS_TEST_COMPARE(0xa, IPv4_Protocol(lBuffer));
 
     KMS_TEST_ASSERT(                                  (lBuffer + 20) == IPv4_Data       (lBuffer));
@@ -80,7 +83,8 @@ KMS_TEST_BEGIN(OpenNetK_Base)
 
     // ===== IPv6.h =========================================================
 
-    KMS_TEST_COMPARE(0x7, IPv6_Protocol(lBuffer));
+    KMS_TEST_COMPARE(1286, IPv6_DataSize(lBuffer));
+    KMS_TEST_COMPARE( 0x7, IPv6_Protocol(lBuffer));
 
     KMS_TEST_ASSERT(                                 (lBuffer + 40) == IPv6_Data       (lBuffer));
     KMS_TEST_ASSERT(reinterpret_cast<unsigned char *>(lBuffer + 24) == IPv6_Destination(lBuffer));
@@ -495,13 +499,18 @@ KMS_TEST_BEGIN(OpenNetK_Base)
     KMS_TEST_COMPARE(2, RegEx_TestString_End(&lRE0, "aa" ));
 
     // ===== TCP.h ==========================================================
+
     KMS_TEST_COMPARE(0x0403, TCP_DestinationPort(lBuffer));
-    KMS_TEST_COMPARE(0x0205, TCP_SourcePort     (lBuffer));
+    KMS_TEST_COMPARE(0x0245, TCP_SourcePort     (lBuffer));
+
+    KMS_TEST_ASSERT((lBuffer + 20) == TCP_Data(lBuffer));
 
     // ===== UDP.h ==========================================================
-    KMS_TEST_COMPARE(0x0403, UDP_DestinationPort(lBuffer));
-    KMS_TEST_COMPARE(0x0205, UDP_SourcePort     (lBuffer));
 
+    KMS_TEST_COMPARE(0x0403, UDP_DestinationPort(lBuffer));
+    KMS_TEST_COMPARE(0x0245, UDP_SourcePort     (lBuffer));
+
+    KMS_TEST_ASSERT((lBuffer + 8) == UDP_Data(lBuffer));
 }
 KMS_TEST_END
 

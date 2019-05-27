@@ -67,7 +67,7 @@
         OPEN_NET_SHARED unsigned int         lEvents;                                                                                               \
         OPEN_NET_GLOBAL unsigned char      * lBase       = (OPEN_NET_GLOBAL unsigned char      *)( aBufferHeader );                                 \
         OPEN_NET_GLOBAL OpenNet_PacketInfo * lPacketInfo = (OPEN_NET_GLOBAL OpenNet_PacketInfo *)( lBase + aBufferHeader->mPacketInfoOffset_byte ); \
-        lEvents = 0;
+        lEvents = 0;                                                                                                                                \
         lPacketInfo += OPEN_NET_PACKET_INDEX;                                                                                                       \
         if ( 0 == lPacketInfo->mSendTo )                                                                                                            \
         {
@@ -112,7 +112,7 @@
         OPEN_NET_SHARED unsigned int         lEvents;                                                                                               \
         OPEN_NET_GLOBAL unsigned char      * lBase       = (OPEN_NET_GLOBAL unsigned char      *)( aBufferHeader );                                 \
         OPEN_NET_GLOBAL OpenNet_PacketInfo * lPacketInfo = (OPEN_NET_GLOBAL OpenNet_PacketInfo *)( lBase + aBufferHeader->mPacketInfoOffset_byte ); \
-        lEvents = 0;
+        lEvents = 0;                                                                                                                                \
         lPacketInfo += OPEN_NET_PACKET_INDEX;                                                                                                       \
         if ( 0 == lPacketInfo->mSendTo )                                                                                                            \
         {

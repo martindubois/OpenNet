@@ -5,7 +5,7 @@
 /// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Ethernet.h
 
-// TEST COVERAGE  2019-05-03  KMS - Martin Dubois, ing.
+// TEST COVERAGE  2019-05-10  KMS - Martin Dubois, ing.
 
 #pragma once
 
@@ -40,6 +40,29 @@ OPEN_NET_GLOBAL unsigned char * Ethernet_Data( OPEN_NET_GLOBAL unsigned char * a
     unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
     return (aBase + aPacketInfo->mOffset_byte + ((ETHERNET_VLAN_TAG_ID_nh == lType_nh) ? 18 : 14));
+}
+
+/// \cond    en
+/// \brief   This function returns the size of the Ethernet payload.
+/// \param   aBase        A pointer to the buffer
+/// \param   aPacketInfo  A pointer to the information about the packet to
+///                       process
+/// \return  This function returns the size of the Etehrnet payload.
+/// \endcond
+/// \cond    fr
+/// \brief   Cette fonction retourne la taille de la charge utile du paquet
+///          Ethernet.
+/// \param   aBase        Un pointeur vers le d&eacute;but du paquet
+/// \param   aPacketInfo  Un pointeur vers l'information au sujet du paquet a
+///          traiter
+/// \return  Cette fonction retourne la taille de la charge utile du paquet
+///          Ethernet.
+/// \endcond
+unsigned int Ethernet_DataSize(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+{
+    unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
+
+    return (aPacketInfo->mSize_byte - ((ETHERNET_VLAN_TAG_ID_nh == lType_nh) ? 18 : 14));
 }
 
 /// \cond    en

@@ -5,12 +5,20 @@
 /// \copyright  Copyright &copy; 1029 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/UDP.h
 
-// TEST COVERAGE  2019-05-03  KMS - Martin Dubois, ing.
+// TEST COVERAGE  2019-05-10  KMS - Martin Dubois, ing.
 
 #pragma once
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
+
+/// \cond    en
+/// \brief   The UDP header size
+/// \endcond
+/// \cond    fr
+/// \brief   La taille de l'ent&ecirc;te UDP
+/// \endcond
+#define UDP_HEADER_SIZE_byte (8)
 
 /// \cond    en
 /// \brief   The IP protocol of UDP packets
@@ -24,6 +32,21 @@
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
+
+/// \cond    en
+/// \brief   This function returns a pointer to the payload.
+/// \param   aData  A pointer to the UDP header
+/// \return  This function returns a pointer to the payload.
+/// \endcond
+/// \cond    fr
+/// \brief   Cette fonction retourne l'adresse de la charge utile.
+/// \param   aData  Un pointeur vers l'ent&ecirc;te UDP
+/// \return  Cette fonction retourne l'adresse de la charge utile.
+/// \endcond
+OPEN_NET_GLOBAL unsigned char * UDP_Data(OPEN_NET_GLOBAL unsigned char * aData)
+{
+    return (aData + UDP_HEADER_SIZE_byte);
+}
 
 /// \cond    en
 /// \brief   This function returns the destination port.

@@ -5,9 +5,15 @@
 /// \copyright  Copyright &copy; 2018-1029 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/IPv4.h
 
-// TEST COVERAGE  2019-05-03  KMS - Martin Dubois, ing.
+// TEST COVERAGE  2019-05-10  KMS - Martin Dubois, ing.
 
 #pragma once
+
+// Includes
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== Includes ===========================================================
+#include <OpenNetK/ByteOrder.h>
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
@@ -26,23 +32,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 /// \cond    en
-/// \brief   This function returns a pointer to the payload.
-/// \param   aData  A pointer to the IPv6 header
-/// \return  This function returns a pointer to the payload.
-/// \endcond
-/// \cond    fr
-/// \brief   Cette fonction retourne un pointeur vers la charge utile.
-/// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
-/// \return  Cette fonction retourne un pointeur vers la charge utile.
-/// \endcond
-OPEN_NET_GLOBAL unsigned char * IPv4_Data(OPEN_NET_GLOBAL unsigned char * aData)
-{
-    unsigned char lHeaderLen = ( aData[0] & 0x0f ) * 4;
-
-    return aData + lHeaderLen;
-}
-
-/// \cond    en
 /// \brief   This function returns a pointer to the destination address.
 /// \param   aData  A pointer to the IPv4 header
 /// \return  This function returns a pointer to the destination address.
@@ -57,6 +46,21 @@ OPEN_NET_GLOBAL unsigned char * IPv4_Data(OPEN_NET_GLOBAL unsigned char * aData)
 OPEN_NET_GLOBAL unsigned short * IPv4_Destination(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 16));
+}
+
+/// \cond    en
+/// \brief   This function returns the size of the IP header.
+/// \param   aData  A pointer to the IPv4 header
+/// \return  This function returns the size of the IP header.
+/// \endcond
+/// \cond    fr
+/// \brief   Cette fonction retourne la taille de l'ent&ecirc;te IP.
+/// \param   aData  Un pointeur vers l'ent&ecirc;te IPv4
+/// \return  Cette fonction retourne la taille de l'ent&ecirc;te IP.
+/// \endcond
+unsigned int IPv4_HeaderSize(OPEN_NET_GLOBAL unsigned char * aData)
+{
+    return ( (aData[0] & 0x0f) * 4 );
 }
 
 /// \cond    en
@@ -87,6 +91,38 @@ unsigned char IPv4_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 OPEN_NET_GLOBAL unsigned short * IPv4_Source(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 12));
+}
+
+// --------------------------------------------------------------------------
+
+/// \cond    en
+/// \brief   This function returns a pointer to the payload.
+/// \param   aData  A pointer to the IPv6 header
+/// \return  This function returns a pointer to the payload.
+/// \endcond
+/// \cond    fr
+/// \brief   Cette fonction retourne un pointeur vers la charge utile.
+/// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
+/// \return  Cette fonction retourne un pointeur vers la charge utile.
+/// \endcond
+OPEN_NET_GLOBAL unsigned char * IPv4_Data(OPEN_NET_GLOBAL unsigned char * aData)
+{
+    return (aData + IPv4_HeaderSize(aData));
+}
+
+/// \cond    en
+/// \brief   This function returns the size of the payload.
+/// \param   aData  A pointer to the IPv4 header
+/// \return  This function returns the size of the payload.
+/// \endcond
+/// \cond    fr
+/// \brief   Cette fonction retourne la taille de la charge utile.
+/// \param   aData  Un pointeur vers l'ent&ecirc;te IPv4
+/// \return  Cette fonction retourne la taille de la charge utile.
+/// \endcond
+unsigned int IPv4_DataSize(OPEN_NET_GLOBAL unsigned char * aData)
+{
+    return (ByteOrder_Swap16(*((OPEN_NET_GLOBAL unsigned short *)(aData + 2))) - IPv4_HeaderSize(aData));
 }
 
 #endif // ! _OPEN_NET_NO_FUNCTION_

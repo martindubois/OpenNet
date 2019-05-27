@@ -5,9 +5,15 @@
 /// \copyright  Copyright &copy; 1029 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/IPv6.h
 
-// TEST COVERAGE  2019-05-03  KMS - Martin Dubois, ing.
+// TEST COVERAGE  2019-05-10  KMS - Martin Dubois, ing.
 
 #pragma once
+
+// Includes
+/////////////////////////////////////////////////////////////////////////////
+
+// ===== Includes ===========================================================
+#include <OpenNetK/ByteOrder.h>
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
@@ -19,6 +25,14 @@
 /// \brief   Le type Ethernet des paquets IPv6
 /// \endcond
 #define IPv6_ETHERNET_TYPE_nh (0xdd86)
+
+/// \cond    en
+/// \brief   The size of the IPv6 header
+/// \endcond
+/// \cond    fr
+/// \brief   La taille de l'ent&ecirc;te IPv6
+/// \endcond
+#define IPv6_HEADER_SIZE_byte (40)
 
 #ifndef _OPEN_NET_NO_FUNCTION_
 
@@ -40,7 +54,22 @@
 /// \endcond
 OPEN_NET_GLOBAL unsigned char * IPv6_Data(OPEN_NET_GLOBAL unsigned char * aData)
 {
-    return aData + 40;
+    return ( aData + IPv6_HEADER_SIZE_byte );
+}
+
+/// \cond    en
+/// \brief   This function returns the size of the payload.
+/// \param   aData  A pointer to the IPv6 header
+/// \return  This function returns the size of the payload.
+/// \endcond
+/// \cond    fr
+/// \brief   Cette fonction retourne la taille de la charge utile.
+/// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
+/// \return  Cette fonction retourne la taille de la charge utile.
+/// \endcond
+unsigned int IPv6_DataSize(OPEN_NET_GLOBAL unsigned char * aData)
+{
+    return ByteOrder_Swap16(*((OPEN_NET_GLOBAL unsigned short *)(aData + 4)));
 }
 
 /// \cond    en
