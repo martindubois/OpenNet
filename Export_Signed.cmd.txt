@@ -1,8 +1,8 @@
 
 # Author     KMS - Martin Dubois, ing.
-# Copyright  (C) 2018-2019 KMS. All rights reserved.
+# Copyright  (C) 2019 KMS. All rights reserved.
 # Product    OpenNet
-# File       Export.cmd.txt
+# File       Export_Signed.cmd.txt
 
 . Binaries
 . Drivers
@@ -85,6 +85,11 @@ Scripts .
 	Import.cmd
 	Import.cmd.txt
 
+Signed/ONK_Pro1000 Drivers/Release_64/ONK_Hardware
+    onk_pro1000.cat
+    ONK_Pro1000.inf
+    ONK_Pro1000.sys
+
 x64/Debug Binaries/Debug_64
     OpenNet.dll
     OpenNet_Tool.exe
@@ -113,8 +118,3 @@ x64/Release Libraries/Release_64
 x64/Release Tests/Release_64
     ONK_Test.exe
     OpenNet_Test.exe
-
-x64/Release/ONK_Pro1000 Drivers/Release_64/ONK_Hardware
-    onk_pro1000.cat
-    ONK_Pro1000.inf
-    ONK_Pro1000.sys

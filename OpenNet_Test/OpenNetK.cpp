@@ -86,9 +86,9 @@ KMS_TEST_BEGIN(OpenNetK_Base)
     KMS_TEST_COMPARE(1286, IPv6_DataSize(lBuffer));
     KMS_TEST_COMPARE( 0x7, IPv6_Protocol(lBuffer));
 
-    KMS_TEST_ASSERT(                                 (lBuffer + 40) == IPv6_Data       (lBuffer));
-    KMS_TEST_ASSERT(reinterpret_cast<unsigned char *>(lBuffer + 24) == IPv6_Destination(lBuffer));
-    KMS_TEST_ASSERT(reinterpret_cast<unsigned char *>(lBuffer +  8) == IPv6_Source     (lBuffer));
+    KMS_TEST_ASSERT(                                  (lBuffer + 40) == IPv6_Data       (lBuffer));
+    KMS_TEST_ASSERT(reinterpret_cast<unsigned short *>(lBuffer + 24) == IPv6_Destination(lBuffer));
+    KMS_TEST_ASSERT(reinterpret_cast<unsigned short *>(lBuffer +  8) == IPv6_Source     (lBuffer));
 
     // ===== RegEx.h ========================================================
 

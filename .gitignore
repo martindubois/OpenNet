@@ -11,6 +11,8 @@
 /KmsDoc/
 /Libraries/
 /Packages/
+/Signed/
+/disk1/
 /doxygen_en/
 /doxygen_fr/
 /htm/
@@ -19,6 +21,9 @@ x64/
 
 /OpenNet.VC.VC.opendb
 /OpenNet.VC.db
+/Signed_*.zip
+/setup.inf
+/setup.rpt
 
 .cache.mk
 .tmp_versions

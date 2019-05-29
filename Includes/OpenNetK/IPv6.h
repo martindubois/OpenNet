@@ -84,9 +84,9 @@ unsigned int IPv6_DataSize(OPEN_NET_GLOBAL unsigned char * aData)
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          destination.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * IPv6_Destination(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned short * IPv6_Destination(OPEN_NET_GLOBAL unsigned char * aData)
 {
-    return (aData + 24);
+    return ((OPEN_NET_GLOBAL unsigned short *)(aData + 24));
 }
 
 /// \cond    en
@@ -114,9 +114,9 @@ unsigned char IPv6_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne un pointeur vers l'adresse de provenance.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * IPv6_Source(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned short * IPv6_Source(OPEN_NET_GLOBAL unsigned char * aData)
 {
-    return (aData + 8);
+    return ((OPEN_NET_GLOBAL unsigned short *)(aData + 8));
 }
 
 #endif // ! _OPEN_NET_NO_FUNCTION_

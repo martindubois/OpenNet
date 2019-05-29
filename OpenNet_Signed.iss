@@ -2,7 +2,7 @@
 ; Author     KMS - Martin Dubois, ing.
 ; Copyright  (C) 2019 KMS. All rights reserved.
 ; Product    OpenNet
-; File       OpenNet.iss
+; File       OpenNet_Signed.iss
 
 [Setup]
 AllowNetworkDrive=no
@@ -51,9 +51,9 @@ Source: "Includes\OpenNetK\RegEx.h";                 DestDir: "{app}\Includes\Op
 Source: "Includes\OpenNetK\TCP.h";                   DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\Types.h";                 DestDir: "{app}\Includes\OpenNetK"
 Source: "Includes\OpenNetK\UDP.h";                   DestDir: "{app}\Includes\OpenNetK"
-Source: "x64\Release\ONK_Pro1000\onk_pro1000.cat";   DestDir: "{app}\Drivers\ONK_Hardware"
-Source: "x64\Release\ONK_Pro1000\ONK_Pro1000.inf";   DestDir: "{app}\Drivers\ONK_Hardware"
-Source: "x64\Release\ONK_Pro1000\ONK_Pro1000.sys";   DestDir: "{app}\Drivers\ONK_Hardware"
+Source: "Signed\ONK_Pro1000\onk_pro1000.cat"       ; DestDir: "{app}\Drivers\ONK_Hardware"
+Source: "Signed\ONK_Pro1000\ONK_Pro1000.inf"       ; DestDir: "{app}\Drivers\ONK_Hardware"
+Source: "Signed\ONK_Pro1000\ONK_Pro1000.sys"       ; DestDir: "{app}\Drivers\ONK_Hardware"
 Source: "x64\Release\OpenNet.dll";                   DestDir: "{app}"
 Source: "x64\Release\OpenNet.lib";                   DestDir: "{app}\Libraries"
 Source: "x64\Release\OpenNet_Setup.exe";             DestDir: "{app}"

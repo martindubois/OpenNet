@@ -49,7 +49,29 @@ Version            ______ . ______ - ______
     - Close the solution
 [ ] Tool "PowerShell" - In the product folder
         .\RunDoxygen.cmd
+[ ] Connect the signing key to the computer
+[ ] Tool "PowerShell" - In the product folder - Already open
         .\Build.cmd
+[ ] Diconnect the signing key from the computer
+If signing driver is needed
+	[ ] Website https://partner.microsoft.com/en-us/dashboard/hardware/Search
+		- CLick "Submit new hardware"
+		- Enter "OpenNet" in the product name box
+		- Click "browse your files"
+		- Select the file "disk1\OpenNet.cab"
+		- Check all x64 signature
+		- Click "Submit"
+	[ ] Wait until Microsoft indicate that submission has been accespted
+	[ ] Website https://partner.microsoft.com/en-us/dashboard/hardware/Search
+		- Click the first submission
+		- Click "More"
+		- Click "Download signed files"
+		- Save the zip file into the product folder
+	[ ] Copy the "ONK_Pro1000" folder from the archive (zip) to the "Signed"
+	    folder into the product folder.
+If valid signed driver are available
+	[ ] Tool "PowerShell" - In the product folder
+			.\Build_Signed.cmd
 
 [ ] Git
 	- Commit modified files

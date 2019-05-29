@@ -1039,8 +1039,6 @@ namespace OpenNetK
 
                     TRACE_BUFFER_STATE_CHANGE(mBuffer.mPx, "TX_PROGRAMMING", "TX_RUNNING");
                     aBufferInfo->mState = BUFFER_STATE_TX_RUNNING;
-
-                    Buffer_TxRunning_Zone0(aBufferInfo);
                 }
 
                 mBuffer.mPx = (mBuffer.mPx + 1) % mBuffer.mCount;

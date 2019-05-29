@@ -12,7 +12,7 @@
 // Constant
 /////////////////////////////////////////////////////////////////////////////
 
-#define ETHERNET_VLAN_TAG_ID_nh (0x8100)
+#define ETHERNET_VLAN_TAG_ID_nh (0x0081)
 
 #ifndef _OPEN_NET_NO_FUNCTION_
 

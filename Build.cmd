@@ -61,25 +61,32 @@ if ERRORLEVEL 1 (
 	exit /B 6
 )
 
+call CreateCab.cmd
+if ERRORLEVEL 1 (
+	echo ERROR  CreateCab.cmd  failed - %ERRORLEVEL%
+	pause
+	exit /B 7
+)
+
 %KMS_VERSION% Common\Version.h Export.cmd.txt OpenNet.iss
 if ERRORLEVEL 1 (
 	echo ERROR  %KMS_VERSION% Common\Version.h Export.cmd.txt OpenNet.iss  failed - %ERRORLEVEL%
 	pause
-	exit /B 7
+	exit /B 8
 )
 
 %INNO_COMPIL32% /cc OpenNet.iss
 if ERRORLEVEL 1 (
 	echo ERROR  %INNO_COMPIL32% /cc OpenNet.iss  failed - %ERRORLEVEL%
 	pause
-	exit /B 8
+	exit /B 9
 )
 
 %KMS_VERSION% -S Common\Version.h Export.cmd
 if ERRORLEVEL 1 (
     echo ERROR  %KMS_VERSION% -S Common\Version.h Export.cmd  failed - %ERRORLEVEL%
 	pause
-	exit /B 9
+	exit /B 10
 )
 
 rem ===== End ===============================================================
