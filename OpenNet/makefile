@@ -197,7 +197,8 @@ CUDA/System_CUDA.o: CUDA/Processor_CUDA.h
 CUDA/System_CUDA.o: /usr/local/cuda-10.0/include/nvrtc.h
 CUDA/System_CUDA.o: Internal/Processor_Internal.h CUDA/System_CUDA.h
 CUDA/System_CUDA.o: Internal/System_Internal.h
-CUDA/Thread_CUDA.o: ../Import/Includes/KmsBase.h ../Import/Includes/SafeAPI.h
+CUDA/Thread_CUDA.o: Component.h ../Import/Includes/KmsBase.h
+CUDA/Thread_CUDA.o: ../Import/Includes/SafeAPI.h
 CUDA/Thread_CUDA.o: ../Import/Includes/WindowsToLinux.h Linux/Adapter_Linux.h
 CUDA/Thread_CUDA.o: /usr/local/cuda-10.0/include/cuda.h
 CUDA/Thread_CUDA.o: Internal/Adapter_Internal.h
@@ -266,7 +267,7 @@ CUDA/Thread_Functions_CUDA.o: CUDA/Thread_CUDA.h Internal/Adapter_Internal.h
 CUDA/Thread_Functions_CUDA.o: CUDA/Processor_CUDA.h
 CUDA/Thread_Functions_CUDA.o: /usr/local/cuda-10.0/include/nvrtc.h
 CUDA/Thread_Functions_CUDA.o: Internal/Processor_Internal.h
-CUDA/Thread_Kernel_CUDA.o: ../Import/Includes/KmsBase.h
+CUDA/Thread_Kernel_CUDA.o: Component.h ../Import/Includes/KmsBase.h
 CUDA/Thread_Kernel_CUDA.o: ../Import/Includes/SafeAPI.h
 CUDA/Thread_Kernel_CUDA.o: ../Import/Includes/WindowsToLinux.h
 CUDA/Thread_Kernel_CUDA.o: CUDA/Buffer_CUDA.h

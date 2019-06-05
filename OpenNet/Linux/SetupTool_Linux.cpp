@@ -109,6 +109,11 @@ OpenNet::Status SetupTool_Linux::Uninstall()
 
 OpenNet::Status SetupTool_Linux::Interactif_ExecuteCommand( unsigned int aCommand )
 {
+    if ( mInfos.size() <= aCommand )
+    {
+        return OpenNet::STATUS_INVALID_COMMAND_INDEX;
+    }
+
     OpenNet::Status lResult = OpenNet::STATUS_OK;
 
     const Info & lInfo = Info_Get( aCommand );
@@ -147,6 +152,11 @@ unsigned int SetupTool_Linux::Interactif_GetCommandCount()
 
 const char * SetupTool_Linux::Interactif_GetCommandText(unsigned int aCommand)
 {
+    if ( mInfos.size() <= aCommand )
+    {
+        return NULL;
+    }
+
     const Info & lInfo = Info_Get( aCommand );
     assert( NULL != ( & lInfo )  );
     assert(    0 <  lInfo.mCount );
@@ -185,6 +195,11 @@ const char * SetupTool_Linux::Interactif_GetCommandText(unsigned int aCommand)
 
 OpenNet::Status SetupTool_Linux::Wizard_ExecutePage(unsigned int * aPage, unsigned int aButton)
 {
+    if ( mInfos.size() <= ( * aPage ) )
+    {
+        return OpenNet::STATUS_INVALID_PAGE_INDEX;
+    }
+
     OpenNet::Status lResult = OpenNet::STATUS_OK;
 
     const Info & lInfo = Info_Get( * aPage );

@@ -86,13 +86,16 @@ KMS_TEST_BEGIN(System_Base)
 
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mSystem->GetConfig      (NULL ));
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mSystem->GetInfo        (NULL ));
-    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE        , lSetup.mSystem->SetConfig      (*lCNP));
     KMS_TEST_COMPARE(OpenNet::STATUS_PACKET_TOO_SMALL         , lSetup.mSystem->SetConfig      (lC0  ));
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mSystem->Adapter_Connect(NULL ));
     KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_ADAPTER          , lSetup.mSystem->Adapter_Connect(reinterpret_cast<OpenNet::Adapter *>(1)));
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSetup.mSystem->Display        (NULL));
     KMS_TEST_COMPARE(OpenNet::STATUS_NO_ADAPTER_CONNECTED     , lSetup.mSystem->Start          (0));
     KMS_TEST_COMPARE(OpenNet::STATUS_SYSTEM_NOT_STARTED       , lSetup.mSystem->Stop           ());
+
+    #ifdef _KMS_WINDOWS_
+        KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE    , lSetup.mSystem->SetConfig      (*lCNP));
+    #endif
 
     KMS_TEST_ASSERT(NULL == lSetup.mSystem->Kernel_Get(0));
 

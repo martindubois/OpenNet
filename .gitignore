@@ -36,4 +36,5 @@ modules.order
 *.mod.c
 *.o
 *.o.cmd
+*.o.ur-safe
 *.user

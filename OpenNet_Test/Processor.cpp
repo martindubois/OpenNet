@@ -20,7 +20,10 @@ KMS_TEST_BEGIN(Processor_Base)
     OpenNet::Processor::Info   lI;
     OpenNet::Processor::Info * lIP = NULL;
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE        , OpenNet::Processor::Display(*lIP, NULL));
+    #ifdef _KMS_WINDOWS_
+        KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE    , OpenNet::Processor::Display(*lIP, NULL));
+    #endif
+
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, OpenNet::Processor::Display(lI, NULL));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , OpenNet::Processor::Display(lI, stdout));
 

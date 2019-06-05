@@ -24,7 +24,6 @@ KMS_TEST_BEGIN(SourceCode_Base)
 
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSC0.AppendCode (NULL, 0));
     KMS_TEST_COMPARE(OpenNet::STATUS_EMPTY_CODE               , lSC0.AppendCode (""  , 0));
-    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE        , lSC0.AppendCode (*lSCNP));
     KMS_TEST_COMPARE(OpenNet::STATUS_CODE_NOT_SET             , lSC0.ResetCode  ());
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSC0.SetCode    (NULL, 0));
     KMS_TEST_COMPARE(OpenNet::STATUS_EMPTY_CODE               , lSC0.SetCode    (""  , 0));
@@ -34,6 +33,7 @@ KMS_TEST_BEGIN(SourceCode_Base)
     #endif
 
     #ifdef _KMS_WINDOWS_
+        KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE        , lSC0.AppendCode (*lSCNP));
         KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, lSC0.SetCode    (NULL ));
         KMS_TEST_COMPARE(OpenNet::STATUS_CANNOT_OPEN_INPUT_FILE   , lSC0.SetCode    ("DoesNotExist" ));
         KMS_TEST_COMPARE(OpenNet::STATUS_EMPTY_INPUT_FILE         , lSC0.SetCode    ("OpenNet_Test/Tests/Empty.txt" ));

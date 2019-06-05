@@ -17,6 +17,7 @@ SOURCES =	Adapter.cpp         \
 			EthernetAddress.cpp \
 			Kernel.cpp          \
 			Kernel_Forward.cpp  \
+			OpenNetK.cpp        \
 			Processor.cpp		\
 			SourceCode.cpp		\
 			Status.cpp          \
@@ -90,6 +91,13 @@ Kernel_Forward.o: ../Includes/OpenNet/Kernel.h
 Kernel_Forward.o: ../Includes/OpenNet/SourceCode.h
 Kernel_Forward.o: ../Includes/OpenNet/OpenNet.h ../Includes/OpenNet/Status.h
 Kernel_Forward.o: ../Includes/OpenNet/StatisticsProvider.h
+OpenNetK.o: Component.h ../Import/Includes/KmsBase.h
+OpenNetK.o: ../Import/Includes/SafeAPI.h ../Import/Includes/WindowsToLinux.h
+OpenNetK.o: ../Import/Includes/KmsTest.h ../Includes/OpenNetK/Types.h
+OpenNetK.o: ../Includes/OpenNetK/ARP.h ../Includes/OpenNetK/ByteOrder.h
+OpenNetK.o: ../Includes/OpenNetK/Ethernet.h ../Includes/OpenNetK/IPv4.h
+OpenNetK.o: ../Includes/OpenNetK/IPv6.h ../Includes/OpenNetK/RegEx.h
+OpenNetK.o: ../Includes/OpenNetK/TCP.h ../Includes/OpenNetK/UDP.h
 Processor.o: Component.h ../Import/Includes/KmsBase.h
 Processor.o: ../Import/Includes/SafeAPI.h ../Import/Includes/WindowsToLinux.h
 Processor.o: ../Import/Includes/KmsTest.h ../Includes/OpenNet/Processor.h

@@ -20,9 +20,11 @@ KMS_TEST_BEGIN(EthernetAddress_Base)
     OpenNet::EthernetAddress   lEA;
     OpenNet::EthernetAddress * lEAP = NULL;
 
-    KMS_TEST_COMPARE(false, OpenNet::EthernetAddress_IsBroadcast(*lEAP));
-    KMS_TEST_COMPARE(false, OpenNet::EthernetAddress_IsMulticast(*lEAP));
-    KMS_TEST_COMPARE(false, OpenNet::EthernetAddress_IsZero     (*lEAP));
+    #ifdef _KMS_WINDOWS_
+        KMS_TEST_COMPARE(false, OpenNet::EthernetAddress_IsBroadcast(*lEAP));
+        KMS_TEST_COMPARE(false, OpenNet::EthernetAddress_IsMulticast(*lEAP));
+        KMS_TEST_COMPARE(false, OpenNet::EthernetAddress_IsZero     (*lEAP));
+    #endif
 
     memset(&lEA.mAddress, 0xff, sizeof(lEA.mAddress));
 

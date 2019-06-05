@@ -35,13 +35,16 @@ KMS_TEST_BEGIN(Adapter_Base)
 
     unsigned int lStatistics[1024];
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE        , OpenNet::Adapter::Display(*lCP , NULL  ));
+    #ifdef _KMS_WINDOWS_
+        KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE    , OpenNet::Adapter::Display(*lCP , NULL  ));
+        KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE    , OpenNet::Adapter::Display(*lIP , NULL  ));
+        KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE    , OpenNet::Adapter::Display(*lSeP, NULL  ));
+    #endif
+
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, OpenNet::Adapter::Display( lC  , NULL  ));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , OpenNet::Adapter::Display( lC  , stdout));
-    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE        , OpenNet::Adapter::Display(*lIP , NULL  ));
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, OpenNet::Adapter::Display( lI  , NULL  ));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , OpenNet::Adapter::Display( lI  , stdout));
-    KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_REFERENCE        , OpenNet::Adapter::Display(*lSeP, NULL  ));
     KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ALLOWED_NULL_ARGUMENT, OpenNet::Adapter::Display( lSe , NULL  ));
     KMS_TEST_COMPARE(OpenNet::STATUS_OK                       , OpenNet::Adapter::Display( lSe , stdout));
 

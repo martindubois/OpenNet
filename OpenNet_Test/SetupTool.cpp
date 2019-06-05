@@ -24,8 +24,15 @@ KMS_TEST_BEGIN(SetupTool_Base)
     KMS_TEST_ASSERT(NULL != lST0->GetInstallFolder());
     KMS_TEST_ASSERT(NULL != lST0->GetLibraryFolder());
 
-    KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ADMINISTRATOR, lST0->Install  ());
-    KMS_TEST_COMPARE(OpenNet::STATUS_OK               , lST0->Uninstall());
+    #ifdef _KMS_LINUX_
+        KMS_TEST_COMPARE(OpenNet::STATUS_OK               , lST0->Install  ());
+        KMS_TEST_COMPARE(OpenNet::STATUS_REBOOT_REQUIRED  , lST0->Uninstall());
+    #endif
+
+    #ifdef _KMS_WINDOWS_
+        KMS_TEST_COMPARE(OpenNet::STATUS_NOT_ADMINISTRATOR, lST0->Install  ());
+        KMS_TEST_COMPARE(OpenNet::STATUS_OK               , lST0->Uninstall());
+    #endif
 
     KMS_TEST_COMPARE(OpenNet::STATUS_INVALID_COMMAND_INDEX, lST0->Interactif_ExecuteCommand (0));
     KMS_TEST_COMPARE(                                    0, lST0->Interactif_GetCommandCount());
