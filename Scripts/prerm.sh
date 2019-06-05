@@ -9,7 +9,7 @@ echo  Executing  postinst.sh  ...
 
 # ===== Configuration =======================================================
 
-OPEN_NET_INSTALL=/usr/local/OpenNet_0.0
+OPEN_NET_INSTALL=/usr/local/OpenNet_1.0
 
 # ===== Execution ===========================================================
 
