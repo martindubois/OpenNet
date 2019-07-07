@@ -12,7 +12,7 @@ echo Excuting  CreatePackages.sh  ...
 
 KERNEL=$(uname -r)
 
-PACKAGE_VERSION=1.0-0
+PACKAGE_VERSION=1.0-1
 
 VERSION=1.0
 
