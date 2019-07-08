@@ -61,7 +61,7 @@ namespace OpenNet
         /// \retval STATUS_OK
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         /// \sa     GetFunctionName
-        virtual Status SetFunctionName(const char * aFunctionName);
+        OPEN_NET_PUBLIC virtual Status SetFunctionName(const char * aFunctionName);
 
         // ===== SourceCode =================================================
         OPEN_NET_PUBLIC virtual        ~Function();

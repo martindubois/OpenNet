@@ -1,8 +1,8 @@
 Package: kms-opennet-ddk
-Version: 1.0-4
+Version: 1.0-5
 Section: base
 Priority: optional
 Architecture: amd64
 Maintainer: KMS <opennet@kms-quebec.com>
 Description: OpenNet Driver Development Kit
- OpenNet 1.0.4 Driver Development Kit
+ OpenNet 1.0.5 Driver Development Kit
