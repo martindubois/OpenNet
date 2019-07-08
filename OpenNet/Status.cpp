@@ -97,6 +97,9 @@ static const StatusInfo STATUS_INFO[OpenNet::STATUS_QTY] =
     { "THREAD_STOP_TIMEOUT"       , "The thread did not stop in allowed time"  },
     { "THREAD_TERMINATE_ERROR"    , "The thread termination reported an error" },
     { "TOO_MANY_BUFFER"           , "Too many buffer allocated"                },
+
+    // 1.0.4
+    { "CUDA_ERROR", "CUDA error" },
 };
 
 namespace OpenNet

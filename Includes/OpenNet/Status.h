@@ -101,7 +101,10 @@ namespace OpenNet
         STATUS_THREAD_CLOSE_ERROR        ,
         STATUS_THREAD_STOP_TIMEOUT       ,
         STATUS_THREAD_TERMINATE_ERROR    ,
-        STATUS_TOO_MANY_BUFFER           ,
+        STATUS_TOO_MANY_BUFFER           , // 68
+
+        // 1.0.4
+        STATUS_CUDA_ERROR, // 69
 
         STATUS_QTY
     }

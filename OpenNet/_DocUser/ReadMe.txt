@@ -5,6 +5,8 @@ Product    OpenNet
 File       OpenNet/_DocUser/ReadMe.txt
 
 
+- STATUS_CUDA_ERROR
+
 - Linux
     - Export public symbols only
 

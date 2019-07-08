@@ -24,6 +24,7 @@ OpenNet::Status Utl_ExceptionToStatus(KmsLib::Exception * aE)
     case KmsLib::Exception::CODE_IOCTL_ERROR      : return OpenNet::STATUS_IOCTL_ERROR    ;
     case KmsLib::Exception::CODE_NOT_ENOUGH_MEMORY: return OpenNet::STATUS_TOO_MANY_BUFFER;
     case KmsLib::Exception::CODE_OPEN_CL_ERROR    : return OpenNet::STATUS_OPEN_CL_ERROR  ;
+    case KmsLib::Exception::CODE_UNKNOWN          : return OpenNet::STATUS_CUDA_ERROR     ;
     }
 
     printf("%s ==> STATUS_EXCEPTION\n", KmsLib::Exception::GetCodeName(aE->GetCode()));
