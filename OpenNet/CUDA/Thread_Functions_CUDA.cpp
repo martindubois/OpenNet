@@ -109,10 +109,12 @@ void Thread_Functions_CUDA::Run_Start()
 void Thread_Functions_CUDA::Release()
 {
     assert( NULL != mKernel );
-    assert( NULL != mModule );
 
     Thread_CUDA::Release( mKernel );
 
-    // Processor_CUDA::Module_Create ==> CUW_ModuleUnload  See Prepare
-    CUW_ModuleUnload( mModule );
+    if ( NULL != mModule )
+    {
+        // Processor_CUDA::Module_Create ==> CUW_ModuleUnload  See Prepare
+        CUW_ModuleUnload( mModule );
+    }
 }
