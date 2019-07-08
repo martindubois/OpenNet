@@ -49,6 +49,7 @@ cp ONK_Tunnel_IO/ONK_Tunnel_IO.ko    $DST_FOLDER/Modules
 cp OpenNet/_DocUser/ReadMe.txt       $DST_FOLDER/OpenNet
 cp OpenNet_Tool/_DocUser/ReadMe.txt  $DST_FOLDER/OpenNet_Tool
 cp Packages/*.deb                    $DST_FOLDER/Packages
+cp Scripts/Import.sh                 $DST_FOLDER/Import.sh
 cp Scripts/OpenNet_Tool/*.txt        $DST_FOLDER/Scripts/OpenNet_Tool
 cp DoxyFile_*.txt                    $DST_FOLDER
 

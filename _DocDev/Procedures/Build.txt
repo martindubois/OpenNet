@@ -30,7 +30,7 @@ Version            ______ . ______ - ______
 [ ] File "Scripts/control_DDK" - Edit the version
 [ ] File "Scripts/OpenNet_Setup.sh - Edit the version
 [ ] File "Scripts/postinst.sh" - Edit the version
-[ ] File "Scripts/preinst.sh" - Edit the version
+[ ] File "Scripts/prerm.sh" - Edit the version
 [ ] Tool "Terminal" - In the product folder
         ./Build.sh {Major.Minor.Build_Type}
 [ ] Copy the exported file on the server
