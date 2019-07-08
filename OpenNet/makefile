@@ -61,7 +61,7 @@ SOURCES =	Adapter.cpp                  \
 # ===== Rules / Regles ======================================================
 
 .cpp.o:
-	g++ -c $(COMPILE_FLAGS) -o $@ $(INCLUDES) $<
+	g++ -fvisibility=hidden -c $(COMPILE_FLAGS) -o $@ $(INCLUDES) $<
 
 # ===== Macros ==============================================================
 

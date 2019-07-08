@@ -27,7 +27,7 @@ namespace OpenNet
     /// \cond fr
     /// \brief  La classe Kernel_Forward
     /// \endcond
-    class Kernel_Forward : public Kernel
+    class OPEN_NET_PUBLIC_CLASS Kernel_Forward : public Kernel
     {
 
     public:

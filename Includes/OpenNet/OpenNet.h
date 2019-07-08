@@ -16,8 +16,13 @@
     #else
         #define OPEN_NET_PUBLIC __declspec( dllimport )
     #endif
+    #define OPEN_NET_PUBLIC_CLASS
 #else
-    // TODO  OpenNet
-    //       Normal - On Linux, Do not export all symbols
-    #define OPEN_NET_PUBLIC
+    #ifdef OPENNET_EXPORTS
+        #define OPEN_NET_PUBLIC         __attribute__ ( ( visibility ( "default" ) ) )
+        #define OPEN_NET_PUBLIC_CLASS   __attribute__ ( ( visibility ( "default" ) ) )
+    #else
+        #define OPEN_NET_PUBLIC
+        #define OPEN_NET_PUBLIC_CLASS
+    #endif
 #endif

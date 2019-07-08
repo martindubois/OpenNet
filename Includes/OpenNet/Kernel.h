@@ -35,7 +35,7 @@ namespace OpenNet
     /// \cond fr
     /// \brief  La classe Kernel
     /// \endcond
-    class Kernel : public SourceCode, public StatisticsProvider
+    class OPEN_NET_PUBLIC_CLASS Kernel : public SourceCode, public StatisticsProvider
     {
 
     public:
