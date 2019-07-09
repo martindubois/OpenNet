@@ -24,6 +24,11 @@ KMS_TEST_BEGIN(SetupTool_Base)
     KMS_TEST_ASSERT(NULL != lST0->GetInstallFolder());
     KMS_TEST_ASSERT(NULL != lST0->GetLibraryFolder());
 
+    printf( "Binary folder   %s\n", lST0->GetBinaryFolder ());
+    printf( "Include folder  %s\n", lST0->GetIncludeFolder());
+    printf( "Install folder  %s\n", lST0->GetInstallFolder());
+    printf( "Library folder  %s\n", lST0->GetLibraryFolder());
+
     #ifdef _KMS_LINUX_
         KMS_TEST_COMPARE(OpenNet::STATUS_OK               , lST0->Install  ());
         KMS_TEST_COMPARE(OpenNet::STATUS_REBOOT_REQUIRED  , lST0->Uninstall());

@@ -52,7 +52,7 @@ FolderFinder_Linux::FolderFinder_Linux()
     memset( & mLibraryFolder, 0, sizeof( mLibraryFolder ) );
 
     int lRet = dl_iterate_phdr( ProcessSO, this );
-    assert( 0 == lRet );
+    assert( 1 == lRet );
 }
 
 void FolderFinder_Linux::SetBinaryFolder( const char * aPath, unsigned int aLength )
@@ -63,18 +63,29 @@ void FolderFinder_Linux::SetBinaryFolder( const char * aPath, unsigned int aLeng
 
     memcpy( mBinaryFolder, aPath, aLength );
 
-    unsigned int lLength = aLength - 4;
-    if ( 0 == strcmp( "/bin", aPath + lLength ) )
+    if ( 0 == strncmp( "./Binaries", aPath, aLength ) )
     {
-        memcpy( mInstallFolder, aPath, lLength );
+        // We are running automated tests in an OpenNet project folder
+        strcpy( mIncludeFolder, "./Includes"  );
+        strcpy( mInstallFolder, "."           );
+        strcpy( mLibraryFolder, "./Libraries" );
     }
     else
     {
-        memcpy( mInstallFolder , aPath, aLength );
-    }
+        unsigned int lLength = aLength - 4;
+        if ( 0 == strcmp( "/bin", aPath + lLength ) )
+        {
+            memcpy( mInstallFolder, aPath, lLength );
+        }
+        else
+        {
+            memcpy( mInstallFolder , aPath, aLength );
+        }
 
-    sprintf( mIncludeFolder, "%s/inc", mInstallFolder );
-    sprintf( mLibraryFolder, "%s/lib", mInstallFolder );
+        sprintf( mIncludeFolder, "%s/inc", mInstallFolder );
+        sprintf( mLibraryFolder, "%s/lib", mInstallFolder );
+
+    }
 
     gFolderFinder = this;
 }
@@ -90,15 +101,35 @@ static int ProcessSO( struct dl_phdr_info * aInfo, size_t aSize_byte, void * aDa
     assert( NULL                          != aData      );
 
     unsigned int lLength = strlen( aInfo->dlpi_name );
-    if ( 14 <= lLength )
+    if ( 13 <= lLength )
     {
-        lLength -= 14;
+        lLength -= 13;
 
-        if ( 0 == strcmp( "/libOpenNet.so", aInfo->dlpi_name + lLength ) )
+        if ( 0 == strcmp( "libOpenNet.so", aInfo->dlpi_name + lLength ) )
         {
             FolderFinder_Linux * lThis = reinterpret_cast< FolderFinder_Linux * >( aData );
 
-            lThis->SetBinaryFolder( aInfo->dlpi_name, lLength );
+            if ( 0 < lLength )
+            {
+                assert( '/' == aInfo->dlpi_name[ lLength - 1 ] );
+
+                lThis->SetBinaryFolder( aInfo->dlpi_name, lLength - 1 );
+            }
+            else
+            {
+                // We run into the folder where libOpenNet.so is.
+                char lCurrent[ 4096 ];
+
+                char * lRet = getcwd( lCurrent, sizeof( lCurrent ) );
+                assert( lCurrent == lRet );
+
+                lLength = strlen( lCurrent );
+                assert( 0 < lLength );
+
+                lThis->SetBinaryFolder( lCurrent, lLength );
+            }
+
+            return 1;
         }
     }
 
