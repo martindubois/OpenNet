@@ -37,7 +37,7 @@
 /// \return  Cette fonction retourne un pointeur vers l'adresse
 ///          questionn&eacute;e.
 /// \endcond
-OPEN_NET_GLOBAL unsigned short * ARP_Destination(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * ARP_Destination(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 24));
 }
@@ -52,7 +52,7 @@ OPEN_NET_GLOBAL unsigned short * ARP_Destination(OPEN_NET_GLOBAL unsigned char *
 /// \param   aData  Un pointeur vers l'ent&ecirc;te ARP
 /// \return  Cette fonction retourne le protocole.
 /// \endcond
-unsigned short ARP_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE unsigned short ARP_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 {
 	return (*((OPEN_NET_GLOBAL unsigned short *)(aData + 2)));
 }
@@ -69,7 +69,7 @@ unsigned short ARP_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          provenance.
 /// \endcond
-OPEN_NET_GLOBAL unsigned short * ARP_Source(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * ARP_Source(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 14));
 }

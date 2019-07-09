@@ -43,7 +43,7 @@
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          destination.
 /// \endcond
-OPEN_NET_GLOBAL unsigned short * IPv4_Destination(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * IPv4_Destination(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 16));
 }
@@ -58,7 +58,7 @@ OPEN_NET_GLOBAL unsigned short * IPv4_Destination(OPEN_NET_GLOBAL unsigned char 
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv4
 /// \return  Cette fonction retourne la taille de l'ent&ecirc;te IP.
 /// \endcond
-unsigned int IPv4_HeaderSize(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE unsigned int IPv4_HeaderSize(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ( (aData[0] & 0x0f) * 4 );
 }
@@ -73,7 +73,7 @@ unsigned int IPv4_HeaderSize(OPEN_NET_GLOBAL unsigned char * aData)
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv4
 /// \return  Cette fonction retourne le protocole.
 /// \endcond
-unsigned char IPv4_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE unsigned char IPv4_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return aData[9];
 }
@@ -88,7 +88,7 @@ unsigned char IPv4_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv4
 /// \return  Cette fonction retourne un pointeur vers l'adresse de provenance.
 /// \endcond
-OPEN_NET_GLOBAL unsigned short * IPv4_Source(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * IPv4_Source(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 12));
 }
@@ -105,7 +105,7 @@ OPEN_NET_GLOBAL unsigned short * IPv4_Source(OPEN_NET_GLOBAL unsigned char * aDa
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne un pointeur vers la charge utile.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * IPv4_Data(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned char * IPv4_Data(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return (aData + IPv4_HeaderSize(aData));
 }
@@ -120,7 +120,7 @@ OPEN_NET_GLOBAL unsigned char * IPv4_Data(OPEN_NET_GLOBAL unsigned char * aData)
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv4
 /// \return  Cette fonction retourne la taille de la charge utile.
 /// \endcond
-unsigned int IPv4_DataSize(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE unsigned int IPv4_DataSize(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return (ByteOrder_Swap16(*((OPEN_NET_GLOBAL unsigned short *)(aData + 2))) - IPv4_HeaderSize(aData));
 }

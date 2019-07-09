@@ -26,7 +26,7 @@
 /// \return  Cette m&eacute;thode retourne la valeur d'entr&eacute;e avec
 ///          l'ordre des octet invers&eacute;
 /// \endcond
-unsigned short ByteOrder_Swap16(unsigned short aIn)
+OPEN_NET_DEVICE unsigned short ByteOrder_Swap16(unsigned short aIn)
 {
     return ((aIn >> 8) | (aIn << 8));
 }
@@ -42,7 +42,7 @@ unsigned short ByteOrder_Swap16(unsigned short aIn)
 /// \return  Cette m&eacute;thode retourne la valeur d'entr&eacute;e avec
 ///          l'ordre des octet invers&eacute;
 /// \endcond
-unsigned int ByteOrder_Swap32(unsigned int aIn)
+OPEN_NET_DEVICE unsigned int ByteOrder_Swap32(unsigned int aIn)
 {
     return ((aIn >> 24) | ((aIn >> 8) & 0x0000ff00) | ((aIn << 8) & 0x00ff0000) | (aIn << 24));
 }

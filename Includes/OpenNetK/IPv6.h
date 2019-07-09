@@ -52,7 +52,7 @@
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne un pointeur vers la charge utile.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * IPv6_Data(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned char * IPv6_Data(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ( aData + IPv6_HEADER_SIZE_byte );
 }
@@ -67,7 +67,7 @@ OPEN_NET_GLOBAL unsigned char * IPv6_Data(OPEN_NET_GLOBAL unsigned char * aData)
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne la taille de la charge utile.
 /// \endcond
-unsigned int IPv6_DataSize(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE unsigned int IPv6_DataSize(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ByteOrder_Swap16(*((OPEN_NET_GLOBAL unsigned short *)(aData + 4)));
 }
@@ -84,7 +84,7 @@ unsigned int IPv6_DataSize(OPEN_NET_GLOBAL unsigned char * aData)
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          destination.
 /// \endcond
-OPEN_NET_GLOBAL unsigned short * IPv6_Destination(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * IPv6_Destination(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 24));
 }
@@ -99,7 +99,7 @@ OPEN_NET_GLOBAL unsigned short * IPv6_Destination(OPEN_NET_GLOBAL unsigned char 
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne le protocole.
 /// \endcond
-unsigned char IPv6_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE unsigned char IPv6_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return aData[6];
 }
@@ -114,7 +114,7 @@ unsigned char IPv6_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne un pointeur vers l'adresse de provenance.
 /// \endcond
-OPEN_NET_GLOBAL unsigned short * IPv6_Source(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * IPv6_Source(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 8));
 }

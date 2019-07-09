@@ -43,7 +43,7 @@
 /// \param   aData  Un pointeur vers l'ent&ecirc;te UDP
 /// \return  Cette fonction retourne l'adresse de la charge utile.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * UDP_Data(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned char * UDP_Data(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return (aData + UDP_HEADER_SIZE_byte);
 }
@@ -58,7 +58,7 @@ OPEN_NET_GLOBAL unsigned char * UDP_Data(OPEN_NET_GLOBAL unsigned char * aData)
 /// \param   aData  Un pointeur vers l'ent&ecirc;te UDP
 /// \return  Cette fonction retourne le port de destination.
 /// \endcond
-unsigned short UDP_DestinationPort(OPEN_NET_GLOBAL const unsigned char * aData)
+OPEN_NET_DEVICE unsigned short UDP_DestinationPort(OPEN_NET_GLOBAL const unsigned char * aData)
 {
     return (*((OPEN_NET_GLOBAL const unsigned short *)(aData + 2)));
 }
@@ -73,7 +73,7 @@ unsigned short UDP_DestinationPort(OPEN_NET_GLOBAL const unsigned char * aData)
 /// \param   aData  Un pointeur vers l'ent&ecirc;te UDP
 /// \return  Cette fonction retourne le port de source.
 /// \endcond
-unsigned short UDP_SourcePort(OPEN_NET_GLOBAL const unsigned char * aData)
+OPEN_NET_DEVICE unsigned short UDP_SourcePort(OPEN_NET_GLOBAL const unsigned char * aData)
 {
     return (*((OPEN_NET_GLOBAL const unsigned short *)(aData + 0)));
 }

@@ -111,37 +111,37 @@ RegEx;
 // Internal
 /////////////////////////////////////////////////////////////////////////////
 
-int RegEx_IsCharValid(char aInput)
+OPEN_NET_DEVICE int RegEx_IsCharValid(char aInput)
 {
     return (((9 <= aInput) && ( 10 >= aInput))
         ||  (13 == aInput)
         || ((32 <= aInput) && (126 >= aInput)));
 }
 
-unsigned short RegEx_StateIndex_Get(RegEx * aThis)
+OPEN_NET_DEVICE unsigned short RegEx_StateIndex_Get(RegEx * aThis)
 {
     return aThis->mThreads[aThis->mThreadCurrent];
 }
 
-void RegEx_StateIndex_Set(RegEx * aThis, unsigned short aState)
+OPEN_NET_DEVICE void RegEx_StateIndex_Set(RegEx * aThis, unsigned short aState)
 {
     aThis->mThreads[aThis->mThreadCurrent] = aState;
 }
 
 // --------------------------------------------------------------------------
 
-unsigned short RegEx_Link_Get(RegEx * aThis)
+OPEN_NET_DEVICE unsigned short RegEx_Link_Get(RegEx * aThis)
 {
     return (aThis->mStates[RegEx_StateIndex_Get(aThis)].mFlagAndLink & REG_EX_LINK_MASK);
 }
 
-void RegEx_Thread_Create(RegEx * aThis, unsigned short aState)
+OPEN_NET_DEVICE void RegEx_Thread_Create(RegEx * aThis, unsigned short aState)
 {
     aThis->mThreads[aThis->mThreadCount] = aState;
     aThis->mThreadCount++;
 }
 
-void RegEx_Thread_Delete(RegEx * aThis)
+OPEN_NET_DEVICE void RegEx_Thread_Delete(RegEx * aThis)
 {
     aThis->mCounters[RegEx_StateIndex_Get(aThis)] = 0;
     aThis->mThreadCount--;
@@ -156,7 +156,7 @@ void RegEx_Thread_Delete(RegEx * aThis)
 
 // --------------------------------------------------------------------------
 
-void RegEx_Or_Handle(RegEx * aThis)
+OPEN_NET_DEVICE void RegEx_Or_Handle(RegEx * aThis)
 {
     while (0 != (aThis->mStates[aThis->mThreads[aThis->mThreadCurrent]].mFlagAndLink & REG_EX_FLAG_OR))
     {
@@ -165,7 +165,7 @@ void RegEx_Or_Handle(RegEx * aThis)
     }
 }
 
-void RegEx_Reset(RegEx * aThis)
+OPEN_NET_DEVICE void RegEx_Reset(RegEx * aThis)
 {
     aThis->mThreadCount   = 0;
     aThis->mThreadCurrent = 0;
@@ -180,7 +180,7 @@ void RegEx_Reset(RegEx * aThis)
     RegEx_Or_Handle(aThis);
 }
 
-void RegEx_StateIndex_Next(RegEx * aThis)
+OPEN_NET_DEVICE void RegEx_StateIndex_Next(RegEx * aThis)
 {
     aThis->mCounters[RegEx_StateIndex_Get(aThis)] = 0;
 
@@ -196,7 +196,7 @@ void RegEx_StateIndex_Next(RegEx * aThis)
 
 // --------------------------------------------------------------------------
 
-void RegEx_Counter_Inc(RegEx * aThis)
+OPEN_NET_DEVICE void RegEx_Counter_Inc(RegEx * aThis)
 {
     unsigned short lState = RegEx_StateIndex_Get(aThis);
 
@@ -207,7 +207,7 @@ void RegEx_Counter_Inc(RegEx * aThis)
     }
 }
 
-int RegEx_Repeat_Min(RegEx * aThis)
+OPEN_NET_DEVICE int RegEx_Repeat_Min(RegEx * aThis)
 {
     unsigned short lState = RegEx_StateIndex_Get(aThis);
 
@@ -221,7 +221,7 @@ int RegEx_Repeat_Min(RegEx * aThis)
     return 0;
 }
 
-void RegEx_Start(RegEx * aThis)
+OPEN_NET_DEVICE void RegEx_Start(RegEx * aThis)
 {
     RegEx_Reset(aThis);
 
@@ -235,7 +235,7 @@ void RegEx_Start(RegEx * aThis)
 
 // --------------------------------------------------------------------------
 
-void RegEx_OK(RegEx * aThis)
+OPEN_NET_DEVICE void RegEx_OK(RegEx * aThis)
 {
     while (0 < aThis->mThreadCount)
     {
@@ -249,7 +249,7 @@ void RegEx_OK(RegEx * aThis)
 
 // ===== RegEx_Execute_... ==================================================
 
-int RegEx_Execute_C(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE int RegEx_Execute_C(RegEx * aThis, char aInput)
 {
     if (aThis->mStates[RegEx_StateIndex_Get(aThis)].mC == aInput)
     {
@@ -260,7 +260,7 @@ int RegEx_Execute_C(RegEx * aThis, char aInput)
     return RegEx_Repeat_Min(aThis);
 }
 
-int RegEx_Execute_Digit(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE int RegEx_Execute_Digit(RegEx * aThis, char aInput)
 {
     if (('0' <= aInput) && ('9' >= aInput))
     {
@@ -271,7 +271,7 @@ int RegEx_Execute_Digit(RegEx * aThis, char aInput)
     return RegEx_Repeat_Min(aThis);
 }
 
-int RegEx_Execute_Digit_Not(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE int RegEx_Execute_Digit_Not(RegEx * aThis, char aInput)
 {
     if (('0' > aInput) || ('9' < aInput))
     {
@@ -282,7 +282,7 @@ int RegEx_Execute_Digit_Not(RegEx * aThis, char aInput)
     return RegEx_Repeat_Min(aThis);
 }
 
-void RegEx_Execute_Group(RegEx * aThis)
+OPEN_NET_DEVICE void RegEx_Execute_Group(RegEx * aThis)
 {
     unsigned short lState = RegEx_StateIndex_Get(aThis);
 
@@ -296,7 +296,7 @@ void RegEx_Execute_Group(RegEx * aThis)
     RegEx_Or_Handle(aThis);
 }
 
-void RegEx_Execute_Or(RegEx * aThis)
+OPEN_NET_DEVICE void RegEx_Execute_Or(RegEx * aThis)
 {
     unsigned short lState = RegEx_StateIndex_Get(aThis);
 
@@ -322,7 +322,7 @@ void RegEx_Execute_Or(RegEx * aThis)
     }
 }
 
-int RegEx_Execute_Or_Fast(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE int RegEx_Execute_Or_Fast(RegEx * aThis, char aInput)
 {
     unsigned short lLink = RegEx_Link_Get(aThis);
 
@@ -353,7 +353,7 @@ int RegEx_Execute_Or_Fast(RegEx * aThis, char aInput)
     }
 }
 
-int RegEx_Execute_Or_Not(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE int RegEx_Execute_Or_Not(RegEx * aThis, char aInput)
 {
     unsigned short lLink = RegEx_Link_Get(aThis);
 
@@ -383,7 +383,7 @@ int RegEx_Execute_Or_Not(RegEx * aThis, char aInput)
     }
 }
 
-void RegEx_Execute_Range(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE void RegEx_Execute_Range(RegEx * aThis, char aInput)
 {
     unsigned short lState = RegEx_StateIndex_Get(aThis);
 
@@ -397,7 +397,7 @@ void RegEx_Execute_Range(RegEx * aThis, char aInput)
     }
 }
 
-void RegEx_Execute_Return(RegEx * aThis)
+OPEN_NET_DEVICE void RegEx_Execute_Return(RegEx * aThis)
 {
     unsigned short lLink = RegEx_Link_Get(aThis);
 
@@ -406,7 +406,7 @@ void RegEx_Execute_Return(RegEx * aThis)
     RegEx_Counter_Inc(aThis);
 }
 
-int RegEx_Execute_Space(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE int RegEx_Execute_Space(RegEx * aThis, char aInput)
 {
     switch (aInput)
     {
@@ -421,7 +421,7 @@ int RegEx_Execute_Space(RegEx * aThis, char aInput)
     return RegEx_Repeat_Min(aThis);
 }
 
-int RegEx_Execute_Space_Not(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE int RegEx_Execute_Space_Not(RegEx * aThis, char aInput)
 {
     switch (aInput)
     {
@@ -436,7 +436,7 @@ int RegEx_Execute_Space_Not(RegEx * aThis, char aInput)
     return 0;
 }
 
-int RegEx_Execute_Word(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE int RegEx_Execute_Word(RegEx * aThis, char aInput)
 {
     if (   (('0' <= aInput) && ('9' >= aInput))
         || (('a' <= aInput) && ('z' >= aInput))
@@ -450,7 +450,7 @@ int RegEx_Execute_Word(RegEx * aThis, char aInput)
     return RegEx_Repeat_Min(aThis);
 }
 
-int RegEx_Execute_Word_Not(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE int RegEx_Execute_Word_Not(RegEx * aThis, char aInput)
 {
     if (   (('0' <= aInput) && ('9' >= aInput))
         || (('a' <= aInput) && ('z' >= aInput))
@@ -467,7 +467,7 @@ int RegEx_Execute_Word_Not(RegEx * aThis, char aInput)
 // Functions
 /////////////////////////////////////////////////////////////////////////////
 
-void RegEx_Create(RegEx * aThis, OPEN_NET_CONSTANT RegEx_State * aStates, unsigned char * aCounters, unsigned int aCount)
+OPEN_NET_DEVICE void RegEx_Create(RegEx * aThis, OPEN_NET_CONSTANT RegEx_State * aStates, unsigned char * aCounters, unsigned int aCount)
 {
     aThis->mCounters   = aCounters;
     aThis->mStateCount = aCount   ;
@@ -476,7 +476,7 @@ void RegEx_Create(RegEx * aThis, OPEN_NET_CONSTANT RegEx_State * aStates, unsign
     RegEx_Start(aThis);
 }
 
-int RegEx_End(RegEx * aThis)
+OPEN_NET_DEVICE int RegEx_End(RegEx * aThis)
 {
     while (0 < aThis->mThreadCount)
     {
@@ -513,7 +513,7 @@ int RegEx_End(RegEx * aThis)
     return 0;
 }
 
-int RegEx_Execute(RegEx * aThis, char aInput)
+OPEN_NET_DEVICE int RegEx_Execute(RegEx * aThis, char aInput)
 {
     if (RegEx_IsCharValid(aInput))
     {

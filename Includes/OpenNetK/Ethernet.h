@@ -35,7 +35,7 @@
 /// \return  Cette fonction retourne un pointeur vers la charge utile du
 ///          paquet Ethernet.
 /// \endcond
-OPEN_NET_GLOBAL unsigned char * Ethernet_Data( OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned char * Ethernet_Data( OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
     unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
@@ -58,7 +58,7 @@ OPEN_NET_GLOBAL unsigned char * Ethernet_Data( OPEN_NET_GLOBAL unsigned char * a
 /// \return  Cette fonction retourne la taille de la charge utile du paquet
 ///          Ethernet.
 /// \endcond
-unsigned int Ethernet_DataSize(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_DEVICE unsigned int Ethernet_DataSize(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
     unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
@@ -83,7 +83,7 @@ unsigned int Ethernet_DataSize(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_G
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          destination.
 /// \endcond
-OPEN_NET_GLOBAL unsigned short * Ethernet_Destination(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * Ethernet_Destination(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
 	return ((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 0));
 }
@@ -102,7 +102,7 @@ OPEN_NET_GLOBAL unsigned short * Ethernet_Destination(OPEN_NET_GLOBAL unsigned c
 ///          traiter
 /// \return  Cette fonction retourne un pointeur vers l'adresse de source.
 /// \endcond
-OPEN_NET_GLOBAL unsigned short * Ethernet_Source(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * Ethernet_Source(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
 	return ((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 6));
 }
@@ -121,7 +121,7 @@ OPEN_NET_GLOBAL unsigned short * Ethernet_Source(OPEN_NET_GLOBAL unsigned char *
 ///          traiter
 /// \return  Cette fonction retourne le type du paquet Ethernet.
 /// \endcond
-unsigned short Ethernet_Type(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_DEVICE unsigned short Ethernet_Type(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
     unsigned short lType_nh = *((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
@@ -144,7 +144,7 @@ unsigned short Ethernet_Type(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_N
 /// \retval  0  Non
 /// \retval  1  Oui
 /// \endcond
-int Ethernet_Vlan(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_DEVICE int Ethernet_Vlan(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
 	unsigned short lType_nh = *((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
@@ -167,7 +167,7 @@ int Ethernet_Vlan(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL c
 /// \return  Cette fonction retourne 0 si le paquet ne contient pas de tag
 ///          VLAN.
 /// \endcond
-unsigned short Ethernet_VlanTag(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_DEVICE unsigned short Ethernet_VlanTag(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
 	unsigned short lType_nh = *((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 

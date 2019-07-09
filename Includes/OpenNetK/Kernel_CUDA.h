@@ -12,7 +12,7 @@
 // Macros
 /////////////////////////////////////////////////////////////////////////////
 
-#define OPEN_NET_CONSTANT            __constant__
+#define OPEN_NET_CONSTANT
 #define OPEN_NET_DEVICE              __device__
 #define OPEN_NET_GLOBAL
 #define OPEN_NET_GLOBAL_MEMORY_FENCE __threadfence_system()
