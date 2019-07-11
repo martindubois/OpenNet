@@ -225,12 +225,14 @@ void Adapter_Internal::Start()
     assert(   0 <  mBufferCount);
     assert(NULL != mHandle     );
 
+    // We must call IOCTL_START before starting the event processing thread
+    // because IOCTL_START flush events from previous acquisition.
+    mHandle->Control(IOCTL_START, mBuffers, sizeof(OpenNetK::Buffer) * mBufferCount, NULL, 0);
+
     if (NULL != mEvent_Callback)
     {
         ThreadBase::Start();
     }
-
-    mHandle->Control(IOCTL_START, mBuffers, sizeof(OpenNetK::Buffer) * mBufferCount, NULL, 0);
 
     mRunning = true;
 }
@@ -865,6 +867,7 @@ Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::Debug
     , mProcessor  (NULL     )
     , mRunning    (false    )
     , mSourceCode (NULL     )
+    , mThread     (NULL     )
 {
     assert(NULL != aHandle  );
     assert(NULL != aDebugLog);

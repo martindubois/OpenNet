@@ -1521,6 +1521,14 @@ namespace OpenNetK
             mBuffer.mRx = 0;
             mBuffer.mTx = 0;
 
+            // IMPORTANT  The OpenNet.dll must call IOCTL_START before
+            //            starting the event processing thread.
+
+            // We flush events from a previous acquisition. We flush them at
+            // start to avoir flushing the cancel event at stop on Linux.
+            mEvent_In  = 0;
+            mEvent_Out = 0;
+
             if (OPEN_NET_BUFFER_QTY >= (mBuffer.mCount + lCount))
             {
                 for (unsigned int i = 0; i < lCount; i++)
@@ -1681,9 +1689,6 @@ namespace OpenNetK
         OpenNetK_IoCtl_Result lResult;
 
         uint32_t lFlags = mZone0->LockFromThread();
-
-            mEvent_In  = 0;
-            mEvent_Out = 0;
 
             if (0 < mBuffer.mCount)
             {
