@@ -4,7 +4,7 @@ Copyright  (C) 2019 KMS. All rights reserved
 Product    OpenNet
 File       OpenNet/_DocUser/ReadMe.txt
 
-1.0.8
+1.0.9
 
 - STATUS_CUDA_ERROR
 
