@@ -4,6 +4,10 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/ARP.h
+/// \brief      ARP_Destination, ARP_ETHERNET_TYPE_nh, ARP_Protocol,
+///             ARP_Source (RT)
+
+// CODE REVIEW    2019-07-16  KMS - Martin Dubois, ing.
 
 // TEST COVERAGE  2019-05-03  KMS - Martin Dubois, ing.
 
@@ -37,7 +41,7 @@
 /// \return  Cette fonction retourne un pointeur vers l'adresse
 ///          questionn&eacute;e.
 /// \endcond
-OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * ARP_Destination(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned short * ARP_Destination(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 24));
 }
@@ -52,7 +56,7 @@ OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * ARP_Destination(OPEN_NET_GLOBAL
 /// \param   aData  Un pointeur vers l'ent&ecirc;te ARP
 /// \return  Cette fonction retourne le protocole.
 /// \endcond
-OPEN_NET_DEVICE unsigned short ARP_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
+unsigned short ARP_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 {
 	return (*((OPEN_NET_GLOBAL unsigned short *)(aData + 2)));
 }
@@ -69,7 +73,7 @@ OPEN_NET_DEVICE unsigned short ARP_Protocol(OPEN_NET_GLOBAL unsigned char * aDat
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          provenance.
 /// \endcond
-OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * ARP_Source(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned short * ARP_Source(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 14));
 }

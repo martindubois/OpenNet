@@ -3,7 +3,13 @@
 
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright &copy; 2019 KMS. All rights reserved.
-/// \file       Includes/OpenNetK/Kernel.h (RT)
+/// \file       Includes/OpenNetK/Kernel.h
+/// \brief      OPEN_NET_ASSERT, OPEN_NET_FUNCTION_BEGIN,
+///             OPEN_NET_FUNCTION_DECLARE, OPEN_NET_FUNCTION_END,
+///             OPEN_NET_KERNEL_BEGIN, OPEN_NET_KERNEL_DECLARE,
+///             OPEN_NET_KERNEL_END (RT)
+
+/// CODE REVIEW  2019-07-16  KMS - Martin Dubois, ing.
 
 #pragma once
 
@@ -52,7 +58,7 @@
 /// \param  F  Le nom de la fonction
 /// \endcond
 #define OPEN_NET_FUNCTION_DECLARE(F)                                                        \
-    OPEN_NET_DEVICE void F( OPEN_NET_GLOBAL OpenNet_BufferHeader * aBufferHeader )
+    void F( OPEN_NET_GLOBAL OpenNet_BufferHeader * aBufferHeader )
 
 /// \cond en
 /// \brief  Begining of a packet processing function

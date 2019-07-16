@@ -334,11 +334,12 @@ nvrtcProgram Processor_CUDA::Program_CreateAndCompile( OpenNet::Kernel * aKernel
     sprintf( lInclude, "-I %s", gFolderFinder->GetIncludeFolder());
 
     unsigned int lOptionCount = 0;
-    const char * lOptions[ 4 ];
+    const char * lOptions[ 5 ];
 
     lOptions[ lOptionCount ] = lInclude                       ; lOptionCount ++;
     lOptions[ lOptionCount ] = "-D _OPEN_NET_CUDA_"           ; lOptionCount ++;
     lOptions[ lOptionCount ] = "--gpu-architecture=compute_61"; lOptionCount ++;
+    lOptions[ lOptionCount ] = "--device-as-default-execution-space"; lOptionCount ++;
 
     char lAdapterNo[64];
 
@@ -347,6 +348,8 @@ nvrtcProgram Processor_CUDA::Program_CreateAndCompile( OpenNet::Kernel * aKernel
         sprintf( lAdapterNo, "-D OPEN_NET_ADAPTER_NO=(%u)", aAdapterNo );
         lOptions[ lOptionCount ] = lAdapterNo; lOptionCount ++;
     }
+
+    size_t lSize_byte;
 
     try
     {
@@ -357,14 +360,15 @@ nvrtcProgram Processor_CUDA::Program_CreateAndCompile( OpenNet::Kernel * aKernel
         mDebugLog->Log(__FILE__, __CLASS__ "Program_CreateAndCompile", __LINE__);
         mDebugLog->Log( eE );
 
-        size_t lSize_byte;
-
         NVRTCW_GetProgramLogSize(   lResult, & lSize_byte );
         NVRTCW_GetProgramLog    (   lResult, aKernel->AllocateBuildLog( lSize_byte ) );
         NVRTCW_DestroyProgram   ( & lResult );
 
         throw;
     }
+
+    NVRTCW_GetProgramLogSize( lResult, & lSize_byte );
+    NVRTCW_GetProgramLog    ( lResult, aKernel->AllocateBuildLog( lSize_byte ) );
 
     return lResult;
 }

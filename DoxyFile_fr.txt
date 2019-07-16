@@ -5,6 +5,7 @@
 
 ENABLED_SECTIONS   = fr
 GENERATE_LATEX     = NO
+HAVE_DOT           = NO
 HIDE_UNDOC_MEMBERS = YES
 INPUT              = Includes Includes/OpenNet Includes/OpenNetK
 OUTPUT_DIRECTORY   = doxygen_fr

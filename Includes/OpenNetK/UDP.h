@@ -2,8 +2,12 @@
 // Product  OpenNet
 
 /// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright &copy; 1029 KMS. All rights reserved.
+/// \copyright  Copyright &copy; 2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/UDP.h
+/// \brief      UDP_Data, UDP_DestinationPort, UDP_HEADER_SIZE_byte,
+///             UDP_IP_PROTOCOL, UDP_SourcePort (RT)
+
+// CODE REVIEW    2019-07-16  KMS - Martin Dubois, ing.
 
 // TEST COVERAGE  2019-05-10  KMS - Martin Dubois, ing.
 
@@ -43,7 +47,7 @@
 /// \param   aData  Un pointeur vers l'ent&ecirc;te UDP
 /// \return  Cette fonction retourne l'adresse de la charge utile.
 /// \endcond
-OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned char * UDP_Data(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned char * UDP_Data(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return (aData + UDP_HEADER_SIZE_byte);
 }
@@ -58,7 +62,7 @@ OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned char * UDP_Data(OPEN_NET_GLOBAL unsigne
 /// \param   aData  Un pointeur vers l'ent&ecirc;te UDP
 /// \return  Cette fonction retourne le port de destination.
 /// \endcond
-OPEN_NET_DEVICE unsigned short UDP_DestinationPort(OPEN_NET_GLOBAL const unsigned char * aData)
+unsigned short UDP_DestinationPort(OPEN_NET_GLOBAL const unsigned char * aData)
 {
     return (*((OPEN_NET_GLOBAL const unsigned short *)(aData + 2)));
 }
@@ -73,7 +77,7 @@ OPEN_NET_DEVICE unsigned short UDP_DestinationPort(OPEN_NET_GLOBAL const unsigne
 /// \param   aData  Un pointeur vers l'ent&ecirc;te UDP
 /// \return  Cette fonction retourne le port de source.
 /// \endcond
-OPEN_NET_DEVICE unsigned short UDP_SourcePort(OPEN_NET_GLOBAL const unsigned char * aData)
+unsigned short UDP_SourcePort(OPEN_NET_GLOBAL const unsigned char * aData)
 {
     return (*((OPEN_NET_GLOBAL const unsigned short *)(aData + 0)));
 }

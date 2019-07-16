@@ -4,6 +4,11 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Ethernet.h
+/// \brief      Ethernet_Data, Ethernet_DataSize, Ethernet_Destination,
+///             Ethernet_Source, Ethernet_Type, Ethernet_Vlan,
+///             ETHERNET_VLAN_TAN_ID_nh. Ethernet_VlanTag (RT)
+
+// CODE REVIEW    2019-07-16  KMS - Martin Dubois, ing.
 
 // TEST COVERAGE  2019-05-10  KMS - Martin Dubois, ing.
 
@@ -12,6 +17,12 @@
 // Constant
 /////////////////////////////////////////////////////////////////////////////
 
+/// \cond    en
+/// \brief   The Ethernet VLAN tag
+/// \endcond
+/// \cond    fr
+/// \brief   Le tag VLAN d'Ethernet
+/// \endcond
 #define ETHERNET_VLAN_TAG_ID_nh (0x0081)
 
 #ifndef _OPEN_NET_NO_FUNCTION_
@@ -35,7 +46,7 @@
 /// \return  Cette fonction retourne un pointeur vers la charge utile du
 ///          paquet Ethernet.
 /// \endcond
-OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned char * Ethernet_Data( OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_GLOBAL unsigned char * Ethernet_Data( OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
     unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
@@ -58,7 +69,7 @@ OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned char * Ethernet_Data( OPEN_NET_GLOBAL u
 /// \return  Cette fonction retourne la taille de la charge utile du paquet
 ///          Ethernet.
 /// \endcond
-OPEN_NET_DEVICE unsigned int Ethernet_DataSize(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+unsigned int Ethernet_DataSize(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
     unsigned short lType_nh = *((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
@@ -83,7 +94,7 @@ OPEN_NET_DEVICE unsigned int Ethernet_DataSize(OPEN_NET_GLOBAL unsigned char * a
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          destination.
 /// \endcond
-OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * Ethernet_Destination(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_GLOBAL unsigned short * Ethernet_Destination(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
 	return ((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 0));
 }
@@ -102,7 +113,7 @@ OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * Ethernet_Destination(OPEN_NET_G
 ///          traiter
 /// \return  Cette fonction retourne un pointeur vers l'adresse de source.
 /// \endcond
-OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * Ethernet_Source(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+OPEN_NET_GLOBAL unsigned short * Ethernet_Source(OPEN_NET_GLOBAL unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
 	return ((OPEN_NET_GLOBAL unsigned short *)(aBase + aPacketInfo->mOffset_byte + 6));
 }
@@ -121,7 +132,7 @@ OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * Ethernet_Source(OPEN_NET_GLOBAL
 ///          traiter
 /// \return  Cette fonction retourne le type du paquet Ethernet.
 /// \endcond
-OPEN_NET_DEVICE unsigned short Ethernet_Type(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+unsigned short Ethernet_Type(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
     unsigned short lType_nh = *((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
@@ -144,7 +155,7 @@ OPEN_NET_DEVICE unsigned short Ethernet_Type(OPEN_NET_GLOBAL const unsigned char
 /// \retval  0  Non
 /// \retval  1  Oui
 /// \endcond
-OPEN_NET_DEVICE int Ethernet_Vlan(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+int Ethernet_Vlan(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
 	unsigned short lType_nh = *((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 
@@ -167,7 +178,7 @@ OPEN_NET_DEVICE int Ethernet_Vlan(OPEN_NET_GLOBAL const unsigned char * aBase, O
 /// \return  Cette fonction retourne 0 si le paquet ne contient pas de tag
 ///          VLAN.
 /// \endcond
-OPEN_NET_DEVICE unsigned short Ethernet_VlanTag(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
+unsigned short Ethernet_VlanTag(OPEN_NET_GLOBAL const unsigned char * aBase, OPEN_NET_GLOBAL const OpenNet_PacketInfo * aPacketInfo)
 {
 	unsigned short lType_nh = *((OPEN_NET_GLOBAL const unsigned short *)(aBase + aPacketInfo->mOffset_byte + 12));
 

@@ -6,6 +6,8 @@
 /// \file       Includes/OpenNetK/ByteOrder.h
 /// \brief      ByteOrder_Swap16, ByteOrder_Swap32 (RT)
 
+// CODE REVIEW    2019-07-16  KMS - Martin Dubois, ing.
+
 // TEST COVERAGE  2019-05-03  KMS - Martin Dubois, ing.
 
 #pragma once
@@ -26,7 +28,7 @@
 /// \return  Cette m&eacute;thode retourne la valeur d'entr&eacute;e avec
 ///          l'ordre des octet invers&eacute;
 /// \endcond
-OPEN_NET_DEVICE unsigned short ByteOrder_Swap16(unsigned short aIn)
+unsigned short ByteOrder_Swap16(unsigned short aIn)
 {
     return ((aIn >> 8) | (aIn << 8));
 }
@@ -42,7 +44,7 @@ OPEN_NET_DEVICE unsigned short ByteOrder_Swap16(unsigned short aIn)
 /// \return  Cette m&eacute;thode retourne la valeur d'entr&eacute;e avec
 ///          l'ordre des octet invers&eacute;
 /// \endcond
-OPEN_NET_DEVICE unsigned int ByteOrder_Swap32(unsigned int aIn)
+unsigned int ByteOrder_Swap32(unsigned int aIn)
 {
     return ((aIn >> 24) | ((aIn >> 8) & 0x0000ff00) | ((aIn << 8) & 0x00ff0000) | (aIn << 24));
 }

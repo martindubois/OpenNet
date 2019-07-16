@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #define OPEN_NET_CONSTANT const
-#define OPEN_NET_DEVICE
 #define OPEN_NET_GLOBAL
 
 // Includes - Part 2

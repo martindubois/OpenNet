@@ -4,6 +4,11 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright &copy; 1029 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/IPv6.h
+/// \brief      IPv6_Data, IPv6_DataSize, IPv6_Destination,
+///             IPv6_ETHERNET_TYPE_nh, IPv6_HEADER_SIZE_byte, IPv6_Protocol,
+///             IPv6_Source (RT)
+
+// CODE REVIEW    2019-07-16  KMS - Martin Dubois, ing.
 
 // TEST COVERAGE  2019-05-10  KMS - Martin Dubois, ing.
 
@@ -52,7 +57,7 @@
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne un pointeur vers la charge utile.
 /// \endcond
-OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned char * IPv6_Data(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned char * IPv6_Data(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ( aData + IPv6_HEADER_SIZE_byte );
 }
@@ -67,7 +72,7 @@ OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned char * IPv6_Data(OPEN_NET_GLOBAL unsign
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne la taille de la charge utile.
 /// \endcond
-OPEN_NET_DEVICE unsigned int IPv6_DataSize(OPEN_NET_GLOBAL unsigned char * aData)
+unsigned int IPv6_DataSize(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ByteOrder_Swap16(*((OPEN_NET_GLOBAL unsigned short *)(aData + 4)));
 }
@@ -84,7 +89,7 @@ OPEN_NET_DEVICE unsigned int IPv6_DataSize(OPEN_NET_GLOBAL unsigned char * aData
 /// \return  Cette fonction retourne un pointeur vers l'adresse de
 ///          destination.
 /// \endcond
-OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * IPv6_Destination(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned short * IPv6_Destination(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 24));
 }
@@ -99,7 +104,7 @@ OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * IPv6_Destination(OPEN_NET_GLOBA
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne le protocole.
 /// \endcond
-OPEN_NET_DEVICE unsigned char IPv6_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
+unsigned char IPv6_Protocol(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return aData[6];
 }
@@ -114,7 +119,7 @@ OPEN_NET_DEVICE unsigned char IPv6_Protocol(OPEN_NET_GLOBAL unsigned char * aDat
 /// \param   aData  Un pointeur vers l'ent&ecirc;te IPv6
 /// \return  Cette fonction retourne un pointeur vers l'adresse de provenance.
 /// \endcond
-OPEN_NET_DEVICE OPEN_NET_GLOBAL unsigned short * IPv6_Source(OPEN_NET_GLOBAL unsigned char * aData)
+OPEN_NET_GLOBAL unsigned short * IPv6_Source(OPEN_NET_GLOBAL unsigned char * aData)
 {
     return ((OPEN_NET_GLOBAL unsigned short *)(aData + 8));
 }
