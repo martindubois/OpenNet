@@ -38,28 +38,34 @@ if [ 0 != $? ] ; then
     RESULT=3
 fi
 
+scp Includes/OpenNetK/*.h $TEST_COMPUTER:$DST_FOLDER/Includes/OpenNetK
+if [ 0 != $? ] ; then
+    echo ERROR  scp Includes/OpenNetK/*.h $TEST_COMPUTER:$DST_FOLDER/Includes/OpenNetK  failed
+    RESULT=4
+fi
+
 scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Pro1000
 if [ 0 != $? ] ; then
     echo ERROR  scp ONK_Pro1000/ONK_Pro1000.ko $TEST_COMPUTER:$DST_FOLDER/ONK_Pro1000  failed
-    RESULT=4
+    RESULT=5
 fi
 
 scp Packages/kms-opennet_0.0-1.deb $TEST_COMPUTER:$DST_FOLDER/Packages
 if [ 0 != $? ] ; then
     echo ERROR  scp Packages/kms-opennet-rt_0.0-0.deb $TEST_COMPUTER:$DST_FOLDER/Packages  failed
-    RESULT=5
+    RESULT=6
 fi
 
 scp Scripts/OpenNet_Setup.sh $TEST_COMPUTER:$DST_FOLDER/Scripts
 if [ 0 != $? ] ; then
     echo ERROR  scp Scripts/OpenNet_Setup.sh $TEST_COMPUTER:$DST_FOLDER/Scripts  failed
-    RESULT=6
+    RESULT=7
 fi
 
 scp Scripts/OpenNet_Tool/*.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool
 if [ 0 != $? ] ; then
     echo ERROR  scp Scripts/OpenNet_Tool/A00RRU_*_18.04.txt $TEST_COMPUTER:$DST_FOLDER/Scripts/OpenNet_Tool  failed
-    RESULT=7
+    RESULT=8
 fi
 
 # ===== End =================================================================

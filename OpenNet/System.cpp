@@ -72,6 +72,7 @@ namespace OpenNet
         {
             printf( __NAMESPACE__ __CLASS__ "Create - Exception\n" );
             eE->Write( stdout );
+            lResult = NULL;
         }
         catch ( ... )
         {
@@ -90,8 +91,14 @@ namespace OpenNet
         {
             delete this;
         }
+        catch ( KmsLib::Exception * eE )
+        {
+            printf( __NAMESPACE__ __CLASS__ "Delete - Exception\n" );
+            eE->Write( stdout );
+        }
         catch (...)
         {
+            printf( __NAMESPACE__ __CLASS__ "Delete - Unknown exception\n" );
         }
     }
 

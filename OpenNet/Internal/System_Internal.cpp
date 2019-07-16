@@ -357,12 +357,12 @@ OpenNet::Status System_Internal::Start(unsigned int aFlags)
 
     mStartFlags = 0;
 
-    Threads_Release();
-
     OpenNet::Status lResult = OpenNet::STATUS_NO_ADAPTER_CONNECTED;
 
     try
     {
+        Threads_Release();
+
         Thread * lThread;
 
         unsigned int i;

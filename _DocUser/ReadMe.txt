@@ -4,6 +4,8 @@ Copyright  (C) 2018-2019 KMS. All rights reserved.
 Product    OpenNet
 File       _DocUser/ReadMe.txt
 
+1.0.10
+
 - Remove OPEN_NET_DEVICE macro by compiling CUDA code with
   --device-as-default-execution-space
 

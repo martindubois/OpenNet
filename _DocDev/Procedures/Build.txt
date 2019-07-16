@@ -28,10 +28,11 @@ Version            ______ . ______ - ______
 
 [ ] File "Scripts/control" - Edit the version
 [ ] File "Scripts/control_DDK" - Edit the version
-[ ] File "Scripts/OpenNet_Setup.sh - Edit the version
-[ ] File "Scripts/postinst.sh" - Edit the version
-[ ] File "Scripts/prerm.sh" - Edit the version
+[ ] File "Scripts/OpenNet_Setup.sh - Edit the version, if needed
+[ ] File "Scripts/postinst.sh" - Edit the version, if needed
+[ ] File "Scripts/prerm.sh" - Edit the version, if needed
 [ ] Tool "Terminal" - In the product folder
+        ./RunDoxygen.sh
         ./Build.sh {Major.Minor.Build_Type}
 [ ] Copy the exported file on the server
 
