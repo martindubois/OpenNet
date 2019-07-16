@@ -22,6 +22,7 @@ extern void CUW_DeviceGetCount     ( int * aCount );
 extern void CUW_DeviceGetName      ( char * aName, int aSize_byte, CUdevice aDevice );
 extern void CUW_DeviceTotalMem     ( size_t * aSize_byte, CUdevice aDevice );
 extern void CUW_EventElapsedTime   ( float * aElapsed_ms, CUevent aStart, CUevent aEnd );
+extern void CUW_FuncGetAttribute   ( int * aOut, CUfunction_attribute aAttr, CUfunction aFunction );
 extern void CUW_Init               ( unsigned int aFlags );
 extern void CUW_MemcpyDtoH         ( void * aDst, CUdeviceptr aSrc_DA, size_t aSize_byte );
 extern void CUW_PointerSetAttribute( const void * aValue, CUpointer_attribute aAttribute, CUdeviceptr aPtr_DA );

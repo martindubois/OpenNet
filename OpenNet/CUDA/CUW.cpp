@@ -124,6 +124,15 @@ void CUW_EventElapsedTime( float * aElapsed_ms, CUevent aStart, CUevent aEnd )
     VERIFY_RET( "cuEventElapsedTime( , ,  ) failed" );
 }
 
+void CUW_FuncGetAttribute( int * aOut, CUfunction_attribute aAttr, CUfunction aFunction )
+{
+    assert( NULL != aOut      );
+    assert( NULL != aFunction );
+
+    CUresult lRet = cuFuncGetAttribute( aOut, aAttr, aFunction );
+    VERIFY_RET( "cuFuncGetAttribute( , ,  ) failed" );
+}
+
 void CUW_Init( unsigned int aFlags )
 {
     CUresult lRet = cuInit( aFlags );

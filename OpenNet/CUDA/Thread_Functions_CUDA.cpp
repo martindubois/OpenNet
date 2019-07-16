@@ -52,7 +52,7 @@ void Thread_Functions_CUDA::Prepare()
     mModule = lProcessor->Module_Create( & mKernelFunctions, ADAPTER_NO_UNKNOWN );
     assert( NULL != mModule );
 
-    Thread_CUDA::Prepare( & mAdapters, & mBuffers, false );
+    Thread_CUDA::Prepare( & mAdapters, & mBuffers, false, & mKernelFunctions );
 
     Thread_Functions::Prepare();
 }

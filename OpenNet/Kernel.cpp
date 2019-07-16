@@ -59,9 +59,28 @@ static const OpenNet::StatisticsProvider::StatisticsDescription STATISTICS_DESCR
     VALUE_VECTOR_DESCRIPTION_RESERVED,
     VALUE_VECTOR_DESCRIPTION_RESERVED,
 
-    { "EXECUTION - DURATION - LAST", "us", 0 },
-    { "QUEUE     - DURATION - LAST", "us", 0 },
-    { "SUBMIT    - DURATION - LAST", "us", 0 }, // 15
+    { "EXECUTION - DURATION - LAST (NR)", "us", 0 },
+    { "QUEUE     - DURATION - LAST (NR)", "us", 0 },
+    { "SUBMIT    - DURATION - LAST (NR)", "us", 0 }, // 15
+    // 1.0.0
+
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED, // 20
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+    VALUE_VECTOR_DESCRIPTION_RESERVED,
+
+    { "BINARY_VERSION          (NR)", ""    , 0 },
+    { "CACHE_MODE_CA           (NR)", ""    , 0 },
+    { "CONST_SIZE              (NR)", "byte", 1 }, // 25
+    { "LOCAL_SIZE              (NR)", "byte", 1 },
+    { "MAX_DYNAMIC_SHARED_SIZE (NR)", "byte", 0 },
+    { "MAX_THREAD_PER_BLOCK    (NR)", ""    , 0 },
+    { "NUM_REGS                (NR)", ""    , 1 },
+    { "PTX_VERSION             (NR)", ""    , 0 }, // 31
+    { "SHARED_SIZE             (NR)", "byte", 1 },
 };
 
 namespace OpenNet
@@ -401,6 +420,15 @@ namespace OpenNet
         assert(NULL == mCommandQueue);
 
         mCommandQueue = aCommandQueue;
+    }
+
+    void Kernel::SetStatistics( unsigned int aIndex, unsigned int aValue )
+    {
+        assert( KERNEL_STATS_QTY > aIndex );
+
+        assert( NULL != mStatistics );
+
+        mStatistics[ aIndex ] = aValue;
     }
 
     // aEvent [---;R--]

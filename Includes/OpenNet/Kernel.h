@@ -4,7 +4,7 @@
 /// \author     KMS - Martin Dubois, ing.
 /// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
 /// \file       Includes/OpenNet/Kernel.h
-/// \brief      OpenNet::Kernel
+/// \brief      OpenNet::Kernel (SDK)
 
 #pragma once
 
@@ -183,6 +183,8 @@ namespace OpenNet
         void ResetCommandQueue();
 
         void SetCommandQueue(void * aCommandQueue);
+
+        void SetStatistics( unsigned int aIndex, unsigned int aValue );
 
         void AddStatistics( Event * aEvent );
 

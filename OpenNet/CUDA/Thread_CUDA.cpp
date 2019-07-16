@@ -15,6 +15,9 @@
 // ===== C ==================================================================
 #include <stdint.h>
 
+// ===== Common =============================================================
+#include "../Common/OpenNet/Kernel_Statistics.h"
+
 // ===== OpenNet/CUDA =======================================================
 
 #include "../Linux/Adapter_Linux.h"
@@ -43,16 +46,18 @@ Thread_CUDA::~Thread_CUDA()
 // aAdapters [---;RW-]
 // aBuffers  [---;RW-]
 // aProfiling
+// aKernel   [---;RW-]
 //
 // Exception  KmsLib::Exception *  See CUW_StreamCreate, CUW_ModuleFunction
 //                                 and Adapter_Linux::Buffers_Allocate
 //
 // Thread_CUDA::Prepare ==> Thread_CUDA::Release
-void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Internal_Vector * aBuffers, bool aProfiling )
+void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Internal_Vector * aBuffers, bool aProfiling, OpenNet::Kernel * aKernel )
 {
     assert( NULL != aAdapters         );
     assert(    0 <  aAdapters->size() );
     assert( NULL != aBuffers          );
+    assert( NULL != aKernel           );
 
     assert( NULL != mModule         );
     assert( NULL != mProcessor_CUDA );
@@ -66,6 +71,18 @@ void Thread_CUDA::Prepare( Adapter_Vector * aAdapters, Buffer_Internal_Vector * 
 
     CUW_ModuleGetFunction( & mFunction, mModule, "Filter" );
     assert( NULL != mFunction );
+
+    int lValue;
+
+    CUW_FuncGetAttribute( & lValue, CU_FUNC_ATTRIBUTE_BINARY_VERSION               , mFunction ); aKernel->SetStatistics( OpenNet::KERNEL_STATS_BINARY_VERSION              , lValue );
+    CUW_FuncGetAttribute( & lValue, CU_FUNC_ATTRIBUTE_CACHE_MODE_CA                , mFunction ); aKernel->SetStatistics( OpenNet::KERNEL_STATS_CACHE_MODE_CA               , lValue );
+    CUW_FuncGetAttribute( & lValue, CU_FUNC_ATTRIBUTE_CONST_SIZE_BYTES             , mFunction ); aKernel->SetStatistics( OpenNet::KERNEL_STATS_CONST_SIZE_byte             , lValue );
+    CUW_FuncGetAttribute( & lValue, CU_FUNC_ATTRIBUTE_LOCAL_SIZE_BYTES             , mFunction ); aKernel->SetStatistics( OpenNet::KERNEL_STATS_LOCAL_SIZE_byte             , lValue );
+    CUW_FuncGetAttribute( & lValue, CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES, mFunction ); aKernel->SetStatistics( OpenNet::KERNEL_STATS_MAX_DYNAMIC_SHARED_SIZE_byte, lValue );
+    CUW_FuncGetAttribute( & lValue, CU_FUNC_ATTRIBUTE_MAX_THREADS_PER_BLOCK        , mFunction ); aKernel->SetStatistics( OpenNet::KERNEL_STATS_MAX_THREADS_PER_BLOCK       , lValue );
+    CUW_FuncGetAttribute( & lValue, CU_FUNC_ATTRIBUTE_NUM_REGS                     , mFunction ); aKernel->SetStatistics( OpenNet::KERNEL_STATS_NUM_REGS                    , lValue );
+    CUW_FuncGetAttribute( & lValue, CU_FUNC_ATTRIBUTE_PTX_VERSION                  , mFunction ); aKernel->SetStatistics( OpenNet::KERNEL_STATS_PTX_VERSION                 , lValue );
+    CUW_FuncGetAttribute( & lValue, CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES            , mFunction ); aKernel->SetStatistics( OpenNet::KERNEL_STATS_SHARED_SIZE_byte            , lValue );
 
     unsigned int i;
 

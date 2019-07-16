@@ -4,13 +4,12 @@
 // Product    OpenNet
 // File       OpenNet/CUDA/Thread_CUDA.h
 
+// CODE REVIEW  2019-07-16  KMS - Martin Dubois, ing.
+
 #pragma once
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
-
-// ===== C ==================================================================
-#include <semaphore.h>
 
 // ===== CUDA ===============================================================
 #include <cuda.h>
@@ -36,7 +35,7 @@ protected:
 
     virtual ~Thread_CUDA();
 
-    void Prepare( Adapter_Vector * aAdapters, Buffer_Internal_Vector * aBuffers, bool aProfiling );
+    void Prepare( Adapter_Vector * aAdapters, Buffer_Internal_Vector * aBuffers, bool aProfiling, OpenNet::Kernel * aKernel );
 
     void Processing_Queue(OpenNet::Kernel * aKernel, Event * aEvent, const size_t * aGlobalSize, const size_t * aLocalSize, void * * aArguments );
 
