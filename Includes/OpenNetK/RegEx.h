@@ -152,7 +152,7 @@
 /// The begining of the string
 /// \endcond
 /// \cond    fr
-/// Le d&eacute;but de la cha&icric;ne
+/// Le d&eacute;but de la cha&icirc;ne
 /// \endcond
 /// \sa      REG_EX_STATE_START
 #define REG_EX_START     (char)(0xfd)
@@ -214,7 +214,7 @@
 ///          table
 /// \endcond
 /// \cond    fr
-/// \bried   Cette macro appel RegEx_Create pour cr&eacute;er un instance
+/// \brief   Cette macro appel RegEx_Create pour cr&eacute;er un instance
 ///          &agrave; partir de la table d'&eacute;tats
 /// \endcond
 /// \sa      RegEx_Create
@@ -367,7 +367,7 @@
 /// The begining of the string
 /// \endcond
 /// \cond    fr
-/// Le d&eacute;but de la cha&icric;ne
+/// Le d&eacute;but de la cha&icirc;ne
 /// \endcond
 /// \sa      REG_EX_START
 #define REG_EX_STATE_START           { REG_EX_START    ,   0,   0,   0 }

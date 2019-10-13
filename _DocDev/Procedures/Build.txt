@@ -56,6 +56,7 @@ Version            ______ . ______ - ______
 [ ] Diconnect the signing key from the computer
 If signing driver is needed
 	[ ] Website https://partner.microsoft.com/en-us/dashboard/hardware/Search
+		- Login using aadeqikaaeewuy@kmsquebec.onmicrosoft.com account
 		- CLick "Submit new hardware"
 		- Enter "OpenNet" in the product name box
 		- Click "browse your files"
@@ -64,6 +65,7 @@ If signing driver is needed
 		- Click "Submit"
 	[ ] Wait until Microsoft indicate that submission has been accespted
 	[ ] Website https://partner.microsoft.com/en-us/dashboard/hardware/Search
+		- Login using aadeqikaaeewuy@kmsquebec.onmicrosoft.com account
 		- Click the first submission
 		- Click "More"
 		- Click "Download signed files"
