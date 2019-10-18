@@ -238,7 +238,7 @@
     <ClInclude Include="Windows\SetupTool_Windows.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="_DocUser\ReadMe.txt" />
+    <Text Include="_DocUser\OpenNet.OpenNet.ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

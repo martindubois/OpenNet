@@ -90,23 +90,35 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Build.cmd = Build.cmd
+		Build.sh = Build.sh
 		Build_Signed.cmd = Build_Signed.cmd
+		Clean.sh = Clean.sh
 		CreateCab.cmd = CreateCab.cmd
+		CreatePackages.sh = CreatePackages.sh
 		DoxyFile_en.txt = DoxyFile_en.txt
 		DoxyFile_fr.txt = DoxyFile_fr.txt
 		Export.cmd = Export.cmd
 		Export.cmd.txt = Export.cmd.txt
+		Export.sh = Export.sh
+		Export.txt = Export.txt
 		Export_Signed.cmd = Export_Signed.cmd
 		Export_Signed.cmd.txt = Export_Signed.cmd.txt
 		Import.cmd = Import.cmd
+		Import.sh = Import.sh
+		Kernel.mk = Kernel.mk
+		Make.sh = Make.sh
 		OpenNet.ddf = OpenNet.ddf
 		OpenNet.iss = OpenNet.iss
 		OpenNet_Signed.iss = OpenNet_Signed.iss
 		README.md = README.md
 		RunDoxygen.cmd = RunDoxygen.cmd
+		RunDoxygen.sh = RunDoxygen.sh
 		Test.cmd = Test.cmd
+		Test.sh = Test.sh
+		UpdateDepend.sh = UpdateDepend.sh
 		UploadDocumentation.cmd = UploadDocumentation.cmd
 		UploadDocumentation.cmd.txt = UploadDocumentation.cmd.txt
+		User.mk = User.mk
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocDev", "_DocDev", "{2347E8F1-0547-43FF-9456-724FC9DAC35F}"
@@ -129,7 +141,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ONK_Pro1000", "ONK_Pro1000\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocUser", "_DocUser", "{5714C93D-2416-4B15-9AA1-490A1D131BFE}"
 	ProjectSection(SolutionItems) = preProject
-		_DocUser\ReadMe.txt = _DocUser\ReadMe.txt
+		_DocUser\OpenNet.ReadMe.txt = _DocUser\OpenNet.ReadMe.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet", "OpenNet", "{B4675DF3-6BF9-483B-AB9F-11FAF0BFC219}"
@@ -158,8 +170,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestLib", "TestLib", "{F717
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{DDC857B0-A3ED-4E00-9A0F-5AAAB745368D}"
 	ProjectSection(SolutionItems) = preProject
+		Scripts\control = Scripts\control
+		Scripts\control_DDK = Scripts\control_DDK
+		Scripts\CreateTestTree.sh = Scripts\CreateTestTree.sh
 		Scripts\Import.cmd = Scripts\Import.cmd
 		Scripts\Import.cmd.txt = Scripts\Import.cmd.txt
+		Scripts\Import.sh = Scripts\Import.sh
+		Scripts\Import.txt = Scripts\Import.txt
+		Scripts\OpenNet_Setup.sh = Scripts\OpenNet_Setup.sh
+		Scripts\postinst.sh = Scripts\postinst.sh
+		Scripts\prerm.sh = Scripts\prerm.sh
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet_Tool", "OpenNet_Tool", "{7A086992-CDEA-4B24-96B1-404A882FE13A}"

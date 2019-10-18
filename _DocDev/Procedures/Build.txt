@@ -4,6 +4,8 @@ Copyright  (C) 2019 KMS. All rights reserved.
 Product    OpenNet
 File       _DocDev/Procedures/Build.txt
 
+CODE REVIEW  2019-07-26  KMS - Martin Dubois, ing.
+
 Name               __________________________________________________________
 
 Date and time      20 ______ - ______ - ______                ______ : ______
@@ -14,23 +16,20 @@ Operating system   [ ] Ubuntu 18.04                            [ ] Windows 10
 
 Version            _____ . _____ . _____ . _____ - __________________________
 
-[ ] File "_DocUser/ReadMe.txt"
-[ ] File "ONK_Lib/_DocUser/ReadMe.txt"
-[ ] File "ONK_Pro1000/_DocUser/ReadMe.txt"
-[ ] File "OpenNet/_DocUser/ReadMe.txt"
-[ ] File "OpenNet_Setup/_DocUser/ReadMe.txt"
-[ ] File "OpenNet_Tool/_DocUser/ReadMe.txt"
+[ ] File "_DocUser/OpenNet.ReadMe.txt"
+[ ] File "ONK_Lib/_DocUser/OpenNet.ONK_Lib.ReadMe.txt"
+[ ] File "ONK_Pro1000/_DocUser/OpenNet.ONK_Hardware.ReadMe.txt"
+[ ] File "OpenNet/_DocUser/OpenNet.OpenNet.ReadMe.txt"
+[ ] File "OpenNet_Setup/_DocUser/OpenNet.OpenNet_Setup.ReadMe.txt"
+[ ] File "OpenNet_Tool/_DocUser/OpenNet.OpenNet_Tool.ReadMe.txt"
 
 ===== Ubuntu seulement ======================================================
 [ ] File "CreatePackages.sh" - Edit the version
-
-Version            ______ . ______ - ______
-
 [ ] File "Scripts/control" - Edit the version
 [ ] File "Scripts/control_DDK" - Edit the version
-[ ] File "Scripts/OpenNet_Setup.sh - Edit the version, if needed
-[ ] File "Scripts/postinst.sh" - Edit the version, if needed
-[ ] File "Scripts/prerm.sh" - Edit the version, if needed
+[ ] File "Scripts/OpenNet_Setup.sh - Edit the version if needed
+[ ] File "Scripts/postinst.sh" - Edit the version if needed
+[ ] File "Scripts/prerm.sh" - Edit the version if needed
 [ ] Tool "Terminal" - In the product folder
         ./RunDoxygen.sh
         ./Build.sh {Major.Minor.Build_Type}

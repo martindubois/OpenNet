@@ -101,7 +101,7 @@
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="_DocUser\ReadMe.txt" />
+    <Text Include="_DocUser\OpenNet.OpenNet_Tool.ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Adapter.h" />

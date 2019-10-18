@@ -4,82 +4,20 @@
 # Product    OpenNet
 # File       Export.cmd.txt
 
+# CODE REVIEW  2019-07-26  KMS - Martin Dubois, ing.
+
 . Binaries
 . Drivers
 . Drivers\Debug_64
-. Drivers\Release_64
-. Includes
 . Libraries
 . Tests
 
 .
-	DoxyFile_en.txt
-	DoxyFile_fr.txt
 	RunDoxygen.cmd
-
-_DocUser .
-	ReadMe.txt
-
-Includes/OpenNet
-	Adapter.h
-	Buffer.h
-	Function.h
-	Function_Forward.h
-	Kernel.h
-	Kernel_Forward.h
-	OpenNet.h
-	PacketGenerator.h
-	Processor.h
-	SetupTool.h
-	SourceCode.h
-	StatisticsProvider.h
-	Status.h
-	System.h
-
-Includes/OpenNetK
-    Adapter.h
-	Adapter_Types.h
-	Adapter_WDF.h
-	ARP.h
-	ByteOrder.h
-	Constants.h
-	Debug.h
-	Ethernet.h
-	Hardware.h
-	Hardware_Statistics.h
-	Hardware_WDF.h
-    Interface.h
-	IPv4.h
-	IPv6.h
-	Kernel.h
-	Kernel_OpenCL.h
-	OS.h
-	OSDep.h
-	Packet.h
-	PacketGenerator_Types.h
-	RegEx.h
-	SpinLock.h
-	StdInt.h
-	TCP.h
-	Types.h
-	UDP.h
-	Windows.h
 
 Installer
 # KmsVersion "OpenNet_" ".exe" 3
 	OpenNet_1.0.11.exe
-
-ONK_Lib/_DocUser ONK_Lib
-	ReadMe.txt
-
-ONK_Pro1000/_DocUser ONK_Hardware
-	ReadMe.txt
-
-OpenNet/_DocUser OpenNet
-	ReadMe.txt
-
-OpenNet_Tool/_DocUser OpenNet_Tool
-	ReadMe.txt
 
 Scripts .
 	Import.cmd
@@ -102,17 +40,22 @@ x64/Debug/ONK_Pro1000 Drivers/Debug_64/ONK_Hardware
     ONK_Pro1000.inf
     ONK_Pro1000.sys
 
+x64/Release Tests/Release_64
+    ONK_Test.exe
+    OpenNet_Test.exe
+
+# ===== File also in the installer ==========================================
+
+. Drivers\Release_64
+
 x64/Release Binaries/Release_64
     OpenNet.dll
+	OpenNet_Setup.exe
     OpenNet_Tool.exe
 
 x64/Release Libraries/Release_64
     ONK_Lib.lib
 	OpenNet.lib
-
-x64/Release Tests/Release_64
-    ONK_Test.exe
-    OpenNet_Test.exe
 
 x64/Release/ONK_Pro1000 Drivers/Release_64/ONK_Hardware
     onk_pro1000.cat

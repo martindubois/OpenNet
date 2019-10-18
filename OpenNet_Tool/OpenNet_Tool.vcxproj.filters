@@ -46,11 +46,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="_DocUser\ReadMe.txt">
-      <Filter>_DocUser</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -69,5 +64,10 @@
     <ClInclude Include="Processor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="_DocUser\OpenNet.OpenNet_Tool.ReadMe.txt">
+      <Filter>_DocUser</Filter>
+    </Text>
   </ItemGroup>
 </Project>

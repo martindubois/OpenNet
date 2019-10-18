@@ -6,9 +6,13 @@ rem Product    OpenNet
 rem File       Export_Signed.cmd
 rem Usage      .\Export_Signed.cmd {Ma.Mi.Bu} {Type}
 
+rem CODE REVIEW  2019-07-26  KMS - Martin Dubois, ing.
+
 echo  Executing  Export_Signed.cmd %1 %2  ...
 
 rem ===== Initialization ====================================================
+
+set EXPORT_TXT="Export.txt"
 
 set EXPORT_CMD_TXT="Export_Signed.cmd.txt"
 
@@ -44,11 +48,18 @@ if not exist %KMS_COPY% (
 
 rem ===== Execution =========================================================
 
+%KMS_COPY% . %DST% %EXPORT_TXT%
+if ERRORLEVEL 1 (
+    echo ERROR  %KMS_COPY% . %DST% %EXPORT_TXT%  failed - %ERRORLEVEL%
+	pause
+	exit /B 40
+)
+
 %KMS_COPY% . %DST% %EXPORT_CMD_TXT%
 if ERRORLEVEL 1 (
     echo ERROR  %KMS_COPY% . %DST% %EXPORT_CMD_TXT%  failed - %ERRORLEVEL%
 	pause
-	exit /B 4
+	exit /B 50
 )
 
 rem ===== End ===============================================================

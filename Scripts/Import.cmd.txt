@@ -4,24 +4,17 @@
 # Product    OpenNet
 # File       Scripts/Import.cmd.txt
 
+# CODE REVIEW  2019-07-26  KMS - Martin Dubois, ing.
+
 . Binaries
 . Drivers
 . Drivers\Debug_64
-. Drivers\Release_64
-. Includes
 . Libraries
 
 .
-	DoxyFile_en.txt
-	DoxyFile_fr.txt
 	RunDoxygen.cmd
-	ReadMe.txt
 
 Binaries/Debug_64
-    OpenNet.dll
-    OpenNet_Tool.exe
-
-Binaries/Release_64
     OpenNet.dll
     OpenNet_Tool.exe
 
@@ -30,58 +23,24 @@ Drivers/Debug_64/ONK_Hardware
     ONK_Pro1000.inf
     ONK_Pro1000.sys
 
+Libraries/Debug_64
+    ONK_Lib.lib
+	OpenNet.lib
+
+# ===== File also in the installer ==========================================
+
+. Drivers\Release_64
+
+Binaries/Release_64
+    OpenNet.dll
+	OpenNet_Setup.exe
+    OpenNet_Tool.exe
+
 Drivers/Release_64/ONK_Hardware
     onk_pro1000.cat
     ONK_Pro1000.inf
     ONK_Pro1000.sys
 
-Includes/OpenNet
-	Adapter.h
-	Buffer.h
-	Function.h
-	Function_Forward.h
-	Kernel.h
-	Kernel_Forward.h
-	OpenNet.h
-	PacketGenerator.h
-	Processor.h
-	SetupTool.h
-	SourceCode.h
-	StatisticsProvider.h
-	Status.h
-	System.h
-
-Includes/OpenNetK
-	Adapter_Types.h
-	ARP.h
-	ByteOrder.h
-	Ethernet.h
-	IPv4.h
-	IPv6.h
-	Kernel.h
-	Kernel_OpenCL.h
-	RegEx.h
-	StdInt.h
-	TCP.h
-	Types.h
-	UDP.h
-
-Libraries/Debug_64
-    ONK_Lib.lib
-	OpenNet.lib
-
 Libraries/Release_64
     ONK_Lib.lib
 	OpenNet.lib
-
-ONK_Lib
-	ReadMe.txt
-
-ONK_Hardware
-	ReadMe.txt
-
-OpenNet
-	ReadMe.txt
-
-OpenNet_Tool
-	ReadMe.txt

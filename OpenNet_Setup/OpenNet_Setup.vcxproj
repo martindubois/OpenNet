@@ -179,7 +179,7 @@
     <ClInclude Include="OSDep.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="_DocUser\ReadMe.txt" />
+    <Text Include="_DocUser\OpenNet.OpenNet_Setup.ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

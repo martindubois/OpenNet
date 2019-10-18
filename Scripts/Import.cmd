@@ -4,7 +4,7 @@ rem Author     KMS - Martin Dubois, ing.
 rem Copyright  (C) 2019 KMS. All right reserved
 rem Product    OpenNet
 rem File       Import.cmd
-rem Usage      Import.cmd {Destination}
+rem Usage      .\Import.cmd {Destination}
 
 echo Executing  Import.cmd %1  ...
 
@@ -29,11 +29,18 @@ if not exist %KMS_COPY_EXE% (
 
 rem ===== Execution =========================================================
 
+%KMS_COPY_EXE% . %1 Import.txt
+if ERRORLEVEL 1 (
+    echo ERROR  %KMS_COPY_EXE% . %1 Import.txt  failed - %ERRORLEVEL
+    pause
+    exit /B 30
+)
+
 %KMS_COPY_EXE% . %1 Import.cmd.txt
 if ERRORLEVEL 1 (
     echo ERROR  %KMS_COPY_EXE% . %1 Import.cmd.txt  failed - %ERRORLEVEL
     pause
-    exit /B 3
+    exit /B 40
 )
 
 rem ===== End ===============================================================
