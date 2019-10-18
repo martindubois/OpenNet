@@ -17,7 +17,7 @@
 
 Installer
 # KmsVersion "OpenNet_" ".exe" 3
-	OpenNet_1.0.11.exe
+	OpenNet_1.0.12.exe
 
 Scripts .
 	Import.cmd

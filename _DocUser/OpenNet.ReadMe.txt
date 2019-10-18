@@ -4,6 +4,8 @@ Copyright  (C) 2018-2019 KMS. All rights reserved.
 Product    OpenNet
 File       _DocUser/OpenNet.ReadMe.txt
 
+1.0.12 Test
+
 1.0.11
 
 1.0.10

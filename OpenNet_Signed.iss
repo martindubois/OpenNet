@@ -14,13 +14,13 @@ AppName=OpenNet
 AppPublisher=KMS
 AppPublisherURL=http://www.kms-quebec.com
 AppSupportURL=http://www.kms-quebec.com
-AppVersion=1.0.11
+AppVersion=1.0.12
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 DefaultDirName={pf}\OpenNet
 LicenseFile=License.txt
 MinVersion=10.0
-OutputBaseFilename=OpenNet_1.0.11
+OutputBaseFilename=OpenNet_1.0.12
 OutputDir=Installer
 
 [Files]
