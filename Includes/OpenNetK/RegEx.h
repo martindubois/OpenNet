@@ -616,6 +616,11 @@ int RegEx_Execute_Digit_Not(RegEx * aThis, char aInput)
     return RegEx_Repeat_Min(aThis);
 }
 
+void RegEx_Execute_End(RegEx * aThis)
+{
+    RegEx_StateIndex_Set(aThis, 0);
+}
+
 void RegEx_Execute_Group(RegEx * aThis)
 {
     unsigned short lState = RegEx_StateIndex_Get(aThis);
@@ -905,7 +910,7 @@ int RegEx_Execute(RegEx * aThis, char aInput)
                 case REG_EX_WORD_NOT : lContinue = RegEx_Execute_Word_Not (aThis, aInput); break;
 
                 case REG_EX_DOT   : lContinue = 0; RegEx_Counter_Inc   (aThis); break;
-                case REG_EX_END   : lContinue = 0; RegEx_Thread_Delete (aThis); break;
+                case REG_EX_END   : lContinue = 1; RegEx_Execute_End   (aThis); break;
                 case REG_EX_GROUP : lContinue = 1; RegEx_Execute_Group (aThis); break;
                 case REG_EX_OR    : lContinue = 1; RegEx_Execute_Or    (aThis); break;
                 case REG_EX_RETURN: lContinue = 1; RegEx_Execute_Return(aThis); break;

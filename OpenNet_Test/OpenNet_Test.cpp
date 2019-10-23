@@ -35,7 +35,8 @@ extern int Kernel_Display();
 extern int Kernel_Forward_Base   ();
 extern int Kernel_Forward_Display();
 
-extern int OpenNetK_Base();
+extern int OpenNetK_Base ();
+extern int OpenNetK_RegEx();
 
 extern int Processor_Base();
 
@@ -61,6 +62,7 @@ KMS_TEST_LIST_BEGIN
     KMS_TEST_LIST_ENTRY(Kernel_Forward_Base   , "Kernel_Forward - Base"         , 0, 0)
     KMS_TEST_LIST_ENTRY(Kernel_Forward_Display, "Kernel_Forward - Display"      , 1, KMS_TEST_FLAG_INTERACTION_NEEDED)
     KMS_TEST_LIST_ENTRY(OpenNetK_Base         , "OpenNetK - Base"               , 0, 0)
+    KMS_TEST_LIST_ENTRY(OpenNetK_RegEx        , "OpenNetK - RegEx"              , 0, 0)
     KMS_TEST_LIST_ENTRY(Processor_Base        , "Processor - Base"              , 0, 0)
     KMS_TEST_LIST_ENTRY(SetupTool_Base        , "SetupTool - Base"              , 0, 0)
     KMS_TEST_LIST_ENTRY(SourceCode_Base       , "SourceCode - Base"             , 0, 0)
