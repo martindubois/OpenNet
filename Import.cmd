@@ -3,7 +3,9 @@
 rem Author   KMS - Martin Dubois, ing.
 rem Product  OpenNet
 rem File     Import.cmd
-rem Usage    Import.cmd
+rem Usage    .\Import.cmd
+
+rem CODE REVIEW  2019-07-25  KMS - Martin Dubois, ing.
 
 echo Executing  Import.cmd  ...
 
@@ -13,7 +15,7 @@ set EXPORT_FOLDER=K:\Export
 
 rem ===== Dependencies ======================================================
 
-set KMS_BASE="%EXPORT_FOLDER%\KmsBase\3.0.13_Windows"
+set KMS_BASE="%EXPORT_FOLDER%\KmsBase\3.0.16_Windows"
 
 rem ===== Constants =========================================================
 
