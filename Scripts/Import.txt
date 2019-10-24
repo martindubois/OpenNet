@@ -18,6 +18,7 @@
 	OpenNet.ONK_Hardware.ReadMe.txt
 	OpenNet.ONK_Lib.ReadMe.txt
 	OpenNet.OpenNet.ReadMe.txt
+	OpenNet.OpenNet_Setup.ReadMe.txt
 	OpenNet.OpenNet_Tool.ReadMe.txt
 	OpenNet.ReadMe.txt
 
