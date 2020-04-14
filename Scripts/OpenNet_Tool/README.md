@@ -6,33 +6,7 @@
 
 For Windows, the script in this folder are nammed
 
-	{Setup}{Computer}{User}{Kernel}{KernelDbg}{DebugFilter}{GPU_State}_{GPU}_{OSVersion}.txt
-
-	Setup
-
-		A			A dual port network adapter with each port connected to each other
-
-	Computer
-
-		00			Memory			32 GB
-					Motherboard		ASUS X99-A II
-					Processor		i7-5930K	3.5 GHz
-
-		01			Memory			16 GB
-					Motherboard		MSI Z97-G43
-					Processor		i7-4790		3.6 GHz
-
-	User
-
-		D			Debug
-
-		R			Release
-
-	Kernel
-
-		D			Debug
-
-		R			Release
+	{Link}_{Setup}{Computer}{User}{Kernel}{KernelDbg}{DebugFilter}{GPU_State}_{GPU}_{OSVersion}.txt
 
 	KernelDbg
 
@@ -46,14 +20,6 @@ For Windows, the script in this folder are nammed
 					HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Debug Print Filter\IHVDRIVER
 					in hex format
 
-	GPU_State
-
-		A			Active
-
-		I			Inactive
-
-		U			Used as graphic card
-
 	GPU
 	
 		WX5100
@@ -66,7 +32,23 @@ For Windows, the script in this folder are nammed
 
 For Linux, the scripts in this folder are named
 
-	{Setup}{Computer}{User}{Kernel}{GPU_State}_{GPU}_{OSVersion}.txt
+	{Link}_{Setup}{Computer}{User}{Kernel}{GPU_State}_{GPU}_{OSVersion}.txt
+
+	GPU
+	
+		P4000
+
+	OSVersion
+
+		18.04		Ubuntu 18.04
+
+Common parts
+
+	Link
+
+		1G
+
+		10G
 
 	Setup
 
@@ -101,11 +83,3 @@ For Linux, the scripts in this folder are named
 		I			Inactive
 
 		U			Used as graphic card
-
-	GPU
-	
-		K620
-
-	OSVersion
-
-		18.04		Ubuntu 18.04

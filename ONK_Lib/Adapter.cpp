@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       ONK_Lib/Adapter.cpp
 
@@ -148,6 +148,7 @@ namespace OpenNetK
             #endif
             break;
 
+        case IOCTL_CONFIG_RESET          :
         case IOCTL_EVENT_WAIT_CANCEL     :
         case IOCTL_PACKET_DROP           :
         case IOCTL_PACKET_GENERATOR_START:
@@ -533,6 +534,7 @@ namespace OpenNetK
         case IOCTL_EVENT_WAIT                 : lResult = IoCtl_Event_Wait                (aIn, reinterpret_cast<Event    *>(aOut), aOutSize_byte); break;
         case IOCTL_STATISTICS_GET             : lResult = IoCtl_Statistics_Get            (aIn, reinterpret_cast<uint32_t *>(aOut), aOutSize_byte); break;
 
+        case IOCTL_CONFIG_RESET               : lResult = IoCtl_Config_Reset              (); break;
         case IOCTL_EVENT_WAIT_CANCEL          : lResult = IoCtl_Event_Wait_Cancel         (); break;
         case IOCTL_PACKET_DROP                : lResult = IoCtl_Packet_Drop               (); break;
         case IOCTL_PACKET_GENERATOR_STOP      : lResult = IoCtl_PacketGenerator_Stop      (); break;
@@ -1293,6 +1295,15 @@ namespace OpenNetK
         mZone0->UnlockFromThread(lFlags);
 
         return (0 == lIndex) ? IOCTL_RESULT_WAIT : (sizeof(OpenNetK::Event) * lIndex);
+    }
+
+    int Adapter::IoCtl_Config_Reset()
+    {
+        ASSERT(NULL != mHardware);
+
+        mHardware->ResetConfig();
+
+        return 0;
     }
 
     int Adapter::IoCtl_Event_Wait_Cancel()

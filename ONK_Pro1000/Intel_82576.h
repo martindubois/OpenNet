@@ -1,9 +1,10 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2019-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       ONK_Pro1000/Intel_82576.h
 
+// CODE REVIEW 2020-04-14 KMS - Martin Dubois, P.Eng.
 #pragma once
 
 // Includes
@@ -35,6 +36,7 @@ namespace Intel_82576
     protected:
 
         // ===== Intel ======================================================
+        virtual void Config_Apply_Zone0     ();
         virtual void Interrupt_Disable_Zone0();
         virtual void Reset_Zone0            ();
         virtual void Statistics_Update      ();

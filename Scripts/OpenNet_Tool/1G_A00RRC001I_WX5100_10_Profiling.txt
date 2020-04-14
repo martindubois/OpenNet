@@ -1,8 +1,8 @@
 
-# Author     KMS - Martin Dubois, ing.
-# Copyright  (C) 2019 KMS. All right reserved.
+# Author     KMS - Martin Dubois, P.Eng.
+# Copyright  (C) 2019-2020 KMS. All right reserved.
 # Product    OpenNet
-# File       Scripts/OpenNet_Tool/A00RRC001I_WX5100_10_Profiling.txt
+# File       Scripts/OpenNet_Tool/1G_A00RRC001I_WX5100_10_Profiling.txt
 
 # Successful execution
 #

@@ -1,8 +1,10 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2019-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       OpenNet_Tool/Processor.cpp
+
+// CODE REVIEW 2020-04-14 KMS - Martin Dubois, P.Eng.
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -14,6 +16,9 @@
 
 // ===== Import/Includes ====================================================
 #include <KmsLib/ToolBase.h>
+
+// ===== Includes ===========================================================
+#include <OpenNet/Processor.h>
 
 // ===== OpenNet_Tool =======================================================
 #include "Globals.h"

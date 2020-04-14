@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       ONK_Pro1000/Intel_82576_Regs.h
 
@@ -748,10 +748,9 @@ namespace Intel_82576
 
         REG_RESERVED(05008, 05400);
 
-        Rx_AddressLow  mRx_AddressLow0 ; // 0x05400
-        Rx_AddressHigh mRx_AddressHigh0; // 0x05404
+        Intel_Rx_Address  mRxAddress[ 16 ]; // 0x05400
 
-        REG_RESERVED(05408, 0c000);
+        REG_RESERVED(05480, 0c000);
 
         uint32_t                      mRx_DescriptorBaseAddressLow0 ; // 0x0c000
         uint32_t                      mRx_DescriptorBaseAddressHigh0; // 0x0c004

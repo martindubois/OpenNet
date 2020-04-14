@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       TestLib/TestC.cpp
 
@@ -12,6 +12,7 @@
 #include "Component.h"
 
 // ===== Includes ===========================================================
+#include <OpenNet/Processor.h>
 #include <OpenNet/UserBuffer.h>
 #include <OpenNetK/Hardware_Statistics.h>
 
@@ -33,7 +34,7 @@ TestC::~TestC()
 
 void TestC::Info_Display() const
 {
-    Connections_Display_2_Cards();
+    Connections_Display_1_Card();
 
     printf(
         "===== Sequence ===============================\n"
@@ -100,6 +101,9 @@ unsigned int TestC::Init()
         }
         else
         {
+            lStatus = mAdapters[1]->ResetConfig();
+            assert(OpenNet::STATUS_OK == lStatus);
+
             OpenNet::Status lStatus = GetGenerator(0)->SetAdapter(mAdapters[1]);
             assert(OpenNet::STATUS_OK == lStatus);
         }

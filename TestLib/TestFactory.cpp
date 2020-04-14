@@ -1,8 +1,10 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       TestLib/TestFactory.cpp
+
+// CODE REVIEW 2020-04-14 KMS - Martin Dubois, P.Eng.
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -25,6 +27,7 @@
 #include "TestD.h"
 #include "TestE.h"
 #include "TestF.h"
+#include "TestG.h"
 
 namespace TestLib
 {
@@ -44,8 +47,8 @@ namespace TestLib
     // aBandwidth_MiB_s
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     unsigned int TestFactory::SetBandwidth(double aBandwidth_MiB_s)
     {
         assert(Test::BANDWIDTH_MAX_MiB_s >= mConfig.mBandwidth_MiB_s);
@@ -71,8 +74,8 @@ namespace TestLib
     // aBandwidth_MiB_s [---;R--]
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     unsigned int TestFactory::SetBandwidth(const char * aBandwidth_MiB_s)
     {
         assert(NULL != aBandwidth_MiB_s);
@@ -91,8 +94,8 @@ namespace TestLib
     // aBufferQty
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     unsigned int TestFactory::SetBufferQty(unsigned int aBufferQty)
     {
         assert(Test::BUFFER_QTY_MAX >= mConfig.mBufferQty);
@@ -118,8 +121,8 @@ namespace TestLib
     // aBufferQty [---;R--]
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     unsigned int TestFactory::SetBufferQty(const char * aBufferQty)
     {
         assert(NULL != aBufferQty);
@@ -138,8 +141,8 @@ namespace TestLib
     // aCode
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     void TestFactory::SetCode(Code aCode)
     {
         assert(CODE_QTY > aCode);
@@ -152,8 +155,8 @@ namespace TestLib
     // aCode [---;R--]
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     unsigned int TestFactory::SetCode(const char * aCode)
     {
         assert(NULL != aCode);
@@ -170,8 +173,8 @@ namespace TestLib
     // aMode
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     void TestFactory::SetMode(Test::Mode aMode)
     {
         assert(Test::MODE_QTY > aMode);
@@ -184,8 +187,8 @@ namespace TestLib
     // aMode [---;R--]
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     unsigned int TestFactory::SetMode(const char * aMode)
     {
         assert(NULL != aMode);
@@ -202,8 +205,8 @@ namespace TestLib
     // aPacketSize_byte
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     unsigned int TestFactory::SetPacketSize(unsigned int aPacketSize_byte)
     {
         assert(Test::TEST_PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte);
@@ -229,8 +232,8 @@ namespace TestLib
     // aPacketSize_byte [---;R--]
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     unsigned int TestFactory::SetPacketSize(const char * aPacketSize_byte)
     {
         assert(NULL != aPacketSize_byte);
@@ -255,8 +258,8 @@ namespace TestLib
     // aProfiling [---;R--]
     //
     // Return
-    //     0  OK
-    // Ohter  Error
+    //      0  OK
+    //  Ohter  Error
     unsigned int TestFactory::SetProfiling(const char * aProfiling)
     {
         if (0 == _strnicmp("false", aProfiling, 5))
@@ -290,12 +293,13 @@ namespace TestLib
         Test * lResult = NULL;
 
         // new ==> delete
-        if (0 == _strnicmp("A", aName, 1)) { lResult = new TestA(); }
-        if (0 == _strnicmp("B", aName, 1)) { lResult = new TestB(); }
-        if (0 == _strnicmp("C", aName, 1)) { lResult = new TestC(); }
-        if (0 == _strnicmp("D", aName, 1)) { lResult = new TestD(); }
-        if (0 == _strnicmp("E", aName, 1)) { lResult = new TestE(); }
-        if (0 == _strnicmp("F", aName, 1)) { lResult = new TestF(); }
+        if      (0 == _strnicmp("A", aName, 1)) { lResult = new TestA(); }
+        else if (0 == _strnicmp("B", aName, 1)) { lResult = new TestB(); }
+        else if (0 == _strnicmp("C", aName, 1)) { lResult = new TestC(); }
+        else if (0 == _strnicmp("D", aName, 1)) { lResult = new TestD(); }
+        else if (0 == _strnicmp("E", aName, 1)) { lResult = new TestE(); }
+        else if (0 == _strnicmp("F", aName, 1)) { lResult = new TestF(); }
+        else if (0 == _strnicmp("G", aName, 1)) { lResult = new TestG(); }
 
         if (NULL != lResult)
         {

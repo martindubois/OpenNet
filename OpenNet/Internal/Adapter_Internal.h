@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       OpenNet/Adapter_Internal.h
 
@@ -82,6 +82,7 @@ public:
     virtual bool            IsConnected     ();
     virtual bool            IsConnected     (const OpenNet::System & aSystem);
     virtual OpenNet::Status Packet_Send     (const void * aData, unsigned int aSize_byte);
+    virtual OpenNet::Status ResetConfig     ();
     virtual OpenNet::Status ResetInputFilter();
     virtual OpenNet::Status ResetProcessor  ();
     virtual OpenNet::Status ResetStatistics ();
@@ -137,6 +138,7 @@ private:
 
     Buffer_Internal * GetBuffer(unsigned int aIndex);
 
+    void Config_Reset ();
     void Config_Update();
 
     void Event_Process(const OpenNetK::Event & aEvent);

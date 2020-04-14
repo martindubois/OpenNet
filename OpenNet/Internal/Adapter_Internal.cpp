@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       OpenNet/Internal/Processor_Internal.cpp
 
@@ -525,6 +525,23 @@ OpenNet::Status Adapter_Internal::Packet_Send(const void * aData, unsigned int a
     return lResult;
 }
 
+OpenNet::Status Adapter_Internal::ResetConfig()
+{
+    OpenNet::Status lResult = Control(IOCTL_CONFIG_RESET, NULL, 0, NULL, 0);
+    if (OpenNet::STATUS_OK == lResult)
+    {
+        Config_Reset();
+
+        lResult = Control(IOCTL_CONFIG_GET, NULL, 0, &mDriverConfig, sizeof(mDriverConfig));
+        if (OpenNet::STATUS_OK == lResult)
+        {
+            Config_Update();
+        }
+    }
+
+    return lResult;
+}
+
 OpenNet::Status Adapter_Internal::ResetInputFilter()
 {
     // printf( __CLASS__ "ResetInputFilter()\n" );
@@ -591,7 +608,10 @@ OpenNet::Status Adapter_Internal::ResetStatistics()
 
 OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
 {
+    assert(mDriverConfig.mFlags.mMulticastPromiscuousDisable == mConfig.mFlags.mMulticastPromiscuousDisable);
+    assert(mDriverConfig.mFlags.mUnicastPromiscuousDisable   == mConfig.mFlags.mUnicastPromiscuousDisable  );
     assert(mDriverConfig.mPacketSize_byte == mConfig.mPacketSize_byte);
+    assert(0 == memcmp(&mDriverConfig.mEthernetAddress, mConfig.mEthernetAddress, sizeof(mDriverConfig.mEthernetAddress)));
     assert(NULL                           != mDebugLog               );
 
     if (NULL == (&aConfig))
@@ -620,7 +640,11 @@ OpenNet::Status Adapter_Internal::SetConfig(const Config & aConfig)
 
     memcpy(&mConfig, &aConfig, sizeof(mConfig));
 
+    mDriverConfig.mFlags.mMulticastPromiscuousDisable = mConfig.mFlags.mMulticastPromiscuousDisable;
+    mDriverConfig.mFlags.mUnicastPromiscuousDisable   = mConfig.mFlags.mUnicastPromiscuousDisable  ;
     mDriverConfig.mPacketSize_byte = mConfig.mPacketSize_byte;
+
+    memcpy(&mDriverConfig.mEthernetAddress, &aConfig.mEthernetAddress, sizeof(mDriverConfig.mEthernetAddress));
 
     OpenNet::Status lResult = Control(IOCTL_CONFIG_SET, &mDriverConfig, sizeof(mDriverConfig), &mDriverConfig, sizeof(mDriverConfig));
     if (OpenNet::STATUS_OK == lResult)
@@ -874,23 +898,22 @@ Adapter_Internal::Adapter_Internal(KmsLib::DriverHandle * aHandle, KmsLib::Debug
 
     mDebugLog->Log( "Adapter_Internal::Adapter_Internal( , ,  )" );
 
-    memset(&mConfig      , 0, sizeof(mConfig      ));
     memset(&mConnect_Out , 0, sizeof(mConnect_Out ));
     memset(&mDriverConfig, 0, sizeof(mDriverConfig));
     memset(&mInfo        , 0, sizeof(mInfo        ));
     memset(&mName        , 0, sizeof(mName        ));
     memset(&mStatistics  , 0, sizeof(mStatistics  ));
 
-    mConfig.mBufferQty = 4;
-	mConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
-
     mConnect_Out.mAdapterNo = ADAPTER_NO_UNKNOWN;
 
+    mDriverConfig.mFlags.mMulticastPromiscuousDisable = false;
+    mDriverConfig.mFlags.mUnicastPromiscuousDisable   = false;
 	mDriverConfig.mPacketSize_byte = PACKET_SIZE_MAX_byte;
 
     mHandle->Control(IOCTL_CONFIG_GET, NULL, 0, &mDriverConfig, sizeof(mDriverConfig));
     mHandle->Control(IOCTL_INFO_GET  , NULL, 0, &mInfo        , sizeof(mInfo        ));
 
+    Config_Reset ();
     Config_Update();
 
     strncpy_s(mName, mInfo.mVersion_Hardware.mComment, sizeof(mName) - 1);
@@ -954,6 +977,17 @@ Buffer_Internal * Adapter_Internal::GetBuffer(unsigned int aIndex)
     return mThread->GetBuffer(this, aIndex);
 }
 
+void Adapter_Internal::Config_Reset()
+{
+    assert(PACKET_SIZE_MAX_byte >= mInfo.mPacketSize_byte);
+    assert(PACKET_SIZE_MIN_byte <= mInfo.mPacketSize_byte);
+
+    memset(&mConfig, 0, sizeof(mConfig));
+
+    mConfig.mBufferQty       = 4;
+    mConfig.mPacketSize_byte = mInfo.mPacketSize_byte;
+}
+
 void Adapter_Internal::Config_Update()
 {
     assert(PACKET_SIZE_MAX_byte >= mConfig.mPacketSize_byte      );
@@ -961,7 +995,11 @@ void Adapter_Internal::Config_Update()
     assert(PACKET_SIZE_MAX_byte >= mDriverConfig.mPacketSize_byte);
     assert(PACKET_SIZE_MIN_byte <= mDriverConfig.mPacketSize_byte);
 
+    mConfig.mFlags.mMulticastPromiscuousDisable = mDriverConfig.mFlags.mMulticastPromiscuousDisable;
+    mConfig.mFlags.mUnicastPromiscuousDisable   = mDriverConfig.mFlags.mUnicastPromiscuousDisable  ;
     mConfig.mPacketSize_byte = mDriverConfig.mPacketSize_byte;
+
+    memcpy(&mConfig.mEthernetAddress, mDriverConfig.mEthernetAddress, sizeof(mConfig.mEthernetAddress));
 }
 
 // aEvent [---;R--] The event to proces

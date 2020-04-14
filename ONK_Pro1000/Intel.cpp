@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       ONK_Pro1000/Intel.cpp
 
@@ -73,6 +73,17 @@ void Intel::GetState(OpenNetK::Adapter_State * aState)
     mZone0->UnlockFromThread( lFlags );
 }
 
+void Intel::ResetConfig()
+{
+    Hardware::ResetConfig();
+
+    uint32_t lFlags = mZone0->LockFromThread();
+
+        Config_Apply_Zone0();
+
+    mZone0->UnlockFromThread(lFlags);
+}
+
 void Intel::ResetMemory()
 {
     // TRACE_DEBUG "%s()" DEBUG_EOL, __FUNCTION__ TRACE_END;
@@ -128,6 +139,19 @@ void Intel::SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA)
         }
 
     mZone0->UnlockFromThread( lFlags );
+}
+
+void Intel::SetConfig(const OpenNetK::Adapter_Config & aConfig)
+{
+    ASSERT(NULL != (&aConfig));
+
+    Hardware::SetConfig(aConfig);
+
+    uint32_t lFlags = mZone0->LockFromThread();
+
+        Config_Apply_Zone0();
+
+    mZone0->UnlockFromThread(lFlags);
 }
 
 // NOT TESTED  ONK_Hardware.Intel.ErrorHandling
@@ -397,6 +421,59 @@ void Intel::Statistics_Reset()
 
 // Protected
 /////////////////////////////////////////////////////////////////////////////
+
+// aOut   [---;-W-]
+// aIn_MA [---;R--]
+void Intel::RxAddress_Read(uint8_t * aOut, volatile Intel_Rx_Address * aIn_MA)
+{
+    ASSERT(NULL != aOut  );
+    ASSERT(NULL != aIn_MA);
+
+    uint32_t lTmp = aIn_MA->mRAL;
+
+    aOut[0] = static_cast<uint8_t>( lTmp & 0x000000ff       );
+    aOut[1] = static_cast<uint8_t>((lTmp & 0x0000ff00) >>  8);
+    aOut[2] = static_cast<uint8_t>((lTmp & 0x00ff0000) >> 16);
+    aOut[3] = static_cast<uint8_t>((lTmp & 0xff000000) >> 24);
+
+    lTmp = aIn_MA->mFields.mRAH;
+
+    aOut[4] = static_cast<uint8_t>( lTmp & 0x000000ff      );
+    aOut[5] = static_cast<uint8_t>((lTmp & 0x0000ff00) >> 8);
+}
+
+// aOut_MA [---;RW-]
+// aIn     [---;R--]
+void Intel::RxAddress_Write(volatile Intel_Rx_Address * aOut_MA, const uint8_t * aIn)
+{
+    ASSERT(NULL != aOut_MA);
+    ASSERT(NULL != aIn    );
+
+    bool lAddressValid = false;
+
+    uint32_t lTmp32;
+
+    lTmp32  = aIn[0]      ;
+    lTmp32 |= aIn[1] <<  8;
+    lTmp32 |= aIn[2] << 16;
+    lTmp32 |= aIn[3] << 24;
+
+    if (0 != lTmp32) { lAddressValid = true; }
+
+    aOut_MA->mRAL = lTmp32;
+
+    uint16_t lTmp16;
+
+    lTmp16  = aIn[4]     ;
+    lTmp16 |= aIn[5] << 8;
+
+    if (0 != lTmp16) { lAddressValid = true; }
+
+    aOut_MA->mFields.mRAH           = lTmp16       ;
+    aOut_MA->mFields.mAddressSelect =             0;
+    aOut_MA->mFields.mAddressValid  = lAddressValid;
+    aOut_MA->mFields.mPoolSelect    =             0;
+}
 
 Intel::Intel(OpenNetK::Adapter_Type aType) : Hardware(aType, PACKET_SIZE_byte)
 {

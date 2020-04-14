@@ -1,10 +1,12 @@
 
 // Product  OpenNet
 
-/// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
+/// \author     KMS - Martin Dubois, P.Eng.
+/// \copyright  Copyright &copy; 2018-2020 KMS. All rights reserved.
 /// \file       Includes/OpenNet/Adapter.h
-/// \brief      OpenNet::Adapter
+/// \brief      OpenNet::Adapter (SDK)
+
+// CODE REVIEW  2020-04-14  KMS - Martin Dubois, P.Eng.
 
 #pragma once
 
@@ -12,13 +14,12 @@
 /////////////////////////////////////////////////////////////////////////////
 
 // ===== Includes ===========================================================
-#include <OpenNet/Processor.h>
 #include <OpenNet/StatisticsProvider.h>
 #include <OpenNetK/Adapter_Types.h>
 
 namespace OpenNet
 {
-
+    class Processor ;
     class SourceCode;
     class System    ;
 
@@ -38,30 +39,73 @@ namespace OpenNet
     public:
 
         /// \cond en
-        /// \brief  The configuration
-        /// \todo   Document members
+        /// \brief  The Adapter's configuration
         /// \endcond
         /// \cond fr
-        /// \brief  La configuration
-        /// \todo   Documenter les membres
+        /// \brief  La configuration de l'Adapter
         /// \endcond
+        /// \sa     GetConfig, ResetConfig, SetConfig
         typedef struct
         {
             unsigned int mBufferQty      ;
             unsigned int mPacketSize_byte;
+
+            struct
+            {
+                unsigned mMulticastPromiscuousDisable : 1;
+                unsigned mUnicastPromiscuousDisable   : 1;
+
+                unsigned mReserved0 : 30;
+            }
+            mFlags;
 
             // TODO  OpenNet.Adapter
             //       Normal (Feature) - Ajouter un "Buffer Factor" pour
             //       allouer un multiple du multiple prefere du Kernel
             //       (division ou multiplication).
 
-            unsigned char mReserved0[1016];
+            unsigned char mReserved0[612];
+
+            OpenNetK::EthernetAddress  mEthernetAddress[50];
         }
         Config;
 
+        /// \cond en
+        /// \brief  The Adapter's information
+        /// \endcond
+        /// \cond fr
+        /// \brief  L'information au sujet de l'Adapter
+        /// \endcond
+        /// \sa     GetInfo
         typedef OpenNetK::Adapter_Info   Info  ;
+
+        /// \cond en
+        /// \brief  The Adapter's state
+        /// \endcond
+        /// \cond fr
+        /// \brief  L'&eacute de l'Adapter
+        /// \endcond
+        /// \sa     GetState
         typedef OpenNetK::Adapter_State  State ;
 
+        /// \cond en
+        /// \brief  The event callback declaration
+        /// \param  aContext       The context passed to
+        ///                        Event_RegisterCallback
+        /// \param  aType          The event type
+        /// \param  aTimestamp_us  The event's timestamp
+        /// \endcond
+        /// \cond fr
+        /// \brief  La d&eacute;claration de la fonction appel&eacute; pour
+        ///         signaler un evennement
+        /// \param  aContext       Le context pass&eacute; &agrave;
+        ///                        Event_RegisterCallback
+        /// \param  aType          Le type d'evennement
+        /// \param  aTimestamp_us  La marque de temps de l'evennement
+        /// \endcond
+        /// \param  aData0
+        /// \param  aData1
+        /// \sa     Event_RegisterCallback
         typedef void(*Event_Callback)(void * aContext, const OpenNetK::Event_Type aType, uint64_t aTimestamp_us, uint32_t aData0, void * aData1);
 
         /// \cond en
@@ -119,6 +163,7 @@ namespace OpenNet
         /// \endcond
         /// \retval STATUS_OK
         /// \retval STATUS_ADAPTER_NOT_CONNECTED
+        /// \retval STATUS_CORRUPTED_DRIVER_DATA
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
         /// \sa     IsConnected
         virtual Status GetAdapterNo(unsigned int * aOut) = 0;
@@ -203,9 +248,6 @@ namespace OpenNet
         /// \sa     GetAdapterNo
         virtual bool IsConnected(const System & aSystem) = 0;
 
-        // TODO  OpenNet.Adapter
-        //       Normal (Feature) - Ajouter ResetConfig
-
         /// \cond en
         /// \brief  This methode reset the input filter.
         /// \endcond
@@ -213,7 +255,10 @@ namespace OpenNet
         /// \brief  Cette m&eacute;thode retire le filtre d'entr&eacute;.
         /// \endcond
         /// \retval STATUS_OK
+        /// \retval STATUS_ADAPTER_RUNNING
+        /// \retval STATUS_CUDA_ERROR
         /// \retval STATUS_FILTER_NOT_SET
+        /// \retval STATUS_OPEN_CL_ERROR
         /// \sa     SetInputFilter
         virtual Status ResetInputFilter() = 0;
 
@@ -224,8 +269,9 @@ namespace OpenNet
         /// \brief  Cette m&eacute;thode retire le processeur.
         /// \endcond
         /// \retval STATUS_OK
+        /// \retval STATUS_FILTER_SET
         /// \retval STATUS_PROCESSOR_NOT_SET
-        /// \sa     SetProcessor
+        /// \sa     ResetInputFilter, SetProcessor
         virtual Status ResetProcessor() = 0;
 
         /// \cond en
@@ -239,7 +285,10 @@ namespace OpenNet
         /// \retval STATUS_OK
         /// \retval STATUS_INVALID_REFERENCE
         /// \retval STATUS_IOCTL_ERROR
-        /// \sa     GetConfig
+        /// \retval STATUS_PACKET_TOO_LARGE
+        /// \retval STATUS_PACKET_TOO_SMALL
+        /// \retval STATUS_TOO_MANY_BUFFER
+        /// \sa     GetConfig, ResetConfig
         virtual Status SetConfig(const Config & aConfig) = 0;
 
         /// \cond en
@@ -251,8 +300,11 @@ namespace OpenNet
         /// \param aSourceCode  L'instance de SourceCode
         /// \endcond
         /// \retval STATUS_OK
+        /// \retval STATUS_ADAPTER_NOT_CONNECTED
+        /// \retval STAUS_CUDA_ERROR
         /// \retval STATUS_FILTER_ALREADY_SET
         /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
+        /// \retval STATUS_OPEN_CL_ERROR
         /// \retval STATUS_PROCESSOR_NOT_SET
         /// \sa     ResetInputFilter
         virtual Status SetInputFilter(SourceCode * aSourceCode) = 0;
@@ -299,7 +351,7 @@ namespace OpenNet
         /// \param  aContext   La contexte pass&eacute; &agrave; la fonction
         /// \endcond
         /// \retval STATUS_OK
-        /// \retval STATUS_NOT_ALLOWED_NULL_ARGUMENT
+        /// \retval STATUS_IOCTL_ERROR
         virtual Status Event_RegisterCallback(Event_Callback aCallback, void * aContext) = 0;
 
         /// \cond en
@@ -333,7 +385,12 @@ namespace OpenNet
         ///                        donn&eacute;es lues ici
         /// \endcond
         /// \retval STATUS_OK
+        /// \retval STATUS_INVALID_SIZE
+        /// \retval STATUS_NOT_ALLOWER_NULL_ARGUMENT
         virtual Status Read(void * aOut, unsigned int aOutSize_byte, unsigned int * aInfo_byte) = 0;
+
+        // TODO  OpenNet.Adapter.Tx_Disable
+        //       Low (Cleanup) - Make it a flag in the configuration
 
         /// \cond en
         /// \brief  This methode disable packet transmit.
@@ -342,6 +399,8 @@ namespace OpenNet
         /// \brief  Cette m&eacute;thode d&eacute;sactive la transmission.
         /// \endcond
         /// \retval STATUS_OK
+        /// \retval STATUS_IOCTL_ERROR
+        /// \sa     Tx_Enable
         virtual Status Tx_Disable() = 0;
 
         /// \cond en
@@ -351,7 +410,21 @@ namespace OpenNet
         /// \brief  Cette m&eacute;thode active la transmission.
         /// \endcond
         /// \retval STATUS_OK
+        /// \retval STATUS_IOCTL_ERROR
+        /// \sa     Tx_Disable
         virtual Status Tx_Enable() = 0;
+
+        /// \cond en
+        /// \brief  This methode reset the configuration.
+        /// \endcond
+        /// \cond fr
+        /// \brief  Cette m&eacute;thode change la configuration pour la
+        ///         configuration par d&eacute;faut.
+        /// \endcond
+        /// \retval STATUS_OK
+        /// \retval STATUS_IOCTL_ERROR
+        /// \sa     GetConfig, SetConfig
+        virtual Status ResetConfig() = 0;
 
     protected:
 

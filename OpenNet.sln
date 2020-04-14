@@ -184,14 +184,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{DDC8
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenNet_Tool", "OpenNet_Tool", "{7A086992-CDEA-4B24-96B1-404A882FE13A}"
 	ProjectSection(SolutionItems) = preProject
-		Scripts\OpenNet_Tool\A00DDC001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDC001A_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00DDC001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDC001I_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00DDN001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDN001A_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00DDN001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00DDN001I_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00RRC001A_WX5100_10.txt = Scripts\OpenNet_Tool\A00RRC001A_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00RRC001I_WX5100_10.txt = Scripts\OpenNet_Tool\A00RRC001I_WX5100_10.txt
-		Scripts\OpenNet_Tool\A00RRC001I_WX5100_10_Profiling.txt = Scripts\OpenNet_Tool\A00RRC001I_WX5100_10_Profiling.txt
-		Scripts\OpenNet_Tool\A01RDCfffA_WX9100_10.txt = Scripts\OpenNet_Tool\A01RDCfffA_WX9100_10.txt
+		Scripts\OpenNet_Tool\10G_A00RDC001I_WX5100_10.txt = Scripts\OpenNet_Tool\10G_A00RDC001I_WX5100_10.txt
+		Scripts\OpenNet_Tool\1G_A00DDC001A_WX5100_10.txt = Scripts\OpenNet_Tool\1G_A00DDC001A_WX5100_10.txt
+		Scripts\OpenNet_Tool\1G_A00DDC001I_WX5100_10.txt = Scripts\OpenNet_Tool\1G_A00DDC001I_WX5100_10.txt
+		Scripts\OpenNet_Tool\1G_A00DDN001A_WX5100_10.txt = Scripts\OpenNet_Tool\1G_A00DDN001A_WX5100_10.txt
+		Scripts\OpenNet_Tool\1G_A00DDN001I_WX5100_10.txt = Scripts\OpenNet_Tool\1G_A00DDN001I_WX5100_10.txt
+		Scripts\OpenNet_Tool\1G_A00RRC001A_WX5100_10.txt = Scripts\OpenNet_Tool\1G_A00RRC001A_WX5100_10.txt
+		Scripts\OpenNet_Tool\1G_A00RRC001I_WX5100_10.txt = Scripts\OpenNet_Tool\1G_A00RRC001I_WX5100_10.txt
+		Scripts\OpenNet_Tool\1G_A00RRC001I_WX5100_10_Profiling.txt = Scripts\OpenNet_Tool\1G_A00RRC001I_WX5100_10_Profiling.txt
+		Scripts\OpenNet_Tool\1G_A01RDCfffA_WX9100_10.txt = Scripts\OpenNet_Tool\1G_A01RDCfffA_WX9100_10.txt
 		Scripts\OpenNet_Tool\README.md = Scripts\OpenNet_Tool\README.md
 	EndProjectSection
 EndProject

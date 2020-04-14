@@ -1,10 +1,10 @@
 
 // Product  OpenNet
 
-/// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
+/// \author     KMS - Martin Dubois, P.Eng.
+/// \copyright  Copyright &copy; 2018-2020 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Hardware.h
-/// \brief      OpenNetK::Hardware
+/// \brief      OpenNetK::Hardware (DDK)
 
 #pragma once
 
@@ -49,7 +49,7 @@ namespace OpenNetK
         /// \param  aSize_byte  La taille
         /// \param  aAddress    L'adresse
         /// \endcond
-        /// \note   Level = Thread, Thread = Initialisation
+        /// \note   Thread = Initialisation
         void * operator new(size_t aSize_byte, void * aAddress);
 
         /// \cond en
@@ -64,6 +64,8 @@ namespace OpenNetK
         ///         l'espace m&eacute;moire partage entre le mat&eacute;riel
         ///         et le logiciel.
         /// \endcond
+        /// \note   Thread = Initialisation
+        /// \sa     SetCommonBuffer
         unsigned int GetCommonBufferSize() const;
 
         /// \cond en
@@ -76,6 +78,7 @@ namespace OpenNetK
         /// \retval Cette methode retourne la taille maximum configur&eacute;
         ///         pour les paquets en octes.
         /// \endcond
+        /// \note   Level = SoftInt or Thread, Threads = Initialisation or Users
         unsigned int GetPacketSize() const;
 
         /// \cond en
@@ -86,8 +89,19 @@ namespace OpenNetK
         /// \brief  Obtenir l'etat courant
         /// \param  aState  L'instance d'OpenNet_State
         /// \endcond
-        /// \note   Level = SoftInt or Thread, Thread = Queue
+        /// \note   Level = SoftInt or Thread, Threads = Users
         virtual void GetState(Adapter_State * aState) = 0;
+
+        /// \cond en
+        /// \brief  Reset the configuation
+        /// \endcond
+        /// \cond fr
+        /// \brief  Changer la configuration pour la configuration par
+        ///         d&eacute;faut
+        /// \endcond
+        /// \note   Level = SoftInt or Thread, Threads = Users
+        /// \sa     SetConfig
+        virtual void ResetConfig();
 
         /// \cond en
         /// \brief  Reset all memory regions
@@ -95,7 +109,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  R&eacute;initialiser toutes les regions de m&eacute;moire
         /// \endcond
-        /// \note   Level = Thread, Thread = Uninitialisation
+        /// \note   Thread = Uninitialisation
         /// \sa     SetMemory
         virtual void ResetMemory();
 
@@ -107,7 +121,7 @@ namespace OpenNetK
         /// \brief  Connecter l'Adaptateur
         /// \param  aAdapter  L'Adaptateur
         /// \endcond
-        /// \note   Level = Thread, Thread = Initialisation
+        /// \note   Thread = Initialisation
         virtual void SetAdapter(Adapter * aAdapter);
 
         /// \cond en
@@ -122,7 +136,8 @@ namespace OpenNetK
         /// \brief  aCommon_CA  L'adresse virtuelle utilis&eacute;e par le
         ///                     logiciel
         /// \endcond
-        /// \note   Level = Thread, Thread = Initialisation
+        /// \note   Thread = Initialisation
+        /// \sa     GetCommonBufferSize
         virtual void SetCommonBuffer(uint64_t aCommon_PA, void * aCommon_CA);
 
         /// \cond en
@@ -133,7 +148,8 @@ namespace OpenNetK
         /// \brief  Changer la configuration
         /// \param  aConfig  La configuration
         /// \endcond
-        /// \note   Level = SoftInt or Thread, Thread = Users
+        /// \note   Level = SoftInt or Thread, Threads = Users
+        /// \sa     ResetConfig
         virtual void SetConfig(const Adapter_Config & aConfig);
 
         /// \cond en
@@ -151,7 +167,7 @@ namespace OpenNetK
         /// \retval false Erreur
         /// \endcond
         /// \retval true  OK
-        /// \note   Level = Thread, Thread = Initialisation
+        /// \note   Thread = Initialisation
         /// \sa     ResetMemory
         virtual bool SetMemory(unsigned int aIndex, void * aMemory_MA, unsigned int aSize_byte);
 
@@ -161,7 +177,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Entrer dans l'&eacute;tat D0
         /// \endcond
-        /// \note   Level = Thread, Thread = Initialisation
+        /// \note   Thread = Initialisation
         /// \sa     D0_Exit
         virtual void D0_Entry();
 
@@ -174,7 +190,7 @@ namespace OpenNetK
         /// \retval false Erreur
         /// \endcond
         /// \retval true  OK
-        /// \note   Level = Thread, Thread = Uninitialisation
+        /// \note   Thread = Uninitialisation
         /// \sa     D0_Exit
         virtual bool D0_Exit();
 
@@ -184,7 +200,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  D&eacute;sactiver les interruptions
         /// \endcond
-        /// \sa     Interrupt_Enable
+        /// \sa     Interrupt_Enable, Interrupt_Process
         virtual void Interrupt_Disable();
 
         /// \cond en
@@ -214,6 +230,7 @@ namespace OpenNetK
         /// \retval true  L'adaptateur a caus&eacute; l'interruption.
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
+        /// \note   Level = Interrupt
         /// \sa     Interrupt_Disable, Interrupt_Enable, Interrupt_Process2
         virtual bool Interrupt_Process(unsigned int aMessageId, bool * aNeedMoreProcessing);
 
@@ -227,6 +244,7 @@ namespace OpenNetK
         /// \param  aNeedMoreProcessing
         /// \note   Cette methode fait partie du chemin critique.
         /// \endcond
+        /// \note   Level = SoftInt
         /// \sa     Interrupt_Process, Interrupt_Process3
         virtual void Interrupt_Process2(bool * aNeedMoreProcessing);
 
@@ -236,6 +254,7 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Traiter une interruption au troisi&egrave;me niveau
         /// \endcond
+        /// \note   Thread = Worker
         /// \sa     Interrupt_Process2
         virtual void Interrupt_Process3();
 
@@ -251,26 +270,15 @@ namespace OpenNetK
         /// \brief  Verouiller l'acc&egrave;s au mat&eacute;riel
         /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
-        /// \sa     Unlock, Unlock_AfterReceive,
-        ///         Unlock_AfterReceive_FromThread, Unlock_AfterSend,
-        ///         Unlock_AfterSend_FromThread
+        /// \note   Level = SoftInt or Thread, Threads = Users
+        /// \sa     Unlock_AfterReceive, Unlock_AfterReceive_FromThread,
+        ///         Unlock_AfterSend, Unlock_AfterSend_FromThread
         void Lock();
 
         // TODO  OpenNet.Hardware
         //       Normal (Feature) - Ajouter Lock_BeforeSend en passant un
         //       nombre de descripteurs necessaires. Cette fonction echouera
         //       s'il n'y a pas assez de descripteur disponible.
-
-        /// \cond en
-        /// \brief  Unlock the hardware
-        /// \note   This method is a part of the critical path.
-        /// \endcond
-        /// \cond fr
-        /// \brief  D&eacuteverouiller l'acc&egrave;s au mat&eacute;riel
-        /// \note   Cette m&eacute;thode fait partie du chemin critique.
-        /// \endcond
-        /// \sa     Lock
-        void Unlock();
 
         /// \cond en
         /// \brief  Unlock the hardware after programming receive descriptors
@@ -287,6 +295,7 @@ namespace OpenNetK
         /// \param  aFlags      La valeur &agrave; passer &agrave;
         ///                     SpinLock::UnlockFromThread
         /// \endcond
+        /// \note   Level = SoftInt or Thread, Threads = Users
         /// \sa     Lock
         void Unlock_AfterReceive_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags );
 
@@ -305,6 +314,7 @@ namespace OpenNetK
         /// \param  aFlags      La valeur &agrave; passer &agrave;
         ///                     SpinLock::UnlockFromThread
         /// \endcond
+        /// \note   Level = SoftInt or Thread, Threads = Users
         /// \sa     Lock
         void Unlock_AfterSend_FromThread(volatile long * aCounter, unsigned int aPacketQty, uint32_t aFlags );
 
@@ -317,6 +327,7 @@ namespace OpenNetK
         ///         r&eacute;ception
         /// \retval false  Pas d'espace m&eacute;moire disponible
         /// \endcond
+        /// \note   Level = SoftInt or Thread, Threads = Users
         /// \retval true OK
         virtual bool Packet_Drop() = 0;
 
@@ -338,6 +349,7 @@ namespace OpenNetK
         /// \param  aCounter  Le compteur d'op&acute;ration
         /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
+        /// \note   Level = SoftInt or Thread, Threads = Users
         /// \sa     Lock, Unlock_AfterReceive
         virtual void Packet_Receive_NoLock(Packet * aPacket, volatile long * aCounter) = 0;
 
@@ -357,6 +369,7 @@ namespace OpenNetK
         /// \param  aCounter    Le compteur d'op&eacute;ration
         /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
+        /// \note   Level = SoftInt or Thread, Threads = Users
         /// \sa     Lock, Unlock_AfterSend
         virtual void Packet_Send_NoLock(uint64_t aPacket_PA, const void * aPacket_XA, unsigned int aSize_byte, volatile long * aCounter) = 0;
 
@@ -376,7 +389,7 @@ namespace OpenNetK
         /// \param  aRepeatCount  Le nombre de r&eacute;p&eacute;tition
         /// \retval false  Erreur
         /// \endcond
-        /// \note   Level = SoftInt or Thread, Thread = Users
+        /// \note   Level = SoftInt or Thread, Threads = Users
         /// \retval true  OK
         virtual bool Packet_Send(const void * aPacket, unsigned int aSize_byte, bool aPriority, unsigned int aRepeatCount = 1) = 0;
 
@@ -398,7 +411,8 @@ namespace OpenNetK
         /// \return Cette m&eacute;thode retourne la taille des statistiques
         ///         &eacute;crites dans l'espace m&eacute;moire de sortie.
         /// \endcond
-        /// \note   Level = SoftInt or Thread, Thread = Users
+        /// \note   Level = SoftInt or Thread, Threads = Users
+        /// \sa     Statistics_Reset
         virtual unsigned int Statistics_Get(uint32_t * aOut, unsigned int aOutSize_byte, bool aReset);
 
         /// \cond en
@@ -407,7 +421,8 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Remettre les statistiques &agrave; z&eacute;ro
         /// \endcond
-        /// \note   Level = SoftInt or Thread, Thread = Users
+        /// \note   Level = SoftInt or Thread, Threads = Users
+        /// \sa     Statistics_Get
         virtual void Statistics_Reset();
 
         /// \cond en
@@ -419,6 +434,7 @@ namespace OpenNetK
         /// \retval false
         /// \retval true
         /// \note   Level = SoftInt or Thread, Thread = Users
+        /// \sa     Tx_Disable, Tx_Enable
         bool Tx_IsEnabled() const;
 
         /// \cond en
@@ -427,7 +443,8 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  D&eacute;sactiver la transmission
         /// \endcond
-        /// \note   Level = SoftInt or Thread, Thread = Users
+        /// \note   Level = SoftInt or Thread, Threads = Users
+        /// \sa     Tx_Enable, Tx_IsEnabled
         virtual void Tx_Disable();
 
         /// \cond en
@@ -436,7 +453,8 @@ namespace OpenNetK
         /// \cond fr
         /// \brief  Activer la transmission
         /// \endcond
-        /// \note   Level = SoftInt or Thread, Thread = Users
+        /// \note   Level = SoftInt or Thread, Threads = Users
+        /// \sa     Tx_Disable, Tx_IsEnabled
         virtual void Tx_Enable();
 
     // internal:
@@ -488,6 +506,17 @@ namespace OpenNetK
         Hardware(OpenNetK::Adapter_Type aType, unsigned int aPacketSize_byte);
 
         /// \cond en
+        /// \brief  Reset the configuation
+        /// \endcond
+        /// \cond fr
+        /// \brief  Changer la configuration pour la configuration par
+        ///         d&eacute;faut
+        /// \endcond
+        /// \note   Level = SoftInt or Thread, Threads = Users
+        /// \sa     ResetConfig
+        void ResetConfig_Internal();
+
+        /// \cond en
         /// \brief  Hardware dependent part of the Unlock_AfterReceive
         /// \note   This method is a part of the critical path.
         /// \endcond
@@ -496,6 +525,8 @@ namespace OpenNetK
         ///         mat&eacute;riel
         /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
+        /// \note   Level = SoftInt
+        /// \sa     Lock
         virtual void Unlock_AfterReceive_Internal() = 0;
 
         /// \cond en
@@ -507,6 +538,8 @@ namespace OpenNetK
         ///         mat&eacute;riel
         /// \note   Cette m&eacute;thode fait partie du chemin critique.
         /// \endcond
+        /// \note   Level = SoftInt
+        /// \sa     Lock
         virtual void Unlock_AfterSend_Internal() = 0;
 
         /// \cond en
@@ -562,11 +595,6 @@ namespace OpenNetK
     inline void Hardware::Lock()
     {
         mZone0->Lock();
-    }
-
-    inline void Hardware::Unlock()
-    {
-        mZone0->Unlock();
     }
 
     inline bool Hardware::Tx_IsEnabled() const

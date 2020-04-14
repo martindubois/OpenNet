@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2019 KMS. All rights reserved
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2019-2020 KMS. All rights reserved
 // Product    OpenNet
 // File       TestLib/Code.cpp
 
@@ -277,7 +277,7 @@ static const char * KERNEL_DO_NOT_REPLY_ON_ERROR =
                                                                                            EOL
 "        lPacketInfo->mSendTo = lResult;"                                                  EOL
                                                                                            EOL
-"    OPEN_NET_KERNEL_END( 0 )"                                                             EOL
+"    OPEN_NET_KERNEL_END"                                                                  EOL
 "}"                                                                                        EOL;
 
 static const char * KERNEL_FORWARD =
@@ -289,7 +289,7 @@ static const char * KERNEL_FORWARD =
                                                                                      EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED | ( 1 << ADAPTER_INDEX );" EOL
                                                                                      EOL
-"    OPEN_NET_KERNEL_END( 0 )"                                                       EOL
+"    OPEN_NET_KERNEL_END"                                                            EOL
 "}"                                                                                  EOL;
 
 static const char * KERNEL_NOTHING =
@@ -301,7 +301,7 @@ static const char * KERNEL_NOTHING =
                                                             EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED;" EOL
                                                             EOL
-"    OPEN_NET_KERNEL_END( 0 )"                              EOL
+"    OPEN_NET_KERNEL_END"                                   EOL
 "}"                                                         EOL;
 
 static const char * KERNEL_REPLY_ON_ERROR =
@@ -340,7 +340,7 @@ static const char * KERNEL_REPLY_ON_ERROR =
                                                                                            EOL
 "        lPacketInfo->mSendTo = lResult;"                                                  EOL
                                                                                            EOL
-"    OPEN_NET_KERNEL_END( 0 )"                                                             EOL
+"    OPEN_NET_KERNEL_END"                                                                  EOL
 "}"                                                                                        EOL;
 
 static const char * KERNEL_REPLY_ON_SEQUENCE_ERROR =
@@ -416,7 +416,7 @@ static const char * KERNEL_REPLY_ON_SEQUENCE_ERROR =
                                                                                                                                EOL
 "        lPacketInfo->mSendTo = lResult;"                                                                                      EOL
                                                                                                                                EOL
-"    OPEN_NET_KERNEL_END( 0 )"                                                                                                 EOL
+"    OPEN_NET_KERNEL_END"                                                                                                      EOL
 "}";
 
 static const char * KERNEL_SIGNAL_EVENT =

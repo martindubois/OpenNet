@@ -1,0 +1,30 @@
+
+# Author     KMS - Martin Dubois, P.Eng.
+# Copyright  (C) 2020 KMS. All right reserved.
+# Product    OpenNet
+# File       Scripts/OpenNet_Tool/10G_A00RDC001I_WX5100_10.txt
+
+# PCIe x16  AMD Radeo Pro WX5100 (x16, Gen3)
+# PCIe x1	Empty
+# PCIe x16	NVIDIA Quadro K620 (x1, Gen1)
+# PCIe x16	Empty
+# PCIe x1	Empty
+# PCIe x16	Dual 82599 (x8, Gen2)
+
+# Test Code    Mode     Packet Size
+# ==== ======= ======== ===========
+# A    NOTHING FUNCTION        9000
+
+Test SetBufferQty 2
+Test SetBandwidth 1200.0
+Test SetCode NOTHING
+Test SetMode FUNCTION
+Test SetPacketSize 9000
+
+Test Run A
+
+# Test Code    Mode     Packet Size
+# ==== ======= ======== ===========
+# G    NOTHING FUNCTION        9000
+
+Test Run G

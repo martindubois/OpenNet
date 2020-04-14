@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       ONK_Lib/Hardware.cpp
 
@@ -43,6 +43,11 @@ namespace OpenNetK
     unsigned int Hardware::GetPacketSize() const
     {
         return mConfig.mPacketSize_byte;
+    }
+
+    void Hardware::ResetConfig()
+    {
+        ResetConfig_Internal();
     }
 
     void Hardware::ResetMemory()
@@ -345,10 +350,7 @@ namespace OpenNetK
         ASSERT(PACKET_SIZE_MAX_byte           >= aPacketSize_byte);
         ASSERT(PACKET_SIZE_MIN_byte           <= aPacketSize_byte);
 
-        memset(&mConfig, 0, sizeof(mConfig));
         memset(&mInfo  , 0, sizeof(mInfo  ));
-
-        mConfig.mPacketSize_byte = aPacketSize_byte;
 
         mInfo.mAdapterType     = aType           ;
         mInfo.mPacketSize_byte = aPacketSize_byte;
@@ -368,6 +370,20 @@ namespace OpenNetK
         strcpy(mInfo.mVersion_ONK_Lib.mCompiled_On, __DATE__      );
         strcpy(mInfo.mVersion_ONK_Lib.mComment    , "ONK_Lib"     );
         strcpy(mInfo.mVersion_ONK_Lib.mType       , VERSION_TYPE  );
+
+        ResetConfig_Internal();
+    }
+
+    void Hardware::ResetConfig_Internal()
+    {
+        ASSERT(PACKET_SIZE_MIN_byte <= mInfo.mPacketSize_byte);
+        ASSERT(PACKET_SIZE_MAX_byte >= mInfo.mPacketSize_byte);
+
+        memset(&mConfig, 0, sizeof(mConfig));
+
+        mConfig.mFlags.mMulticastPromiscuousDisable = false;
+        mConfig.mFlags.mUnicastPromiscuousDisable   = false;
+        mConfig.mPacketSize_byte       = mInfo.mPacketSize_byte;
     }
 
 }

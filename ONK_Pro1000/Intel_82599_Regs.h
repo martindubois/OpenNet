@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2019-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       ONK_Pro1000/Intel_82599_Regs.h
 
@@ -620,13 +620,6 @@ namespace Intel_82599
 
     typedef struct
     {
-        uint32_t mRAL; // 0x00
-        uint32_t mRAH; // 0x04
-    }
-    RxAddress;
-
-    typedef struct
-    {
         uint32_t mRDBAL     ; // 0x00
         uint32_t mRDBAH     ; // 0x04
         uint32_t mRDLen_byte; // 0x08
@@ -815,7 +808,7 @@ namespace Intel_82599
 
         REG_RESERVED(087ac, 0a200);
 
-        RxAddress mRxAddress[128]; // 0a200
+        Intel_Rx_Address mRxAddress[128]; // 0a200
 
         REG_RESERVED(0a600, 0d000);
 

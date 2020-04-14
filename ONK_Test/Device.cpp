@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       ONK_Test/Device.cpp
 
@@ -88,6 +88,8 @@ KMS_TEST_BEGIN(Device_SetupA)
 
     KMS_TEST_ASSERT( PACKET_SIZE_MAX_byte >= lConfig.mPacketSize_byte );
     KMS_TEST_ASSERT( PACKET_SIZE_MIN_byte <= lConfig.mPacketSize_byte );
+
+    // ===== IOCTL_CONFIG_RESET =============================================
 
     // ====== IOCTL_CONFIG_SET ==============================================
     KMS_TEST_COMPARE( 0, TestError( & lDH0, IOCTL_CONFIG_SET, NULL, 0, NULL, 0, KmsLib::Exception::CODE_IOCTL_ERROR ) );

@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved
 // Product    OpenNet
 // File       OpenNet/Kernel_Forward.cpp
 
@@ -40,7 +40,7 @@ static const char * CODE =
                                                                               EOL
 "        lPacketInfo->mSendTo = OPEN_NET_PACKET_PROCESSED | DESTINATIONS;"    EOL
                                                                               EOL
-"    OPEN_NET_KERNEL_END( 0 )"                                                EOL
+"    OPEN_NET_KERNEL_END"                                                     EOL
 "}"                                                                           EOL;
 
 namespace OpenNet

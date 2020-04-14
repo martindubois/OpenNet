@@ -1,10 +1,12 @@
 
 // Product  OpenNet
 
-/// \author     KMS - Martin Dubois, ing.
-/// \copyright  Copyright &copy; 2018-2019 KMS. All rights reserved.
+/// \author     KMS - Martin Dubois, P.Eng.
+/// \copyright  Copyright &copy; 2018-2020 KMS. All rights reserved.
 /// \file       Includes/OpenNetK/Adapter.h
 /// \brief      OpenNetK::Adapter (DDK)
+
+// CODE REVIEW  2020-04-14  KMS - Martin Dubois, P.Eng.
 
 #pragma once
 
@@ -53,6 +55,14 @@ namespace OpenNetK
 
     public:
 
+        /// \cond en
+        /// \brief  Declaration of the event callback
+        /// \endcond
+        /// \cond fr
+        /// \brief  D&eacute;claration de la fonction de traitement des
+        ///         evennements
+        /// \endcond
+        /// \sa     Event_RegisterCallback
         typedef void(*Event_Callback)(void *);
 
         /// \cond en
@@ -110,6 +120,7 @@ namespace OpenNetK
         /// \return Cette m&eacute;thode retourne le nombre
         ///         d'&eacute;v&eacute;nements en attente.
         /// \endcond
+        /// \sa     Event_Callback, Event_RegisterCallback
         unsigned int Event_GetPendingCount() const;
 
         /// \cond en
@@ -122,6 +133,7 @@ namespace OpenNetK
         /// \param  aCallback  La fonction
         /// \param  aContext   Le contexte pass&eacute; &agrave; la fonction
         /// \endcond
+        /// \sa     Event_GetPendingCount
         void Event_RegisterCallback(Event_Callback aCallback, void * aContext);
 
     // Internal
@@ -131,8 +143,9 @@ namespace OpenNetK
         //       fichier prive. En faire une classe.
 
         /// \cond en
-        /// \brief  DirectGMA Buffer information. This structur is not
-        ///         documented and may change or disapear in futur version.
+        /// \brief  DirectGMA or GPUDirect Buffer information. This structur
+        ///         is not documented and may change or disapear in futur
+        ///         version.
         /// \endcond
         /// \cond fr
         /// \brief  L'information au sujet d'un espace m&eacute;moire.
@@ -235,6 +248,7 @@ namespace OpenNetK
         int IoCtl_Event_Wait    (const void * aIn, Event    * aOut, unsigned int aOutSize_byte);
         int IoCtl_Statistics_Get(const void * aIn, uint32_t * aOut, unsigned int aOutSize_byte) const;
 
+        int IoCtl_Config_Reset        ();
         int IoCtl_Event_Wait_Cancel   ();
         int IoCtl_Packet_Drop         ();
         int IoCtl_PacketGenerator_Stop();

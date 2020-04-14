@@ -28,6 +28,7 @@
     <ClCompile Include="TestE.cpp" />
     <ClCompile Include="TestF.cpp" />
     <ClCompile Include="TestFactory.cpp" />
+    <ClCompile Include="TestG.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code.h" />
@@ -38,6 +39,7 @@
     <ClInclude Include="TestD.h" />
     <ClInclude Include="TestE.h" />
     <ClInclude Include="TestF.h" />
+    <ClInclude Include="TestG.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

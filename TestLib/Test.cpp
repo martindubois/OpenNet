@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       TestLib/Test.cpp
 
@@ -29,6 +29,7 @@
 #include <KmsLib/ThreadBase.h>
 
 // ===== Includes ===========================================================
+#include <OpenNet/Processor.h>
 #include <OpenNetK/Constants.h>
 
 // ===== Common =============================================================
@@ -705,6 +706,9 @@ namespace TestLib
             printf(__NAMESPACE__ __CLASS__ "Init - No adapter\n");
             return __LINE__;
         }
+
+        OpenNet::Status lStatus = mAdapters[0]->ResetConfig();
+        assert(OpenNet::STATUS_OK == lStatus);
 
         mProcessor = mSystem->Processor_Get(0);
         if (NULL == mProcessor)

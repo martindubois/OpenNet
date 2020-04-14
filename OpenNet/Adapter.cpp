@@ -1,8 +1,10 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       OpenNet/Adapter.cpp
+
+// CODE COVERAGE 2020-04-14 KMS - Martin Dubois, P.Eng.
 
 // Includes
 /////////////////////////////////////////////////////////////////////////////
@@ -254,6 +256,7 @@ namespace OpenNet
         }
 
         fprintf(aOut, "    Rx Descriptors     = %u\n", aIn.mRx_Descriptors);
+        fprintf(aOut, "    Rx Ethernet Addr.  = %u\n", aIn.mRx_EthernetAddress);
         fprintf(aOut, "    Tx Descriptors     = %u\n", aIn.mTx_Descriptors);
         fprintf(aOut, "    Ethernet Address   = ");
 
@@ -306,6 +309,8 @@ namespace OpenNet
     // Protected
     /////////////////////////////////////////////////////////////////////////
 
+    // TEST INFO  OpenNet.Adapter
+    //            The default constructor is fully tested by OpenNet_Test - Adapter - Setup A
     Adapter::Adapter() : StatisticsProvider(STATISTICS_DESCRIPTIONS, sizeof(STATISTICS_DESCRIPTIONS) / sizeof(STATISTICS_DESCRIPTIONS[0]))
     {
     }
@@ -317,6 +322,9 @@ namespace OpenNet
 
 const char * GetAdapterTypeName(OpenNetK::Adapter_Type aType)
 {
+    // NOT TESTED  OpenNet.Adapter.GetAdapterTypeName
+    //             Only ADAPTER_TYPE_UNKNOWN and invalid type is tested
+
     switch (aType)
     {
     case OpenNetK::ADAPTER_TYPE_ALL         : return "ALL"         ;

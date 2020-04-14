@@ -1,8 +1,8 @@
 
-# Author     KMS - Martin Dubois, ing.
-# Copyright  (C) 2019 KMS. All right reserved.
+# Author     KMS - Martin Dubois, P.Eng.
+# Copyright  (C) 2019-2020 KMS. All right reserved.
 # Product    OpenNet
-# File       Scripts/OpenNet_Tool/A00DDN001A_WX5100_10.txt
+# File       Scripts/OpenNet_Tool/1G_A00DDN001A_WX5100_10.txt
 
 # PCIe x16	AMD Radeo Pro WX5100
 # PCIe x1	Empty

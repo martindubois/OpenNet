@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       TestLib/TestD.cpp
 
@@ -137,12 +137,18 @@ unsigned int TestD::Init()
             return __LINE__;
         }
 
+        lStatus = mAdapters[1]->ResetConfig();
+        assert(OpenNet::STATUS_OK == lStatus);
+
         mAdapters[2] = GetSystem()->Adapter_Get(lInfo.mEthernetAddress.mAddress, MASK_E, MASK_1);
         if (NULL == mAdapters[2])
         {
             printf(__CLASS__ "Init - Not enough adapter\n");
             return __LINE__;
         }
+
+        lStatus = mAdapters[2]->ResetConfig();
+        assert(OpenNet::STATUS_OK == lStatus);
 
         lStatus = GetGenerator(0)->SetAdapter(mAdapters[2]);
         assert(OpenNet::STATUS_OK == lStatus);

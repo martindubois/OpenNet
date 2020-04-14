@@ -1,11 +1,13 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       Common/OpenNetK/IoCtl.h
 //
 // This file contains the definition of IoCtl code and the definition of data
 // type used only to pass data in or out of IoCtl.
+
+// CODE REVIEW  2020-04-14  KMS - Martin Dubois. P.Eng
 
 // TODO  Common.IoCtl
 //       Low (Cleanup) - Retirer IOCTL_STATISTICS_RESET
@@ -73,6 +75,10 @@
 // Output  OpenNetK::Adapter_Config
 #define IOCTL_CONFIG_SET        IOCTL_CODE_RW(1, OpenNetK::Adapter_Config)
 
+// Input   None
+// Output  None
+#define IOCTL_CONFIG_RESET      IOCTL_CODE(2)
+
 // ----- 16 - 31  Connect ---------------------------------------------------
 
 // Input   IoCtl_Connect_In
@@ -88,7 +94,7 @@
 // ----- 48 - 63  Packet ----------------------------------------------------
 
 // Input   IoCtl_Packet_Send_Ex_In
-//         The packet
+//         The packet               The size is IoCtl_Packet_Send_Ex_In.mSize_byte
 // Output  None
 #define IOCTL_PACKET_SEND_EX    IOCTL_CODE_W2(49, sizeof(IoCtl_Packet_Send_Ex_In) + (16 * 1024))
 
@@ -98,7 +104,7 @@
 
 // ----- 64 - 79  Start -----------------------------------------------------
 
-// Input   OpenNetK::Buffer[ 1 .. N ]
+// Input   OpenNetK::Buffer[ 1 .. N ]  If Buffer.
 // Output  None
 #define IOCTL_START             IOCTL_CODE_W(64, OpenNetK::Buffer[128])
 
@@ -111,7 +117,7 @@
 // ----- 96 - 111  Statistics -----------------------------------------------
 
 // Input   IoCtl_Statistics_Get_In
-// Output  uint32_t[ 0 .. N ]
+// Output  uint32_t[ 0 .. N ]  The size is IoCtl_Statistics_Get_In.mOutputSize_byte
 #define IOCTL_STATISTICS_GET    IOCTL_CODE_RW(96, uint32_t[128])
 
 // Input   None
@@ -155,7 +161,7 @@
 // ----- 160 - 175  Event ---------------------------------------------------
 
 // Input   IoCtl_Event_Wait_In
-// Output  OpenNetK::Event[ 0 .. N ]
+// Output  OpenNetK::Event[ 0 .. N ]  The size is IoCtl_Event_Wait_In.mOutputSize_byte
 #define IOCTL_EVENT_WAIT                  IOCTL_CODE_RW(160, OpenNetK::Event[32])
 
 // Input   None
@@ -170,6 +176,10 @@
 
 // Data types
 /////////////////////////////////////////////////////////////////////////////
+
+// CONSTRAINT  IoCtl.Connect
+//             IoCtl_Connect_In and IoCtl_Connect_Out must be of the same
+//             size
 
 // mSharedMemory  The user space virtual address of the memory shared by all
 //                adapter connected to a same system
@@ -194,6 +204,7 @@ typedef struct
 }
 IoCtl_Connect_Out;
 
+// mOutputSize_byte  The size of the output buffer
 typedef struct
 {
     uint32_t mOutputSize_byte;
@@ -202,6 +213,11 @@ typedef struct
 }
 IoCtl_Event_Wait_In;
 
+// CONSTRAINT  IoCtl.LicenseSet
+//             IoCtl_License_Set_In and IoCtl_License_Set_Out must be of the
+//             same size
+
+// mKey  The license key
 typedef struct
 {
     uint32_t mKey;
@@ -210,6 +226,9 @@ typedef struct
 }
 IoCtl_License_Set_In;
 
+// mFlags.mLicenseOk
+//  false  The license is not valid
+//  true   The license is valid
 typedef struct
 {
     struct
@@ -241,8 +260,10 @@ typedef struct
 }
 IoCtl_Packet_Send_Ex_In;
 
-// mFlags.mReset  When set to true, all the statisticas counters are reset to
-//                0 just after the reading operation.
+// mFlags.mReset
+//  false
+//  true   All the statisticas counters are reset to 0 just after the reading
+//         operation.
 // mOutSize_byte  The size of the output buffer
 typedef struct
 {

@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       ONK_Pro1000/Intel_Regs.h
 
@@ -168,6 +168,26 @@ typedef union
     mFields;
 }
 Intel_Rx_CheckSumControl;
+
+// ===== Groups =============================================================
+
+typedef struct
+{
+    uint32_t mRAL; // 0x00
+
+    struct
+    {
+        unsigned mRAH           : 16;
+        unsigned mAddressSelect :  2;
+        unsigned mPoolSelect    :  8;
+
+        unsigned mReserved : 5;
+
+        unsigned mAddressValid : 1;
+    }
+    mFields;
+}
+Intel_Rx_Address;
 
 // ===== BARs ===============================================================
 

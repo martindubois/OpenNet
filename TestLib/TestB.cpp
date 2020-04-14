@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       TestLib/TestB.cpp
 
@@ -85,6 +85,9 @@ unsigned int TestB::Init()
         }
         else
         {
+            lStatus = mAdapters[1]->ResetConfig();
+            assert(OpenNet::STATUS_OK == lStatus);
+
             OpenNet::Status lStatus = GetGenerator(0)->SetAdapter(mAdapters[1]);
             assert(OpenNet::STATUS_OK == lStatus);
         }

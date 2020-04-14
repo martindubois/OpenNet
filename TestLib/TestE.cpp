@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2018-2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2018-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       TestLib/TestE.cpp
 
@@ -42,7 +42,7 @@ TestE::~TestE()
 
 void TestE::Info_Display() const
 {
-    Connections_Display_2_Cards();
+    Connections_Display_1_Card();
 
     printf(
         "===== Sequence ===============================\n"
@@ -97,6 +97,9 @@ unsigned int TestE::Init()
             printf("%s - Not enough adapters\n", __FUNCTION__);
             return __LINE__;
         }
+
+        lStatus = mAdapters[1]->ResetConfig();
+        assert(OpenNet::STATUS_OK == lStatus);
 
         lStatus = GetGenerator(0)->SetAdapter(mAdapters[1]);
         if (OpenNet::STATUS_OK != lStatus)

@@ -1,6 +1,6 @@
 
-// Author     KMS - Martin Dubois, ing.
-// Copyright  (C) 2019 KMS. All rights reserved.
+// Author     KMS - Martin Dubois, P.Eng.
+// Copyright  (C) 2019-2020 KMS. All rights reserved.
 // Product    OpenNet
 // File       ONK_Pro1000/Intel_82576.cpp
 
@@ -30,6 +30,7 @@ namespace Intel_82576
         ASSERT(0x0e02c == sizeof(BAR1));
 
         mInfo.mRx_Descriptors = RX_DESCRIPTOR_QTY;
+        mInfo.mRx_EthernetAddress = 15;
         mInfo.mTx_Descriptors = TX_DESCRIPTOR_QTY;
 
         mInfo.mCommonBufferSize_byte += (sizeof(Intel_Rx_Descriptor) * RX_DESCRIPTOR_QTY); // Rx packet descriptors
@@ -67,12 +68,7 @@ namespace Intel_82576
 
                 mBAR1_82576_MA = reinterpret_cast< volatile BAR1 * >( aMemory_MA );
 
-                mInfo.mEthernetAddress.mAddress[0] = mBAR1_82576_MA->mRx_AddressLow0 .mFields.mA;
-                mInfo.mEthernetAddress.mAddress[1] = mBAR1_82576_MA->mRx_AddressLow0 .mFields.mB;
-                mInfo.mEthernetAddress.mAddress[2] = mBAR1_82576_MA->mRx_AddressLow0 .mFields.mC;
-                mInfo.mEthernetAddress.mAddress[3] = mBAR1_82576_MA->mRx_AddressLow0 .mFields.mD;
-                mInfo.mEthernetAddress.mAddress[4] = mBAR1_82576_MA->mRx_AddressHigh0.mFields.mE;
-                mInfo.mEthernetAddress.mAddress[5] = mBAR1_82576_MA->mRx_AddressHigh0.mFields.mF;
+                RxAddress_Read(mInfo.mEthernetAddress.mAddress, mBAR1_82576_MA->mRxAddress);
 
             mZone0->UnlockFromThread( lFlags );
             break;
@@ -115,6 +111,8 @@ namespace Intel_82576
             Rx_Config_Zone0();
             Tx_Config_Zone0();
 
+            Config_Apply_Zone0();
+
         mZone0->UnlockFromThread( lFlags );
     }
 
@@ -154,6 +152,23 @@ namespace Intel_82576
     /////////////////////////////////////////////////////////////////////////
 
     // ===== Intel ==========================================================
+
+    void Intel_82576::Config_Apply_Zone0()
+    {
+        mBAR1_82576_MA->mRx_Control.mFields.mEnable = false;
+
+        for (unsigned int i = 0; i < mInfo.mRx_EthernetAddress; i++)
+        {
+            RxAddress_Write(mBAR1_82576_MA->mRxAddress + i + 1, mConfig.mEthernetAddress[i].mAddress);
+        }
+
+        memset(mConfig.mEthernetAddress + mInfo.mRx_EthernetAddress, 0, sizeof(mConfig.mEthernetAddress) - (mInfo.mRx_EthernetAddress * sizeof(mConfig.mEthernetAddress[0])));
+
+        mBAR1_82576_MA->mRx_Control.mFields.mMulticastPromiscuousEnabled = ! mConfig.mFlags.mMulticastPromiscuousDisable;
+        mBAR1_82576_MA->mRx_Control.mFields.mUnicastPromiscuousEnabled   = ! mConfig.mFlags.mUnicastPromiscuousDisable  ;
+
+        mBAR1_82576_MA->mRx_Control.mFields.mEnable = true;
+    }
 
     void Intel_82576::Interrupt_Disable_Zone0()
     {
@@ -242,7 +257,7 @@ namespace Intel_82576
         // TODO  OpenNet.Adapter
         //       Low (Feature) - Add configuration field for:
         //       BroadcastAcceptMode, MulticastPromiscuousEnabled,
-        //       PassMacControlFrames, StoreBadPackets, UnicastPromiscuousEnabled
+        //       PassMacControlFrames, StoreBadPackets
         mBAR1_82576_MA->mRx_Control.mFields.mBroadcastAcceptMode         = true ;
         mBAR1_82576_MA->mRx_Control.mFields.mDiscardPauseFrames          = true ;
         mBAR1_82576_MA->mRx_Control.mFields.mLongPacketEnabled           = true ;
@@ -272,8 +287,6 @@ namespace Intel_82576
         mBAR1_82576_MA->mRx_DescriptorControl0.mFields.mPrefetchThreshold  =   16;
         mBAR1_82576_MA->mRx_DescriptorControl0.mFields.mWriteBackThreshold =   16;
         mBAR1_82576_MA->mRx_DescriptorControl0.mFields.mQueueEnable        = true;
-
-        mBAR1_82576_MA->mRx_Control.mFields.mEnable = true;
     }
 
     // Level   Thread
